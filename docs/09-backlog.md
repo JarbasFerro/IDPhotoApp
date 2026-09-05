@@ -1,850 +1,702 @@
-# 09 — Ordered implementation backlog
+# 09 — Native iOS ordered implementation backlog
 
 ## 1. How to use this backlog
 
-This is the initial execution order, not an immutable feature wishlist. Convert items into GitHub issues when active development starts. Keep issue acceptance criteria linked to the stable requirement IDs in `02-requirements.md`.
+This is the execution order for the iPhone product. Convert items into GitHub issues as work becomes active.
 
 Priority:
 
-- **P0** — required for viable MVP/release.
-- **P1** — strong MVP target.
-- **P2** — post-MVP or optional.
+- **P0** — required for MVP/release viability.
+- **P1** — strong quality target.
+- **P2** — post-MVP/optional.
 
-Size is relative effort/risk, not calendar time:
+Size:
 
 - **S** — small/self-contained.
 - **M** — moderate.
 - **L** — large/cross-cutting.
-- **XL** — research-heavy or architectural.
+- **XL** — research/architecture-heavy.
 
-Dependencies are written as backlog IDs.
+The architecture is now fixed at the platform level: native Swift/SwiftUI. M1 validates implementations, limits, and performance rather than reconsidering Flutter/Android.
 
 ---
 
-# EPIC 0 — Product and planning lock
+# EPIC 0 — Product/platform lock
 
-## P0-001 — Review and approve MVP scope — P0 / S
+## P0-001 — Confirm native iOS scope — P0 / S
 
-Deliverable:
+Done when:
 
-- reviewed `01-product-definition.md`;
-- explicit launch/non-goal list;
-- unresolved questions moved to `10-decisions.md`.
-
-Done when scope is clear enough that M1 spikes cannot be invalidated by a basic product misunderstanding.
+- iPhone/iOS-only scope accepted;
+- Android/cross-platform removed from active plans;
+- ADR-001 Accepted;
+- Apple-frameworks-first policy Accepted.
 
 ## P0-002 — Select launch rule-research shortlist — P0 / M
 
-Choose a deliberately small first set of high-demand jurisdictions/document profiles.
+Choose a deliberately small set of high-demand jurisdictions/document profiles.
 
 Acceptance:
 
-- each candidate has identifiable authoritative sources;
-- list covers at least one digital-output workflow and one physical-print workflow where practical;
-- child/baby support scope is explicitly included or deferred by profile.
+- authoritative sources identifiable;
+- at least one digital workflow;
+- at least one physical print workflow where practical;
+- child/baby scope explicit per profile.
 
-## P0-003 — Define compliance wording — P0 / S
+## P0-003 — Lock compliance wording — P0 / S
 
-Create approved product language distinguishing “measurable checks passed” from “government acceptance guaranteed.”
+Define Ready, Needs Review, Retake Recommended, and Manual Check wording.
 
-Acceptance:
+No UI may imply guaranteed government acceptance.
 
-- wording exists for Ready, Needs review, Retake recommended, and manual checks;
-- no screen may use stronger compliance language without a decision update.
+## P0-004 — Decide generic/custom sizes MVP scope — P1 / S
 
-## P0-004 — Decide monetization constraints for MVP — P1 / S
+## P0-005 — Decide monetization direction — P1 / S
 
-Lock whether MVP is free, paid, freemium, or technically prepared but not monetized.
-
-Guardrails from product definition remain mandatory.
+StoreKit only if monetization is introduced; guardrails remain mandatory.
 
 ---
 
-# EPIC 1 — Technical feasibility (M1)
+# EPIC 1 — M1 native technical spikes
 
-## S1-001 — Bootstrap disposable Flutter spike app — P0 / M
-
-Dependencies: P0-001.
-
-Build a non-production spike supporting iOS and Android.
+## S1-001 — Bootstrap disposable Xcode 27 spike app — P0 / M
 
 Acceptance:
 
-- runs on physical device on both platforms;
-- no production architecture assumed yet;
-- results documented before code is promoted/discarded.
+- native SwiftUI app;
+- Swift 6 language mode;
+- physical iPhone run;
+- no production architecture assumption;
+- spike results documented.
 
-## S1-002 — Camera and import spike — P0 / L
+## S1-002 — AVFoundation responsive camera spike — P0 / XL
+
+Dependencies: S1-001.
+
+Build/test:
+
+- camera permission at point of use;
+- fast session startup;
+- preview;
+- still capture;
+- high-resolution path;
+- orientation;
+- interruptions/backgrounding;
+- repeated entry/exit;
+- camera unavailable;
+- memory/thermal behavior.
+
+Instrument first-frame and shutter-to-result latency.
+
+## S1-003 — PhotosPicker + Transferable ingest spike — P0 / L
 
 Dependencies: S1-001.
 
 Test:
 
-- camera capture;
-- native photo picker;
-- limited permission behavior;
-- orientation normalization;
-- HEIC/JPEG/common inputs;
-- large source photos;
-- save/share output.
+- no broad library permission;
+- HEIC/JPEG/PNG;
+- orientation;
+- large 24/48 MP images;
+- ImageIO downsampling;
+- temp/private lifecycle;
+- cancellation.
 
-Capture latency, peak memory, and known platform differences.
-
-## S1-003 — Face detector benchmark harness — P0 / L
+## S1-004 — Vision face benchmark harness — P0 / L
 
 Dependencies: S1-001.
 
-Create a harness that runs candidate detectors against fixture metadata and exports comparable results.
+Output:
+
+- face count;
+- normalized geometry;
+- available landmarks/pose;
+- latency;
+- errors;
+- fixture IDs/tags.
+
+No private images in public repo.
+
+## S1-005 — Benchmark Vision face analysis — P0 / XL
+
+Dependencies: S1-004.
 
 Acceptance:
 
-- same test set can benchmark each candidate;
-- output records face count, normalized geometry, landmark support, runtime, error state;
-- no private fixture images committed.
+- reliable observations selected;
+- hard vs advisory check limitations documented;
+- child/baby evidence noted;
+- normalized mapping defined.
 
-## S1-004 — Benchmark candidate face detectors — P0 / XL
+## S1-006 — Vision segmentation benchmark harness — P0 / L
 
-Dependencies: S1-003.
+## S1-007 — Benchmark automatic segmentation — P0 / XL
 
-Acceptance:
+Dependencies: S1-006.
 
-- comparison report;
-- candidate selected or explicit additional test needed;
-- hard-rule landmark limitations documented.
+Cover hair, glasses, head coverings, shoulders, skin/background contrast, child/baby scenarios.
 
-## S1-005 — Segmentation benchmark harness — P0 / L
-
-Dependencies: S1-001.
-
-Acceptance:
-
-- comparable visual/quantitative outputs;
-- timing and memory capture;
-- model/version identified.
-
-## S1-006 — Benchmark candidate segmenters — P0 / XL
-
-Dependencies: S1-005.
-
-Evaluate difficult edges and diverse scenarios from test strategy.
-
-Acceptance:
-
-- selected implementation/fallback;
-- known unsupported scenarios documented;
-- decision records privacy/network behavior.
-
-## S1-007 — Deterministic geometry/export spike — P0 / L
-
-Dependencies: S1-001.
-
-Acceptance:
-
-- known source + parameters yield exact expected output dimensions/crop;
-- mm/inch/pixel conversions unit-tested;
-- rounding policy proposed.
-
-## S1-008 — PDF print spike — P0 / L
+## S1-008 — iOS 27 segmentation-refinement spike — P1 / L
 
 Dependencies: S1-007.
 
+Prototype tap/scribble/rectangle refinement.
+
 Acceptance:
 
-- generated PDF has exact intended page dimensions;
-- representative photo physically measured after actual-size printing;
-- selected PDF library/approach documented.
+- user value proven;
+- iOS 26 fallback defined;
+- accessibility alternative considered;
+- performance recorded.
 
-## S1-009 — Accessible editor interaction spike — P0 / M
+## S1-009 — Core Image/ImageIO render spike — P0 / XL
 
-Dependencies: S1-001.
+Prove:
+
+- bounded decode;
+- reused CIContext;
+- working-resolution preview;
+- high-resolution render;
+- deterministic crop;
+- background composition;
+- metadata/color handling;
+- memory stability.
+
+## S1-010 — Core Graphics PDF/print spike — P0 / L
+
+Dependencies: S1-009.
+
+Acceptance:
+
+- exact page geometry;
+- exact photo placement;
+- native print path;
+- physical measurement at 100%.
+
+## S1-011 — SwiftUI editor/accessibility spike — P0 / XL
 
 Prototype:
 
+- full-bleed photo canvas;
 - drag/pinch;
-- move/zoom buttons;
-- guide overlays;
-- VoiceOver/TalkBack semantics.
+- live guides;
+- system toolbar/floating controls;
+- VoiceOver adjustable/directional controls;
+- Voice Control labels;
+- Dynamic Type;
+- Reduce Motion;
+- increased contrast;
+- current Liquid Glass behavior.
 
-## S1-010 — Establish device/performance baseline — P0 / M
+## S1-012 — App Intent proof — P1 / M
 
-Dependencies: S1-002, S1-004, S1-006.
+Prototype `Create ID Photo` / open profile.
 
-Record performance budgets and minimum practical device/OS assumptions.
+Ensure no sensitive photo data exposed.
 
-## S1-011 — Lock ADR-001 through ADR-005 — P0 / M
+## S1-013 — Optional Foundation Models proof — P2 / L
 
-Dependencies: S1-002 through S1-010.
+Only if a concrete problem is selected.
 
-Update `10-decisions.md` with evidence and accepted choices.
+Test structured warning explanation or profile selection. Controlled evaluation required.
+
+## S1-014 — Physical-device performance baseline — P0 / L
+
+Dependencies: S1-002, S1-003, S1-005, S1-007, S1-009.
+
+Test older supported + current iPhone.
+
+Record:
+
+- app/camera startup;
+- Vision latency;
+- segmentation;
+- preview;
+- final render;
+- PDF;
+- peak memory;
+- thermal behavior.
+
+## S1-015 — Finalize deployment target ADR — P0 / S
+
+Dependencies: S1-014.
+
+Current proposal: iOS 26 minimum, compile with iOS 27 SDK, availability-gate iOS 27 features.
+
+## S1-016 — Lock M1 implementation ADRs — P0 / M
+
+Dependencies: S1-002 through S1-015.
+
+Update ADR-003/004/005/024/034 and performance budgets.
 
 ---
 
-# EPIC 2 — Production foundation (M2)
+# EPIC 2 — Production SwiftUI foundation
 
-## F2-001 — Bootstrap production app — P0 / M
+## F2-001 — Bootstrap production iOS app — P0 / M
 
-Dependencies: S1-011.
-
-Acceptance:
-
-- clean production Flutter project if ADR-001 accepted;
-- application/bundle identifiers configured;
-- iOS/Android launch on physical devices;
-- README updated with local setup.
-
-## F2-002 — Configure strict static analysis/linting — P0 / S
-
-Dependencies: F2-001.
-
-## F2-003 — Establish module/folder boundaries — P0 / M
-
-Dependencies: F2-001.
-
-Create domain/application/infrastructure/feature structure from architecture doc.
-
-## F2-004 — Add core result/error model — P0 / M
-
-Dependencies: F2-003.
-
-Implement typed application errors and user-safe mapping boundaries.
-
-## F2-005 — Add localization infrastructure — P0 / M
-
-Dependencies: F2-001.
+Dependencies: S1-016.
 
 Acceptance:
 
-- no production strings hard-coded in screens;
-- English baseline;
-- pseudo/long-string test path documented.
+- SwiftUI app target;
+- Swift 6 mode;
+- selected minimum iOS;
+- signing/bundle ID setup;
+- unit/UI test targets;
+- physical device launch.
 
-## F2-006 — Add design tokens/theme shell — P0 / M
-
-Dependencies: F2-001.
-
-Typography, spacing, radius, status semantics, light/dark strategy if supported.
-
-## F2-007 — Add navigation shell — P0 / M
+## F2-002 — Add PrivacyInfo.xcprivacy — P0 / S
 
 Dependencies: F2-001.
 
-No final UI required; routes reflect intended workflow.
+Start valid and minimal; update with actual APIs/dependencies.
 
-## F2-008 — Add settings persistence abstraction — P0 / M
+## F2-003 — Add String Catalog/localization foundation — P0 / M
 
-Dependencies: F2-003.
+## F2-004 — Establish Observation/AppEnvironment pattern — P0 / M
 
-Store only non-sensitive baseline settings.
+Use `@Observable`, initializer injection, typed environment only where appropriate.
 
-## F2-009 — Configure CI — P0 / L
+## F2-005 — Establish domain/module boundaries — P0 / M
 
-Dependencies: F2-001, F2-002.
+No SwiftUI import in pure domain geometry/rules.
+
+## F2-006 — Implement typed error model — P0 / M
+
+## F2-007 — Implement structured privacy-safe logging/signposts — P0 / M
+
+## F2-008 — Configure navigation shell — P0 / M
+
+Use native `NavigationStack` unless product testing demonstrates another structure.
+
+## F2-009 — Configure Xcode Cloud or CI — P0 / L
 
 Checks:
 
-- formatting;
-- static analysis;
-- unit tests;
-- rule validator once available;
-- Android debug build;
-- iOS build where runner/signing constraints allow.
+- build;
+- Swift Testing;
+- rule validation placeholder;
+- localization;
+- privacy manifest;
+- dependency-lock review.
 
-## F2-010 — Add dependency review record/process — P1 / S
+## F2-010 — Establish Apple dependency review template — P0 / S
 
-Create lightweight documentation/template for third-party package adoption.
+Every third-party package must explain why Apple APIs are insufficient.
 
----
-
-# EPIC 3 — Domain geometry and image job model
-
-## D3-001 — Implement coordinate-space value types — P0 / L
-
-Dependencies: F2-003.
-
-Types/conversions for source pixels, normalized image space, output pixels, physical mm, PDF points.
-
-## D3-002 — Implement physical-unit conversion and rounding — P0 / M
-
-Dependencies: D3-001.
-
-Boundary/unit tests mandatory.
-
-## D3-003 — Implement aspect/crop primitives — P0 / L
-
-Dependencies: D3-001.
-
-## D3-004 — Implement `PhotoJob` domain model — P0 / M
-
-Dependencies: F2-003.
-
-Source remains immutable; edits parameterized.
-
-## D3-005 — Implement `EditParameters` — P0 / M
-
-Dependencies: D3-004.
-
-## D3-006 — Implement validation-state model — P0 / M
-
-Dependencies: F2-004.
-
-`pass / warn / fail / manual_check` plus overall derivation.
-
-## D3-007 — Implement print-grid geometry engine — P0 / L
-
-Dependencies: D3-002.
-
-Tests packing, margins, gutters, page orientations, copy counts.
+## F2-011 — Establish current-HIG UI review checklist — P0 / S
 
 ---
 
-# EPIC 4 — Image acquisition and normalization (M3)
+# EPIC 3 — Domain geometry and job model
 
-## I4-001 — Define image acquisition port — P0 / S
+## D3-001 — Coordinate-space value types — P0 / L
 
-Dependencies: F2-003.
+Types:
 
-## I4-002 — Implement camera adapter — P0 / L
+- source pixels;
+- normalized image;
+- preview points;
+- output pixels;
+- physical millimetres;
+- PDF points.
 
-Dependencies: I4-001, ADR choices.
+## D3-002 — Physical conversion/rounding policy — P0 / M
 
-Permission timing and error recovery included.
+## D3-003 — Aspect/crop primitives — P0 / L
 
-## I4-003 — Implement native photo-picker adapter — P0 / M
+## D3-004 — `PhotoJob` immutable-source model — P0 / M
 
-Dependencies: I4-001.
+## D3-005 — `EditParameters` — P0 / M
 
-## I4-004 — Implement image header/type validation — P0 / M
+## D3-006 — validation state model — P0 / M
 
-Dependencies: I4-002/I4-003.
+`pass / warn / fail / manual_check`.
 
-## I4-005 — Implement orientation normalization — P0 / L
+## D3-007 — print-grid geometry — P0 / L
 
-Dependencies: I4-004.
-
-## I4-006 — Implement bounded analysis decode — P0 / L
-
-Dependencies: I4-005.
-
-## I4-007 — Implement source/temp-file lifecycle — P0 / L
-
-Dependencies: I4-001, privacy policy.
-
-Acceptance:
-
-- private locations;
-- cleanup;
-- no source overwrite;
-- stale-cache cleanup strategy.
+## D3-008 — Swift Testing parameterized boundary suite — P0 / M
 
 ---
 
-# EPIC 5 — Face and quality analysis
+# EPIC 4 — Image acquisition and lifecycle
 
-## A5-001 — Define domain-neutral face detector port — P0 / S
+## I4-001 — SourceAsset abstraction — P0 / S
 
-Dependencies: D3-001.
+## I4-002 — PhotosPicker production import — P0 / L
 
-## A5-002 — Implement selected detector adapter — P0 / L
+Dependencies: I4-001, S1-003.
 
-Dependencies: A5-001, S1-011.
+## I4-003 — AVFoundation camera controller — P0 / XL
 
-## A5-003 — Normalize detector geometry — P0 / M
+Dependencies: I4-001, S1-002, ADR-034.
 
-Dependencies: A5-002.
+Include authorization, lifecycle, interruptions, capture and instrumentation.
 
-Convert immediately into domain coordinate types.
+## I4-004 — Camera SwiftUI presentation/preview bridge — P0 / L
 
-## A5-004 — Implement no-face/multiple-face states — P0 / M
+## I4-005 — Image header/type validation — P0 / M
 
-Dependencies: A5-002.
+## I4-006 — ImageIO orientation + bounded decode — P0 / L
 
-## A5-005 — Implement source resolution check — P0 / M
+## I4-007 — Private source/temp lifecycle + file protection — P0 / L
 
-Dependencies: D3-002.
+## I4-008 — stale-source cleanup — P0 / M
 
-## A5-006 — Implement blur/sharpness check — P0 / L
+---
 
-Dependencies: benchmark/calibration plan.
+# EPIC 5 — Vision and quality analysis
 
-## A5-007 — Implement exposure check — P0 / L
+## A5-001 — Vision face analyzer adapter — P0 / L
 
-## A5-008 — Implement pose/rotation advisory — P1 / L
+## A5-002 — Normalize Vision observations to domain geometry — P0 / M
 
-Only if M1 detector accuracy supports useful warnings.
+## A5-003 — no-face/multiple-face states — P0 / M
 
-## A5-009 — Build analysis orchestration use case — P0 / L
+## A5-004 — source resolution check — P0 / M
 
-Dependencies: A5-002, A5-005, A5-006, A5-007.
+## A5-005 — blur/sharpness calibration — P0 / L
 
-Supports cancellation/stale-result rejection.
+## A5-006 — exposure calibration — P0 / L
+
+## A5-007 — pose/rotation advisory — P1 / L
+
+Only if evidence supports it.
+
+## A5-008 — analysis orchestrator with cancellation/revision — P0 / XL
+
+## A5-009 — OSLog signposts and Instruments benchmark hooks — P0 / M
 
 ---
 
 # EPIC 6 — Segmentation/background
 
-## B6-001 — Define segmenter port — P0 / S
+## B6-001 — Vision segmentation adapter — P0 / L
 
-## B6-002 — Implement selected segmenter adapter — P0 / L
+## B6-002 — mask representation/cache lifecycle — P0 / L
 
-Dependencies: S1-011.
+## B6-003 — Core Image background compositor — P0 / L
 
-## B6-003 — Implement mask representation/cache — P0 / L
+## B6-004 — segmentation uncertainty/failure path — P0 / M
 
-Dependencies: B6-002, privacy/temp lifecycle.
+## B6-005 — iOS 27 refinement interaction — P1 / XL
 
-## B6-004 — Implement background compositor — P0 / L
+Dependencies: S1-008.
 
-Dependencies: B6-003.
+Availability-gated with iOS 26 fallback.
 
-Must not alter face/foreground outside defined mask blend.
+## B6-006 — accessible refinement alternative — P1 / L
 
-## B6-005 — Implement segmentation uncertainty/failure path — P0 / M
-
-Dependencies: B6-002.
-
-## B6-006 — Implement manual mask correction — P1 / XL
-
-Dependencies: B6-003, UX prototype.
-
-## B6-007 — Add segmentation regression fixture suite — P0 / L
-
-Dependencies: B6-004.
+## B6-007 — segmentation regression fixture suite — P0 / L
 
 ---
 
-# EPIC 7 — Rules engine (M4)
+# EPIC 7 — Rules engine
 
-## R7-001 — Define canonical JSON Schema — P0 / L
+## R7-001 — canonical schema — P0 / L
 
-Dependencies: P0-002, D3-002.
+## R7-002 — schema validator — P0 / M
 
-## R7-002 — Implement schema validator — P0 / M
+## R7-003 — semantic validator — P0 / L
 
-Dependencies: R7-001.
+## R7-004 — typed Swift rule loader — P0 / L
 
-## R7-003 — Implement semantic validator — P0 / L
+## R7-005 — provenance model — P0 / M
 
-Dependencies: R7-001.
+## R7-006 — evaluator registry — P0 / L
 
-## R7-004 — Implement typed rule loader — P0 / L
+## R7-007 — output-dimension evaluator — P0 / M
 
-Dependencies: R7-001, F2-005.
+## R7-008 — head-size evaluator — P0 / L
 
-## R7-005 — Implement provenance model — P0 / M
+## R7-009 — head-position evaluator — P0 / L
 
-Dependencies: R7-001.
+## R7-010 — resolution evaluator — P0 / M
 
-## R7-006 — Implement evaluator registry — P0 / L
+## R7-011 — manual-check rules — P0 / M
 
-Dependencies: D3-006, R7-004.
+## R7-012 — background policy — P0 / M
 
-## R7-007 — Implement output-dimension evaluator — P0 / M
+## R7-013 — automatic crop solver — P0 / XL
 
-Dependencies: R7-006.
+## R7-014 — initial official profiles — P0 / XL
 
-## R7-008 — Implement head-size evaluator — P0 / L
-
-Dependencies: R7-006, A5-003.
-
-## R7-009 — Implement head-position/centering evaluator — P0 / L
-
-Dependencies: R7-006, A5-003.
-
-## R7-010 — Implement resolution evaluator — P0 / M
-
-Dependencies: R7-006, A5-005.
-
-## R7-011 — Implement manual-check rules — P0 / M
-
-Dependencies: R7-006.
-
-## R7-012 — Implement background policy rule — P0 / M
-
-Dependencies: R7-006, B6-004.
-
-## R7-013 — Implement automatic crop solver — P0 / XL
-
-Dependencies: D3-003, R7-008, R7-009.
-
-Must produce diagnostics when constraints are infeasible.
-
-## R7-014 — Add initial official profiles — P0 / XL
-
-Dependencies: R7-001 through R7-013, P0-002.
-
-One profile is not “done” until provenance and fixtures pass.
-
-## R7-015 — Add rules validation to CI — P0 / M
-
-Dependencies: R7-002, R7-003.
+## R7-015 — rules CI validation — P0 / M
 
 ---
 
-# EPIC 8 — Renderer and editor
+# EPIC 8 — Rendering/editor engine
 
-## E8-001 — Implement preview renderer — P0 / L
+## E8-001 — Core Image preview renderer — P0 / L
 
-Dependencies: D3-005, B6-004, R7-013.
+## E8-002 — high-resolution final renderer — P0 / XL
 
-## E8-002 — Implement high-resolution final renderer — P0 / XL
+## E8-003 — direct manipulation crop/position gestures — P0 / L
 
-Dependencies: E8-001, I4-007.
+## E8-004 — VoiceOver/non-gesture position controls — P0 / L
 
-## E8-003 — Implement crop/position gestures — P0 / L
+## E8-005 — live rule feedback during edit — P0 / L
 
-Dependencies: S1-009, E8-001.
+## E8-006 — guide overlays — P1 / M
 
-## E8-004 — Implement accessible move/zoom controls — P0 / M
+## E8-007 — reset/automatic composition — P0 / S
 
-Dependencies: E8-003.
+## E8-008 — limited tonal correction only if approved — P1 / L
 
-## E8-005 — Implement live rule feedback while editing — P0 / L
-
-Dependencies: E8-003, R7-006.
-
-## E8-006 — Implement guide overlays — P1 / M
-
-Dependencies: rule semantics.
-
-## E8-007 — Implement reset/automatic position — P0 / S
-
-Dependencies: R7-013.
-
-## E8-008 — Implement before/after comparison — P1 / M
-
-## E8-009 — Implement limited tonal corrections if approved — P1 / L
-
-Dependencies: explicit decision; otherwise do not build.
+No beautification.
 
 ---
 
-# EPIC 9 — Main UX (M5)
+# EPIC 9 — Signature camera guidance
 
-## U9-001 — Home screen — P0 / M
+## C9-001 — define real-time guidance rules — P0 / L
 
-## U9-002 — Country picker — P0 / M
+Only high-confidence, actionable guidance.
 
-Dependencies: R7-004.
+## C9-002 — low-resolution Vision frame analysis — P0 / L
 
-## U9-003 — Document profile picker — P0 / M
+## C9-003 — debounce/hysteresis guidance — P0 / M
 
-Dependencies: R7-004.
+No flickering messages.
 
-## U9-004 — Requirement summary screen — P0 / M
+## C9-004 — accessible spoken guidance policy — P0 / M
 
-Dependencies: R7-004, localization.
+Avoid VoiceOver spam.
 
-## U9-005 — Camera/import choice and permission recovery — P0 / M
+## C9-005 — camera visual overlay polish — P0 / L
 
-Dependencies: I4-002, I4-003.
+Content first, minimal chrome.
 
-## U9-006 — Analysis/progress state — P0 / S
-
-Dependencies: A5-009, B6-002.
-
-## U9-007 — Photo-check report — P0 / L
-
-Dependencies: D3-006, R7-006.
-
-## U9-008 — Editor screen — P0 / XL
-
-Dependencies: E8-001 through E8-007.
-
-## U9-009 — Export choice — P0 / S
-
-## U9-010 — Source/provenance details — P0 / M
-
-Dependencies: R7-005.
-
-## U9-011 — Settings/privacy/help — P0 / M
-
-## U9-012 — Recent/favourite profiles — P1 / M
-
-Dependencies: F2-008.
-
-## U9-013 — Full error/empty-state pass — P0 / L
-
-Dependencies: primary screens.
-
-## U9-014 — Task-based usability test — P0 / L
-
-Dependencies: U9-001 through U9-013.
-
-Resolve high-severity comprehension/navigation issues before M5 exit.
+## C9-006 — camera performance/energy regression tests — P0 / L
 
 ---
 
-# EPIC 10 — Digital export (M6)
+# EPIC 10 — Main SwiftUI UX
 
-## X10-001 — Define export image codec port — P0 / S
+## U10-001 — Home — P0 / M
 
-## X10-002 — Implement exact-dimension JPEG export — P0 / L
+## U10-002 — searchable country/document picker — P0 / L
 
-Dependencies: E8-002.
+## U10-003 — requirements summary — P0 / M
 
-## X10-003 — Implement PNG export where profiles allow/require — P1 / M
+## U10-004 — capture/import decision — P0 / M
 
-## X10-004 — Implement metadata stripping — P0 / M
+## U10-005 — analysis transition — P0 / S
 
-Dependencies: X10-002.
+## U10-006 — Photo Check — P0 / L
 
-## X10-005 — Implement file-size constraint loop — P1 / L
+## U10-007 — editor screen — P0 / XL
 
-Dependencies: X10-002, rule profiles needing it.
+## U10-008 — export choice — P0 / S
 
-## X10-006 — Implement post-export verification — P0 / M
+## U10-009 — digital export UI — P0 / M
 
-Dependencies: X10-002.
+## U10-010 — print setup UI — P0 / L
 
-## X10-007 — Implement native save/share — P0 / M
+## U10-011 — source/provenance detail — P0 / M
 
-Dependencies: X10-002.
+## U10-012 — Help/Settings/Privacy — P0 / M
 
-## X10-008 — Digital export screen — P0 / M
+## U10-013 — recent/favorite profiles — P1 / M
 
-Dependencies: U9-009, X10-006.
+## U10-014 — complete error/empty/interruption state pass — P0 / XL
 
----
+## U10-015 — current Liquid Glass/HIG review — P0 / M
 
-# EPIC 11 — Print export (M6)
+## U10-016 — full accessibility pass — P0 / XL
 
-## P11-001 — Define supported paper profiles — P0 / M
+VoiceOver, Voice Control, Dynamic Type, Reduce Motion, contrast, non-color state.
 
-Dependencies: D3-007.
-
-## P11-002 — Implement layout packing use case — P0 / L
-
-Dependencies: D3-007.
-
-## P11-003 — Implement PDF generator — P0 / L
-
-Dependencies: S1-008, P11-002, E8-002.
-
-## P11-004 — Implement copy count/orientation — P1 / M
-
-## P11-005 — Implement optional cut guides — P1 / M
-
-## P11-006 — Print setup/preview screen — P0 / L
-
-Dependencies: P11-002, P11-003.
-
-## P11-007 — Add actual-size print warning/instructions — P0 / S
-
-## P11-008 — Physical print validation campaign — P0 / L
-
-Dependencies: P11-003.
-
-Record actual measured results.
+## U10-017 — task-based usability test — P0 / L
 
 ---
 
-# EPIC 12 — Privacy, security, and observability
+# EPIC 11 — Digital export
 
-## S12-001 — Implement safe logging facade — P0 / M
+## X11-001 — exact JPEG encode — P0 / L
 
-Dependencies: F2-004.
+## X11-002 — PNG where required — P1 / M
 
-## S12-002 — Verify temp-file deletion/backup exclusion — P0 / M
+## X11-003 — metadata stripping — P0 / M
 
-Dependencies: I4-007.
+## X11-004 — file-size constraint loop — P1 / L
 
-## S12-003 — Verify export metadata stripping — P0 / M
+## X11-005 — post-export verification — P0 / M
 
-Dependencies: X10-004.
+## X11-006 — Transferable/ShareLink native share path — P0 / M
 
-## S12-004 — Decide analytics/crash reporting — P0 / M
-
-Dependency: architecture/privacy review.
-
-Decision can be “none for MVP.”
-
-## S12-005 — Implement privacy-safe telemetry if approved — P1 / L
-
-Dependencies: S12-004.
-
-## S12-006 — Network inspection test — P0 / M
-
-Acceptance: core import/capture/edit/export flow transmits no photo/derived sensitive data.
-
-## S12-007 — Dependency/privacy audit — P0 / M
-
-Run before release and after high-risk SDK changes.
-
-## S12-008 — Add secrets/signing setup documentation — P0 / M
-
-No secrets committed.
-
-## S12-009 — Remote rules signing — P2 / XL
-
-Only if remote catalog updates are included. If not, defer entirely.
+## X11-007 — save destination behavior — P0 / M
 
 ---
 
-# EPIC 13 — Accessibility and localization
+# EPIC 12 — Print/PDF
 
-## L13-001 — Screen-reader primary flow — P0 / L
+## P12-001 — Core Graphics PDF renderer — P0 / L
 
-## L13-002 — Large-text layout pass — P0 / M
+## P12-002 — page/copy layout — P0 / L
 
-## L13-003 — Non-color status audit — P0 / S
+## P12-003 — cut guides — P1 / M
 
-## L13-004 — Editor non-gesture controls — P0 / M
+## P12-004 — native print interaction — P0 / M
 
-Tracked also by E8-004.
+## P12-005 — physical size QA — P0 / L
 
-## L13-005 — Pseudo-localization stress test — P0 / M
-
-## L13-006 — RTL smoke test — P1 / M
-
-## L13-007 — Add launch languages after translation QA — P1 / L per language set
-
-Language count should not exceed review capacity.
+## P12-006 — user Actual Size guidance — P0 / S
 
 ---
 
-# EPIC 14 — Reliability/performance hardening (M7)
+# EPIC 13 — App Intents / Spotlight
 
-## H14-001 — Large-image stress suite — P0 / L
+## AI13-001 — `CreateIDPhotoIntent` — P1 / M
 
-## H14-002 — Memory profiling — P0 / L
+## AI13-002 — `OpenDocumentProfileIntent` — P1 / M
 
-## H14-003 — Background/foreground interruption tests — P0 / M
+## AI13-003 — App Shortcut phrases/localization — P1 / M
 
-## H14-004 — Cancellation/stale-result tests — P0 / M
+## AI13-004 — Core Spotlight document-profile indexing — P1 / M
 
-## H14-005 — Offline end-to-end test — P0 / M
+## AI13-005 — AppIntentsTesting + privacy review — P1 / M
 
-## H14-006 — Corrupt-input failure injection — P0 / M
-
-## H14-007 — Rules-catalog corruption/version tests — P0 / M
-
-## H14-008 — Performance regression benchmark — P1 / L
-
-Compare to M1 budgets.
-
-## H14-009 — Full supported-device matrix run — P0 / L
-
-## H14-010 — Release candidate defect triage — P0 / L
-
-No release with disallowed open severity.
+No personal photos/face-derived data indexed.
 
 ---
 
-# EPIC 15 — Store/release (M8)
+# EPIC 14 — Optional intelligent assistance
 
-## R15-001 — Finalize product name/brand — P0 / M
+## FM14-001 — select one concrete user problem — P2 / S
 
-Must precede final store assets, bundle-facing naming, privacy/support publication.
+If no strong problem exists, close epic as deferred.
 
-## R15-002 — App icons/splash assets — P0 / M
+## FM14-002 — structured Foundation Models prototype — P2 / L
 
-## R15-003 — Privacy policy/support content — P0 / M
+## FM14-003 — model-unavailable fallback — P2 / M
 
-Must describe actual shipped behavior, not planned behavior.
+## FM14-004 — controlled evaluation suite — P2 / L
 
-## R15-004 — Configure signing/release pipelines — P0 / L
+## FM14-005 — privacy/authority UX review — P2 / M
 
-## R15-005 — Configure purchases if applicable — P1 / XL
-
-Depends on monetization decision.
-
-## R15-006 — Store privacy/data-safety declarations — P0 / M
-
-Audit against actual SDK/runtime behavior immediately before submission.
-
-## R15-007 — Store listing/screenshots — P0 / L
-
-## R15-008 — Internal/beta distribution — P0 / M
-
-## R15-009 — Release-candidate acceptance test — P0 / L
-
-## R15-010 — Submit iOS — P0 / M
-
-## R15-011 — Submit Android — P0 / M
-
-## R15-012 — Controlled rollout/monitoring — P0 / M
-
-## R15-013 — Release runbook — P0 / M
-
-Include bad-rule response, crash spike response, store hotfix steps, and support workflow.
+Generative output never creates official rule results.
 
 ---
 
-# EPIC 16 — Post-MVP candidates
+# EPIC 15 — Accessibility excellence
 
-These do not enter MVP unless an explicit scope decision changes.
+## AX15-001 — VoiceOver core-flow audit — P0 / L
 
-## PM-001 — Signed remote rule catalog — P2 / XL
+## AX15-002 — Voice Control audit — P0 / M
 
-## PM-002 — Internal rule-authoring tool — P2 / XL
+## AX15-003 — Dynamic Type accessibility-size audit — P0 / L
 
-## PM-003 — Additional languages — P2 / L
+## AX15-004 — Reduce Motion/Transparency audit — P0 / M
 
-## PM-004 — Additional jurisdiction waves — P2 / L per wave
+## AX15-005 — Increased Contrast/Color differentiation audit — P0 / M
 
-## PM-005 — Custom/generic dimension editor — P1/P2 depending MVP decision / L
-
-## PM-006 — Raster print-kiosk export — P2 / M
-
-## PM-007 — Resume/recent photo jobs — P2 / L
-
-Requires privacy/retention UX.
-
-## PM-008 — Optional cloud sync/account — P2 / XL
-
-Requires new privacy/security architecture.
-
-## PM-009 — Business/kiosk/batch mode — P2 / XL
-
-## PM-010 — Printing fulfilment — P2 / XL
+## AX15-006 — editor accessibility task test — P0 / L
 
 ---
 
-## 17. Critical dependency chain
+# EPIC 16 — Privacy/security
 
-The shortest path to a trustworthy MVP is approximately:
+## PS16-001 — privacy manifest validation — P0 / M
+
+## PS16-002 — required-reason API audit — P0 / M
+
+## PS16-003 — runtime network inspection — P0 / M
+
+## PS16-004 — temp/file-protection verification — P0 / M
+
+## PS16-005 — EXIF/GPS stripping tests — P0 / M
+
+## PS16-006 — dependency privacy/security audit — P0 / M
+
+## PS16-007 — App Privacy answers draft + binary reconciliation — P0 / M
+
+---
+
+# EPIC 17 — Performance/reliability
+
+## PR17-001 — signpost coverage for critical intervals — P0 / M
+
+## PR17-002 — Instruments baseline — P0 / L
+
+## PR17-003 — memory pressure / 48 MP stress — P0 / L
+
+## PR17-004 — repeated camera thermal/energy stress — P0 / L
+
+## PR17-005 — Swift Concurrency race/stale-result audit — P0 / L
+
+## PR17-006 — hang/responsiveness audit — P0 / M
+
+## PR17-007 — MetricKit decision — P1 / S
+
+---
+
+# EPIC 18 — App Store release
+
+## AS18-001 — final name/brand lock — P0 / M
+
+## AS18-002 — Icon Composer app icon — P0 / M
+
+## AS18-003 — SF Symbols/custom icon audit — P0 / S
+
+## AS18-004 — App Store screenshots/story — P0 / L
+
+## AS18-005 — privacy policy/support page — P0 / M
+
+## AS18-006 — StoreKit products if monetized — P1 / L
+
+## AS18-007 — TestFlight internal QA — P0 / L
+
+## AS18-008 — TestFlight external/usability validation — P0 / L
+
+## AS18-009 — final rule provenance audit — P0 / M
+
+## AS18-010 — final accessibility/performance/privacy gates — P0 / L
+
+## AS18-011 — App Store submission — P0 / M
+
+Use App Store-accepted non-beta Xcode toolchain.
+
+## AS18-012 — phased launch / monitoring — P0 / M
+
+---
+
+# 2. Critical path
 
 ```text
 P0-001
-  ↓
-S1 feasibility spikes
-  ↓
-S1-011 architecture lock
-  ↓
-F2 foundation
-  ↓
-D3 geometry + I4 acquisition
-  ↓
-A5 face analysis + B6 segmentation
-  ↓
-R7 rules + crop solver
-  ↓
-E8 renderer/editor
-  ↓
-U9 complete UX
-  ↓
-X10 digital + P11 print export
-  ↓
-H14 hardening + S12 privacy
-  ↓
-R15 release
+→ S1-001
+→ S1-002 / S1-003 / S1-004 / S1-006 / S1-009 / S1-011
+→ S1-014
+→ S1-015 / S1-016
+→ F2-001
+→ D3 + I4
+→ A5 + B6
+→ R7
+→ E8 + C9
+→ U10
+→ X11 + P12
+→ AX15 + PS16 + PR17
+→ AS18
 ```
 
-Do not allow attractive lower-priority features to bypass this dependency chain.
+App Intents can progress after the navigation/domain model stabilizes. Optional Foundation Models work is deliberately outside the critical path.
 
-## 18. First issues to create
+# 3. Definition of done for every iOS feature
 
-When issue tracking begins, create these first:
+A feature is done only when relevant items are true:
 
-1. `P0-001 Review and approve MVP scope`
-2. `P0-002 Select launch rule-research shortlist`
-3. `S1-001 Bootstrap disposable Flutter spike app`
-4. `S1-002 Camera and import spike`
-5. `S1-003 Face detector benchmark harness`
-6. `S1-005 Segmentation benchmark harness`
-7. `S1-007 Deterministic geometry/export spike`
-8. `S1-008 PDF print spike`
-9. `S1-009 Accessible editor interaction spike`
-10. `S1-011 Lock architecture decisions`
-
-No production feature issue should be marked “ready” until its upstream decision/spike dependencies are closed.
+- acceptance criteria tested;
+- current HIG/native control review completed;
+- VoiceOver/Voice Control semantics present;
+- Dynamic Type considered;
+- Reduce Motion/contrast considered;
+- no unnecessary permission;
+- privacy/logging reviewed;
+- async cancellation/stale state handled;
+- physical-device behavior verified when hardware/performance relevant;
+- Instruments review for performance-sensitive code;
+- localization/String Catalog complete;
+- iOS 26/iOS 27 availability behavior tested if applicable;
+- documentation/ADR updated if a foundational choice changed.
