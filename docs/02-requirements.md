@@ -1,546 +1,743 @@
-# 02 — Requirements
+# 02 — Native iOS requirements
 
-This document defines the initial functional and non-functional requirements. IDs are stable references for design, code, tests, issues, and release gates.
-
-## 1. Requirement conventions
+This document defines functional and non-functional requirements for the iPhone product. IDs are stable references for design, code, tests, issues, and release gates.
 
 Priorities:
 
 - **P0** — required for MVP/release viability.
-- **P1** — strongly desired for MVP; may move only with an explicit decision.
-- **P2** — post-MVP or opportunistic.
+- **P1** — strong quality target; may move only through an explicit decision.
+- **P2** — post-MVP/optional.
 
 A requirement is not complete until its acceptance criteria are testable.
 
 ---
 
-## 2. App launch and onboarding
+## 1. Platform and app launch
 
-### FR-001 — Launch without account — P0
+### FR-001 — Native iPhone application — P0
 
-The user can enter the core app without registration, login, email, phone number, or cloud account.
+The production app is implemented natively in Swift/SwiftUI for iOS.
 
-Acceptance criteria:
+Acceptance:
 
-- first launch reaches product entry flow without authentication;
-- no account is required to take/import, process, or export a supported photo;
-- optional services that later require an account are clearly separated.
+- no Flutter/React Native/cross-platform runtime;
+- app launches on supported physical iPhones;
+- production UI uses SwiftUI first, with UIKit bridging only where Apple has no appropriate SwiftUI surface or a framework boundary requires it.
 
-### FR-002 — First-use privacy explanation — P0
+### FR-002 — Launch without account — P0
 
-Explain that identity photos are processed locally by default and identify any optional feature that would transmit data.
+The user can enter the core app without registration or login.
 
-Acceptance criteria:
+### FR-003 — First-use privacy explanation — P0
 
-- short, plain-language first-use explanation;
-- detailed privacy information remains accessible from Settings/About;
-- no permission is requested before the user initiates a feature requiring it.
+Explain that the normal workflow processes identity photos locally on iPhone.
 
-### FR-003 — Optional onboarding — P1
+Acceptance:
+
+- concise plain-language explanation;
+- detailed Privacy/About view accessible later;
+- no permission requested before a feature needs it.
+
+### FR-004 — Optional onboarding — P1
 
 Onboarding can be skipped and must not block the first core task.
 
 ---
 
-## 3. Country and document selection
+## 2. Country and document selection
 
-### FR-010 — Country selection — P0
+### FR-010 — Country/jurisdiction selection — P0
 
-The user can select the relevant country/jurisdiction from the published rule catalog.
+Select a jurisdiction from the published rule catalog.
 
 ### FR-011 — Document/use-case selection — P0
 
-After country selection, show supported document profiles such as passport, visa, national ID, residence permit, driving licence, or non-official photo format.
+Show supported document profiles such as passport, visa, national ID, residence permit, licence, and clearly labelled non-official formats.
 
-### FR-012 — Search — P1
+### FR-012 — Native search — P1
 
-Search countries and document names using localized names plus common aliases.
+Use current SwiftUI/iOS search behavior to search localized country/document names and common aliases.
 
-### FR-013 — Recent profiles — P1
+### FR-013 — Recent/favorite profiles — P1
 
-Show recently used profiles locally on device.
+Store recent/favorite profile IDs locally without storing face photos by default.
 
 ### FR-014 — Requirement preview — P0
 
-Before image selection, show a concise requirement summary including output size, background guidance, and major pose/expression constraints.
+Before acquisition, show the small set of requirements most useful for taking/selecting a good source photo.
 
 ### FR-015 — Source/provenance view — P0
 
-For every official profile, show source label/URL metadata, revision/review date, and app rule version.
+Every official profile exposes authority/source, source URL/reference, rule version, and last-reviewed date.
 
 ### FR-016 — Unsupported profile handling — P0
 
-If a profile is not supported, do not silently substitute a similar standard. Offer generic/manual sizing only when clearly labelled as non-validated.
+Never silently substitute a similar official standard. Generic sizing, if supported, is clearly non-validated.
 
 ---
 
-## 4. Image acquisition
+## 3. Camera acquisition
 
-### FR-020 — Camera capture — P0
+### FR-020 — AVFoundation guided camera — P0
 
-Allow capture with the device camera using platform permission flows.
+Provide native camera capture using AVFoundation.
 
-Acceptance criteria:
+Acceptance:
 
-- permission requested only after tapping camera action;
-- denied/restricted states provide recovery instructions;
-- preview respects device orientation;
-- captured image enters the same normalized pipeline as imports.
+- authorization requested only after `Take Photo`;
+- denied/restricted states offer useful recovery;
+- preview appears promptly on physical test devices;
+- capture enters the same normalized pipeline as imports;
+- app handles camera interruptions/backgrounding;
+- capture does not depend on network.
 
-### FR-021 — Photo-library import — P0
+### FR-021 — Responsive camera — P0
 
-Allow selecting an existing image using platform-native pickers.
+Camera implementation must be instrumented for screen-entry-to-first-frame and shutter-to-result latency.
 
-### FR-022 — Limited-library support — P0
+Performance budgets are set by M1 physical-device measurements.
 
-Support modern OS limited-photo-library permission models without requiring full-library access.
+### FR-022 — Live source guidance — P1
 
-### FR-023 — File validation — P0
+Provide calm real-time guidance only for high-confidence, actionable source-photo conditions.
 
-Reject unsupported, unreadable, corrupt, or excessively small images with actionable errors.
+Possible guidance:
 
-### FR-024 — Orientation normalization — P0
+- one face only;
+- move closer/farther;
+- center/raise/lower device;
+- improve lighting;
+- hold still.
 
-Normalize pixel orientation before analysis while preserving required metadata separately.
+Acceptance:
 
-### FR-025 — Multiple faces — P0
+- guidance is debounced/hysteretic to prevent flicker;
+- it does not claim real-time government compliance;
+- VoiceOver users do not receive excessive spoken updates.
 
-If multiple plausible faces are detected, prevent automatic continuation until the intended subject can be resolved safely; MVP may require retake/import of a single-subject image rather than manual face selection.
+### FR-023 — High-resolution still path — P0
 
-### FR-026 — No face detected — P0
+Final capture quality is appropriate for document output even when real-time analysis uses a lower-resolution frame stream.
 
-Explain likely causes and let the user retry, choose another image, or enter a limited manual crop path if product policy permits.
+---
+
+## 4. Existing-photo acquisition
+
+### FR-030 — PhotosPicker import — P0
+
+Use PhotosUI/`PhotosPicker` for normal source-photo selection.
+
+Acceptance:
+
+- no broad Photo Library permission is required for selecting one photo;
+- cancellation is harmless;
+- imported item enters the same pipeline as camera capture.
+
+### FR-031 — Transferable/import handling — P0
+
+Use supported native transfer/file mechanisms to ingest selected content safely.
+
+### FR-032 — Supported formats — P0
+
+Support HEIC/JPEG and other launch-approved image formats. PNG support may be included where useful.
+
+### FR-033 — File validation — P0
+
+Reject unreadable, corrupt, unsupported, or implausibly small inputs with actionable errors.
+
+### FR-034 — Orientation normalization — P0
+
+Normalize visual orientation before analysis while retaining only metadata needed for correct processing.
+
+### FR-035 — Large-image memory safety — P0
+
+Use ImageIO downsampling/bounded analysis representations. Do not fully decode 24/48 MP sources when analysis does not require it.
 
 ---
 
 ## 5. Source-photo analysis
 
-### FR-030 — Face detection — P0
+### FR-040 — Vision face detection — P0
 
-Detect the primary face and a minimum landmark set needed for composition checks.
+Use Apple Vision as the default face-analysis framework unless M1 demonstrates a material limitation requiring a new ADR.
 
-### FR-031 — Face confidence — P0
+### FR-041 — Face count — P0
 
-Store confidence/quality information from the detector and do not treat low-confidence results as precise measurements.
+Detect no-face and multiple-face states and block unsafe automatic continuation.
 
-### FR-032 — Image sharpness/blur screening — P0
+### FR-042 — Domain-normalized face geometry — P0
 
-Estimate whether blur is likely to compromise the output.
+Convert Vision observations into explicit normalized domain coordinate types immediately after analysis.
 
-### FR-033 — Exposure screening — P0
+### FR-043 — Confidence/measurement uncertainty — P0
 
-Detect severe underexposure/overexposure and clipped regions where practical.
+Do not treat low-confidence/unstable measurements as precise hard-rule inputs.
 
-### FR-034 — Resolution sufficiency — P0
+### FR-044 — Sharpness/blur screening — P0
 
-Determine whether source resolution can produce the requested digital/print output without unacceptable upscaling.
+Provide calibrated blur/sharpness guidance.
 
-### FR-035 — Head-size check — P0
+### FR-045 — Exposure screening — P0
 
-Where a document rule defines measurable head size or face occupancy, calculate and compare against the specified tolerance.
+Warn about severe under/overexposure where calibration supports useful guidance.
 
-### FR-036 — Head-position check — P0
+### FR-046 — Resolution sufficiency — P0
 
-Where measurable, validate vertical/horizontal head position and required top/bottom spacing.
+Determine whether the source can produce the requested output without unacceptable upscaling.
 
-### FR-037 — Rotation/tilt warning — P1
+### FR-047 — Head-size evaluation — P0
 
-Estimate significant in-plane head/camera rotation and warn when it likely violates requirements.
+Where official rules define measurable head/face occupancy and Vision semantics support it, evaluate against sourced tolerances.
 
-### FR-038 — Occlusion risk — P1
+### FR-048 — Head-position evaluation — P0
 
-Where reliable, warn about likely eye/face occlusion. Never hard-fail solely from a low-confidence classifier.
+Where measurable, evaluate vertical/horizontal composition.
 
-### FR-039 — Expression/eye-state guidance — P1
+### FR-049 — Pose/expression/occlusion advisory — P1
 
-May provide warnings when confidence is adequate, but rules involving expression, gaze, mouth position, glasses reflection, or subjective appearance must support `manual_check` rather than false certainty.
+Provide advisory warnings only when evidence supports them. Subjective or low-confidence requirements remain `manual_check`.
 
-### FR-040 — Analysis report — P0
+### FR-050 — Analysis result model — P0
 
-Present results as individual checks with `pass`, `warn`, `fail`, or `manual_check` state and a human-readable remedy.
-
----
-
-## 6. Background processing
-
-### FR-050 — Subject segmentation — P0
-
-Generate a foreground/background mask suitable for ID-photo output.
-
-### FR-051 — Rule-aware background action — P0
-
-Do not automatically replace a background if the selected profile forbids or makes such alteration inappropriate. The rule profile determines what actions are offered.
-
-### FR-052 — Background replacement — P0
-
-Where allowed, replace the background using a permitted solid or controlled background value.
-
-### FR-053 — Edge quality — P0
-
-Preserve fine hair and edge detail as far as the chosen model/algorithm can reliably support.
-
-### FR-054 — Manual mask correction — P1
-
-Provide a simple correction mode for erase/restore operations when automatic segmentation is visibly wrong.
-
-### FR-055 — Segmentation uncertainty — P0
-
-When confidence/quality is inadequate, show the original-background path or recommend a new source image rather than hiding defects.
-
-### FR-056 — No identity alteration — P0
-
-Background tools must not alter facial structure, skin texture, hairline, ears, clothing boundary, or other identity-bearing pixels beyond operations needed at the segmentation boundary.
+Every rule/check shown to the user is `pass`, `warn`, `fail`, or `manual_check` with an actionable explanation.
 
 ---
 
-## 7. Crop, alignment, and composition
+## 6. Segmentation and background
 
-### FR-060 — Rule-derived crop — P0
+### FR-060 — Vision subject segmentation — P0
 
-Generate the crop from document-profile dimensions and measured subject geometry.
+Use Vision subject/foreground segmentation as the baseline implementation.
 
-### FR-061 — Aspect-ratio lock — P0
+### FR-061 — Rule-aware background policy — P0
 
-The final crop maintains the exact required aspect ratio.
+Do not replace/alter background when the selected document profile disallows or cannot confidently permit it.
 
-### FR-062 — Deterministic geometry — P0
+### FR-062 — Background replacement — P0
 
-Given identical source pixels, rule version, and edit parameters, the crop/output geometry is deterministic.
+Where permitted, compose an approved background deterministically.
 
-### FR-063 — Automatic alignment — P0
+### FR-063 — Edge quality — P0
 
-Provide an initial crop/position that targets rule constraints.
+Preserve identity-bearing foreground detail including hair, ears, glasses edges, and clothing boundaries as reliably as supported.
 
-### FR-064 — Manual adjustment — P0
+### FR-064 — Segmentation uncertainty — P0
 
-Allow translation and permitted scale adjustment without breaking aspect ratio.
+When automatic quality is inadequate, expose a safe fallback rather than hiding artifacts.
 
-### FR-065 — Live compliance overlays — P1
+### FR-065 — iOS 27 segmentation refinement — P1
 
-Show head/eye guides or safe zones when they materially help the user understand composition.
+Evaluate and, if useful, implement current Vision tap/scribble/rectangle segmentation refinement for difficult masks.
 
-### FR-066 — Constraint feedback — P0
+Acceptance:
 
-If manual movement causes a measurable rule failure, update the check state immediately or after a bounded debounce.
+- availability-gated;
+- iOS 26 fallback exists;
+- no dependency of official correctness on the optional API;
+- accidental user refinements are reversible.
 
-### FR-067 — Original preservation — P0
+### FR-066 — Accessible refinement — P1
 
-All crop/edit operations remain parameterized and non-destructive until export.
+Where freehand/direct visual refinement is offered, provide a reasonable non-freehand or guided alternative for accessibility where technically possible.
+
+### FR-067 — No identity alteration — P0
+
+Background operations cannot intentionally reshape facial structure, skin, hairline, ears, or other identity-bearing content.
+
+---
+
+## 7. Crop, alignment, and editor
+
+### FR-070 — Rule-derived crop — P0
+
+Generate initial crop from selected `DocumentProfile` and measured subject geometry.
+
+### FR-071 — Exact aspect ratio — P0
+
+Final crop maintains exact required aspect ratio.
+
+### FR-072 — Deterministic geometry — P0
+
+Identical source pixels + profile version + edit parameters produce identical output geometry.
+
+### FR-073 — Automatic alignment — P0
+
+Provide a stable preferred crop/position inside legal constraints where feasible.
+
+### FR-074 — Direct manipulation — P0
+
+Sighted users can drag/pinch to adjust position/scale within allowed render bounds.
+
+### FR-075 — Accessible editor alternatives — P0
+
+Provide non-precision-gesture controls such as move directions, zoom in/out, reset, and clear semantic status.
+
+### FR-076 — Live constraint feedback — P0
+
+Rule status updates during editing after an appropriate bounded debounce.
+
+### FR-077 — Guide overlays — P1
+
+Show only guides that materially help the user understand composition.
+
+### FR-078 — Original preservation — P0
+
+Edits remain parameterized/non-destructive until export.
+
+### FR-079 — Reset — P0
+
+User can restore automatic/original edit state.
 
 ---
 
 ## 8. Editing policy
 
-### FR-070 — Basic corrections — P1
+### FR-080 — No beautification in official mode — P0
 
-Permitted corrections may include limited brightness/contrast or white-balance normalization only if they do not misrepresent appearance and are allowed by product policy.
+No face reshaping, eye enlargement, synthetic makeup, beautification smoothing, wrinkle removal, hair reconstruction, clothing replacement, or generative facial editing.
 
-### FR-071 — No beautification for official mode — P0
+### FR-081 — Limited tonal correction — P1
 
-No skin smoothing, face reshaping, eye enlargement, makeup synthesis, wrinkle removal, or generative facial edits in official-document mode.
+Brightness/white-balance/contrast normalization may be introduced only if it preserves appearance and product/rule policy approves it.
 
-### FR-072 — Reset — P0
+### FR-082 — Before/after — P1
 
-Each editing stage has a clear reset to automatic/original state.
-
-### FR-073 — Before/after — P1
-
-Allow comparison with the normalized original without confusing the original with the export result.
+Allow comparison without confusing source, preview, and final export.
 
 ---
 
 ## 9. Digital export
 
-### FR-080 — Exact pixel dimensions — P0
+### FR-090 — Exact pixel dimensions — P0
 
-When a profile specifies pixel dimensions, export exactly those dimensions.
+When specified, encoded output matches exact required width/height.
 
-### FR-081 — Physical dimensions + resolution — P0
+### FR-091 — Physical size/resolution conversion — P0
 
-When a profile specifies physical dimensions and DPI/PPI expectations, calculate pixel dimensions deterministically and record the conversion rule.
+Physical dimensions + PPI/DPI expectations convert deterministically with one documented rounding policy.
 
-### FR-082 — File format — P0
+### FR-092 — File format — P0
 
-Support output formats required by published profiles; JPEG is baseline, PNG where appropriate.
+JPEG baseline; PNG/other launch-approved formats only where appropriate.
 
-### FR-083 — File-size constraint — P1
+### FR-093 — File-size constraints — P1
 
-Where an official profile imposes a maximum/minimum file size, provide controlled JPEG quality iteration while preserving dimensions and avoiding needless quality loss.
+When a profile defines byte-size constraints, optimize encoding without altering dimensions or needlessly degrading quality.
 
-### FR-084 — Color profile — P1
+### FR-094 — Color handling — P1
 
-Normalize/export using a well-defined color space compatible with common submission systems and test it across platforms.
+Export in a deliberately selected compatible color space/profile and test real output.
 
-### FR-085 — Metadata policy — P0
+### FR-095 — Metadata stripping — P0
 
-Strip unnecessary sensitive metadata such as geolocation. Retain only metadata required for output correctness or explicitly selected by product policy.
+Remove unnecessary sensitive metadata, including geolocation.
 
-### FR-086 — Save/share — P0
+### FR-096 — Post-export verification — P0
 
-Use native share/save flows.
+Re-open/inspect generated output and verify dimensions/format/metadata invariants before success state.
 
-### FR-087 — Export validation — P0
+### FR-097 — Native share/save — P0
 
-After encoding, re-open/inspect the generated file to confirm actual pixel dimensions and encoding succeeded before reporting success.
+Use `Transferable`, `ShareLink`, system share/save surfaces, or native destination APIs rather than a custom file browser.
 
-### FR-088 — No surprise watermark — P0
+### FR-098 — No surprise watermark — P0
 
-Do not add a watermark unless that limitation was clearly disclosed before the user invested effort in the workflow.
+No watermark unless disclosed before the user invests effort.
 
 ---
 
 ## 10. Print-sheet export
 
-### FR-090 — Paper selection — P0
+### FR-100 — Paper selection — P0
 
-Support an initial set of common paper/photo sizes driven by configuration.
+Support a deliberate first set of common photo/paper sizes.
 
-### FR-091 — Physical-size accuracy — P0
+### FR-101 — Physical-size accuracy — P0
 
-Each placed photo has a mathematically correct physical size at 100% print scale.
+Placed photos are mathematically correct at 100% print scale.
 
-### FR-092 — Layout optimization — P0
+### FR-102 — Layout packing — P0
 
-Fit the maximum practical number of copies while respecting configurable margins, gutters, cut spacing, and orientation.
+Fit requested copies while respecting margins, gutters, orientation, and cut guides.
 
-### FR-093 — Copy count — P1
+### FR-103 — Copy count — P1
 
-Allow the user to request a copy count and choose a layout accordingly.
+Allow requested copy count where practical.
 
-### FR-094 — Cut guides — P1
+### FR-104 — Core Graphics PDF — P0
 
-Optional non-intrusive cut marks may be generated outside photo content.
+Generate PDF using an implementation that preserves exact page geometry; Core Graphics is the preferred baseline.
 
-### FR-095 — PDF output — P0
+### FR-105 — Native print UI — P0
 
-Generate a print-ready PDF with a defined page size. The UI must warn users to disable printer/page scaling and print at 100%/actual size.
+Use native iOS printing interface where printing directly from the app is supported.
 
-### FR-096 — Raster print sheet — P1
+### FR-106 — Actual Size warning — P0
 
-Optionally export a high-resolution raster sheet for photo-kiosk workflows where PDF is inconvenient.
+Clearly instruct users about Actual Size / 100% and scaling risk when leaving the app’s controlled print path.
 
-### FR-097 — Physical calibration test — P0
+### FR-107 — Physical calibration — P0
 
-Release QA must physically print representative sheets on multiple printer paths and measure output sizes.
-
----
-
-## 11. Rules and content
-
-### FR-100 — Versioned rule profiles — P0
-
-Each country/document profile has a stable ID and semantic/internal version.
-
-### FR-101 — Provenance — P0
-
-Each official rule includes source metadata and reviewed date.
-
-### FR-102 — Effective dates — P1
-
-Rule schema supports effective-from/effective-to fields where requirements change over time.
-
-### FR-103 — Localization — P0
-
-User-facing profile names, instructions, warnings, and manual-check text are localizable independently from numeric constraints.
-
-### FR-104 — Rule validation — P0
-
-Invalid or incomplete profiles cannot be loaded silently. Schema validation failures must fail safely in development/CI and exclude invalid profiles from production publication.
-
-### FR-105 — Catalog update mechanism — P1
-
-Architecture supports signed/versioned rule-catalog updates without requiring a full app release, but MVP may initially ship catalog updates with app releases until remote-update security is implemented.
+Release QA prints and physically measures representative sheets.
 
 ---
 
-## 12. Privacy and local data
+## 11. Rules/content
 
-### FR-110 — Local processing default — P0
+### FR-110 — Versioned rule profiles — P0
 
-Core image processing occurs on-device unless a future feature has a documented exception.
+Each profile has stable ID/version.
 
-### FR-111 — Temporary working files — P0
+### FR-111 — Provenance — P0
 
-Working files are deleted when no longer required and are not written to shared/public storage unnecessarily.
+Official profiles contain authoritative source metadata and last-reviewed date.
 
-### FR-112 — No background upload — P0
+### FR-112 — Effective dates — P1
 
-No image upload occurs without a user action and explicit product behavior requiring it.
+Schema supports effective date ranges.
 
-### FR-113 — Local recent history — P1
+### FR-113 — Localized rule text — P0
 
-If recent jobs are stored, provide a setting to disable/clear them and define retention behavior.
+Profile names/instructions/warnings are localized independently from numeric values.
 
-### FR-114 — Analytics minimization — P0
+### FR-114 — Rule validation — P0
 
-Analytics events must not contain image pixels, face embeddings, file paths, person names, document numbers, or arbitrary user-entered sensitive text.
+Schema and semantic errors fail CI/production publication safely.
 
----
+### FR-115 — Rule capability level — P0
 
-## 13. Settings and help
+Each rule is classified as machine-hard, machine-advisory, manual, informational, or unsupported for the current implementation.
 
-### FR-120 — Language — P1
+### FR-116 — Future signed remote catalog — P1 architecture / deferred feature
 
-Use system language by default and allow in-app override if supported by framework/product policy.
-
-### FR-121 — Privacy controls — P0
-
-Provide clear access to privacy information, analytics/crash-reporting controls where required, and local-data clearing.
-
-### FR-122 — About rule data — P0
-
-Explain that official requirements can change and provide last-reviewed information.
-
-### FR-123 — Troubleshooting — P1
-
-Provide guidance for camera permissions, export permissions, printing scale, and rejected photos.
+Architecture supports a signed/validated/atomic remote update mechanism without requiring it for MVP.
 
 ---
 
-## 14. Accessibility
+## 12. iOS design-system behavior
 
-### NFR-A11Y-001 — Screen-reader semantics — P0
+### NFR-UI-001 — Current HIG alignment — P0
 
-All primary controls and status checks have meaningful accessibility labels and roles.
+Navigation, sheets, menus, search, alerts, toolbars, permission timing, and common controls follow current Human Interface Guidelines unless an explicit design decision documents a deviation.
 
-### NFR-A11Y-002 — Scalable text — P0
+### NFR-UI-002 — SwiftUI standard controls first — P0
 
-Primary flows remain usable at large accessibility text sizes without clipped critical content.
+Before introducing a custom control, document why the system control cannot meet the task.
 
-### NFR-A11Y-003 — Status independence from color — P0
+### NFR-UI-003 — Liquid Glass by inheritance — P0
 
-Pass/warn/fail/manual states use text/icon semantics, not color alone.
+Build against the current SDK and allow standard SwiftUI components to adopt current Liquid Glass behavior naturally.
 
-### NFR-A11Y-004 — Touch targets — P0
+Do not build a custom app-wide “glass theme.”
 
-Interactive targets meet platform minimum guidance.
+### NFR-UI-004 — Custom glass restraint — P0
 
-### NFR-A11Y-005 — Editor alternatives — P1
+Custom `glassEffect` is used only when it improves interaction/hierarchy and remains accessible under Reduce Transparency/Increase Contrast.
 
-Where gestures adjust crop/position, provide accessible controls or stepper-like alternatives for users unable to perform precise pinch/drag gestures.
+### NFR-UI-005 — Content-first photo surfaces — P0
+
+Camera/photo/editor content remains visually dominant over navigation chrome.
+
+### NFR-UI-006 — System typography/symbols — P0
+
+Use system typography and SF Symbols unless a domain-specific custom asset has a clear need.
+
+### NFR-UI-007 — Haptic restraint — P1
+
+Use system sensory feedback only for meaningful events such as alignment/success; no continuous decorative haptics.
 
 ---
 
-## 15. Performance
+## 13. Accessibility
 
-Exact budgets are to be baselined during M1 on representative devices.
+### NFR-A11Y-001 — VoiceOver core flow — P0
 
-### NFR-PERF-001 — Responsive UI — P0
+A VoiceOver user can complete the core workflow without a known avoidable blocker.
 
-Image processing does not block the main/UI thread long enough to create visible hangs.
+### NFR-A11Y-002 — Voice Control — P0
+
+Primary controls have distinct, discoverable spoken labels.
+
+### NFR-A11Y-003 — Dynamic Type — P0
+
+Surrounding UI supports accessibility text sizes without hiding primary actions.
+
+### NFR-A11Y-004 — Status independent from color — P0
+
+Pass/warn/fail/manual states use symbols/text, not color alone.
+
+### NFR-A11Y-005 — Reduce Motion — P0
+
+Important transitions remain understandable with Reduce Motion enabled.
+
+### NFR-A11Y-006 — Contrast/transparency — P0
+
+UI remains usable with increased contrast and reduced transparency.
+
+### NFR-A11Y-007 — Editor equivalence — P0
+
+Crop/position can be adjusted without relying solely on pinch/drag.
+
+---
+
+## 14. Localization
+
+### NFR-I18N-001 — String Catalogs — P0
+
+Production strings use `.xcstrings` from first implementation.
+
+### NFR-I18N-002 — Long text — P0
+
+Layouts survive materially longer translations.
+
+### NFR-I18N-003 — RTL structural readiness — P1
+
+Architecture does not hard-code left/right layout assumptions that block RTL.
+
+### NFR-I18N-004 — Foundation formatting — P0
+
+Measurements/numbers/dates use appropriate Foundation formatting rather than manual string concatenation.
+
+---
+
+## 15. Privacy and local data
+
+### NFR-PRIV-001 — Local processing — P0
+
+Core image processing remains on-device.
+
+### NFR-PRIV-002 — Privacy manifest — P0
+
+Production target includes valid `PrivacyInfo.xcprivacy` and accurately describes applicable data/API use.
+
+### NFR-PRIV-003 — Required-reason API accuracy — P0
+
+Any required-reason APIs used by app/dependencies are declared using approved reasons matching actual behavior.
+
+### NFR-PRIV-004 — No unnecessary Photos permission — P0
+
+PhotosPicker covers normal import; broad library access is not requested without a new feature need.
+
+### NFR-PRIV-005 — Sensitive temporary lifecycle — P0
+
+Temporary images/masks are private, protected, cleaned, and excluded from backup where ephemeral.
+
+### NFR-PRIV-006 — No hidden upload — P0
+
+No source/derived image upload occurs in the core flow.
+
+### NFR-PRIV-007 — Telemetry minimization — P0
+
+No image pixels, thumbnails, face embeddings/landmarks, GPS, sensitive paths, names, or document numbers in telemetry/logs.
+
+---
+
+## 16. Concurrency, performance, reliability
+
+### NFR-PERF-001 — Main-actor responsiveness — P0
+
+Heavy decode/Vision/segmentation/render work does not block the main actor enough to create visible hangs.
 
 ### NFR-PERF-002 — Bounded memory — P0
 
-Large camera images are decoded/processsed using bounded-resolution stages where full resolution is unnecessary; export uses a memory-safe full-resolution path.
+Large source images use bounded analysis decoding and memory-safe final rendering.
 
-### NFR-PERF-003 — Processing targets — P1
+### NFR-PERF-003 — Physical-device budgets — P0
 
-Technical spike will set median/p95 budgets for face detection, segmentation, preview render, and export on low/mid/high device tiers.
+M1 establishes measurable latency/memory/thermal budgets on representative iPhones.
 
-### NFR-PERF-004 — Startup — P1
+### NFR-PERF-004 — Instruments verification — P0
 
-Cold startup should avoid loading heavy ML models until needed unless profiling proves preload improves total UX without excessive memory cost.
+Performance-sensitive changes are verified with Instruments rather than Simulator timing/subjective feel alone.
 
----
+### NFR-CONC-001 — Swift 6 concurrency safety — P0
 
-## 16. Reliability and compatibility
+Use Swift 6 language mode/strict concurrency with clear actor boundaries and `Sendable` correctness.
 
-### NFR-REL-001 — Offline core — P0
+### NFR-CONC-002 — Cancellation/stale result protection — P0
 
-Previously shipped document profiles and all core editing/export functions work without network access.
+Replacing a photo/profile or leaving a workflow cannot allow obsolete async results to overwrite current state.
 
-### NFR-REL-002 — Crash safety — P0
+### NFR-REL-001 — Offline core flow — P0
 
-Unexpected failures during processing never overwrite the source image.
+Shipped profiles + capture/import/process/export work without network.
 
-### NFR-REL-003 — Recoverable job — P1
+### NFR-REL-002 — Source crash safety — P0
 
-Where practical, preserve non-sensitive edit parameters after app interruption so the user does not lose work.
+Failures never overwrite/corrupt source.
 
-### NFR-REL-004 — Platform support policy — P0
+### NFR-REL-003 — Interruption recovery — P0
 
-Minimum iOS/Android versions are explicitly selected at M1 based on framework support, market coverage, ML APIs, security updates, and test capacity.
+Camera and processing handle app lifecycle/system interruptions with understandable recovery.
 
----
+### NFR-REL-004 — iOS support policy — P0
 
-## 17. Security
-
-### NFR-SEC-001 — Dependency review — P0
-
-Every third-party SDK/package is reviewed for maintenance, licence, privacy behavior, binary size, native permissions, and security history before adoption.
-
-### NFR-SEC-002 — No secrets in repo — P0
-
-Signing keys, API keys, certificates, service credentials, and production secrets are never committed.
-
-### NFR-SEC-003 — Supply-chain scanning — P1
-
-CI should include dependency vulnerability/license checks where practical.
-
-### NFR-SEC-004 — Signed remote rules — P0 if remote updates ship
-
-If the rules catalog becomes remotely updateable, app clients must verify authenticity/integrity before activation and retain a known-good fallback.
+Minimum deployment target is explicitly decided after M1; current proposal is iOS 26 with iOS 27 APIs availability-gated.
 
 ---
 
-## 18. Observability
+## 17. State architecture
 
-### NFR-OBS-001 — Privacy-safe errors — P0
+### NFR-ARCH-001 — Observation — P0
 
-Diagnostics identify pipeline stage and error class without sending image content.
+Use SwiftUI/Observation (`@Observable`) for UI-facing feature state.
 
-### NFR-OBS-002 — Structured events — P1
+### NFR-ARCH-002 — Domain independence — P0
 
-If analytics is enabled, use a documented event schema with stable names and no free-form photo-related payloads.
+Pure geometry/rules/validation do not depend on SwiftUI/AVFoundation/PhotosUI/UIKit.
 
-### NFR-OBS-003 — Local debug bundle — P2
+### NFR-ARCH-003 — No third-party architecture by default — P0
 
-For development/support, consider an explicitly user-triggered diagnostic bundle containing app version, device class, rule profile ID/version, and non-sensitive error traces—but never photos by default.
+Do not adopt TCA/Redux/DI frameworks without a demonstrated problem and ADR.
 
----
+### NFR-ARCH-004 — Apple-frameworks-first dependency policy — P0
 
-## 19. Localization
-
-### NFR-I18N-001 — No hard-coded UI strings — P0
-
-Production UI strings live in localization resources.
-
-### NFR-I18N-002 — Long-text tolerance — P0
-
-Layouts support materially longer translated strings.
-
-### NFR-I18N-003 — RTL readiness — P1
-
-Architecture and layouts should not make irreversible assumptions that block right-to-left languages.
-
-### NFR-I18N-004 — Rule-language separation — P0
-
-Numeric/legal rule data is not duplicated per language; translated explanations reference the same canonical rule IDs.
+Every third-party dependency records why first-party APIs are insufficient plus privacy/license/maintenance/performance/removal analysis.
 
 ---
 
-## 20. Release requirements
+## 18. App Intents and system integration
 
-### REL-001 — No P0/P1 blocker — P0
+### FR-120 — Create-ID-photo App Intent — P1
 
-No open P0 defects; no P1 defect affecting correctness, privacy, data loss, export fidelity, or primary navigation.
+Expose a simple intent/shortcut that starts the core workflow.
 
-### REL-002 — Rule audit — P0
+### FR-121 — Open-profile App Intent — P1
 
-Every launch profile has current source evidence and completed validation fixtures.
+Allow selecting/opening a known document profile through system experiences where useful.
 
-### REL-003 — Physical-device test — P0
+### FR-122 — Sensitive entity restriction — P0
 
-Run end-to-end capture/import/export on the supported device matrix, not simulators alone.
+Personal photos, face geometry, and sensitive file paths are not broadly indexed App Entities.
 
-### REL-004 — Print measurement — P0
+### FR-123 — Core Spotlight profiles — P1
 
-Print-sheet dimensions pass physical measurement tests.
+Supported document profiles may be indexed for safe system search discovery.
 
-### REL-005 — Store assets/legal — P0
+### NFR-INTENT-001 — App Intents testing — P1
 
-Privacy policy, permission strings, store privacy disclosures, screenshots, support information, age rating, and required platform declarations are reviewed before submission.
+Adopt AppIntentsTesting/current Apple validation tools for shipped intents where applicable.
 
-### REL-006 — Rollback/kill strategy — P1
+---
 
-Have a documented response for a bad rule profile or severe processing bug. If remote rule controls do not exist, define expedited app-release procedure and in-app warning options available to the shipped build.
+## 19. Optional Foundation Models / intelligence
+
+### FR-130 — AI is optional — P2
+
+No generative model is required for the core workflow.
+
+### FR-131 — Allowed AI roles — P2
+
+Potential uses are explanation/coaching/natural-language profile selection.
+
+### FR-132 — AI cannot define compliance — P0
+
+Foundation Models/cloud models cannot set official dimensions, crop geometry, or authoritative pass/fail results.
+
+### FR-133 — Model-unavailable fallback — P0 if AI ships
+
+Core feature remains complete when the model is unavailable.
+
+### FR-134 — Controlled evaluation — P0 if AI ships
+
+Evaluate for invented rules, contradictions, accuracy, latency, and privacy before release.
+
+### FR-135 — Cloud AI requires new ADR — P0
+
+No silent Private Cloud Compute/external provider fallback involving sensitive image data.
+
+---
+
+## 20. Testing and observability
+
+### NFR-TEST-001 — Swift Testing — P0
+
+Use Swift Testing for new domain/unit/integration suites where suitable.
+
+### NFR-TEST-002 — XCUITest — P0
+
+Automate stable primary/error/deep-link UI flows.
+
+### NFR-TEST-003 — Fixture/golden image tests — P0
+
+Critical render/export transformations have controlled non-sensitive fixtures.
+
+### NFR-TEST-004 — Physical print tests — P0
+
+Dimensionally relevant print changes are physically measured.
+
+### NFR-TEST-005 — Accessibility audits — P0
+
+Release candidate includes VoiceOver/Voice Control/Dynamic Type/motion/contrast testing.
+
+### NFR-OBS-001 — Unified logging — P0
+
+Use privacy-safe `Logger`/OSLog diagnostics.
+
+### NFR-OBS-002 — Signposts — P0
+
+Instrument critical camera/image/export intervals.
+
+### NFR-OBS-003 — MetricKit decision — P1
+
+Evaluate Apple-native production diagnostics before adding third-party monitoring.
+
+---
+
+## 21. Security
+
+### NFR-SEC-001 — No secrets in repository — P0
+
+Signing/API/service credentials are never committed.
+
+### NFR-SEC-002 — Dependency review — P0
+
+Review all non-Apple code for security/privacy/supply-chain risk.
+
+### NFR-SEC-003 — Signed remote rules — P0 if remote rules ship
+
+Remote catalog authenticity/integrity must be cryptographically verified with rollback/fallback.
+
+### NFR-SEC-004 — Malformed image resilience — P0
+
+Image ingest validates headers/dimensions and avoids unbounded allocation.
+
+---
+
+## 22. App Store/release
+
+### NFR-REL-010 — App Store privacy accuracy — P0
+
+App Privacy answers/privacy policy/privacy manifest match actual binary/runtime behavior.
+
+### NFR-REL-011 — Release toolchain — P0
+
+Production submission uses an App Store-accepted non-beta Xcode version.
+
+### NFR-REL-012 — Icon Composer — P0
+
+Final app icon is built/tested using current Apple icon tooling.
+
+### NFR-REL-013 — SF Symbols audit — P0
+
+Use system symbols for standard actions unless a custom domain icon is justified.
+
+### NFR-REL-014 — TestFlight gate — P0
+
+Release passes internal/external TestFlight quality validation before production.
+
+---
+
+## 23. Global definition of done
+
+A production feature is complete only when relevant requirements above are satisfied and:
+
+- happy/error/cancellation states exist;
+- current HIG/native-control review is complete;
+- accessibility equivalent exists;
+- localization is complete;
+- privacy/data flow is reviewed;
+- concurrency/cancellation behavior is tested;
+- physical-device behavior is verified when hardware/performance relevant;
+- iOS 26/iOS 27 availability behavior is verified where applicable;
+- documentation/ADRs are updated after foundational changes.
