@@ -1,0 +1,75 @@
+name: M1 Xcode 27 Spike
+
+on:
+  push:
+    branches:
+      - m1/native-pipeline-spike
+    paths:
+      - "Spikes/M1PipelineSpike/**"
+      - ".github/workflows/m1-xcode27.yml"
+  pull_request:
+    paths:
+      - "Spikes/M1PipelineSpike/**"
+      - ".github/workflows/m1-xcode27.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: m1-xcode27-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: xcode-27
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Record toolchain
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
+          swift --version
+
+      - name: Build spike with Xcode 27
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Spikes/M1PipelineSpike/M1PipelineSpike.xcodeproj \
+            -scheme M1PipelineSpike \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Select an available iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          payload = json.load(sys.stdin)
+          for runtime in sorted(payload["devices"].keys(), reverse=True):
+              for device in payload["devices"][runtime]:
+                  if device.get("isAvailable") and device.get("name", "").startswith("iPhone"):
+                      print(device["udid"])
+                      raise SystemExit(0)
+          raise SystemExit("No available iPhone simulator found")
+          ')
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          echo "Selected simulator: $UDID"
+
+      - name: Run deterministic export tests
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Spikes/M1PipelineSpike/M1PipelineSpike.xcodeproj \
+            -scheme M1PipelineSpike \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}' \
+            CODE_SIGNING_ALLOWED=NO \
+            test
