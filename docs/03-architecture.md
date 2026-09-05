@@ -1,563 +1,709 @@
-# 03 — Architecture
+# 03 — Native iOS architecture
 
-## 1. Architecture goals
+## 1. Architecture objective
 
-The architecture must optimize for five properties:
+The application is iOS-only and should be architected as a first-class Apple platform product, not as a portable application with an iOS skin.
+
+The architecture must optimize for:
 
 1. **Correctness** — output geometry and rule evaluation are deterministic and testable.
-2. **Privacy** — the core workflow does not require cloud processing.
-3. **Replaceability** — face detection, segmentation, analytics, and persistence implementations can be changed without rewriting product logic.
-4. **International scale** — document rules are data, not UI conditionals.
-5. **Testability** — image transformations and rule decisions can run in automated tests without booting the entire application.
+2. **Native quality** — SwiftUI and Apple frameworks are the default implementation surface.
+3. **Privacy** — the core workflow runs on-device and does not require an account or cloud image processing.
+4. **Performance** — image work minimizes copies, stays off the main actor, and is profiled with Instruments on physical iPhones.
+5. **Accessibility** — editing and validation remain usable without relying only on vision, color, or gestures.
+6. **Replaceability** — face analysis, segmentation, persistence, and optional intelligence remain behind narrow protocols where practical.
+7. **International scale** — country/document requirements remain data, not UI conditionals.
+8. **System integration** — use iOS capabilities such as App Intents, PhotosPicker, ShareLink, Spotlight, and native printing when they improve the task.
 
-## 2. Proposed stack
+## 2. Platform baseline
 
-### Recommended baseline
+### Development baseline — September 2026
 
-- **Client:** Flutter / Dart.
-- **Targets:** iOS + Android.
-- **Native interop:** platform channels / FFI only for capabilities that materially outperform portable Dart implementations.
-- **Persistence:** lightweight local database/key-value storage for settings, recent profile IDs, and optional job metadata; raw images should not be stored in the database.
-- **Rule catalog:** versioned JSON (or generated typed assets) validated against a schema during CI/build.
-- **Backend:** none required for the first core workflow.
+- **Product target:** iPhone / iOS only.
+- **IDE / SDK:** Xcode 27 during development; while Xcode 27 remains beta, use it for technical validation and switch release builds to the first App Store-accepted non-beta Xcode 27.
+- **Compiler:** Swift 6.4 compiler, Swift 6 language mode.
+- **UI:** SwiftUI-first.
+- **Deployment target:** proposed iOS 26.0; iOS 27 APIs are adopted behind availability checks until ADR-024 is finalized.
+- **Concurrency:** structured Swift Concurrency with strict checking; UI state isolated to `@MainActor` where appropriate.
+- **Observation:** Observation framework / `@Observable`; avoid adopting a third-party state-management framework.
+- **Testing:** Swift Testing for new unit/integration suites; XCUITest for UI/system flows.
 
-This is an **Architecture Decision Candidate**, not a final lock. M1 must compare practical performance, plugin maturity, image memory behavior, native API access, and build/release complexity before ADR-001 becomes accepted.
+The deployment target is intentionally separate from the build SDK. The app should compile against the newest SDK so it receives current platform behavior and can adopt iOS 27 features without requiring every user to update immediately.
 
-## 3. Why Flutter is the current default
+## 3. Apple-frameworks-first policy
 
-The product needs highly customized image UI but does not need two independent native product implementations. Flutter offers a single rendering/runtime model, one UI codebase, predictable custom drawing for crop guides, and strong cross-platform development speed.
+Before adding a dependency, verify that an Apple framework cannot solve the requirement adequately.
 
-However, the decision is conditional on M1 proving that:
+Preferred framework map:
 
-- camera/photo-picker integrations are reliable enough;
-- image processing does not cause unacceptable memory copies;
-- face/segmentation native bridges can be integrated cleanly;
-- generated PDF/image export is dimensionally exact;
-- accessibility semantics remain strong;
-- app size and cold-start impact are acceptable.
+| Need | Preferred Apple technology |
+|---|---|
+| UI / navigation | SwiftUI |
+| state observation | Observation (`@Observable`) |
+| concurrency | Swift Concurrency |
+| camera | AVFoundation |
+| photo import | PhotosUI / `PhotosPicker` |
+| face / image analysis | Vision |
+| subject segmentation | Vision |
+| optional custom on-device model | Core AI / Core ML only if Vision is insufficient |
+| image pipeline | Core Image + ImageIO + Core Graphics |
+| accelerated pixel operations | Accelerate / vImage where profiling justifies it |
+| PDF geometry | Core Graphics PDF APIs |
+| print UI | UIKit `UIPrintInteractionController` bridge if needed |
+| export/share | `Transferable`, `ShareLink`, system share sheet |
+| local settings | `UserDefaults` / AppStorage for simple settings |
+| structured local metadata | SwiftData only if requirements justify it |
+| localization | String Catalogs (`.xcstrings`) |
+| symbols | SF Symbols |
+| app icon | Icon Composer |
+| shortcuts / Siri / Action button | App Intents / App Shortcuts |
+| search exposure | Core Spotlight |
+| contextual education | TipKit where useful |
+| monetization | StoreKit |
+| performance diagnostics | Instruments, MetricKit, OSLog/OSSignposter |
+| privacy declaration | `PrivacyInfo.xcprivacy` |
 
-If those conditions fail, the fallback decision should compare Kotlin Multiplatform/shared core with native SwiftUI/Compose UIs or fully native apps.
+Third-party SDKs should be exceptional, especially in the image, analytics, advertising, and privacy-sensitive layers.
 
-## 4. Logical architecture
+## 4. Design-system architecture
+
+The app should inherit the platform before customizing it.
+
+Rules:
+
+- standard SwiftUI controls and navigation are the default;
+- do not recreate buttons, sheets, menus, search, share UI, or navigation chrome without a documented product need;
+- build with the latest SDK so current Liquid Glass behavior is inherited automatically;
+- custom `glassEffect` is reserved for a small number of floating, interactive surfaces where it clarifies hierarchy;
+- no decorative layers of glass behind already-glass controls;
+- semantic colors/materials instead of hard-coded appearance colors where possible;
+- SF Symbols before custom glyph assets;
+- Dynamic Type and accessibility sizes are supported by layout rather than patched later;
+- motion uses SwiftUI system transitions and `sensoryFeedback` judiciously;
+- Reduce Motion and accessibility contrast settings must remain coherent.
+
+## 5. Logical architecture
 
 ```text
-┌───────────────────────────────────────────────┐
-│ Presentation                                 │
-│ screens, navigation, view models, editor UI  │
-└──────────────────────┬────────────────────────┘
+┌────────────────────────────────────────────────────┐
+│ SwiftUI Presentation                               │
+│ screens, navigation, feature views, accessibility  │
+└──────────────────────┬─────────────────────────────┘
                        │
-┌──────────────────────▼────────────────────────┐
-│ Application / Use Cases                      │
-│ select profile, analyze, edit, validate,     │
-│ export digital, export print sheet           │
-└──────────────┬───────────────────────┬────────┘
+┌──────────────────────▼─────────────────────────────┐
+│ Feature Models / Application Use Cases             │
+│ @Observable state, commands, async orchestration   │
+└──────────────┬───────────────────────┬─────────────┘
                │                       │
-┌──────────────▼─────────────┐ ┌───────▼──────────────┐
-│ Domain                     │ │ Ports / Interfaces   │
-│ rules, geometry, states,   │ │ detector, segmenter,│
-│ edit model, export model   │ │ encoder, storage... │
-└──────────────┬─────────────┘ └───────┬──────────────┘
+┌──────────────▼──────────────┐ ┌──────▼─────────────┐
+│ Domain                      │ │ Apple Adapters     │
+│ rules, geometry, validation,│ │ AVFoundation,      │
+│ edits, export contracts     │ │ Vision, CoreImage, │
+│ pure Swift where possible   │ │ PhotosUI, Print... │
+└──────────────┬──────────────┘ └──────┬─────────────┘
                │                       │
-               │              ┌────────▼──────────────┐
-               │              │ Infrastructure       │
-               │              │ native ML, camera,   │
-               │              │ files, PDF, analytics│
-               │              └───────────────────────┘
-               │
-┌──────────────▼───────────────────────────────┐
-│ Rules Catalog                               │
-│ validated, versioned, sourced specifications│
-└─────────────────────────────────────────────┘
+┌──────────────▼───────────────────────▼─────────────┐
+│ Rules Catalog / Assets                             │
+│ versioned, sourced, validated specifications       │
+└────────────────────────────────────────────────────┘
 ```
 
-The Domain layer must not depend on Flutter widgets or platform APIs.
+The Domain layer must not import SwiftUI, AVFoundation, PhotosUI, or UIKit.
 
-## 5. Proposed source structure after stack lock
+## 6. Proposed source structure
+
+Start simple. Add modules only where they enforce a meaningful boundary.
 
 ```text
-lib/
-├── app/
-│   ├── app.dart
-│   ├── navigation/
-│   └── theme/
-├── core/
-│   ├── errors/
-│   ├── logging/
-│   ├── result/
-│   └── utils/
-├── domain/
-│   ├── document_rules/
-│   ├── geometry/
-│   ├── image_job/
-│   ├── quality_checks/
-│   └── export/
-├── application/
-│   ├── analyze_photo/
-│   ├── compose_photo/
-│   ├── validate_photo/
-│   ├── export_digital/
-│   └── export_print/
-├── infrastructure/
-│   ├── camera/
-│   ├── files/
-│   ├── face_detection/
-│   ├── segmentation/
-│   ├── image_codec/
-│   ├── pdf/
-│   ├── persistence/
-│   └── telemetry/
-├── features/
-│   ├── home/
-│   ├── profile_picker/
-│   ├── capture_import/
-│   ├── analysis/
-│   ├── editor/
-│   ├── export/
-│   └── settings/
-└── l10n/
-
-assets/
-└── rules/
-
-test/
-integration_test/
-tool/
+IDPhotoApp/
+├── App/
+│   ├── IDPhotoApp.swift
+│   ├── AppEnvironment.swift
+│   ├── Navigation/
+│   └── DesignSystem/
+├── Features/
+│   ├── Home/
+│   ├── ProfilePicker/
+│   ├── Requirements/
+│   ├── Capture/
+│   ├── PhotoCheck/
+│   ├── Editor/
+│   ├── Export/
+│   └── Settings/
+├── Domain/
+│   ├── DocumentRules/
+│   ├── Geometry/
+│   ├── PhotoJob/
+│   ├── Validation/
+│   └── Export/
+├── ImagePipeline/
+│   ├── Acquisition/
+│   ├── VisionAnalysis/
+│   ├── Segmentation/
+│   ├── Rendering/
+│   └── ImageIO/
+├── Infrastructure/
+│   ├── Persistence/
+│   ├── Logging/
+│   ├── AppIntents/
+│   ├── Spotlight/
+│   └── Store/
+├── Resources/
+│   ├── Rules/
+│   ├── Localizable.xcstrings
+│   └── Assets.xcassets
+└── Tests/
 ```
 
-Avoid a generic `services/` dumping ground. Each infrastructure adapter implements a narrow domain/application port.
+If compile times or reuse justify it, `Domain`, `RuleKit`, `ImagePipeline`, and `TestSupport` may later become local Swift packages. Do not split the project into packages simply to mimic a large-company architecture.
 
-## 6. Core domain model
+## 7. State management
 
-### 6.1 DocumentProfile
+Use platform-native state tools.
 
-Canonical representation of one supported output requirement set.
+Default pattern:
 
-Key concepts:
+- immutable domain value types;
+- `@Observable` feature models for screen/workflow state;
+- `@MainActor` for UI-facing state mutation;
+- dependencies injected through initializers or a small typed `AppEnvironment`;
+- SwiftUI `Environment` only for truly app-wide capabilities;
+- explicit async use cases for long-running work;
+- no global mutable singleton `PhotoJob`;
+- no Redux/TCA-style dependency unless a real complexity problem emerges that native tools cannot solve cleanly.
+
+Views should describe UI. They should not contain image-processing algorithms or document-rule math.
+
+## 8. Concurrency model
+
+Image work is expensive and must never accidentally block UI responsiveness.
+
+Principles:
+
+- UI-facing models run on the main actor;
+- image decoding, Vision analysis, segmentation, and rendering execute away from the main actor;
+- task cancellation is propagated when the user replaces an image, changes profile, or leaves the workflow;
+- every long operation carries a job/revision identity so stale results cannot overwrite newer state;
+- use `Sendable` models across concurrency boundaries;
+- avoid `Task.detached` unless actor inheritance is explicitly undesirable and documented;
+- use task groups only when parallel work is independent and memory impact is measured;
+- profile actor contention and task scheduling with the Swift Concurrency instrument.
+
+Example stale-result rule:
+
+1. photo A begins analysis;
+2. user picks photo B;
+3. A is cancelled;
+4. even if a framework callback for A completes, its revision no longer matches the active job and is discarded.
+
+## 9. Image acquisition
+
+### 9.1 Camera
+
+Use AVFoundation for the custom capture experience because the product benefits from live composition and quality guidance.
+
+Architecture:
+
+- dedicated camera session controller;
+- explicit authorization flow initiated by user action;
+- camera session lifecycle tied to the capture screen;
+- preview and capture configuration optimized independently;
+- high-resolution still capture only when needed;
+- no permanent camera session running outside the capture flow;
+- interruptions, thermal pressure, media-services reset, and backgrounding handled explicitly;
+- signpost launch-to-first-frame and shutter-to-result latency.
+
+The technical spike should incorporate current Apple camera guidance, including fast camera startup and high-resolution capture practices from WWDC26.
+
+### 9.2 Photo import
+
+Use `PhotosPicker` / PhotosUI rather than requesting broad Photo Library access.
+
+Benefits:
+
+- system-controlled privacy;
+- limited selection without full library permission;
+- familiar interaction;
+- less custom code;
+- fewer permission failure states.
+
+Import using `Transferable` where practical and copy the selected source into app-controlled temporary/private storage only when processing requires it.
+
+## 10. Image pipeline
+
+The pipeline should avoid repeatedly materializing full-resolution `UIImage` values.
+
+Preferred primitives:
+
+- ImageIO / `CGImageSource` for metadata-aware decode and downsampling;
+- `CGImage` / `CIImage` as core processing representations;
+- a reused Metal-backed `CIContext` for composition/export where supported;
+- Core Graphics for exact raster/PDF geometry;
+- `UIImage` mainly at UIKit boundaries, not as the universal pipeline type.
+
+Pipeline:
+
+### Stage 1 — ingest
+
+- validate type/header;
+- read orientation;
+- capture dimensions/color information;
+- store immutable source reference;
+- reject corrupt or implausible inputs.
+
+### Stage 2 — analysis image
+
+Downsample to a bounded resolution using ImageIO. Apply orientation consistently. Do not decode a 48 MP file into memory merely to detect a face.
+
+### Stage 3 — Vision analysis
+
+Use Vision for:
+
+- face count;
+- face bounding boxes;
+- available landmarks/pose information;
+- foreground/subject segmentation;
+- supported quality/image-analysis operations where evidence is strong enough.
+
+Convert Vision observations immediately into domain-neutral normalized geometry.
+
+### Stage 4 — deterministic quality checks
+
+Independent checks may include:
+
+- input resolution;
+- blur/sharpness;
+- exposure;
+- face size/position;
+- head pose where measurement reliability supports it.
+
+Each check can be enabled, disabled, calibrated, and tested independently.
+
+### Stage 5 — segmentation
+
+Use Vision subject/foreground segmentation first. On iOS 27, investigate the new tap/scribble/rectangle segmentation capabilities as a precise user-driven refinement mechanism.
+
+The automatic segmenter must expose uncertainty and a fallback. A broken hair mask must never silently become the official export.
+
+### Stage 6 — rule evaluation
+
+Evaluate measurable results against the selected `DocumentProfile` and produce `pass / warn / fail / manual_check` states.
+
+### Stage 7 — preview
+
+Compose a responsive working-resolution preview. Guides and status are SwiftUI overlays and are never baked into the image.
+
+### Stage 8 — final render
+
+Reconstruct from the original/high-resolution source using the final crop/mask/background parameters. Encode once at the end where possible.
+
+### Stage 9 — post-export verification
+
+Re-open generated output and verify dimensions, format, page size, metadata policy, and profile-specific machine-checkable constraints before reporting success.
+
+## 11. Coordinate systems
+
+Use explicit value types. Never pass anonymous `CGRect` values across layers without knowing their coordinate space.
+
+Required spaces:
+
+- `SourcePixelSpace`
+- `NormalizedImageSpace` (0...1)
+- `PreviewPointSpace`
+- `OutputPixelSpace`
+- `PhysicalMillimeterSpace`
+- `PDFPointSpace`
+
+Conversions are centralized and unit-tested.
+
+Rule geometry should prefer normalized/physical coordinates rather than screen points.
+
+## 12. Geometry engine
+
+A pure Swift domain module owns:
+
+- aspect-ratio calculations;
+- crop fitting;
+- head-height target/range evaluation;
+- eye-line and face-center placement;
+- legal translation/scale ranges;
+- millimetre ↔ inch ↔ pixel conversions;
+- PPI/DPI calculations;
+- print-grid packing;
+- margins/gutters/cut marks;
+- rounding policy.
+
+No SwiftUI view independently reimplements this math.
+
+Rounding is defined once and tested at boundaries.
+
+## 13. Core domain model
+
+### `DocumentProfile`
+
+Contains:
 
 - stable profile ID;
 - jurisdiction;
 - document/use-case type;
 - output dimensions;
 - permitted encodings;
-- background requirements;
+- background rules;
 - composition constraints;
 - manual instructions;
 - provenance;
 - version/effective dates.
 
-### 6.2 PhotoJob
-
-A working session containing references and parameters, not duplicated destructive images where avoidable.
-
-Suggested conceptual fields:
+### `PhotoJob`
 
 ```text
 PhotoJob
-- jobId
-- profileId + profileVersion
-- sourceImageRef
+- id
+- profileID + profileVersion
+- sourceAsset
 - normalizedImageInfo
 - analysisResult
-- segmentationResultRef/cache
+- segmentationState
 - editParameters
 - validationResult
-- exportHistory metadata (optional)
+- exportMetadata (optional)
+- revision
 ```
 
-### 6.3 EditParameters
-
-Pure parameters describing the intended output:
+### `EditParameters`
 
 ```text
-- crop center / rectangle
+- crop rectangle/center
 - subject scale
 - translation
-- rotation if permitted
+- permitted rotation
 - background mode/value
 - mask corrections
-- limited tonal corrections if supported
+- permitted tonal correction parameters
 ```
 
-The renderer reconstructs the preview/output from source + parameters.
-
-### 6.4 ValidationResult
+### `ValidationResult`
 
 ```text
 ValidationResult
-- profileId/version
+- profileID/version
 - overallState
 - checks[]
 
 ValidationCheck
-- ruleId
+- ruleID
 - state: pass | warn | fail | manual_check
-- measuredValue? 
+- measuredValue?
 - expectedRange?
 - confidence?
 - userMessageKey
 - remediationMessageKey
 ```
 
-## 7. Image pipeline
+## 14. Foundation Models / generative intelligence policy
 
-The pipeline must distinguish preview resolution from final export resolution.
+Generative intelligence is optional and subordinate to the deterministic product core.
 
-### Stage 1 — Ingest
+Potential high-value uses:
 
-- obtain photo/camera asset;
-- decode header and validate format;
-- read orientation;
-- retain immutable source reference;
-- reject implausible/corrupt input.
+- explain a structured warning in simpler language;
+- answer a question such as “Why do I need more space above my head?” using only approved rule context;
+- provide non-authoritative photo-taking coaching;
+- natural-language shortcuts to select a document profile.
 
-### Stage 2 — Normalized analysis bitmap
+Rules:
 
-Create a bounded-resolution, correctly oriented bitmap for detection/analysis. Do not run heavy ML on a 40+ MP image unless profiling proves it necessary.
+- a Foundation Model never decides final crop dimensions or official pass/fail geometry;
+- model output cannot silently override sourced rule text;
+- official-photo decisions remain traceable to rule IDs and deterministic measurements;
+- image inputs stay on-device unless a future cloud feature is separately approved;
+- if a Foundation Models feature is added, use Apple’s Evaluations framework / a controlled evaluation suite before release;
+- the experience must degrade cleanly when Apple Intelligence/model availability is absent.
 
-### Stage 3 — Face analysis
+A feature should not exist merely to claim “AI.”
 
-- face count;
-- bounding box;
-- landmarks/pose/confidence as available;
-- derived normalized geometry.
+## 15. App Intents and system integration
 
-All detector-specific types are converted immediately into domain-neutral structures.
+Expose only actions that make sense outside the app.
 
-### Stage 4 — Quality analysis
+Candidate App Intents:
 
-Independent checks:
+- `CreateIDPhoto`
+- `OpenDocumentProfile`
+- `CreatePrintSheetFromLastPreparedPhoto` only if a safe recent-job model exists
 
-- resolution;
-- blur/sharpness;
-- exposure;
-- face geometry;
-- optional pose/eye/occlusion warnings.
+Candidate App Shortcuts:
 
-Checks must be independently testable and independently disableable if a model/algorithm proves unreliable.
+- “Create an ID photo”
+- “Make a passport photo”
+- “Open my recent ID photo format”
 
-### Stage 5 — Segmentation
+Privacy rule: sensitive user photos, face geometry, and file paths must not become broadly indexed App Entities.
 
-Generate a foreground alpha mask at an appropriate working resolution. Preserve enough information to re-run/refine final-resolution edges during export if the model supports it.
+Use Core Spotlight for document/profile discovery, not personal images.
 
-### Stage 6 — Rule evaluation
+## 16. Localization
 
-Run composition/quality measurements against the selected `DocumentProfile` and produce `ValidationResult`.
+Use String Catalogs from the first production screen.
 
-### Stage 7 — Preview composition
+Requirements:
 
-Render source + mask/background + crop parameters to a UI-resolution preview. Guides and warnings are overlays; they are never baked into the photo.
+- no user-facing production strings embedded in code outside intentional developer diagnostics;
+- pluralization and grammatical variation represented structurally;
+- official document names may have localized aliases while preserving canonical identifiers;
+- measurement formatting uses Foundation format styles;
+- RTL layout should not be accidentally blocked by custom geometry;
+- pseudolocalization / long-string testing is part of CI/manual QA.
 
-### Stage 8 — Final render
+## 17. Accessibility architecture
 
-Reconstruct from original/high-resolution source. Apply deterministic transforms in a defined order and encode once at the end where possible.
+Accessibility is not a modifier pass at the end.
 
-### Stage 9 — Post-export verification
+Core editor must support:
 
-Decode metadata/header from the generated asset and verify dimensions, page size, format, and other machine-checkable invariants before reporting success.
+- VoiceOver labels and values;
+- accessible adjustable actions for scale/position where suitable;
+- explicit move up/down/left/right alternatives;
+- Voice Control discoverable names;
+- Dynamic Type including accessibility sizes for surrounding controls;
+- status semantics independent of color;
+- Reduce Motion fallbacks;
+- increased contrast;
+- sufficient hit regions;
+- meaningful focus updates after analysis or modal transitions.
 
-## 8. Coordinate systems
+For image-centric content, descriptions should communicate task state without unnecessarily narrating sensitive physical traits.
 
-Image apps become fragile when pixels, display points, crop coordinates, and physical units are mixed. Define coordinate types explicitly.
+## 18. Persistence
 
-Recommended systems:
+Default to less persistence.
 
-- **SourcePixelSpace** — actual normalized source image pixels.
-- **NormalizedImageSpace** — 0.0–1.0 coordinates independent of resolution.
-- **PreviewSpace** — Flutter logical pixels for interaction/rendering.
-- **OutputPixelSpace** — final exported image pixels.
-- **PhysicalSpaceMm** — millimetres used for document/print rules.
-- **PdfPointSpace** — points used for page generation where applicable.
+Persist:
 
-Conversion functions should be centralized and unit-tested. Domain rule geometry should prefer normalized and physical units instead of UI coordinates.
+- settings;
+- favorites/recent document profile IDs;
+- installed rule-catalog version;
+- purchase entitlement state via StoreKit mechanisms as appropriate.
 
-## 9. Geometry engine
+Do not create a permanent face gallery by default.
 
-Create a small pure-Dart package/module responsible for:
+Use SwiftData only if resume/history or more complex local structured data becomes a validated requirement. A simple requirement should not be inflated into a database.
 
-- aspect-ratio calculations;
-- crop fitting;
-- head-height target/range evaluation;
-- eye-line/face-center placement;
-- safe translation/scale ranges;
-- mm ↔ inch ↔ pixel conversions;
-- DPI/PPI calculations;
-- print grid packing;
-- margins/gutters/cut marks;
-- rounding policy.
+## 19. Sensitive file lifecycle
 
-No UI code should independently repeat this math.
+Source and temporary outputs are sensitive.
 
-Critical rule: define rounding once. For example, physical-to-pixel conversion must specify whether values are rounded to nearest integer and at which stage. Avoid repeated conversion/rounding.
+Rules:
 
-## 10. Face-detection abstraction
+- use app-private storage;
+- use file protection appropriate for sensitive content;
+- strip EXIF/GPS from official exports unless a profile explicitly requires metadata;
+- delete temporary analysis/render files when the job completes or expires;
+- clean stale files after interrupted sessions;
+- exclude unnecessary temporary content from backups;
+- never log raw image bytes, thumbnails, landmarks, or local sensitive paths.
 
-Define a port similar to:
+## 20. Privacy manifest and permissions
 
-```text
-FaceDetector
-  detect(AnalysisImage) -> FaceDetectionResult
-```
+The production target includes `PrivacyInfo.xcprivacy` from the beginning, not as release cleanup.
 
-Domain-neutral result:
+Camera access:
 
-```text
-FaceDetectionResult
-- faces[]
+- request only when the user chooses camera capture;
+- clear `NSCameraUsageDescription` in plain language.
 
-DetectedFace
-- boundingBoxNormalized
-- landmarksNormalized
-- yaw/pitch/roll? 
-- confidence? 
-```
+Photo import:
 
-Candidate implementations may use platform Vision APIs, ML Kit, or another vetted on-device model. The architecture must permit A/B benchmark comparison using the same fixture corpus.
+- prefer PhotosPicker so full-library permission is unnecessary for the normal flow.
 
-## 11. Segmentation abstraction
+Every dependency must be reviewed for required-reason APIs and its own privacy manifest.
 
-```text
-SubjectSegmenter
-  segment(AnalysisImage, optionalFaceHint) -> SegmentationResult
-```
+## 21. Telemetry
 
-Result should expose:
+Start with Apple-native diagnostics and minimal structured instrumentation.
 
-- mask reference/data;
-- source/working dimensions;
-- confidence/quality information if available;
-- model/implementation version;
-- warnings.
+Preferred sequence:
 
-Do not couple the editor to a specific segmentation SDK.
+1. local `Logger` / unified logging with privacy redaction;
+2. Instruments during development;
+3. MetricKit for production performance diagnostics if useful;
+4. third-party crash/analytics SDK only after an explicit privacy/value decision.
 
-## 12. Rules catalog architecture
+Never collect:
 
-Initial recommendation:
-
-1. Human-maintained canonical source files under `assets/rules/`.
-2. JSON Schema validation in CI.
-3. Additional semantic validator written in Dart/tooling.
-4. Build step generates typed immutable rule objects or validates runtime assets.
-5. Tests load every profile.
-6. Rule fixtures assert expected dimensions and sample composition decisions.
-
-A future remote catalog must be signed and versioned. The app should activate a new catalog atomically and retain a known-good fallback.
-
-## 13. State management
-
-Do not choose a state-management package before the Flutter spike. Required properties are more important than brand:
-
-- explicit unidirectional state transitions;
-- testable view models/controllers;
-- cancellation of obsolete image-processing tasks;
-- no hidden mutable singleton job state;
-- lifecycle-safe handling when the app backgrounds;
-- clear distinction between transient UI state and persisted domain state.
-
-Candidate packages can be compared in M1/M2. Avoid adopting a large architecture framework solely because it is popular.
-
-## 14. Concurrency and cancellation
-
-Image work can be expensive. Every long operation should support cancellation or stale-result rejection.
-
-Example:
-
-1. User imports photo A.
-2. Analysis A begins.
-3. User immediately imports photo B.
-4. Result A must never overwrite state for B.
-
-Use a job/revision token to associate asynchronous results with the active `PhotoJob` state.
-
-CPU-heavy pure Dart transforms should be isolated from the UI isolate when profiling requires it. Native ML calls must likewise avoid blocking the UI thread.
-
-## 15. Caching
-
-Cache only where it has measurable UX value.
-
-Potential caches:
-
-- normalized analysis image;
-- face detection result;
-- segmentation mask;
-- low-resolution composed preview.
-
-Cache keys must include source identity/hash, algorithm version, and relevant parameters. A changed segmentation model must not reuse an old incompatible mask.
-
-Sensitive temporary caches must follow retention/deletion policy.
-
-## 16. Persistence
-
-### MVP
-
-Persist only:
-
-- app settings;
-- language override;
-- recent/favourite profile IDs;
-- optional non-sensitive job metadata if resume is implemented;
-- installed rule-catalog version.
-
-Do not create a permanent gallery of source faces by default.
-
-### Storage abstraction
-
-Keep persistence behind repositories/interfaces so secure local storage, preferences, or a database can change without leaking into features.
-
-## 17. Backend strategy
-
-MVP should not have a backend unless required for one of these validated needs:
-
-- signed rule catalog updates;
-- optional purchase/entitlement verification beyond store-native needs;
-- explicitly opt-in diagnostics/support;
-- future account/sync service.
-
-A backend is not justified merely to process images that can be processed locally.
-
-## 18. Telemetry
-
-Telemetry must be optional/configurable according to release/legal decisions and privacy-preserving by schema.
-
-Allowed examples:
-
-- app version;
-- OS major version;
-- device performance tier (not unique fingerprint);
-- profile ID/version;
-- pipeline stage duration bucket;
-- check outcome category;
-- export format;
-- structured error code.
-
-Forbidden by default:
-
-- image pixels;
+- source/exported face images;
 - thumbnails;
 - face embeddings;
-- landmark arrays;
+- landmarks;
 - EXIF GPS;
-- local file paths;
-- user name/document number;
-- arbitrary exception context containing sensitive paths/data.
+- user document numbers;
+- arbitrary file paths.
 
-## 19. Error model
+## 22. Performance observability
 
-Use typed errors, not user-facing raw exceptions.
+Create signposts for:
 
-Suggested groups:
+- camera screen requested → first preview frame;
+- shutter → captured photo ready;
+- import → analysis image ready;
+- face analysis;
+- segmentation;
+- first compliant preview;
+- high-resolution render;
+- PDF generation;
+- export completion.
 
-```text
-InputError
-PermissionError
-DecodeError
-FaceDetectionError
-SegmentationError
-RuleCatalogError
-GeometryError
-RenderError
-EncodeError
-PdfError
-StorageError
-ShareError
-```
+Budgets are established on physical devices after M1 profiling. Do not choose artificial performance numbers before measurements.
 
-Each maps to:
+Use Instruments run comparisons to prove improvements rather than relying on subjective impressions.
 
-- stable internal code;
-- safe diagnostic context;
-- localized user message;
-- recovery actions;
-- severity.
+## 23. Testing architecture
 
-## 20. Dependency policy
+### Swift Testing
 
-Before adding a package/SDK, record:
+Use for:
 
-- purpose;
-- owner/maintainer;
-- latest maintenance signal;
-- licence;
-- native platforms/permissions;
+- geometry;
+- rule evaluation;
+- conversion/rounding;
+- domain state transitions;
+- export invariants;
+- fixture-driven Vision result normalization where determinism permits.
+
+### Image golden/reference tests
+
+- fixed source fixtures;
+- fixed edit parameters;
+- deterministic output geometry;
+- pixel/tolerance comparisons where codecs permit;
+- metadata assertions.
+
+### XCUITest
+
+Cover:
+
+- primary flow;
+- permission-denied recovery;
+- PhotosPicker boundary where automation permits;
+- error states;
+- Dynamic Type layout;
+- VoiceOver/accessibility audit scenarios where tooling supports them.
+
+### Physical validation
+
+- real iPhone camera capture;
+- memory/thermal tests;
+- interruption/backgrounding;
+- print at Actual Size / 100%;
+- measure printed dimensions physically.
+
+## 24. CI/CD
+
+Preferred path: Xcode Cloud if it provides the required test/device/build capabilities at acceptable cost; GitHub Actions/macOS remains an alternative.
+
+PR gates:
+
+- build with current supported Xcode;
+- Swift format/lint policy if adopted;
+- Swift Testing suites;
+- rule schema/semantic validation;
+- deterministic image/export fixtures;
+- privacy manifest validation;
+- localization checks;
+- dependency review when Package.resolved changes.
+
+Main/release gates add:
+
+- archive validation;
+- XCUITest matrix;
+- Instruments/performance review for critical changes;
+- App Store privacy/export metadata review;
+- TestFlight validation.
+
+## 25. Dependency rule
+
+For every non-Apple package or binary SDK record:
+
+- exact product need;
+- why an Apple API is insufficient;
+- maintainer and release activity;
+- license;
 - transitive dependencies;
-- binary-size impact;
-- privacy/network behavior;
-- replaceability;
-- benchmark if performance-critical.
+- network behavior;
+- permissions;
+- privacy manifest;
+- required-reason APIs;
+- binary size;
+- startup/runtime impact;
+- removal strategy.
 
-Prefer fewer well-understood dependencies in the image pipeline.
+Default answer for analytics, ad, photo-editing, and AI SDKs is “no” until justified.
 
-## 21. CI/CD target architecture
+## 26. M1 native iOS spikes
 
-After M2:
+### Spike A — responsive camera + PhotosPicker
 
-### Pull request checks
+Validate AVFoundation startup/capture, permissions, interruptions, HEIC/JPEG, orientation, large photos, and system photo import.
 
-- format/lint;
-- static analysis;
-- unit tests;
-- rules schema + semantic validation;
-- golden tests;
-- dependency/security checks where configured;
-- debug builds for iOS/Android where runners permit.
+### Spike B — Vision face analysis
 
-### Main branch
+Measure face count, normalized geometry, landmarks/pose usefulness, latency, and failure cases on representative fixtures.
 
-- all PR checks;
-- signed/non-production distributable builds when credentials/infrastructure are configured;
-- versioned artifacts;
-- release notes generated from accepted process.
+### Spike C — Vision segmentation
 
-### Release candidate
+Evaluate subject/foreground segmentation and iOS 27 tap-to-segment refinement for hair, glasses, head coverings, shoulders, children/babies, and difficult backgrounds.
 
-- integration suite;
-- physical-device smoke test;
-- rule audit;
-- export fixture verification;
-- print measurement checklist;
-- privacy/store checklist.
+### Spike D — Core Image / ImageIO pipeline
 
-## 22. Architecture fitness tests
+Prove bounded decode, low-copy analysis, responsive previews, high-resolution final render, color handling, and memory stability.
 
-The architecture should be considered healthy if we can:
+### Spike E — exact image/PDF export
 
-- swap face detector without changing editor screens;
-- add a country profile without changing crop code;
-- test crop math without Flutter bindings;
-- run rule validation over all profiles in CI;
-- run image fixture tests headlessly;
-- disable telemetry without breaking application behavior;
-- generate the same output geometry from identical input/parameters across supported platforms;
-- add another output paper size using configuration/domain logic rather than screen-specific code.
+Generate known dimensions, verify headers/page boxes, print at 100%, and physically measure.
 
-## 23. M1 technical spikes required before architecture lock
+### Spike F — SwiftUI editor + accessibility
 
-### Spike A — Camera/import
+Prototype drag/pinch, constrained geometry, live validation, VoiceOver adjustable actions, button alternatives, Dynamic Type, Reduce Motion, and Voice Control naming.
 
-Validate capture/import, orientation, permissions, HEIC/JPEG handling, large-image memory behavior.
+### Spike G — App Intents proof
 
-### Spike B — Face detection
+Prototype a small `Create ID Photo` intent/shortcut to validate system entry points without exposing sensitive photo data.
 
-Benchmark at least the strongest practical on-device candidate(s) over a representative fixture set.
+### Spike H — iOS 27 optional intelligence
 
-### Spike C — Segmentation
+Prototype only if a clear user benefit exists. Evaluate Foundation Models image/text assistance against a controlled rubric and prove that the app remains correct when the model is unavailable.
 
-Benchmark edge quality, hair, glasses, light/dark backgrounds, diverse skin tones, babies/children where consented fixtures exist, runtime, memory, and model size.
+### Spike I — performance
 
-### Spike D — Geometry/export
+Use Instruments on at least one older supported and one current iPhone class. Record memory, latency, responsiveness, and thermal behavior.
 
-Produce exact known outputs and compare pixel dimensions/crops byte- or pixel-wise where appropriate.
+## 27. Architecture fitness tests
 
-### Spike E — PDF/print
+The architecture is healthy if we can:
 
-Generate known physical sizes, inspect PDF page boxes, print at 100%, and physically measure.
+- add a document profile without changing SwiftUI crop logic;
+- test geometry without booting the app;
+- replace one Vision-derived heuristic without rewriting screens;
+- cancel photo A and guarantee it cannot update photo B;
+- run the full core flow offline;
+- delete all optional AI functionality without breaking compliance logic;
+- use standard iOS controls without fighting a custom design system;
+- enable VoiceOver and finish the core workflow without gesture-only dead ends;
+- generate identical output geometry from identical source/parameters;
+- prove no third-party network call is necessary during the core flow.
 
-### Spike F — Accessibility/editor
+## 28. Primary Apple references
 
-Prototype crop gestures plus accessible alternative controls and screen-reader semantics.
+Keep these as living architectural references and review them after each WWDC / major SDK release:
 
-### Spike G — Performance
+- Apple Human Interface Guidelines — https://developer.apple.com/design/human-interface-guidelines/
+- WWDC26 iOS guide — https://developer.apple.com/wwdc26/guides/ios/
+- WWDC26 SwiftUI guide — https://developer.apple.com/wwdc26/guides/swiftui/
+- Liquid Glass overview — https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass
+- Vision — https://developer.apple.com/documentation/vision
+- App Intents — https://developer.apple.com/documentation/appintents
+- Foundation Models — https://developer.apple.com/documentation/FoundationModels
+- Privacy manifests — https://developer.apple.com/documentation/bundleresources/adding-a-privacy-manifest-to-your-app-or-third-party-sdk
+- Xcode system requirements — https://developer.apple.com/xcode/system-requirements/
 
-Measure memory and latency on one lower-tier and one current representative device per platform if available.
-
-Only after these spikes should `docs/10-decisions.md` mark the core stack and ML implementations as accepted.
+Platform APIs and guidance evolve. When the repository and Apple documentation conflict, update the repository deliberately and record the architecture decision.
