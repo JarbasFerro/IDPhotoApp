@@ -1,0 +1,54 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Generated platform files
+**/GeneratedPluginRegistrant.*
+
+# Android
+.gradle/
+local.properties
+**/android/.cxx/
+**/android/captures/
+*.jks
+*.keystore
+key.properties
+
+# iOS / macOS
+**/Pods/
+**/.symlinks/
+**/DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.mobileprovision
+
+# Test output / profiling
+*.lcov
+*.trace
+*.prof
+
+# Temporary images and local datasets
+/tmp/
+/test_data/private/
+/test_data/local/
