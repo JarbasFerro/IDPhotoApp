@@ -1,248 +1,390 @@
-# 06 — Delivery plan
+# 06 — Native iOS delivery plan
 
 ## 1. Delivery strategy
 
-The project should be built in gated milestones. Each milestone reduces a specific category of risk before the next layer of product complexity is added.
+Build the project in gated milestones. Each milestone removes a specific risk before the next layer is added.
 
-The sequence is intentionally different from “build screens first.” The highest-risk parts are image correctness, rules, segmentation, export fidelity, and platform behavior; these should be proven early.
+The sequence is intentionally not “design all screens, then code.” The largest risks are camera responsiveness, image memory, Vision quality, segmentation edges, exact geometry, print fidelity, accessibility of direct manipulation, and rule correctness.
+
+The app is iOS-only. Native platform excellence is a deliverable in every milestone, not a polishing phase at the end.
 
 ## 2. Milestone overview
 
 | Milestone | Goal | Primary exit condition |
 |---|---|---|
-| M0 | Product definition | Scope, requirements, risks, and initial launch assumptions are documented |
-| M1 | Technical feasibility | Core technical choices are benchmarked and architecture decisions are locked |
-| M2 | App foundation | Buildable iOS/Android app with CI, navigation, localization, and core domain skeleton |
-| M3 | Image pipeline | Import/capture, normalization, detection, analysis, segmentation, and deterministic render work end to end |
-| M4 | Rules engine | Versioned, sourced profiles drive validation and crop geometry |
-| M5 | Product UX | Complete guided workflow is usable and accessible |
-| M6 | Export/print | Digital outputs and physical print sheets are dimensionally verified |
-| M7 | Hardening | Privacy, reliability, accessibility, performance, localization, and QA gates pass |
-| M8 | Release | Store submission and controlled production launch |
+| M0 | Product + platform definition | Native iOS scope, Apple-quality bar, requirements, risks, and decisions are explicit |
+| M1 | Native technical feasibility | AVFoundation/Vision/Core Image/export/accessibility performance proven on device |
+| M2 | SwiftUI foundation | Production Xcode project, architecture, tests, privacy, localization, CI |
+| M3 | Image/camera pipeline | Capture/import → analysis → segmentation → deterministic render works end to end |
+| M4 | Rules engine | Sourced/versioned profiles drive validation and crop geometry |
+| M5 | Apple-quality product UX | Complete guided workflow is polished, accessible, and HIG-aligned |
+| M6 | Export/print | Digital and physical outputs are verified dimensionally |
+| M7 | Hardening | Accessibility, privacy, performance, reliability, localization, App Intents, QA gates pass |
+| M8 | App Store release | TestFlight → review → controlled production launch |
 
 ---
 
-## 3. M0 — Product definition
+## 3. M0 — Product and platform definition
 
 ### Objective
 
-Turn the product idea into explicit constraints before coding.
+Lock what kind of iPhone product we are building before production implementation.
 
 ### Work
 
-- lock product principles;
-- define MVP and non-goals;
-- decide initial target user groups;
+- accept iOS-only strategy;
+- define Apple-quality review lens;
+- define MVP and explicit non-goals;
+- select preliminary minimum deployment strategy;
 - define official-profile publication policy;
 - define quality-state semantics;
-- decide whether generic/custom photo sizes belong in MVP;
-- decide initial monetization guardrails;
+- decide generic/custom photo-size scope;
+- establish monetization guardrails;
 - identify initial launch markets for rule research;
-- define success metrics and privacy constraints;
-- create prioritized backlog.
+- define privacy constraints;
+- establish native dependency policy;
+- create revised native backlog.
 
 ### Exit criteria
 
-- README and docs 01–10 reviewed;
-- no unresolved ambiguity that blocks M1 spikes;
-- launch-country research shortlist exists;
-- official-profile source standard is accepted;
-- project decision log is active.
+- README and docs reflect iOS-only direction;
+- ADR for native Swift/SwiftUI is Accepted;
+- no unresolved cross-platform assumption blocks M1;
+- Apple-frameworks-first policy accepted;
+- M1 spike acceptance criteria are explicit.
 
 ---
 
-## 4. M1 — Technical feasibility and architecture lock
+## 4. M1 — Native iOS technical feasibility
 
 ### Objective
 
-Prove that the proposed stack can deliver the required image quality, performance, and platform integration before building production architecture around it.
+Prove the hardest Apple-platform capabilities on physical iPhones before freezing production architecture.
 
-### Spike A — Flutter/platform integration
+M1 spike code is disposable unless explicitly promoted after review.
 
-Build a disposable app that:
+### Spike A — AVFoundation responsive camera
 
-- launches on iOS and Android;
-- requests camera only on user action;
-- captures/imports images;
-- handles EXIF rotation;
-- imports large images;
-- writes a generated output;
-- uses platform share/save.
+Build a focused camera prototype.
 
-Measure memory, copies, and latency.
+Validate:
 
-### Spike B — Face detection
+- point-of-use camera authorization;
+- session startup;
+- time to first preview frame;
+- front/rear camera behavior if both remain in scope;
+- orientation;
+- still capture quality;
+- high-resolution capture path;
+- interruptions and background/foreground transitions;
+- cancellation;
+- repeated captures;
+- thermal/memory behavior;
+- camera unavailable/restricted states.
 
-Compare practical on-device candidates.
+Instrument:
 
-Dataset dimensions should include:
+- screen entry → preview visible;
+- shutter → capture result;
+- peak memory;
+- dropped/hitched UI behavior.
 
+Review current WWDC26 camera guidance during implementation.
+
+### Spike B — PhotosPicker + image ingest
+
+Validate:
+
+- system `PhotosPicker` without full-library permission;
+- `Transferable` import;
+- HEIC/JPEG/PNG as required;
+- orientation metadata;
+- wide-gamut/common color profiles;
+- large 24/48 MP sources;
+- ImageIO downsampling;
+- temporary-file lifecycle;
+- import cancellation.
+
+Acceptance:
+
+- no broad library permission required for normal import;
+- no avoidable full-resolution decode for analysis;
+- memory behavior recorded.
+
+### Spike C — Vision face analysis
+
+Use a controlled fixture corpus.
+
+Evaluate:
+
+- face count;
 - frontal adult faces;
-- different skin tones;
-- glasses;
-- facial hair;
-- different hair types;
-- weak/strong lighting;
-- children/babies where ethically sourced and consented;
-- small faces/high-resolution source photos;
-- rotations and difficult backgrounds.
-
-Record:
-
-- detection success;
-- landmark availability/quality;
+- skin-tone diversity;
+- glasses/facial hair/hair types;
+- lighting variation;
+- children/babies where ethically sourced;
+- rotation;
+- small face in high-resolution image;
+- landmarks/pose information;
 - false positives;
-- latency;
-- memory;
-- binary/model size;
-- platform consistency.
+- latency.
 
-### Spike C — Segmentation
+Acceptance:
 
-Compare candidate on-device segmentation solutions using a visual scoring rubric.
+- exact Vision observations chosen for MVP;
+- unsupported/low-confidence checks documented;
+- normalized domain geometry mapping defined.
 
-Important cases:
+### Spike D — Vision subject segmentation
 
-- fine hair;
-- curly hair;
+Evaluate difficult edges:
+
+- fine/curly hair;
 - light hair on light background;
 - dark hair on dark background;
 - glasses;
 - ears;
-- shoulders/clothing edges;
-- veils/head coverings;
+- shoulders;
+- head coverings;
 - child/baby hair;
 - shadows;
-- textured walls.
+- textured backgrounds.
 
-### Spike D — Geometry/render
+For iOS 27, prototype tap/scribble/rectangle segmentation refinement as a candidate manual-correction UX.
 
-Create a headless deterministic test that:
+Acceptance:
 
-- reads fixture image;
-- applies known crop parameters;
-- renders exact target dimensions;
-- compares output geometry with expected values;
-- runs identically on CI-compatible environment.
+- automatic segmentation quality rubric documented;
+- failure/fallback defined;
+- refinement approach selected or deferred;
+- performance/memory measured.
 
-### Spike E — PDF/print
+### Spike E — Core Image / ImageIO render pipeline
 
-Generate representative print sheets and physically verify dimensions.
+Prove:
 
-### Spike F — Editor/accessibility
+- bounded analysis decode;
+- reuse of processing context;
+- low-copy representations;
+- responsive working-resolution preview;
+- exact high-resolution final crop;
+- background composition;
+- color/profile handling;
+- no repeated lossy encode cycles.
 
-Prototype drag/pinch plus accessible movement/zoom controls and screen-reader labeling.
+Acceptance:
 
-### Spike G — Performance budget
+- deterministic known fixture outputs;
+- memory budget documented;
+- chosen pipeline types recorded.
 
-Establish actual budgets for:
+### Spike F — PDF and physical print
 
-- app startup;
-- photo normalization;
-- face detection;
+Generate known photo sizes on representative page formats.
+
+Validate:
+
+- Core Graphics PDF page geometry;
+- mm → PDF point calculations;
+- margins/gutters/cut marks;
+- system print interaction;
+- Actual Size / 100% output;
+- physical ruler/caliper measurement.
+
+Acceptance:
+
+- measured sizes fall within documented tolerance;
+- scaling risks understood;
+- implementation approach locked.
+
+### Spike G — SwiftUI editor and accessibility
+
+Prototype:
+
+- edge-to-edge portrait canvas;
+- drag/pinch;
+- live crop guide/status;
+- system toolbar/floating control behavior;
+- Dynamic Type around editor;
+- VoiceOver labels/value/state;
+- non-gesture move/zoom actions;
+- Voice Control naming;
+- Reduce Motion behavior;
+- high contrast/dark appearance.
+
+Acceptance:
+
+- core task can be completed without precision gestures;
+- screen does not require custom controls where system controls suffice;
+- custom glass, if any, has a concrete UX reason.
+
+### Spike H — App Intents
+
+Prototype one small intent: `Create ID Photo` or open a document profile.
+
+Acceptance:
+
+- action is discoverable in Shortcuts/Siri as supported;
+- deep link reaches correct app state;
+- no sensitive photo/face data exposed as indexed entities.
+
+### Spike I — optional Foundation Models evaluation
+
+Only execute if a concrete user problem is selected, such as explaining structured warnings.
+
+Prove:
+
+- on-device availability behavior;
+- deterministic compliance remains source of truth;
+- model-unavailable fallback;
+- controlled evaluation set;
+- no authoritative/hallucinated rule claims.
+
+This spike may conclude “do not ship AI in MVP.” That is a valid success result.
+
+### Spike J — device/performance baseline
+
+Profile on at least:
+
+- one older device compatible with the proposed minimum iOS target;
+- one current-generation iPhone.
+
+Record:
+
+- launch;
+- camera first frame;
+- capture latency;
+- import/downsample;
+- Vision face analysis;
 - segmentation;
-- preview refresh;
-- final export;
-- peak memory.
+- first preview;
+- final render;
+- PDF generation;
+- peak memory;
+- responsiveness/hangs;
+- repeated-session thermal behavior.
 
-### Exit criteria
+### M1 exit criteria
 
-- architecture stack accepted/rejected in decision log;
-- face-detection implementation selected or shortlist narrowed with clear decision rule;
-- segmentation implementation selected or fallback defined;
-- print-generation approach physically validated;
-- minimum supported OS versions selected;
-- performance budgets written down;
-- no unresolved feasibility blocker for MVP.
-
----
-
-## 5. M2 — Foundation
-
-### Objective
-
-Create the maintainable production skeleton after M1 decisions are locked.
-
-### Workstreams
-
-#### Repository/app bootstrap
-
-- create Flutter app (if ADR accepted);
-- configure bundle/application IDs;
-- environments/flavors only if needed;
-- strict analysis/linting;
-- dependency policy;
-- folder/module structure.
-
-#### App shell
-
-- navigation;
-- theme/design tokens;
-- localization framework;
-- settings repository;
-- error/result primitives;
-- logging abstraction;
-- dependency injection approach.
-
-#### CI
-
-- format/lint/static analysis;
-- unit tests;
-- rules validation placeholder;
-- Android debug build;
-- iOS build where infrastructure permits;
-- artifact/report retention.
-
-#### Domain skeleton
-
-- coordinate types;
-- document profile interfaces;
-- `PhotoJob`;
-- validation states;
-- geometry primitives;
-- typed error taxonomy.
-
-### Exit criteria
-
-- clean checkout builds;
-- automated checks pass;
-- app launches on physical iOS/Android device;
-- localization test string works;
-- architecture boundaries are enforceable by review/lints/tests;
-- no production image logic hidden in UI widgets.
+- native Swift/SwiftUI architecture confirmed;
+- minimum deployment proposal validated or revised;
+- camera approach confirmed;
+- Vision capabilities selected with explicit limitations;
+- segmentation/refinement strategy defined;
+- Core Image/ImageIO pipeline proven;
+- PDF physical sizing proven;
+- accessible editor interaction proven;
+- baseline performance budgets recorded;
+- no unresolved feasibility blocker.
 
 ---
 
-## 6. M3 — Image pipeline
+## 5. M2 — Production SwiftUI foundation
 
 ### Objective
 
-Implement a reliable source-to-preview pipeline independently of full rules catalog UX.
+Create a clean production project after M1 evidence is available.
 
-### Order
+### Xcode project
 
-1. image acquisition abstraction;
-2. orientation normalization;
-3. image metadata and validation;
-4. analysis-resolution decode;
-5. face detection adapter;
-6. derived face geometry;
-7. blur/resolution/exposure checks;
-8. segmentation adapter;
-9. preview renderer;
-10. deterministic high-resolution render;
-11. cancellation/stale-result handling;
-12. typed errors and recovery.
+- create native iOS SwiftUI application;
+- Swift 6 language mode;
+- strict concurrency warnings/errors policy;
+- bundle ID/signing setup;
+- minimum deployment target from M1;
+- app target + unit/UI test targets;
+- local Swift packages only if they enforce real stable boundaries;
+- no third-party dependency by default.
+
+### Foundation architecture
+
+- `AppEnvironment` / typed dependency injection;
+- navigation model;
+- Observation-based feature state;
+- domain value types;
+- typed errors;
+- cancellation/revision model;
+- structured logging with privacy redaction.
+
+### Design foundation
+
+- current SwiftUI system controls;
+- semantic spacing/product tokens only where needed;
+- String Catalog;
+- SF Symbols baseline;
+- light/dark/high-contrast support;
+- accessibility test scaffolding;
+- no custom design system that fights HIG behavior.
+
+### Privacy foundation
+
+- `PrivacyInfo.xcprivacy` exists immediately;
+- camera usage purpose string;
+- no Photo Library permission if PhotosPicker covers import;
+- private/temp file directories;
+- cleanup policy;
+- dependency privacy review template.
+
+### CI
+
+Evaluate Xcode Cloud first; GitHub Actions/macOS remains an alternative.
+
+PR checks:
+
+- build;
+- Swift Testing;
+- rules validator placeholder;
+- deterministic fixture tests;
+- localization validation;
+- privacy manifest validation;
+- Package.resolved dependency review when changed.
 
 ### Exit criteria
 
-- controlled fixture images flow through the complete pipeline;
+- clean checkout builds with documented Xcode version;
+- production app launches on physical iPhone;
+- unit/UI tests run;
+- sample localized content works;
+- VoiceOver-friendly sample state exists;
+- privacy manifest is valid;
+- no image/business logic embedded in SwiftUI views.
+
+---
+
+## 6. M3 — Image and camera pipeline
+
+### Objective
+
+Turn spike findings into production-quality acquisition/analysis/rendering.
+
+### Build order
+
+1. source asset abstraction;
+2. PhotosPicker import;
+3. AVFoundation camera session/capture;
+4. ImageIO metadata and bounded decode;
+5. source lifecycle/file protection;
+6. Vision face analysis;
+7. derived geometry;
+8. blur/resolution/exposure checks;
+9. Vision segmentation;
+10. optional refinement interaction backend;
+11. preview renderer;
+12. deterministic high-resolution renderer;
+13. cancellation/revision safeguards;
+14. typed errors/recovery;
+15. signposts/performance instrumentation.
+
+### Exit criteria
+
+- controlled fixture images flow end-to-end;
+- live camera works reliably across test devices;
 - source remains immutable;
-- output reproduces expected crop parameters;
-- multiple/no-face cases handled;
+- no-face/multiple-face handled;
 - segmentation failure has safe fallback;
-- no UI-thread blocking beyond established budget;
-- image memory remains within M1 budget on target devices.
+- old async results cannot overwrite a newer job;
+- main actor remains responsive;
+- memory stays within M1 budget.
 
 ---
 
@@ -250,125 +392,159 @@ Implement a reliable source-to-preview pipeline independently of full rules cata
 
 ### Objective
 
-Make product behavior driven by explicit, sourced document profiles.
+Make product behavior data-driven and auditable.
 
 ### Work
 
-- JSON Schema;
+- canonical schema;
 - semantic validator;
-- typed profile loader;
+- Swift typed profile loader;
 - provenance model;
 - evaluator registry;
 - output-size rules;
 - head-size/position evaluators;
 - manual-check representation;
-- background policy representation;
-- rule-version display;
+- background policy;
+- profile version/review-date presentation;
 - initial launch profiles;
 - boundary fixtures;
 - CI validation.
 
 ### Exit criteria
 
-- adding a supported profile requires no country-specific UI/crop code;
+- adding a supported profile requires no document-specific SwiftUI/crop code;
 - every launch profile has sources and review date;
 - invalid profiles fail CI;
 - every machine-hard rule has tests;
-- manual requirements appear explicitly in validation results;
-- profile version can be traced into diagnostics/export metadata where appropriate.
+- manual requirements remain visible;
+- profile version is traceable in diagnostics.
 
 ---
 
-## 8. M5 — Complete product UX
+## 8. M5 — Apple-quality product UX
 
 ### Objective
 
-Turn technical capability into a fast, understandable end-to-end user journey.
+Turn capability into a coherent native iPhone experience.
 
 ### Build order
 
 1. home;
-2. country/profile selection;
+2. searchable country/document profile selection;
 3. requirement summary;
-4. camera/import entry;
-5. analysis state;
-6. photo-check report;
-7. editor;
+4. guided camera / Choose Photo path;
+5. analysis transition;
+6. Photo Check;
+7. constrained editor;
 8. export choice;
-9. digital export UI;
-10. print setup UI;
+9. digital export;
+10. print setup;
 11. completion;
-12. settings/help.
+12. help/settings;
+13. App Intent deep-link integration;
+14. optional intelligent explanation if approved.
 
-### Cross-cutting work
+### Required review passes
 
-- design system/components;
-- all empty/error states;
-- accessibility semantics;
-- scalable text;
-- localization stress testing;
-- privacy explanations;
-- source/provenance UI;
-- first-use guidance;
-- no-permission dead ends.
+#### HIG / design principles
 
-### User testing gate
+- purpose;
+- agency;
+- responsibility;
+- familiarity;
+- flexibility;
+- simplicity;
+- craft;
+- delight.
 
-Run task-based usability testing before calling M5 complete.
+#### Native component review
 
-Minimum questions to validate:
+For every custom control, answer: why does the system component not meet the need?
 
-- Can users select the correct document profile?
-- Do users understand `manual_check`?
-- Do users know whether “Ready” is a guarantee? They must understand it is not.
-- Can users correct crop without instruction?
-- Can users recover from bad source photos?
-- Can users create a print sheet?
+#### Liquid Glass review
+
+- standard components inherit system styling;
+- content remains primary;
+- no decorative glass overload;
+- Reduce Transparency/contrast remain usable.
+
+#### Accessibility
+
+- VoiceOver;
+- Voice Control;
+- Dynamic Type/accessibility sizes;
+- Reduce Motion;
+- Increased Contrast;
+- Differentiate Without Color;
+- switch/keyboard behavior where relevant.
+
+#### Localization
+
+- pseudolocalization;
+- long strings;
+- RTL structural test;
+- measurement formatting.
+
+### Usability gate
+
+Task-test:
+
+- create from Photos;
+- create from camera;
+- recover from denied camera permission;
+- understand a warning;
+- understand manual checks;
+- correct crop with gestures;
+- correct crop without gestures;
+- generate a print sheet;
+- locate source provenance;
+- launch from Shortcut/deep link.
 
 ### Exit criteria
 
-- complete core workflow works without developer explanation;
-- usability blockers resolved;
+- core workflow works without explanation;
 - no inaccessible gesture-only critical action;
-- localization does not break primary layouts;
-- all defined states implemented.
+- native navigation/presentation behavior is consistent;
+- no major misunderstanding of Ready vs guaranteed acceptance;
+- no high-severity usability issue remains.
 
 ---
 
 ## 9. M6 — Export and print fidelity
 
-### Objective
-
-Prove that what the user saves/prints matches the selected rules exactly.
-
 ### Digital export
 
-- exact dimensions;
-- encoding;
+Validate:
+
+- exact pixels/aspect ratio;
+- JPEG/PNG encoding as required;
 - color profile;
 - metadata stripping;
 - file-size constraints;
-- post-export verification;
-- save/share behavior.
+- post-export decode verification;
+- `Transferable`/share/save behavior.
 
 ### Print export
 
-- page-size model;
+Validate:
+
+- page dimensions;
 - grid packing;
 - copy count;
 - margins/gutters;
 - cut guides;
-- PDF page geometry;
-- 100% print instruction;
-- physical measurements.
+- PDF page boxes;
+- native print UI;
+- Actual Size instruction;
+- physical measurement across representative printers.
 
 ### Exit criteria
 
-- all output fixtures pass;
-- digital files re-open with exact expected dimensions;
+- output fixtures pass;
+- files reopen with exact expected properties;
 - PDF page boxes are correct;
-- multiple real printer paths produce measured photo sizes within documented tolerance when printed at actual size;
-- failure modes are user-readable.
+- physical photo size is within documented tolerance;
+- failed save/share/print states are recoverable.
 
 ---
 
@@ -376,111 +552,166 @@ Prove that what the user saves/prints matches the selected rules exactly.
 
 ### Objective
 
-Remove release risk.
+Remove App Store/reliability/accessibility risk and polish the details visible in real usage.
 
-### QA dimensions
+### Reliability
 
-- regression;
-- physical devices;
-- older supported OS;
+- repeated camera sessions;
+- interruptions;
+- background/foreground;
 - memory pressure;
-- app background/foreground interruption;
-- rotation/orientation;
-- corrupt/huge images;
-- privacy permissions;
+- low disk;
+- corrupt/huge input;
+- cancellation races;
 - offline mode;
-- accessibility;
-- localization;
-- performance;
-- dependency security/licences;
-- store disclosure accuracy.
+- thermal stress;
+- OS update/beta compatibility.
 
-### Privacy/security review
+### Performance
 
-- confirm no unexpected network calls during core flow;
-- inspect SDK behavior;
-- verify temp-file deletion;
-- verify EXIF/GPS stripping;
-- verify logs/crash payloads contain no image/sensitive data;
-- review permission strings;
-- threat-model rule updates if enabled.
+Use Instruments to profile and compare runs for:
+
+- SwiftUI responsiveness;
+- Time Profiler hotspots;
+- allocations/leaks;
+- Swift Concurrency contention;
+- image memory;
+- camera startup;
+- export.
+
+Use MetricKit only if it materially improves production diagnostics.
+
+### Accessibility
+
+Perform full core-flow audits on physical device with accessibility features enabled.
+
+No release while a core task is unavailable to VoiceOver due to an avoidable design choice.
+
+### Privacy/security
+
+- no unexpected network traffic in core flow;
+- PrivacyInfo.xcprivacy matches binary behavior;
+- required-reason APIs declared correctly;
+- temporary photos deleted;
+- EXIF/GPS stripping verified;
+- logs contain no sensitive image/face data;
+- every third-party dependency re-reviewed;
+- permission strings match actual use.
+
+### System integration
+
+- App Intents tested with AppIntentsTesting if adopted;
+- Spotlight only contains safe entities;
+- Shortcuts/deep links recover correctly after app state changes.
 
 ### Exit criteria
 
-- release criteria in requirements pass;
 - no open P0;
-- no correctness/privacy/data-loss P1;
+- no correctness/privacy/data-loss/accessibility P1;
+- performance budgets pass;
 - launch rules re-audited;
-- store disclosures match actual binaries/SDK behavior;
-- release candidate signed and distributed to test group.
+- App Store disclosures match binary;
+- TestFlight release candidate accepted by internal/external testers.
 
 ---
 
-## 11. M8 — Store release
+## 11. M8 — App Store release
 
 ### Objective
 
-Release safely and observe real-world reliability without compromising privacy.
+Ship a polished iPhone product safely.
 
-### Work
+### Product page
 
-- final name/branding lock;
-- icons/splash assets;
-- screenshots/localized listing;
-- privacy policy;
-- support page/contact;
-- pricing/IAP configuration if applicable;
-- App Store / Play metadata;
-- privacy/data-safety forms;
+- final product name;
+- Icon Composer final icon;
+- screenshots/localizations;
+- concise privacy-first messaging;
+- accurate capability claims;
+- no “guaranteed accepted” language;
+- support/privacy policy.
+
+### Store configuration
+
+- App Privacy answers;
 - age rating;
-- export compliance declarations as applicable;
-- staged/phased rollout where available;
-- crash/quality monitoring;
-- rule-support runbook.
+- encryption/export compliance declarations as applicable;
+- StoreKit products if monetized;
+- TestFlight notes;
+- phased release where appropriate.
+
+### Release QA
+
+- build using App Store-accepted non-beta Xcode;
+- archive validation;
+- clean install;
+- upgrade path if applicable;
+- production rules/catalog hash/version recorded;
+- rollback/hotfix procedure documented.
 
 ### Exit criteria
 
-- both stores approve or platform-specific issues are understood;
+- App Review approved;
 - production version available to intended cohort;
-- release monitoring active;
-- rollback/hotfix process tested/documented;
-- next rule/feature wave begins only after first-release quality is stable.
+- quality monitoring in place;
+- next feature/rule wave begins only after first-release stability.
 
 ---
 
-## 12. Workstream ownership model
+## 12. WWDC-quality review gate
 
-Even if one developer initially performs all work, track these as distinct disciplines:
+Before calling 1.0 complete, run a separate product review that ignores the backlog and asks only:
+
+1. Is the purpose immediately obvious?
+2. Does it look and behave like current iOS rather than a custom framework?
+3. Does the photo remain the visual focus?
+4. Is every animation/haptic useful?
+5. Are system capabilities used meaningfully rather than decoratively?
+6. Can a VoiceOver user complete the core task?
+7. Are permissions minimal and explained at point of use?
+8. Does the app stay fast with 48 MP images?
+9. Is every compliance claim traceable?
+10. Is optional AI clearly subordinate to deterministic logic?
+11. Are empty/error/interruption states as polished as the happy path?
+12. Could we remove any visible control or step?
+13. Is there at least one moment of genuine delight that comes from the workflow working exceptionally well rather than from decoration?
+
+A “no” does not automatically block release, but every “no” needs an explicit decision.
+
+## 13. Workstream disciplines
+
+Even with one developer, track distinct disciplines:
 
 - Product/specification
+- Apple platform architecture
 - UX/UI
-- Mobile application
-- Image/ML pipeline
+- Camera/image pipeline
 - Rules/content research
+- Accessibility
 - QA/validation
 - Privacy/security
-- Release/store operations
+- Performance
+- App Intents/system integration
+- App Store operations
 
-This prevents “coding is done” from hiding incomplete rule research, store compliance, or physical print testing.
-
-## 13. Suggested issue hierarchy
-
-Use GitHub issues with labels rather than encoding every implementation detail only in documents.
-
-Recommended labels:
+## 14. Suggested GitHub labels
 
 ```text
 priority:P0
 priority:P1
 priority:P2
 area:product
-area:ux
-area:architecture
+area:ios
+area:swiftui
+area:camera
+area:vision
 area:image-pipeline
 area:rules
 area:export
 area:privacy
 area:accessibility
+area:performance
+area:app-intents
 area:qa
 area:release
 type:feature
@@ -490,18 +721,23 @@ type:chore
 type:decision
 ```
 
-Milestones should mirror M0–M8.
+Milestones mirror M0–M8.
 
-## 14. Change-control rule
+## 15. Change-control rule
 
-If an implementation discovery changes a foundational assumption—such as cloud processing becoming necessary, background removal proving unreliable, or a store policy affecting monetization—do not quietly work around it. Update:
+When implementation changes a foundational assumption, update:
 
 1. the relevant requirement;
-2. `docs/10-decisions.md`;
+2. `10-decisions.md`;
 3. affected acceptance criteria;
-4. backlog priority/dependencies;
-5. privacy/security analysis if data flow changes.
+4. backlog dependencies;
+5. privacy/security analysis if data flow changes;
+6. iOS excellence strategy if platform usage changes.
 
-## 15. Immediate next development step
+Do not quietly work around architectural discoveries.
 
-Do **not** start by implementing final home screens. The next repository change after planning should create M1 spike scaffolding and a fixture/benchmark methodology. Production app bootstrap follows only after the spike results support the architecture decision.
+## 16. Immediate next development step
+
+Create the **M1 native iOS spike Xcode project**, not the final home screen.
+
+The first production-looking artifact should emerge only after we have measured the camera, Vision, image pipeline, editor accessibility, and exact export behavior on real iPhones.
