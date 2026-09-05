@@ -1,475 +1,646 @@
-# 04 — UX / UI
+# 04 — iOS UX / UI
 
 ## 1. UX objective
 
-The interface should feel much simpler than the underlying problem. The user should not need to understand biometric-photo geometry, pixels, DPI, or background rules to produce the correct output.
+The interface should feel materially simpler than the underlying problem. A person should not need to understand biometric-photo geometry, pixels, DPI, segmentation, or image formats to produce the correct output.
 
-The main experience is a guided task, not a general-purpose photo editor.
+This is a guided iPhone task, not a general-purpose photo editor.
 
-## 2. UX principles
+The experience should be credible against current Apple Human Interface Guidelines and WWDC26 design guidance. Native behavior is the baseline; custom presentation exists only when it improves the task.
 
-### UXP-01 — One primary task per screen
+## 2. Apple design-principle review lens
 
-Each main screen should have one obvious next action.
+Every meaningful product/design review should explicitly consider:
+
+- **Purpose** — does this help create a correct ID photo?
+- **Agency** — can the user understand and reverse what the app is doing?
+- **Responsibility** — are privacy, uncertainty, and identity preservation handled honestly?
+- **Familiarity** — are standard iOS patterns used where people already know them?
+- **Flexibility** — does the experience work across text sizes, accessibility needs, input methods, and supported iPhones?
+- **Simplicity** — can an element or step be removed without losing necessary control?
+- **Craft** — are spacing, typography, motion, state transitions, latency, and errors polished?
+- **Delight** — does the product create confidence through care rather than through decorative effects?
+
+## 3. UX principles
+
+### UXP-01 — One dominant action per state
+
+Each screen/state should have one obvious next action. Secondary actions remain available without competing visually.
 
 ### UXP-02 — Progressive disclosure
 
-Show only the requirements needed at the current step. Detailed source/legal information remains available but should not clutter the fast path.
+Show requirements when they matter. Full official sources and detailed measurements remain accessible without cluttering the fast path.
 
 ### UXP-03 — Explain, then fix
 
-If a photo has a problem, pair the warning with a concrete action: retake, choose another photo, reposition, adjust mask, or review manually.
+Every warning pairs with an actionable recovery: retake, choose another photo, reposition, adjust background, review manually, or continue knowingly.
 
-### UXP-04 — Do not hide uncertainty
+### UXP-04 — Preserve uncertainty
 
-A yellow/manual-review state is better than a misleading green state.
+`manual_check` is a first-class state. The app must not convert uncertainty into green confidence for visual neatness.
 
 ### UXP-05 — Preserve user effort
 
-Changing export type, copy count, or paper size must not force the user to repeat capture/editing.
+Changing export format, copy count, or compatible document profile should not make the user repeat acquisition/editing.
 
-### UXP-06 — Editing should be constrained
+### UXP-06 — Constrained editor
 
-The editor is not Photoshop. Only expose controls that help satisfy the selected output requirement.
+The editor exposes only controls required to make a compliant output. No filters, stickers, beautification, text overlays, or decorative effects in official mode.
 
-### UXP-07 — Show the actual final frame
+### UXP-07 — What you see is what is exported
 
-The crop preview must accurately represent what will be exported. Safe-area guides may overlay it, but they must never alter the output.
+The final frame is accurate. Guides/status remain UI overlays and are never baked into output.
 
-## 3. Information architecture
+### UXP-08 — Native before custom
 
-Recommended top-level structure:
+Prefer `NavigationStack`, system toolbars, sheets, menus, `PhotosPicker`, `ShareLink`, standard alerts/confirmation dialogs, SF Symbols, semantic colors, and platform gestures.
+
+### UXP-09 — No permission surprise
+
+Never request camera access on launch. Ask only after the user chooses camera capture. Normal photo import uses PhotosPicker and should not require full-library access.
+
+### UXP-10 — Accessibility is an interaction mode, not an afterthought
+
+Every core editing operation has a non-precision-gesture alternative and clear semantic state.
+
+## 4. Information architecture
+
+Recommended structure:
 
 ```text
 Home
-├── New photo
-│   ├── Country
-│   ├── Document/use case
+├── Create ID photo
+│   ├── Country / document profile
 │   ├── Requirements
-│   ├── Capture / Import
-│   ├── Analysis
+│   ├── Capture or Choose Photo
+│   ├── Photo Check
 │   ├── Editor
 │   └── Export
-├── Recent profiles (not photo history by default)
+├── Recent / Favorite Profiles
 ├── Help
 └── Settings
 ```
 
-Avoid a permanent bottom navigation bar for MVP unless testing proves users need frequent lateral navigation. The core workflow is linear and task-oriented.
+Do not add a persistent tab bar merely because it is common. The primary product is a linear task. A `NavigationStack` is the default unless testing demonstrates a genuine parallel-navigation need.
 
-## 4. Primary flow
+## 5. System appearance and Liquid Glass
+
+### Principle
+
+Use the newest system appearance by using native controls correctly, not by manually painting “Apple-looking” glass everywhere.
+
+Rules:
+
+- build with the latest SDK so standard SwiftUI navigation, toolbars, controls, menus, sheets, and materials inherit current Liquid Glass behavior;
+- let photo/content extend edge-to-edge where it improves immersion;
+- reserve custom `glassEffect` for a small number of floating interactive surfaces such as an editor control cluster when native toolbar placement cannot solve the task;
+- avoid glass-on-glass layering;
+- avoid persistent translucent cards covering the portrait;
+- status feedback must remain legible over diverse photos;
+- custom brand color should tint meaningfully, not flood navigation chrome;
+- verify light/dark appearance, increased contrast, Reduce Transparency, and high Dynamic Type sizes.
+
+The newest visual language is a consequence of using the system well, not the product’s visual gimmick.
+
+## 6. Visual language
+
+The app should feel precise, calm, modern, and human.
+
+Use:
+
+- system typography and Dynamic Type;
+- large, high-quality portrait previews;
+- generous spatial hierarchy;
+- SF Symbols for familiar actions/states;
+- semantic system colors/materials;
+- one restrained brand accent;
+- content-driven full-bleed photo surfaces;
+- clear toolbars rather than dense card grids;
+- subtle haptics and motion only at meaningful transitions.
+
+Avoid:
+
+- fake camera hardware chrome;
+- decorative gradients competing with faces;
+- excessive cards within cards;
+- permanently visible technical measurements;
+- tiny caption-style action labels;
+- custom back buttons;
+- custom share sheets;
+- custom photo-library browsers;
+- copied Android/cross-platform interaction conventions.
+
+## 7. Primary flow
 
 ### Screen 1 — Home
 
-Purpose: start quickly.
+Purpose: start immediately.
 
 Content:
 
-- product name/logo;
-- primary action: `Create ID photo`;
-- recent/favourite document profiles if available;
-- optional secondary entry: generic/custom photo size, only if clearly separated from validated official profiles;
-- Settings/About access.
+- product identity;
+- dominant `Create ID Photo` action;
+- recent/favorite document profiles when available;
+- subtle access to Help/Settings through appropriate navigation/toolbar placement.
 
-Do not ask for permissions here.
+Optional iOS integration may allow Siri/Shortcuts/Spotlight to deep-link directly to a document profile, but the in-app home remains complete on its own.
 
-### Screen 2 — Country
+Do not ask for permissions.
 
-Purpose: choose jurisdiction.
+### Screen 2 — Country and document profile
 
-Content:
+Prefer one searchable selection experience rather than forcing multiple screens if testing shows a combined picker is faster.
 
-- search field;
-- suggested/recent countries;
-- alphabetical list;
-- localized country name;
-- optional flag as secondary visual cue, never the only identifier.
+Use:
 
-### Screen 3 — Document type
+- SwiftUI searchable navigation;
+- recent/favorite sections;
+- localized country/document names;
+- output size as secondary information;
+- verified-source status only when provenance policy is satisfied.
 
-Purpose: choose the exact profile.
+Flags may be supplementary but never the sole identifier.
 
-Each item should show:
+### Screen 3 — Requirements summary
 
-- document name;
-- short output dimension summary;
-- `Official rules verified` or equivalent trust label only when provenance requirements are satisfied;
-- last-reviewed detail on demand.
+Purpose: prevent avoidable capture failures.
 
-### Screen 4 — Requirements summary
+Show only the high-value pre-capture guidance:
 
-Purpose: tell the user how to prepare the source photo before taking/importing it.
+- pose/expression;
+- background;
+- glasses/headwear where relevant;
+- lighting/shadow guidance;
+- photo-recency requirements where relevant;
+- child/baby exceptions where applicable.
 
-Recommended content:
+Primary action: `Take Photo`.
+Secondary action: `Choose Photo`.
+Tertiary: `View Full Requirements`.
 
-- large simple illustration/guide;
-- background instruction;
-- face/pose instruction;
-- glasses/headwear/expression summary where relevant;
-- photo age/recency guidance if the profile specifies it;
-- `Take photo` primary action;
-- `Choose existing photo` secondary action;
-- `View full requirements` tertiary action.
+### Screen 4A — Guided camera
 
-This screen should reduce avoidable retakes.
+The camera is one of the product’s signature experiences.
 
-### Screen 5A — Camera
+Design:
 
-Purpose: acquire a usable source.
+- edge-to-edge live preview;
+- minimal overlay;
+- large system-style shutter control;
+- camera-switch control only when useful;
+- a lightweight composition guide;
+- one or two high-confidence live messages at a time;
+- no technical score dashboard while framing.
 
-Possible overlays:
+Live guidance may include:
 
-- approximate face oval/frame;
-- headroom indicator;
-- simple distance guidance;
-- lighting warning if available in real time;
-- camera switch where appropriate;
-- shutter.
+- move farther/closer;
+- center your face;
+- raise/lower the phone;
+- improve lighting;
+- only one face;
+- hold still.
 
-Do not promise real-time official compliance unless the implementation actually evaluates the required conditions.
+Use feedback only when confidence is high enough to help. Do not flicker warnings frame-to-frame. Apply hysteresis/debouncing.
 
-After capture, show confirmation only if needed; otherwise proceed directly to analysis.
+Camera guidance optimizes the **source photo**, not the final official crop. The user should leave enough room for downstream formatting.
 
-### Screen 5B — Native photo picker
+Accessibility:
 
-Use the platform picker rather than building a custom full photo-library UI unless a strong requirement appears.
+- all controls have VoiceOver/Voice Control labels;
+- guidance is spoken without becoming an incessant stream;
+- visual guide is not required to complete capture;
+- shutter remains a predictable accessible control;
+- no critical state conveyed only by color.
 
-### Screen 6 — Analysis
+### Screen 4B — PhotosPicker
 
-Purpose: provide fast feedback while processing.
+Use the system picker. Do not replicate the Photos app.
 
-The loading state should communicate actual stages only if they help perceived progress, e.g.:
+After selection, transition directly into analysis unless an explicit confirmation solves a proven problem.
 
-- checking photo;
-- finding face;
-- preparing background;
-- applying document rules.
+### Screen 5 — Analysis transition
 
-Avoid fake precision percentages unless work progress is genuinely measurable.
+The analysis should feel immediate and truthful.
 
-### Screen 7 — Photo check
+If processing is short, avoid a separate loading screen; transition directly to the result with progressive state.
 
-Purpose: summarize source suitability.
+If longer, show meaningful stage names such as:
+
+- Checking photo
+- Finding face
+- Preparing background
+- Applying document rules
+
+Do not show fake percentages.
+
+Use animation that respects Reduce Motion.
+
+### Screen 6 — Photo Check
 
 Structure:
 
-- photo preview;
+- prominent portrait preview;
 - overall state;
-- grouped checks;
-- clear next action.
+- concise check list;
+- one primary next action.
 
-Overall-state examples:
+Overall states:
 
 **Ready**
-- “The measurable checks look good. Review the remaining manual requirements before export.”
+> The measurable checks look good. Review the remaining manual requirements before export.
 
-**Needs review**
-- “A few items need your attention.”
+**Needs Review**
+> A few items need your attention.
 
-**Retake recommended**
-- “This source photo is unlikely to produce a good result.”
+**Retake Recommended**
+> This source photo is unlikely to produce a good result.
 
-Each check row contains:
+Each check row includes:
 
-- state icon;
+- SF Symbol/status treatment;
 - short label;
-- one-line explanation;
-- optional `How to fix` expansion.
+- plain-language explanation;
+- `How to Fix` detail where useful.
 
-Manual checks are always visible.
+Manual checks remain visible.
 
-### Screen 8 — Editor
+### Screen 7 — Editor
 
-Purpose: produce the final composition.
+The editor is the second signature experience.
 
-Recommended default layout:
+Default structure:
 
-- large photo canvas;
-- rule guides;
-- compliance status chip/summary;
-- compact control tray.
+- full-bleed/large portrait canvas;
+- official crop frame and composition guides;
+- minimal floating/toolbar controls;
+- concise current status;
+- primary `Continue` action when no hard measurable failure remains.
 
-Control groups:
+Controls:
 
-1. **Position** — drag/pinch plus accessible buttons/step controls.
-2. **Background** — automatic/original/permitted color choices.
-3. **Mask refine** — only when needed.
-4. **Adjust** — only allowed limited corrections.
-5. **Reset**.
+1. **Position** — direct drag/pinch plus accessible adjustment actions.
+2. **Background** — automatic/original/permitted colors.
+3. **Refine** — only when segmentation requires user help.
+4. **Reset** — return to automatic composition.
+5. **Details** — show exact measurements/status on demand, not permanently.
 
-Do not expose generic filters, stickers, effects, face retouching, text, or decorative tools.
+On iOS 27, evaluate Vision’s tap/scribble/rectangle segmentation refinement for a more natural mask-correction experience. It should feel like pointing out what is foreground/background rather than painting pixels manually.
 
-The primary action is `Continue` / `Export` once no hard measurable failures remain. The app may allow export with warnings/manual checks if policy permits, but the warning must be explicit.
+Gesture behavior:
 
-### Screen 9 — Export choice
+- drag translates;
+- pinch scales;
+- optional rotation only if official rules and usability justify it;
+- use live rule feedback;
+- hard constraints only prevent impossible output (for example, empty crop pixels).
 
-Two primary cards/options:
+Accessible alternatives:
 
-- `Digital photo`
-- `Print sheet`
+- VoiceOver adjustable action for zoom where appropriate;
+- explicit Move Up/Down/Left/Right actions;
+- Zoom In/Out;
+- Reset Position;
+- Background choices with readable names;
+- mask-refinement controls accessible without freehand drawing when possible.
 
-Each explains what the user receives.
+Haptics:
 
-### Screen 10A — Digital export
+Use `sensoryFeedback` sparingly for meaningful events such as snapping into a recommended range or successful completion. Do not buzz continuously during drag.
+
+### Screen 8 — Export choice
+
+Use a clear native list/card decision:
+
+- `Digital Photo`
+- `Print Sheet`
+
+Do not introduce a generic “Export Center.”
+
+### Screen 9A — Digital export
 
 Show:
 
-- final size in pixels and/or physical unit according to profile;
-- file format;
-- estimated/actual file size if relevant;
-- remaining manual checks;
-- primary `Save / Share` action.
+- final dimensions;
+- format;
+- file-size constraint status if relevant;
+- remaining manual checks.
 
-If a profile defines an upload file-size limit, report whether the generated file satisfies it.
+Primary action should use a native share/save path (`ShareLink`/system share sheet or appropriate Photos/files export action).
 
-### Screen 10B — Print setup
+Do not invent a proprietary file browser.
+
+### Screen 9B — Print setup
 
 Show:
 
 - paper size;
-- paper orientation if user-selectable;
-- number of copies;
-- layout preview;
-- cutting guides toggle if supported;
-- `Generate PDF` primary action.
+- copy count;
+- orientation where meaningful;
+- print-sheet preview;
+- cut-guide choice if supported.
 
-After PDF generation, show a prominent printing instruction: use **Actual size / 100% scale** and disable fit-to-page scaling.
+Primary action: `Print / Share PDF`.
 
-### Screen 11 — Completion
+The system printing interface is preferred. Explicitly tell users to preserve Actual Size / 100% scaling when printing outside the app.
 
-Keep this lightweight.
+### Screen 10 — Completion
 
-Actions:
+Completion should be quiet and useful.
+
+Actions may include:
 
 - share/save again;
-- create another format from the same edited photo where safe;
-- start a new photo;
-- optionally ask for non-intrusive feedback.
+- make another compatible format from the same prepared source;
+- create a new photo.
 
-Do not trap the user in an upsell after successful completion.
+No forced review prompt or full-screen upsell immediately after success.
 
-## 5. Secondary flows
+## 8. Navigation and presentation rules
 
-### 5.1 Change document profile mid-job
+- Use `NavigationStack` for the task flow.
+- Use system sheets for contained secondary decisions.
+- Use confirmation dialogs for destructive/choice-heavy actions when appropriate.
+- Avoid nested sheets.
+- Avoid custom modal transitions unless the system cannot express the desired relationship.
+- Place primary actions consistently with current iOS toolbar conventions.
+- Use destructive role styling for destructive actions.
+- Preserve swipe-back behavior unless an active editing state genuinely requires confirmation.
+- When abandoning unsaved work, ask only if meaningful effort would be lost.
 
-Changing to another profile should preserve the normalized source and non-destructive edits where compatible, then recompute crop/rules. The user must be warned if a background or edit allowed in the first profile is not allowed in the second.
+## 9. Search
 
-### 5.2 Permission denied
+Search exists where users need to find a country/document profile, not as universal decoration.
 
-Never show a dead-end error.
+Use native searchable behavior and current iOS search conventions.
 
-Camera permission denied:
+Search should match:
 
-- explain why permission is needed;
-- offer `Open Settings` where supported;
-- offer `Choose existing photo`.
+- localized country name;
+- document name;
+- common aliases;
+- country code if useful;
+- visa/passport/common-language terms.
 
-Photo permission constrained:
+Core Spotlight may expose supported document profiles to system search. Never index personal photos or face-derived metadata.
 
-- use native limited picker;
-- do not demand full-library permission without a feature need.
+## 10. App Intents / Siri UX
 
-### 5.3 No face / multiple faces
+Only expose durable, understandable actions.
 
-No face:
+Good candidates:
 
-- show example of acceptable source;
-- retry;
-- choose another photo.
+- “Create an ID photo”
+- “Create a passport photo”
+- “Open Spain passport photo requirements”
 
-Multiple faces:
+System entry should land at the earliest sensible point with context preselected, then continue in the normal app flow.
 
-- explain that the app needs a single subject for reliable ID formatting;
-- choose another image/retake;
-- only add manual face selection later if validated as safe and useful.
+Do not make Siri responsible for taking or approving a sensitive official photo.
 
-### 5.4 Segmentation failure
+## 11. Optional Foundation Models experience
 
-Options depend on rule profile:
+An optional on-device helper may explain structured diagnostics or answer plain-language questions.
 
-- use original background if acceptable;
-- refine mask manually;
-- retake on a simpler background.
+Examples:
 
-Never output an obviously broken edge without warning.
+- “Why is this marked Needs Review?”
+- “What does head height mean?”
+- “How should I take this photo again?”
 
-### 5.5 Low resolution
+Boundaries:
 
-Explain whether:
+- deterministic checks remain visible and authoritative;
+- generated text is presented as assistance, not a new compliance result;
+- the feature disappears cleanly when model capability is unavailable;
+- no cloud fallback without a separate privacy/product decision;
+- evaluation is required before release.
 
-- digital output is impossible;
-- print output is likely to be soft;
-- a smaller supported format remains possible.
+Do not add a chat tab merely to advertise AI.
 
-Avoid silent aggressive upscaling.
+## 12. Status design
 
-### 5.6 Offline
-
-Core flow continues. If future remote catalog update or support content needs network, explain that separately without blocking shipped rules.
-
-## 6. Design language
-
-The app should feel trustworthy, modern, and utilitarian rather than playful or bureaucratic.
-
-Recommended visual characteristics:
-
-- neutral base palette;
-- one clear brand accent;
-- status colors with icons/text redundancy;
-- generous whitespace;
-- large portrait previews;
-- subtle separators rather than dense cards everywhere;
-- restrained motion;
-- no fake camera chrome;
-- no banner/interstitial advertising in the core flow.
-
-## 7. Status design
-
-Use consistent semantics across the entire app:
-
-| State | Meaning | UX treatment |
+| State | Meaning | Treatment |
 |---|---|---|
-| Pass | Machine-checkable requirement appears satisfied | positive icon + concise confirmation |
-| Warn | Risk or low-confidence issue | warning icon + action/review guidance |
-| Fail | Measurable requirement clearly not satisfied | blocking/error icon + fix action |
-| Manual check | App cannot safely validate | neutral review icon + user checklist |
+| Pass | measurable requirement appears satisfied | positive symbol + text |
+| Warn | risk or uncertain measurable issue | warning symbol + remediation |
+| Fail | measurable requirement clearly fails | error symbol + fix/retake action |
+| Manual check | cannot be safely validated automatically | review symbol + checklist |
 
-The overall status is derived from individual checks; it must not hide them.
+Color supplements meaning but never carries it alone.
 
-## 8. Photo editor interaction model
+## 13. Error design
 
-### Gestures
-
-- drag = translate photo/subject within frame;
-- pinch = scale within safe limits;
-- optional two-finger rotation only if document policy and UX tests justify it; otherwise avoid exposing it.
-
-### Accessibility alternatives
-
-Provide buttons/controls for:
-
-- move up/down/left/right;
-- zoom in/out;
-- reset automatic position;
-- select background;
-- enter mask correction.
-
-### Constraint behavior
-
-Do not hard-lock every movement just because it crosses a recommended boundary; this can feel broken. Prefer live failure/warning feedback, with hard bounds only where output would become impossible (for example empty pixels inside crop).
-
-## 9. Camera guidance strategy
-
-The camera should optimize for source quality rather than attempt to duplicate the full final crop.
-
-Useful guidance:
-
-- one person only;
-- camera at face height;
-- stand away from wall to reduce shadows;
-- even frontal lighting;
-- neutral expression where required;
-- enough room around shoulders/head;
-- avoid digital zoom;
-- clean lens.
-
-For baby/child profiles, guidance must adapt where official rules differ.
-
-## 10. Error-writing rules
-
-Every error should answer:
+Every error answers:
 
 1. What happened?
 2. Why does it matter?
-3. What can the user do now?
+3. What can I do now?
 
 Bad:
 
-> Error 204: segmentation confidence insufficient.
+> Segmentation confidence insufficient.
 
 Better:
 
-> We could not separate the hair cleanly from the background. Try a photo taken farther from the wall, use the original background, or correct the edge manually.
+> We couldn’t separate the hair cleanly from the background. Try a photo farther from the wall, keep the original background if allowed, or refine the edge.
 
-## 11. Localization UX
+Use system alerts only for events that genuinely interrupt the workflow. Inline errors are preferred when recovery belongs to the current screen.
 
-- Never embed numeric values inside non-localizable images.
-- Country/document names require localized aliases.
-- Units should follow profile requirements first, then optionally show user-familiar equivalents.
-- Avoid fixed-width controls based on English labels.
-- Screenshots/illustrations should not contain baked-in explanatory text where possible.
+## 14. Permission states
 
-## 12. Accessibility checklist by screen
+### Camera denied
 
-For every screen:
+Explain the purpose and provide:
 
+- `Open Settings` when appropriate;
+- `Choose Photo` as immediate alternative.
+
+### Photo import
+
+Normal PhotosPicker use should avoid broad Photo Library permission entirely.
+
+Never block the product behind permissions not required for the selected path.
+
+## 15. Accessibility requirements
+
+### VoiceOver
+
+- meaningful screen titles;
 - logical focus order;
-- descriptive page title/announcement;
-- every icon button has a label;
-- image preview has useful semantics without describing sensitive visual identity unnecessarily;
-- warnings announced after analysis;
-- status is not color-only;
-- editor has non-gesture controls;
-- text scales without hiding primary actions;
-- landscape behavior is intentionally supported or intentionally constrained with rationale.
+- concise status announcements after analysis;
+- no redundant reading of every decorative guide;
+- editor adjustments expose current value/state;
+- move/zoom controls are operable without direct manipulation.
 
-## 13. Empty/loading/error states that must be designed
+### Voice Control
 
-Before implementation is considered UI-complete, designs must exist for:
+- visible/semantic labels map to predictable spoken names;
+- avoid multiple ambiguous `Edit`/`More` actions on one screen.
+
+### Dynamic Type
+
+- surrounding controls support accessibility text sizes;
+- do not scale the actual photo/crop geometry based on Dynamic Type;
+- layouts reflow rather than clip;
+- primary action remains reachable.
+
+### Reduce Motion
+
+- replace spatial/morphing transitions with simpler fades where necessary;
+- no important information encoded only in motion.
+
+### Differentiate Without Color / Increased Contrast
+
+- use symbols, text, borders/shape where needed;
+- verify status chips and overlays on varied photos.
+
+### Touch targets
+
+Controls should meet current HIG target guidance and remain forgiving near the photo editor.
+
+## 16. Localization
+
+Use String Catalogs from the beginning.
+
+- no baked-in text in instructional images where avoidable;
+- document names support official/localized aliases;
+- numbers and measurements use Foundation formatting;
+- long German/French/Portuguese strings must not break layouts;
+- RTL should be tested even if not a launch language;
+- screenshots/localized App Store assets are planned per launch locale.
+
+## 17. Empty/loading/error states that must exist
+
+Before UI is complete, design and implement:
 
 - no recent profiles;
 - no search results;
-- rules catalog unavailable/corrupt;
-- camera permission denied/restricted;
-- photo-picker cancellation;
-- image decode failure;
-- unsupported image type;
+- rule catalog failure;
+- camera unauthorized/restricted;
+- camera interruption;
+- camera unavailable;
+- PhotosPicker cancellation;
+- decode failure;
+- unsupported/corrupt image;
 - image too small;
 - no face;
 - multiple faces;
-- detector failure;
+- Vision failure;
 - segmentation failure;
+- iOS 27 refinement unavailable;
 - processing cancelled;
+- background/foreground app interruption;
 - export failure;
-- storage/share failure;
-- PDF generation failure;
-- offline remote-update failure;
+- disk-space failure;
+- share/print cancellation/failure;
 - invalid/outdated profile warning.
 
-## 14. UX validation plan
+## 18. Animation and sensory-feedback policy
 
-Test prototypes with tasks, not preference questions.
+Animation should communicate hierarchy/state change, not advertise polish.
+
+Use:
+
+- native transitions;
+- matched transitions only when the source/destination relationship is clear;
+- short status transitions;
+- subtle alignment/export haptics.
+
+Avoid:
+
+- looping decorative motion;
+- confetti for official-document completion;
+- dramatic zoom transitions that obscure navigation;
+- constant haptics while tracking continuous gestures.
+
+Every motion path is reviewed with Reduce Motion enabled.
+
+## 19. App icon and brand
+
+Use Icon Composer for the final app icon and test it across current appearance treatments.
+
+Brand strategy:
+
+- simple, recognizable silhouette/layers;
+- works small;
+- no tiny text;
+- no passport/government emblem that implies official affiliation;
+- identity should complement the iOS visual system rather than fight it.
+
+SF Symbols should cover most in-app utility iconography. Custom symbols must match system optical weight and alignment.
+
+## 20. UX validation
+
+Use task testing, not preference polling.
 
 Representative tasks:
 
-1. “Create a passport photo from a photo already on your phone.”
-2. “The app says the photo is blurry. What would you do?”
-3. “Move the face into the correct position.”
-4. “Tell me which checks the app cannot verify for you.”
-5. “Create a page with six printable copies.”
-6. “Find the source/date for this document requirement.”
-7. “Recover after denying camera permission.”
+1. Create a passport photo from Photos.
+2. Recover after camera permission is denied.
+3. Understand why a photo is marked blurry.
+4. Correct face position without verbal instruction.
+5. Correct face position using VoiceOver/non-gesture controls.
+6. Identify which checks remain manual.
+7. Create six printable copies.
+8. Find the official source and review date.
+9. Start the app through a Shortcut and understand where you landed.
 
 Measure:
 
-- task completion;
+- completion;
 - time on task;
 - wrong turns;
-- misunderstanding of status;
-- whether users incorrectly interpret `Ready` as guaranteed government acceptance;
-- editor accessibility and gesture discoverability.
+- accidental exits;
+- misunderstanding of Ready/manual-check semantics;
+- gesture discoverability;
+- VoiceOver completion;
+- large-text layout failures;
+- perceived confidence without overclaiming acceptance.
 
-## 15. Design deliverables before production UI implementation
+## 21. Design review checklist
 
-Required artifacts:
+Before a screen is accepted:
 
-- complete screen map;
-- low-fidelity wireframes for all primary/error states;
-- clickable prototype of the main flow;
-- design tokens;
-- component inventory;
-- editor interaction prototype;
+- Is every element necessary?
+- Is the dominant action obvious?
+- Could a standard iOS control replace a custom one?
+- Does content remain primary over glass/chrome?
+- Does it work in light/dark/increased contrast?
+- Does it work with accessibility text sizes?
+- Does VoiceOver expose equivalent functionality?
+- Does Voice Control have usable names?
+- Does Reduce Motion remain coherent?
+- Are loading and error states truthful?
+- Are permissions requested only at point of use?
+- Does the screen remain understandable if all optional AI features are removed?
+
+## 22. Design deliverables before final production UI
+
+Required:
+
+- screen/state map;
+- low-fidelity wireframes;
+- current-HIG component inventory;
+- main-flow prototype;
+- camera interaction prototype;
+- editor direct-manipulation prototype;
+- VoiceOver editor interaction prototype;
+- Liquid Glass/system-material study using real SwiftUI controls rather than static mockups;
+- design tokens only for product-specific values not already represented by system semantics;
 - accessibility annotations;
-- localization stress-test screens;
-- final visual design for the primary path;
-- App Store / Google Play screenshot plan later in M8.
+- localization stress tests;
+- Icon Composer exploration;
+- final visual design for primary path;
+- App Store screenshot/story plan.
+
+## 23. Primary Apple references
+
+- Human Interface Guidelines: https://developer.apple.com/design/human-interface-guidelines/
+- Design principles: https://developer.apple.com/design/human-interface-guidelines/design-principles
+- WWDC26 Design guide: https://developer.apple.com/wwdc26/guides/design/
+- Liquid Glass: https://developer.apple.com/documentation/TechnologyOverviews/liquid-glass
+- SwiftUI: https://developer.apple.com/wwdc26/guides/swiftui/
+- Apple Design Resources: https://developer.apple.com/design/resources/
+
+Re-review this document after major HIG/SDK changes instead of treating it as frozen visual law.
