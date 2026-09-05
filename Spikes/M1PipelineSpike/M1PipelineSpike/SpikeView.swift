@@ -94,6 +94,8 @@ struct SpikeView: View {
 
             Text("Device: \(report.hardwareIdentifier) — \(report.operatingSystem)")
             Text("Resolved still: \(report.resolvedCaptureWidth)×\(report.resolvedCaptureHeight)")
+            Text("Full oriented source: \(report.normalizedSourceWidth)×\(report.normalizedSourceHeight)")
+            Text("Vision analysis: \(report.analysisWidth)×\(report.analysisHeight) (max edge \(report.analysisMaximumPixelSize))")
             Text("Faces detected: \(report.faceCount)")
             metric("Face detection", report.faceDetectionMilliseconds, suffix: " ms")
             metric("Person segmentation", report.personSegmentationMilliseconds, suffix: " ms")

@@ -24,6 +24,9 @@ struct SpikeRunReport: Codable, Sendable {
     let captureMilliseconds: Double
     let normalizedSourceWidth: Int
     let normalizedSourceHeight: Int
+    let analysisWidth: Int
+    let analysisHeight: Int
+    let analysisMaximumPixelSize: Int
     let faceCount: Int
     let primaryFaceBoundingBox: [Double]
     let faceDetectionMilliseconds: Double
@@ -48,7 +51,7 @@ struct PipelineResult: Sendable {
 
 enum PipelineError: LocalizedError {
     case cannotDecodeCapture
-    case cannotCreateCGImage
+    case cannotCreateAnalysisImage
     case noFace
     case noPersonMask
     case cannotCreateSRGB
@@ -56,7 +59,7 @@ enum PipelineError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .cannotDecodeCapture: "ImageIO/Core Image could not decode the captured still."
-        case .cannotCreateCGImage: "Core Image could not materialize an orientation-normalized CGImage."
+        case .cannotCreateAnalysisImage: "ImageIO could not create the bounded analysis image."
         case .noFace: "Vision did not detect a face in the captured photo."
         case .noPersonMask: "Vision did not generate a person-instance segmentation mask."
         case .cannotCreateSRGB: "The sRGB color space is unavailable."

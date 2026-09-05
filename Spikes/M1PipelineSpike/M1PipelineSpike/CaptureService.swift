@@ -40,8 +40,8 @@ enum CaptureServiceError: LocalizedError {
 }
 
 actor CaptureService {
-    // This is intentionally exposed read-only so AVCaptureVideoPreviewLayer can attach on MainActor.
-    // All configuration and mutation still happens on this actor's serial executor.
+    // Read-only exposure lets AVCaptureVideoPreviewLayer attach on MainActor.
+    // Configuration/capture mutation remains isolated to this actor's serial executor.
     nonisolated let captureSession = AVCaptureSession()
 
     private let sessionQueue = DispatchSerialQueue(
@@ -89,12 +89,7 @@ actor CaptureService {
             throw CaptureServiceError.captureAlreadyInProgress
         }
 
-        let settings = AVCapturePhotoSettings()
-        settings.photoQualityPrioritization = .quality
-        if requestedDimensions.width > 0, requestedDimensions.height > 0 {
-            settings.maxPhotoDimensions = requestedDimensions
-        }
-
+        let settings = makePhotoSettings()
         let start = ContinuousClock.now
         let captured: CapturedPhoto = try await withCheckedThrowingContinuation { continuation in
             let delegate = PhotoCaptureDelegate(
@@ -105,6 +100,8 @@ actor CaptureService {
             activePhotoDelegate = delegate
             photoOutput.capturePhoto(with: settings, delegate: delegate)
         }
+
+        // AVCam-style lifetime discipline: retain through didFinishCaptureFor.
         activePhotoDelegate = nil
         return captured
     }
@@ -161,7 +158,19 @@ actor CaptureService {
             photoOutput.maxPhotoDimensions = largest
         }
 
+        // Give AVFoundation an early resource hint without blocking first preview.
+        // With deferred start enabled, preparation work participates in the session's deferred work.
+        photoOutput.setPreparedPhotoSettingsArray([makePhotoSettings()])
         configured = true
+    }
+
+    private func makePhotoSettings() -> AVCapturePhotoSettings {
+        let settings = AVCapturePhotoSettings()
+        settings.photoQualityPrioritization = .quality
+        if requestedDimensions.width > 0, requestedDimensions.height > 0 {
+            settings.maxPhotoDimensions = requestedDimensions
+        }
+        return settings
     }
 }
 
@@ -169,6 +178,7 @@ private final class PhotoCaptureDelegate: NSObject, @preconcurrency AVCapturePho
     private let requestedDimensions: CMVideoDimensions
     private let captureStart: ContinuousClock.Instant
     private var continuation: CheckedContinuation<CapturedPhoto, Error>?
+    private var processedResult: Result<CapturedPhoto, Error>?
     private let lock = NSLock()
 
     init(
@@ -187,16 +197,16 @@ private final class PhotoCaptureDelegate: NSObject, @preconcurrency AVCapturePho
         error: Error?
     ) {
         if let error {
-            finish(.failure(error))
+            storeProcessedResult(.failure(error))
             return
         }
         guard let data = photo.fileDataRepresentation() else {
-            finish(.failure(CaptureServiceError.noPhotoData))
+            storeProcessedResult(.failure(CaptureServiceError.noPhotoData))
             return
         }
 
         let resolved = photo.resolvedSettings.photoDimensions
-        finish(.success(CapturedPhoto(
+        storeProcessedResult(.success(CapturedPhoto(
             data: data,
             requestedWidth: requestedDimensions.width,
             requestedHeight: requestedDimensions.height,
@@ -213,7 +223,19 @@ private final class PhotoCaptureDelegate: NSObject, @preconcurrency AVCapturePho
     ) {
         if let error {
             finish(.failure(error))
+            return
         }
+
+        lock.lock()
+        let processedResult = self.processedResult
+        lock.unlock()
+        finish(processedResult ?? .failure(CaptureServiceError.noPhotoData))
+    }
+
+    private func storeProcessedResult(_ result: Result<CapturedPhoto, Error>) {
+        lock.lock()
+        processedResult = result
+        lock.unlock()
     }
 
     private func finish(_ result: Result<CapturedPhoto, Error>) {
