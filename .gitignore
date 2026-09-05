@@ -3,7 +3,6 @@ DerivedData/
 build/
 .build/
 .swiftpm/
-Package.resolved
 *.xcuserstate
 xcuserdata/
 *.xccheckout
@@ -57,4 +56,5 @@ Local.xcconfig
 # Swift Package Manager local scratch state
 .swiftpm/xcode/package.xcworkspace/xcuserdata/
 
+# Package.resolved should be committed for an application target to pin dependency versions.
 # Keep source-controlled shared schemes/settings intentionally; do not blanket-ignore *.xcscheme
