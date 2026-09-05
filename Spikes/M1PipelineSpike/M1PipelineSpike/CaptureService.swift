@@ -39,10 +39,27 @@ enum CaptureServiceError: LocalizedError {
     }
 }
 
+/// A deliberately narrow bridge that transports the identity of an `AVCaptureSession`
+/// from the capture actor to the main-actor preview layer.
+///
+/// Safety proof for `@unchecked Sendable`:
+/// - `session` is immutable reference identity after initialization.
+/// - All session configuration, start/stop, and capture mutation happens only inside
+///   `CaptureService`, whose executor is one serial dispatch queue.
+/// - Main-actor code may only attach this exact reference to
+///   `AVCaptureVideoPreviewLayer.session`; it never configures or starts/stops it.
+/// - The bridge contains no other mutable application state.
+final class CaptureSessionPreviewHandle: @unchecked Sendable {
+    let session: AVCaptureSession
+
+    init(session: AVCaptureSession) {
+        self.session = session
+    }
+}
+
 actor CaptureService {
-    // Read-only exposure lets AVCaptureVideoPreviewLayer attach on MainActor.
-    // Configuration/capture mutation remains isolated to this actor's serial executor.
-    nonisolated let captureSession = AVCaptureSession()
+    private let captureSession: AVCaptureSession
+    nonisolated let previewHandle: CaptureSessionPreviewHandle
 
     private let sessionQueue = DispatchSerialQueue(
         label: "com.jarbasferro.IDPhoto.M1PipelineSpike.capture-session"
@@ -56,6 +73,12 @@ actor CaptureService {
     private var configured = false
     private var requestedDimensions = CMVideoDimensions(width: 0, height: 0)
     private var activePhotoDelegate: PhotoCaptureDelegate?
+
+    init() {
+        let session = AVCaptureSession()
+        captureSession = session
+        previewHandle = CaptureSessionPreviewHandle(session: session)
+    }
 
     func start() async throws -> CameraStartEvidence {
         try await authorizeCameraAtPointOfUse()
@@ -174,7 +197,7 @@ actor CaptureService {
     }
 }
 
-private final class PhotoCaptureDelegate: NSObject, @preconcurrency AVCapturePhotoCaptureDelegate {
+private final class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
     private let requestedDimensions: CMVideoDimensions
     private let captureStart: ContinuousClock.Instant
     private var continuation: CheckedContinuation<CapturedPhoto, Error>?

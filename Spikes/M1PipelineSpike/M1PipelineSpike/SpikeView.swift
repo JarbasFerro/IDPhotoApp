@@ -45,7 +45,7 @@ struct SpikeView: View {
             .frame(minHeight: 320)
         default:
             CameraPreview(
-                session: model.camera.captureSession,
+                sessionHandle: model.camera.previewHandle,
                 onFirstPreviewFrame: model.noteFirstPreviewFrame
             )
             .aspectRatio(3.0 / 4.0, contentMode: .fit)

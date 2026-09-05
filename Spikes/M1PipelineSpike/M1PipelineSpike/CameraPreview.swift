@@ -3,19 +3,19 @@ import SwiftUI
 import UIKit
 
 struct CameraPreview: UIViewRepresentable {
-    let session: AVCaptureSession
+    let sessionHandle: CaptureSessionPreviewHandle
     let onFirstPreviewFrame: @MainActor () -> Void
 
     func makeUIView(context: Context) -> PreviewView {
         let view = PreviewView()
-        view.attach(session: session)
+        view.attach(session: sessionHandle.session)
         view.beginFirstFrameProbe(onFirstPreviewFrame)
         return view
     }
 
     func updateUIView(_ uiView: PreviewView, context: Context) {
-        if uiView.previewLayer.session !== session {
-            uiView.attach(session: session)
+        if uiView.previewLayer.session !== sessionHandle.session {
+            uiView.attach(session: sessionHandle.session)
         }
         uiView.beginFirstFrameProbe(onFirstPreviewFrame)
     }
@@ -50,6 +50,8 @@ final class PreviewView: UIView {
     }
 
     func attach(session: AVCaptureSession) {
+        // This is the preview handle's only use of the session reference.
+        // CaptureService remains the sole owner of session mutation.
         previewLayer.session = session
         didReportFirstFrame = false
     }
