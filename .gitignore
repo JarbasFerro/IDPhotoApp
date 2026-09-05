@@ -1,54 +1,60 @@
-# Dart / Flutter
-.dart_tool/
-.packages
-.pub/
+# Xcode / Swift
+DerivedData/
 build/
-coverage/
-.flutter-plugins
-.flutter-plugins-dependencies
-
-# Generated platform files
-**/GeneratedPluginRegistrant.*
-
-# Android
-.gradle/
-local.properties
-**/android/.cxx/
-**/android/captures/
-*.jks
-*.keystore
-key.properties
-
-# iOS / macOS
-**/Pods/
-**/.symlinks/
-**/DerivedData/
+.build/
+.swiftpm/
+Package.resolved
 *.xcuserstate
 xcuserdata/
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+
+# CocoaPods / Carthage if ever adopted
+Pods/
+Carthage/Build/
+
+# Xcode Cloud / test / result output
+*.xcresult
+*.trace
+*.prof
+*.memgraph
+coverage/
+
+# Swift playgrounds
+*.playground/timeline.xctimeline
+*.playground/playground.xcworkspace
 
 # IDE
 .idea/
 .vscode/
-*.iml
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Secrets / local environment
+# Secrets / signing / local configuration
 .env
 .env.*
 !.env.example
 *.pem
 *.p12
+*.cer
 *.mobileprovision
+*.provisionprofile
+AuthKey_*.p8
+Secrets.xcconfig
+Local.xcconfig
 
-# Test output / profiling
-*.lcov
-*.trace
-*.prof
-
-# Temporary images and local datasets
+# Local/private fixtures and generated image artifacts
 /tmp/
 /test_data/private/
 /test_data/local/
+/TestData/Private/
+/TestData/Local/
+/Artifacts/
+
+# Swift Package Manager local scratch state
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+
+# Keep source-controlled shared schemes/settings intentionally; do not blanket-ignore *.xcscheme
