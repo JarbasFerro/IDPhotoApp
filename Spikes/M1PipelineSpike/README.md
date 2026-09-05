@@ -31,7 +31,25 @@ The 900 × 1200 crop is **not an official ID-photo rule**. It exists only to pro
 
 Do not use Simulator as evidence for camera latency, segmentation performance, memory, thermal behavior, or M1 feasibility.
 
-## Run procedure
+## Xcode 27 compiler/test evidence
+
+GitHub's `xcode-27` hosted runner has compiled this project using:
+
+- Xcode 27.0 beta 6 (`27A5252f`);
+- Swift 6.4;
+- iOS 27.0 / iOS Simulator 27.0 SDKs.
+
+The branch CI successfully:
+
+- builds the complete `M1PipelineSpike` application with Swift 6 strict concurrency;
+- selects an available iPhone simulator;
+- runs the Swift Testing suite;
+- reopens a generated JPEG and verifies exactly **900 × 1200 px** with no GPS metadata;
+- verifies the deterministic spike crop remains inside the source and preserves the requested aspect ratio.
+
+This CI result proves toolchain/API compatibility and deterministic export behavior. It does **not** substitute for the physical-device camera/segmentation gate below.
+
+## Run procedure on the current iPhone
 
 1. Open `M1PipelineSpike.xcodeproj` in Xcode 27.
 2. Select the `M1PipelineSpike` scheme.
@@ -41,7 +59,7 @@ Do not use Simulator as evidence for camera latency, segmentation performance, m
 6. Tap **Start Camera**. Camera permission should appear only now, not at app launch.
 7. Frame one clearly visible person from the chest/shoulders upward against a normal background.
 8. Tap **Capture + Run M1**.
-9. Wait for the screen to show either `M1 core pipeline PASS` or an explicit failure.
+9. Confirm the screen shows either `M1 core pipeline PASS` or an explicit failure.
 10. Inspect the rendered preview for obvious mask alignment errors.
 11. Share the JSON evidence file and verified JPEG if the run needs review. Do **not** commit personal/family test photos to this public repository.
 
@@ -69,7 +87,8 @@ The JSON record includes:
 - requested and resolved AVFoundation still dimensions;
 - camera entry → preview-rendering latency;
 - still-capture latency;
-- normalized source dimensions;
+- full orientation-normalized source dimensions;
+- bounded Vision-analysis dimensions;
 - face count and normalized primary-face box;
 - face detection latency;
 - person segmentation latency;
@@ -97,9 +116,11 @@ A second performance pass on an older iOS-26-compatible iPhone is still required
 
 ## Current status
 
-- Source implementation: **created for M1 review**.
-- Automated unit evidence: **not executed in this remote environment; run in Xcode 27**.
-- Physical current-iPhone evidence: **pending**.
+- Source implementation: **implemented**.
+- Xcode 27 compile: **PASS**.
+- Deterministic simulator unit evidence: **PASS**.
+- Physical current-iPhone pipeline evidence: **pending**.
+- iOS 27 iterative-segmentation physical-device evidence: **pending**.
 - Older-supported-iPhone baseline: **pending**.
 - Production promotion decision: **not made**.
 

@@ -284,7 +284,9 @@ actor ImagePipeline {
             sysctlbyname("hw.machine", buffer.baseAddress, &size, nil, 0)
         }
         guard result == 0 else { return "unknown" }
-        return String(cString: machine)
+
+        let utf8Bytes = machine.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }
+        return String(decoding: utf8Bytes, as: UTF8.self)
     }
 }
 
