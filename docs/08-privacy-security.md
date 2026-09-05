@@ -1,169 +1,306 @@
-# 08 — Privacy and security
+# 08 — iOS privacy and security
 
 ## 1. Privacy posture
 
-Identity photos are sensitive personal data in ordinary use. The product should be designed so that the main workflow does not need to transmit or permanently retain them.
+Identity photos are sensitive personal data. The product is designed so the normal workflow does not need to transmit or permanently retain them.
 
 Default posture:
 
-- process on device;
-- no account required;
+- on-device processing;
+- no account;
 - no cloud upload for the core workflow;
-- no advertising SDK access to images;
-- no biometric face-template storage;
-- no unnecessary photo history;
-- no EXIF geolocation in exports unless an explicit future requirement justifies it;
-- no raw image data in analytics or crash logs.
+- no advertising SDK;
+- no biometric identity template storage;
+- no permanent photo history by default;
+- no EXIF geolocation in normal exports;
+- no image/landmark data in logs or analytics;
+- minimal permissions through point-of-use system APIs;
+- privacy manifest included from production project bootstrap.
 
-## 2. Data inventory
+The intended user-facing truth should remain simple:
 
-### 2.1 Source photo
+> **Your photo is processed on your iPhone for the normal workflow.**
 
-Purpose: create the requested output.
+## 2. Apple privacy architecture
 
-Default location: device-local application memory/private temporary storage.
+### `PrivacyInfo.xcprivacy`
 
-Retention: only as long as needed for the active job unless the user explicitly chooses a future save/resume feature.
+The production app target includes a privacy manifest from the beginning.
 
-Network transmission: none for the core workflow.
+It must accurately declare:
 
-### 2.2 Derived analysis data
+- data collected by the app, if any;
+- required-reason API usage by app code;
+- the actual behavior of linked SDKs/frameworks where applicable.
 
-Examples:
+Every third-party SDK must provide/reconcile its own privacy manifest requirements where Apple requires it.
 
-- face bounding box;
-- landmarks;
+### Required-reason APIs
+
+Before adopting an API or dependency, verify current Apple required-reason API policy.
+
+Rules:
+
+- declare only approved reasons that actually match product behavior;
+- do not select a reason merely to silence App Store validation;
+- re-audit after major dependency/SDK changes;
+- use Xcode privacy reports where available to inspect aggregate app/SDK behavior.
+
+### Tracking / fingerprinting
+
+The app has no product need for cross-app tracking or device fingerprinting.
+
+Advertising/attribution SDKs are therefore disfavored by architecture, not merely disabled by configuration.
+
+## 3. Data inventory
+
+### 3.1 Source photo
+
+Purpose: create requested ID output.
+
+Location: app memory and/or app-private temporary storage.
+
+Retention: active job only unless a future resume/history feature is explicitly enabled.
+
+Network: none in the core workflow.
+
+### 3.2 Derived face/image data
+
+Includes:
+
+- Vision face bounding boxes;
+- landmarks/pose;
 - quality scores;
-- segmentation mask;
-- crop parameters.
+- segmentation masks;
+- crop parameters;
+- preview caches.
 
-These are treated as sensitive working data because they derive from a face image.
+Treat as sensitive working data.
 
-Default retention: active job only; temporary cache where needed for performance.
+Default retention: active job / short-lived private cache only.
 
-### 2.3 Exported photo
+### 3.3 Exported photo/PDF
 
-Created only on user action.
+Created only from explicit user action.
 
-The user chooses save/share destination through platform mechanisms.
+The user chooses the destination through native iOS share/save/print mechanisms.
 
-The app should not silently retain another permanent copy after successful export unless a clearly communicated history feature is enabled.
+The app should not silently keep a separate permanent copy after successful export.
 
-### 2.4 Preferences
+### 3.4 Preferences
 
-Examples:
+May include:
 
-- language;
-- recent document-profile IDs;
-- favourite profiles;
-- analytics preference;
-- installed rule-catalog version.
+- language/locale override if offered;
+- recent/favorite profile IDs;
+- installed rule-catalog version;
+- non-sensitive product settings;
+- entitlement state as appropriate.
 
-These contain no photo pixels and can be stored persistently.
+### 3.5 Telemetry
 
-### 2.5 Telemetry
+If enabled later, only structured privacy-reviewed events.
 
-If used, only structured, privacy-reviewed events are allowed. No image, thumbnail, face embedding, local file path, EXIF, person identity, document number, or free-form sensitive content.
+Never include:
 
-## 3. Data-flow baseline
+- photo bytes;
+- thumbnails;
+- image hashes used as identifiers;
+- face embeddings;
+- landmark arrays;
+- EXIF/GPS;
+- sensitive file paths;
+- person/document identity;
+- free-form context containing sensitive data.
+
+## 4. Baseline data flow
 
 ```text
-Camera / Photo Picker
-        │
-        ▼
-Private local source reference
-        │
-        ├──> bounded analysis bitmap ──> face/quality analysis
-        │                                │
-        │                                └──> derived measurements
-        │
-        ├──> segmentation ──> temporary mask
-        │
-        └──> final renderer + edit parameters
-                         │
-                         ▼
-                  generated output
-                         │
-                         ▼
-               user-triggered Save/Share
+AVFoundation camera / PhotosPicker
+              │
+              ▼
+      private source asset
+              │
+       ┌──────┼─────────┐
+       │      │         │
+       ▼      ▼         ▼
+  downsample Vision  segmentation
+  analysis   face      mask
+       │      │         │
+       └──────┼─────────┘
+              ▼
+      deterministic rules
+              │
+              ▼
+      Core Image renderer
+              │
+              ▼
+     generated image / PDF
+              │
+              ▼
+   user Share / Save / Print
 ```
 
-No network arrow exists in the baseline core flow.
+No network arrow exists in the core flow.
 
-## 4. Permission strategy
+## 5. Permission strategy
 
 ### Camera
 
-Request only after the user taps `Take photo`.
+Use AVFoundation authorization only after the user chooses `Take Photo`.
 
-Permission text must explain the actual purpose plainly.
+`NSCameraUsageDescription` must be short, specific, and truthful.
 
-### Photos/media
+No camera permission request on launch/onboarding.
 
-Prefer platform-native pickers that minimize broad library access. Do not request full-library access just to select one image if the platform offers a scoped picker.
+### Photos
 
-### Storage/files
+Use PhotosUI/`PhotosPicker` for normal import.
 
-Use platform-native save/share/document mechanisms. Avoid legacy broad external-storage permissions.
+The standard flow should therefore not request broad Photo Library permission merely to select one image.
+
+If a future feature requires Photo Library write/read authorization, introduce it through a separate explicit requirement/decision.
+
+### Files / printing
+
+Use system share/document/print UI. Do not create broad file-system access patterns.
 
 ### Network
 
-The app may need network access later for rule updates, purchase infrastructure, help pages, or privacy-safe telemetry. None of those justify uploading source photos.
+Future rule updates, StoreKit, support content, or privacy-safe diagnostics may use network access. None justify sending user face photos by default.
 
-## 5. Temporary-file policy
+## 6. File protection and temporary data
 
-Temporary image data must:
+Sensitive temporary data should:
 
-- live in application-private cache/temp locations;
-- use unpredictable file names where filenames are needed;
-- avoid names containing person/document identity;
-- be deleted on successful job completion where no longer required;
-- be cleaned on cancellation/abandonment according to lifecycle policy;
-- be eligible for startup/periodic stale-cache cleanup;
-- not be backed up to cloud device backup if the platform allows excluding ephemeral files.
+- live in app-private directories;
+- use appropriate iOS Data Protection/file-protection class for the workflow;
+- use non-identifying unpredictable filenames;
+- avoid filenames containing person/document details;
+- be deleted when no longer needed;
+- be cleaned after abandoned/interrupted jobs;
+- be excluded from backup when ephemeral;
+- never be written into shared/public locations without user export action.
 
-In-memory processing is preferred where reasonable, but forcing all operations into memory can create stability risk with large photos. Private temporary files are acceptable when they improve safety/performance and are managed deliberately.
+In-memory processing is preferred where efficient, but forcing 48 MP sources to remain entirely memory-resident can increase crash risk. Private temporary files are acceptable when lifecycle is deliberate.
 
-## 6. Original-photo safety
+## 7. Original-photo safety
 
-The app must never overwrite the source asset.
+Never modify the source Photos asset in place.
 
-Import/capture produces an immutable internal source reference. All transforms are non-destructive until a new export file is generated.
+Captured/imported input becomes an immutable internal source reference. Edits are parameters until a new output file is rendered.
 
-Any write failure during export must leave both source and previous successful outputs untouched.
+Export failures must leave source and prior successful outputs untouched.
 
-## 7. Metadata policy
+## 8. Metadata policy
 
-On import, read only metadata needed for correct processing, especially orientation and possibly color-space information.
+### Import
 
-On export:
+Read only what supports correct processing, including:
 
-- strip GPS/geolocation;
-- strip device serial-like/private metadata;
-- strip unnecessary original timestamps/comments/software fields where appropriate;
-- write only metadata intentionally required for image correctness/interoperability;
-- test actual output metadata, not just intended encoder options.
+- orientation;
+- image dimensions;
+- format;
+- color profile information where needed.
 
-## 8. Face and biometric data policy
+Do not collect metadata “just in case.”
 
-The app may detect faces/landmarks locally to perform composition checks. It should not create persistent face embeddings/templates for identification.
+### Export
 
-The product is not a face-recognition system. It does not need to know who the person is, compare identities, or match a face against a database.
+Normal official-photo exports should strip:
 
-Any future proposal to add identity matching, cloud face analysis, or persistent biometric templates requires a separate privacy/security/legal review and is outside the current architecture.
+- GPS/location;
+- unnecessary capture/device metadata;
+- original comments/software strings where unnecessary;
+- private/source file identifiers.
 
-## 9. Analytics policy
+Write only metadata intentionally required for interoperability/profile requirements.
 
-Analytics is optional from an architecture perspective and must earn its place.
+Test actual encoded output metadata.
 
-If enabled, use a strict allowlist schema.
+## 9. Face / biometric policy
 
-Potentially allowed:
+The app detects/analyzes a face locally to format a photo. It does not need to identify the person.
+
+Do not create persistent face embeddings/templates for recognition.
+
+No identity matching or database comparison.
+
+Future identity verification/recognition requires a completely separate privacy/security/legal review.
+
+## 10. Foundation Models / Core AI privacy boundary
+
+Optional intelligence must not silently change the data flow.
+
+### On-device Foundation Models
+
+May be considered for explanation/coaching if useful.
+
+Requirements:
+
+- feature works without uploading face data;
+- user-facing compliance remains deterministic;
+- model-unavailable fallback;
+- logs do not contain prompts with sensitive image/path content.
+
+### Private Cloud Compute / external model providers
+
+Not part of baseline architecture.
+
+Any future cloud-model use requires a new ADR covering:
+
+- exact image/text transmitted;
+- user value;
+- explicit UI disclosure/consent as appropriate;
+- retention/provider terms;
+- region/availability;
+- fallback;
+- App Privacy disclosures;
+- child-photo implications.
+
+## 11. Logging
+
+Use Apple unified logging (`Logger`) with privacy annotations/redaction.
+
+Production logs must never contain:
+
+- images/base64;
+- thumbnails;
+- landmarks;
+- local source filenames/paths when sensitive;
+- EXIF dumps;
+- names/document numbers;
+- model prompts containing sensitive photo context;
+- secrets/tokens.
+
+Prefer stable error codes and coarse safe diagnostics.
+
+## 12. Diagnostics / MetricKit / crash reporting
+
+Start with:
+
+- development Instruments;
+- privacy-safe `Logger` events;
+- `OSSignposter` intervals;
+- MetricKit only if production value justifies it.
+
+Before adding third-party crash/analytics:
+
+- inspect default collection;
+- disable screenshots/session replay;
+- prevent photo attachments;
+- sanitize breadcrumbs;
+- document retention/vendor data flow;
+- validate privacy manifest/required-reason behavior;
+- confirm App Privacy answers.
+
+## 13. Allowed telemetry examples
+
+Potential structured values:
 
 ```text
 app_version
 os_major_version
-screen_name
 profile_id
 profile_version
 processing_stage
@@ -171,269 +308,247 @@ processing_duration_bucket
 validation_state_category
 export_type
 structured_error_code
+performance_bucket
 ```
 
-Not allowed:
+Never use telemetry to reconstruct a person’s face or image.
 
-```text
-photo bytes
-photo hashes intended to identify an image
-thumbnails
-face coordinates/landmarks in telemetry
-face embeddings
-EXIF GPS
-full local paths
-person names
-document numbers
-raw user-entered text
-arbitrary diagnostic attachments containing images
-```
-
-Avoid unique device fingerprinting beyond what a strictly necessary service may already provide and what privacy/store requirements permit.
-
-## 10. Crash reporting
-
-Before adopting a crash SDK:
-
-- inspect what it collects by default;
-- disable screenshot/session replay for image screens;
-- prevent attachment of photos;
-- sanitize exception messages and breadcrumbs;
-- avoid logging local photo paths;
-- confirm consent/disclosure requirements;
-- document data retention/vendor terms.
-
-Prefer stable internal error codes to verbose context that risks leaking data.
-
-## 11. Logging
-
-Production logs must never contain:
-
-- image bytes/base64;
-- face landmark arrays;
-- source file names if they can reveal identity;
-- full paths;
-- GPS/EXIF dumps;
-- user names/document identifiers;
-- signed URLs or credentials.
-
-Debug builds may expose more technical detail but should still avoid committing/logging real sensitive fixture content unnecessarily.
-
-## 12. Secrets management
+## 14. Secrets and signing
 
 Never commit:
 
-- Apple/Google signing keys;
-- `.p12`, keystores, provisioning secrets;
-- API tokens;
-- service account files;
-- backend signing keys;
-- analytics secrets;
-- store credentials.
+- Apple signing certificates/private keys;
+- App Store Connect API private keys;
+- provisioning credentials;
+- backend keys/tokens;
+- analytics/service credentials;
+- rule-signing private keys.
 
-Use CI secret stores and local environment/configuration mechanisms. `.gitignore` provides baseline exclusions but is not a security control by itself.
+Use Apple/Xcode Cloud/GitHub secret stores or local Keychain/environment configuration as appropriate.
 
-If a secret is ever committed, assume compromise and rotate it; deleting the file in a later commit is not sufficient.
+If a secret is committed, rotate it. Deleting the file later does not undo exposure.
 
-## 13. Dependency security
+## 15. Dependency security
 
-Every package/SDK must be evaluated for:
+Apple-frameworks-first reduces attack/privacy surface.
+
+Every non-Apple dependency requires review for:
 
 - necessity;
-- maintenance state;
-- licence;
-- known vulnerabilities;
-- network behavior;
-- data collection;
-- native permissions;
+- why Apple APIs are insufficient;
+- maintenance/reputation;
+- license;
+- vulnerabilities;
 - transitive dependencies;
-- update cadence;
-- ownership/reputation;
+- network calls;
+- data collection;
+- privacy manifest;
+- required-reason APIs;
+- permissions;
+- binary size;
 - replaceability.
 
-High-risk dependencies include camera, ML, analytics, ad, attribution, image-codec, PDF, and storage SDKs because they touch sensitive data or platform capabilities.
+High-scrutiny categories:
 
-## 14. Advertising policy
+- camera;
+- ML/AI;
+- analytics/crash;
+- attribution/ads;
+- image codecs/editing;
+- PDF;
+- storage/networking.
 
-The intended product direction is ad-free in the critical workflow.
+## 16. Advertising policy
 
-If ads are ever considered:
+Preferred baseline: no advertising SDK.
 
-- no ad SDK may receive photo content;
-- no ad overlay on the camera/editor;
-- no interstitial before showing a critical compliance warning;
-- ad tracking must not be a hidden condition for using the core feature;
-- privacy/store impact must be reassessed.
+Reasons:
 
-Given the product motivation and sensitivity of face photos, avoiding third-party advertising SDKs entirely is the preferred baseline.
+- product motivation includes ad-heavy competitor frustration;
+- identity photos are sensitive;
+- ad/attribution SDKs increase privacy and dependency surface;
+- monetization can use StoreKit directly if needed.
 
-## 15. Threat model
+Any future advertising proposal requires a new explicit ADR and cannot receive photo/derived face content.
 
-### T-01 — Accidental cloud upload
+## 17. Threat model
 
-Risk: SDK or implementation sends photo/derived data to a server.
+### T-01 — Accidental image upload
 
 Controls:
 
-- local-only interfaces by default;
+- no upload endpoint in core architecture;
+- local Apple frameworks;
 - dependency review;
-- network inspection tests;
-- no upload endpoint in MVP architecture;
-- structured telemetry allowlist.
+- network inspection testing;
+- telemetry allowlist.
 
-### T-02 — Sensitive data in logs/crashes
+### T-02 — Sensitive data in logs/diagnostics
 
 Controls:
 
-- safe typed errors;
-- log redaction;
-- no file paths/image metadata dumps;
-- crash SDK configuration/testing.
+- privacy-marked Logger fields;
+- typed errors;
+- no image/path/EXIF dumps;
+- diagnostics test review.
 
 ### T-03 — Temporary file exposure
 
 Controls:
 
-- application-private directories;
-- scoped platform storage;
-- cleanup policy;
-- no public cache/gallery writes.
+- app-private directories;
+- iOS Data Protection;
+- backup exclusion where appropriate;
+- cleanup lifecycle;
+- no shared files before explicit export.
 
-### T-04 — Malicious/incorrect remote rules
-
-Only applicable if remote catalog updates ship.
-
-Controls:
-
-- signed catalogs;
-- integrity hashes;
-- schema + semantic validation;
-- atomic activation;
-- known-good fallback;
-- version rollback path.
-
-### T-05 — Dependency compromise
+### T-04 — Oversized/malformed image denial of service
 
 Controls:
 
-- minimized dependency count;
-- version review/update policy;
-- lockfiles;
-- vulnerability monitoring where practical;
-- no unreviewed native binary SDKs.
+- ImageIO header inspection;
+- bounded/downsampled analysis decode;
+- pixel/dimension guardrails;
+- typed failure;
+- memory profiling.
 
-### T-06 — Oversized/malformed image denial of service
-
-Controls:
-
-- validate headers;
-- bounded analysis decode;
-- safe codec libraries;
-- pixel-count limits/guardrails;
-- typed failure instead of unbounded allocation.
-
-### T-07 — Path/file overwrite
+### T-05 — Source overwrite/data loss
 
 Controls:
 
-- application-generated output paths;
-- native save/share APIs;
-- never modify imported asset in place;
-- atomic output writes where practical.
+- immutable source;
+- separate output URLs;
+- atomic writes where appropriate;
+- tests.
 
-### T-08 — False compliance/security-of-trust failure
-
-Risk: user relies on a false green status.
+### T-06 — Incorrect/malicious rule catalog
 
 Controls:
 
-- explicit machine/manual states;
-- provenance;
-- conservative tolerances;
+- schema/semantic validation;
+- source provenance;
+- bundled known-good rules for MVP;
+- signed/atomic/rollback model if remote updates are added.
+
+### T-07 — Dependency compromise
+
+Controls:
+
+- minimal dependencies;
+- lockfile review;
+- update/vulnerability process;
+- avoid opaque binary SDKs;
+- Apple framework preference.
+
+### T-08 — False compliance / trust failure
+
+Controls:
+
+- pass/warn/fail/manual states;
+- conservative thresholds;
+- manual checks remain visible;
+- sourced rules;
 - no acceptance guarantee;
-- rule regression tests;
-- review dates.
+- regression/calibration tests.
 
-## 16. Remote rule update security
+### T-09 — Optional AI invents rules
 
-If implemented later, use a threat model in which CDN/network content can be hostile.
+Controls:
 
-Recommended model:
+- deterministic rule engine remains authoritative;
+- constrained official context;
+- explicit AI-assistance presentation;
+- evaluations;
+- no model output writes directly into rule catalog or hard compliance result.
 
-1. release app contains trusted public verification key;
-2. catalog/manifest is signed by an offline/protected private key;
-3. client verifies signature and hash;
-4. schema compatibility checked;
-5. semantic validation runs;
-6. content staged;
-7. activation atomic;
-8. previous version retained;
-9. failed verification never alters active rules.
+## 18. Remote rule updates
 
-Do not place the signing private key in the mobile app or repository.
-
-## 17. Payments
-
-If paid features are introduced:
-
-- use platform-compliant in-app purchase/store mechanisms where required;
-- keep entitlement state separate from photo content;
-- do not require account creation unless entitlement portability genuinely needs it;
-- never transmit a photo as part of purchase verification;
-- design offline/grace behavior explicitly.
-
-## 18. Child photos
-
-The app may be used by parents to create photos for children. This increases the importance of:
-
-- local processing;
-- no photo-history default;
-- no advertising/behavioral profiling based on the image;
-- no cloud model training on user photos;
-- clear deletion behavior.
-
-Any future cloud feature handling child photos requires separate legal/privacy review.
-
-## 19. Privacy UX requirements
-
-The product must explain privacy at meaningful decision points without overwhelming the user.
+If added later, treat remote content as untrusted until verified.
 
 Recommended:
 
-- short first-use statement;
-- permission prompts only in context;
-- Settings → Privacy page;
-- clear `Delete local data` action if persistent job data is later introduced;
-- specific disclosure before any optional feature sends an image/data off-device;
-- no bundled consent for unrelated purposes.
+1. app contains trusted public verification key;
+2. protected/offline private key signs catalog/manifest;
+3. client verifies signature/hash;
+4. schema compatibility validation;
+5. semantic validation;
+6. staging;
+7. atomic activation;
+8. previous version retained;
+9. failure keeps known-good active rules.
 
-## 20. Store/privacy review checklist
+Private signing key never ships in app or repository.
 
-Before each store release:
+## 19. Payments
 
-- inventory every SDK and its data behavior;
-- inspect current runtime network calls;
-- verify platform permission strings;
-- verify store privacy/data-safety disclosures match the binary;
-- verify privacy policy matches actual data flows;
-- verify analytics/crash configuration;
-- verify photo picker/camera permissions;
-- verify no test endpoint/credential remains;
-- verify metadata stripping;
-- verify remote-rule verification if enabled;
-- verify deletion/retention statements.
+If monetized:
 
-Platform rules change over time, so this checklist must be reviewed against current official platform requirements at release time rather than relying only on this planning document.
+- StoreKit is default;
+- entitlement data stays separate from photos;
+- no login unless genuine portability need arises;
+- no photo transmission for entitlement validation;
+- offline/grace behavior defined.
 
-## 21. Security release blockers
+## 20. Child photos
+
+Parent use increases the need for:
+
+- local processing;
+- no photo history default;
+- no ad profiling;
+- no cloud model training on user photos;
+- short-lived derived data;
+- clear deletion behavior.
+
+Any cloud feature involving child photos requires separate legal/privacy review.
+
+## 21. Privacy UX
+
+Explain privacy at meaningful points rather than through one giant onboarding screen.
+
+Recommended:
+
+- concise first-use privacy statement;
+- permission explanation at point of use;
+- Settings → Privacy/About explanation;
+- deletion controls if persistent job data ever exists;
+- explicit disclosure before any optional future off-device feature.
+
+Avoid consent bundling for unrelated purposes.
+
+## 22. Release privacy checklist
+
+Before every App Store release:
+
+- [ ] `PrivacyInfo.xcprivacy` valid.
+- [ ] Required-reason APIs re-audited.
+- [ ] Third-party SDK privacy manifests reviewed.
+- [ ] Runtime network calls inspected.
+- [ ] Core flow works with network disabled.
+- [ ] Camera purpose string accurate.
+- [ ] No unnecessary Photo Library permission.
+- [ ] App Privacy answers match binary.
+- [ ] Privacy policy matches actual data flow.
+- [ ] Temp cleanup verified.
+- [ ] EXIF/GPS stripping verified.
+- [ ] Logs/diagnostics sampled for sensitive leakage.
+- [ ] No test endpoint/credential.
+- [ ] Remote rules signature logic verified if enabled.
+- [ ] Optional AI data flow re-reviewed if changed.
+
+Apple policy changes over time; compare this list to current official documentation at release time.
+
+## 23. Security/privacy release blockers
 
 Release is blocked by:
 
 - unexplained photo/derived-data network transmission;
 - committed active secret;
-- known critical dependency vulnerability affecting shipped path without mitigation;
-- source-image overwrite/data-loss risk;
+- critical unmitigated dependency vulnerability affecting shipped path;
+- source overwrite/data-loss risk;
+- invalid/inaccurate privacy manifest;
+- inaccurate App Privacy disclosure;
+- sensitive image/face data in telemetry/crash logs;
+- public/shared temporary source storage without explicit user action;
 - insecure remote-rule activation;
-- inaccurate store privacy declarations;
-- crash/analytics payload containing sensitive image data;
-- public/shared temporary storage of source images without necessity.
+- optional AI transmitting sensitive data contrary to product disclosure.
