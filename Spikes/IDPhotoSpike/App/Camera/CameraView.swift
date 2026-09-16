@@ -62,7 +62,7 @@ struct CameraView: View {
                     .ignoresSafeArea()
                     .accessibilityHidden(true)
                 headGuide
-                horizonLine
+                eyeLine
                 overlayControls
                 if let countdown {
                     Text("\(countdown)")
@@ -133,15 +133,16 @@ struct CameraView: View {
         .accessibilityHidden(true)
     }
 
-    /// A world-horizontal line through the guide, shown only near level; green when within tolerance.
-    @ViewBuilder private var horizonLine: some View {
-        if let level = camera.deviceLevel, abs(level.rollDegrees) < 12 {
+    /// The detected eye line, rotated by the head's roll relative to the camera; green when level in the frame.
+    /// What matters is this relative angle, not the phone's absolute attitude.
+    @ViewBuilder private var eyeLine: some View {
+        if let roll = camera.faceRollDegrees, abs(roll) < 25 {
             GeometryReader { geometry in
-                let ok = camera.readiness.level == .ok
+                let ok = abs(roll) <= CaptureGuidanceThresholds.default.maxRollDegrees
                 Rectangle()
                     .fill(ok ? Color.green : Color.white.opacity(0.8))
                     .frame(width: ok ? 140 : 110, height: 2)
-                    .rotationEffect(.degrees(-level.rollDegrees))
+                    .rotationEffect(.degrees(roll))
                     .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: ok)
             }
@@ -150,7 +151,7 @@ struct CameraView: View {
         }
     }
 
-    /// Four segments: phone level, head pose, light, distance. Unknown stays grey; only the hint speaks.
+    /// Four segments: framing, head pose relative to the camera, light, distance. Unknown stays grey; only the hint speaks.
     private var readinessRow: some View {
         HStack(spacing: 10) {
             ForEach(ReadinessGroup.allCases, id: \.self) { group in
@@ -313,8 +314,8 @@ enum CameraPresentation {
         case .moveBack: "Move a little farther away"
         case .tooClose: "Too close: move back, or ask someone to take it"
         case .centerFace: "Centre your face in the oval"
-        case .levelPhone: "Level the phone"
-        case .uprightPhone: "Hold the phone upright"
+        case .levelPhone: "Level the phone to match your head"
+        case .uprightPhone: "Straighten the phone; it is leaning"
         case .keepLevel: "Keep your head level"
         case .faceCamera: "Look straight at the camera"
         case .eyeLevel: "Hold the phone at eye level"
@@ -329,8 +330,8 @@ enum CameraPresentation {
 
     static func symbol(for group: ReadinessGroup) -> String {
         switch group {
-        case .level: "level"
-        case .face: "face.dashed"
+        case .framing: "person.crop.rectangle"
+        case .pose: "face.dashed"
         case .light: "sun.max"
         case .distance: "ruler"
         }
@@ -338,8 +339,8 @@ enum CameraPresentation {
 
     static func name(for group: ReadinessGroup) -> LocalizedStringResource {
         switch group {
-        case .level: "Phone level"
-        case .face: "Head position"
+        case .framing: "Framing"
+        case .pose: "Head position"
         case .light: "Lighting"
         case .distance: "Distance"
         }

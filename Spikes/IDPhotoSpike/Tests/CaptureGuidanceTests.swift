@@ -63,19 +63,44 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 15) == .ready)
     }
 
-    @Test func phoneAttitudeHintsComeBeforeHeadHintsAndClearWhenLevel() {
+    @Test func poseErrorsAreRelativeAndBlamedOnWhateverIsTilted() {
         var tracker = GuidanceTracker()
-        var frame = face(height: 0.3, roll: 20)
-        frame.device = DeviceLevel(rollDegrees: 6, pitchDegrees: 0)
-        #expect(feed(&tracker, frame, times: 5) == .levelPhone)
-        frame.device = DeviceLevel(rollDegrees: 1, pitchDegrees: 20)
-        #expect(feed(&tracker, frame, times: 5) == .uprightPhone)
-        frame.device = DeviceLevel(rollDegrees: 1, pitchDegrees: 5)
-        #expect(feed(&tracker, frame, times: 5) == .keepLevel)
-        frame.rollDegrees = 0
+        // A tilted phone with a matching tilted head is a level portrait: no hint at all.
+        var frame = face(height: 0.3, roll: 0)
+        frame.device = DeviceLevel(rollDegrees: 12, pitchDegrees: 15)
         #expect(feed(&tracker, frame, times: 5) == .holdStill)
-        #expect(tracker.readiness.level == .ok && tracker.readiness.face == .ok)
+        #expect(tracker.readiness.pose == .ok && tracker.readiness.framing == .ok)
+        // Head rolled in the frame while the phone is tilted: move the phone.
+        frame.rollDegrees = 12
+        #expect(feed(&tracker, frame, times: 5) == .levelPhone)
+        // Same head roll with a level phone: move the head.
+        frame.device = DeviceLevel(rollDegrees: 1, pitchDegrees: 0)
+        #expect(feed(&tracker, frame, times: 5) == .keepLevel)
+        #expect(tracker.readiness.pose == .attention)
+        // Pitch: a leaning phone is straightened; an upright phone is raised or lowered.
+        frame.rollDegrees = 0
+        frame.pitchDegrees = 15
+        frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: 20)
+        #expect(feed(&tracker, frame, times: 5) == .uprightPhone)
+        frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: 3)
+        #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
+        frame.device = nil
+        #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
+        frame.pitchDegrees = 0
+        #expect(feed(&tracker, frame, times: 5) == .holdStill)
         #expect(tracker.readiness.light == .unknown && tracker.readiness.distance == .unknown)
+    }
+
+    @Test func framingSegmentTracksSizeAndCentre() {
+        var tracker = GuidanceTracker()
+        tracker.update(face(height: 0.12))
+        #expect(tracker.readiness.framing == .attention)
+        tracker.update(face(height: 0.3, centerX: 0.8))
+        #expect(tracker.readiness.framing == .attention)
+        tracker.update(.empty)
+        #expect(tracker.readiness.framing == .attention && tracker.readiness.pose == .unknown)
+        tracker.update(face(height: 0.3))
+        #expect(tracker.readiness.framing == .ok)
     }
 
     @Test func distanceAndPitchHints() {
@@ -87,7 +112,7 @@ struct CaptureGuidanceTests {
         frame.distanceCM = 65
         frame.pitchDegrees = 16
         #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
-        #expect(tracker.readiness.face == .attention && tracker.readiness.distance == .ok)
+        #expect(tracker.readiness.pose == .attention && tracker.readiness.distance == .ok)
         frame.pitchDegrees = -4
         #expect(feed(&tracker, frame, times: 5) == .holdStill)
     }

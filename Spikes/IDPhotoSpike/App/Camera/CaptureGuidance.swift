@@ -3,9 +3,13 @@ import Foundation
 // Live capture guidance: pure Swift, no AVFoundation. Inputs come from cheap face metadata per frame, a slower
 // Vision pass every few frames (pitch, distance, lighting) and the motion sensors; outputs are one calm hint at
 // a time, debounced with hysteresis so nothing flickers (FR-022, C9-003).
+//
+// Reference frame: the photo records the head relative to the camera, so the head pose in the image is what is
+// checked. The phone's absolute attitude is never a requirement; it only decides whether a pose error is worded
+// as "move the phone" (the phone is tilted) or as "move your head" (the phone is fine).
 
-/// Phone attitude from the motion sensors, degrees. Roll: lean left/right about the lens axis (0 = level).
-/// Pitch: lean back (+) or forward (−) from vertical (0 = screen vertical, lens axis horizontal).
+/// Phone attitude from the motion sensors, degrees, used only to attribute a relative pose error to the phone.
+/// Roll: lean left/right about the lens axis (0 = level). Pitch: lean back (+) or forward (−) from vertical.
 struct DeviceLevel: Sendable, Hashable {
     var rollDegrees: Double
     var pitchDegrees: Double
@@ -48,19 +52,21 @@ enum CaptureHint: String, Sendable, Hashable, CaseIterable {
 }
 
 /// Which readiness segment a hint belongs to, for the four-part indicator.
-enum ReadinessGroup: String, Sendable, Hashable, CaseIterable { case level, face, light, distance }
+enum ReadinessGroup: String, Sendable, Hashable, CaseIterable { case framing, pose, light, distance }
 
 struct CaptureReadiness: Sendable, Hashable {
     enum State: Sendable, Hashable { case unknown, attention, ok }
-    var level: State = .unknown
-    var face: State = .unknown
+    /// One face, large enough and centred.
+    var framing: State = .unknown
+    /// Head roll, yaw and pitch relative to the camera.
+    var pose: State = .unknown
     var light: State = .unknown
     var distance: State = .unknown
 
     subscript(group: ReadinessGroup) -> State {
         switch group {
-        case .level: level
-        case .face: face
+        case .framing: framing
+        case .pose: pose
         case .light: light
         case .distance: distance
         }
@@ -81,11 +87,11 @@ struct CaptureGuidanceThresholds: Sendable, Hashable {
     var targetCenterY = 0.45
     var maxRollDegrees = 8.0
     var maxYawDegrees = 15.0
-    /// Face pitch beyond this means the camera is above or below the eyes (or the chin is tilted).
+    /// Face pitch relative to the camera beyond this means the camera is above or below the eyes, or leaning.
     var maxPitchDegrees = 10.0
-    /// Phone attitude. Roll is a spirit level; pitch tolerates the natural slight lean-back of a hand-held phone.
-    var maxDeviceRollDegrees = 3.0
-    var maxDevicePitchDegrees = 10.0
+    /// Phone attitude beyond which a head roll or pitch error is blamed on the phone rather than the head.
+    var deviceRollAttribution = 4.0
+    var devicePitchAttribution = 8.0
     /// Below this the wide front lens distorts the nose and hides the ears.
     var minDistanceCM = 45.0
     /// |ln(left/right)| beyond this is a one-sided light; 0.29 is a 4:3 ratio.
@@ -130,7 +136,7 @@ struct GuidanceTracker: Sendable, Hashable {
         return hint
     }
 
-    /// Hints in priority order: presence, size, distance, position, phone attitude, head attitude, light.
+    /// Hints in priority order: presence, size, distance, position, head pose relative to the camera, light.
     private func rawHint(for frame: FaceFrameSummary) -> CaptureHint {
         let t = thresholds
         if frame.faceCount == 0 || frame.bounds == nil { return .noFace }
@@ -144,13 +150,14 @@ struct GuidanceTracker: Sendable, Hashable {
         if let distance = frame.distanceCM, distance < t.minDistanceCM { return .tooClose }
         let centerX = box.x + box.width / 2, centerY = box.y + box.height / 2
         if abs(centerX - 0.5) > t.horizontalTolerance || abs(centerY - t.targetCenterY) > t.verticalTolerance { return .centerFace }
-        if let device = frame.device {
-            if abs(device.rollDegrees) > t.maxDeviceRollDegrees { return .levelPhone }
-            if abs(device.pitchDegrees) > t.maxDevicePitchDegrees { return .uprightPhone }
+        // Relative pose errors, attributed to whichever is tilted: the phone or the head.
+        if let roll = frame.rollDegrees, abs(roll) > t.maxRollDegrees {
+            return abs(frame.device?.rollDegrees ?? 0) > t.deviceRollAttribution ? .levelPhone : .keepLevel
         }
-        if let roll = frame.rollDegrees, abs(roll) > t.maxRollDegrees { return .keepLevel }
         if let yaw = frame.yawDegrees, abs(yaw) > t.maxYawDegrees { return .faceCamera }
-        if let pitch = frame.pitchDegrees, abs(pitch) > t.maxPitchDegrees { return .eyeLevel }
+        if let pitch = frame.pitchDegrees, abs(pitch) > t.maxPitchDegrees {
+            return abs(frame.device?.pitchDegrees ?? 0) > t.devicePitchAttribution ? .uprightPhone : .eyeLevel
+        }
         if let light = frame.lighting {
             if light.backgroundRatio > t.backlightRatio, light.faceMean < 0.45 { return .backlit }
             if light.faceMean < t.minFaceLuminance { return .moreLight }
@@ -164,14 +171,15 @@ struct GuidanceTracker: Sendable, Hashable {
 
     static func readiness(for frame: FaceFrameSummary, thresholds t: CaptureGuidanceThresholds) -> CaptureReadiness {
         var result = CaptureReadiness()
-        if let device = frame.device {
-            result.level = abs(device.rollDegrees) <= t.maxDeviceRollDegrees && abs(device.pitchDegrees) <= t.maxDevicePitchDegrees ? .ok : .attention
-        }
-        if frame.faceCount == 1, frame.bounds != nil {
+        if frame.faceCount == 1, let box = frame.bounds {
+            let sizeOK = box.height >= t.minFaceHeight && box.height <= t.maxFaceHeight
+            let centreOK = abs(box.x + box.width / 2 - 0.5) <= t.horizontalTolerance
+                && abs(box.y + box.height / 2 - t.targetCenterY) <= t.verticalTolerance
+            result.framing = sizeOK && centreOK ? .ok : .attention
             let rollOK = frame.rollDegrees.map { abs($0) <= t.maxRollDegrees } ?? true
             let yawOK = frame.yawDegrees.map { abs($0) <= t.maxYawDegrees } ?? true
             let pitchOK = frame.pitchDegrees.map { abs($0) <= t.maxPitchDegrees } ?? true
-            result.face = rollOK && yawOK && pitchOK ? .ok : .attention
+            result.pose = rollOK && yawOK && pitchOK ? .ok : .attention
             if let distance = frame.distanceCM { result.distance = distance >= t.minDistanceCM ? .ok : .attention }
             if let light = frame.lighting {
                 let backlit = light.backgroundRatio > t.backlightRatio && light.faceMean < 0.45
@@ -182,7 +190,9 @@ struct GuidanceTracker: Sendable, Hashable {
                 result.light = .attention
             }
         } else if frame.faceCount > 1 {
-            result.face = .attention
+            result.framing = .attention
+        } else {
+            result.framing = .attention
         }
         return result
     }

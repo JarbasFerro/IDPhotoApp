@@ -236,7 +236,7 @@ Acceptance:
 
 ## S1-020 — Camera with iOS 26 capture features — P0 / XL
 
-Dependencies: S1-002. Evaluate Deferred Start, responsive capture, `maxPhotoDimensions`, `.onCameraCaptureEvent`, front-camera dynamic aspect ratio on iPhone 17, and `DetectLensSmudgeRequest` as a pre-capture warning. Guided camera implemented 2026-09-16 (version 0.5.0); capture aids phase 1 (phone level, face pitch, distance, lighting, face metering, auto capture) in version 0.8.0; see [spike 05](spikes/05-guided-camera.md). All hardware evidence (first frame, shutter latency, orientation, interruptions, thermal) must come from the physical iPhone.
+Dependencies: S1-002. Evaluate Deferred Start, responsive capture, `maxPhotoDimensions`, `.onCameraCaptureEvent`, front-camera dynamic aspect ratio on iPhone 17, and `DetectLensSmudgeRequest` as a pre-capture warning. Guided camera implemented 2026-09-16 (version 0.5.0); capture aids phase 1 (relative head pose, face pitch, distance, lighting, face metering, auto capture) in versions 0.8.0 and 0.8.1; see [spike 05](spikes/05-guided-camera.md). All hardware evidence (first frame, shutter latency, orientation, interruptions, thermal) must come from the physical iPhone.
 
 ## S1-021 — Document Tone and Studio Light check — P1 / M
 
