@@ -20,7 +20,7 @@ The architecture must optimize for:
 ### Development baseline — September 2026
 
 - **Product target:** iPhone / iOS only.
-- **IDE / SDK:** Xcode 27 during development; while Xcode 27 remains beta, use it for technical validation and switch release builds to the first App Store-accepted non-beta Xcode 27.
+- **IDE / SDK:** Xcode 27 with the iOS 27 SDK. The first prototype verified Xcode 27.0 (27A266a) on 2026-09-16; release submissions must use an App Store-accepted non-beta toolchain.
 - **Compiler:** Swift 6.4 compiler, Swift 6 language mode.
 - **UI:** SwiftUI-first.
 - **Deployment target:** proposed iOS 26.0; iOS 27 APIs are adopted behind availability checks until ADR-024 is finalized.

@@ -1,0 +1,66 @@
+# Foto carnet feasibility prototype
+
+Native iPhone app for the first M1 import/render experiment. This is disposable spike code, not the production application or a published DNI-compliance implementation.
+
+## Run
+
+1. Open `IDPhotoSpike.xcodeproj` in Xcode 27 and select the shared `IDPhotoSpike` scheme.
+2. Choose an iPhone simulator running iOS 26 or later and run.
+3. Choose a photo, adjust its crop, and select **Prepare Export**.
+
+For the user's iPhone 15 Pro Max / iOS 26.6.2: select a development team under Signing & Capabilities, use an available unique bundle identifier if needed, pair the phone, enable Developer Mode as required, and run. No signing identity is checked into the repository.
+
+Command-line simulator build from the repository root:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
+  -project Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj \
+  -scheme IDPhotoSpike \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath build/DerivedData \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+List simulators, then pass a simulator UUID to the test script:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun simctl list devices available
+scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
+```
+
+## Implemented
+
+- PhotosPicker with file-based Transferable import; no broad photo-library permission.
+- Immutable, privately stored source; protected and excluded-from-backup working directories.
+- ImageIO orientation normalization and a preview bounded to a 1,600-pixel long edge.
+- Deterministic 13:16 portrait crop with drag/pinch, labeled adjustable sliders, and reset.
+- JPEG at 520 × 640 pixels, sRGB, with new whitelisted metadata. The resolution is an engineering choice, not a sourced official upload requirement.
+- One A6 PDF page with six 26 mm wide × 32 mm high copies, centered with 4 mm gutters.
+- Post-encoding JPEG format/dimension/metadata checks and PDF page-size verification.
+- Native share sheets for JPEG and PDF; originals are never modified in Photos.
+- Cancellation/revision checks and stale-result cleanup; image processing runs on an actor away from the main actor.
+- String Catalog, minimal privacy manifest, Swift Testing, XCUITest, and privacy-safe signposts.
+
+## Data lifetime
+
+Imported provider files are copied while their transfer URL is valid. Staged files are removed after ingestion, including failure/cancellation. Replaced/removed sources are deleted. Export files are retained while the export sheet and its system sharing interaction are active, then removed when the export sheet closes. Abandoned working files are cleared on the next app launch. Backgrounding cancels work; active source storage uses complete file protection. No account, backend, analytics, or photo logging exists.
+
+Files deliberately saved/shared by the user are owned by their destination and are not deleted by the app. A photo held only in iCloud may require a system download before import; already-local inputs can be processed offline.
+
+## Test fixtures
+
+Tests generate colored geometry images at runtime, including EXIF rotations/mirroring, synthetic GPS/comment metadata, HEIC/PNG, Display P3 color, and a 48 MP case. No private photo fixture is committed. Debug builds accept `--uitesting-fixture` to load the generated four-color image through the ingest pipeline. This flag and fixture generator are excluded from Release builds.
+
+## Remaining M1 work
+
+- Physical-device launch, memory/thermal/latency measurements, and broader device coverage.
+- Real-camera HEIC/PNG and wider color-profile fixtures beyond the generated JPEG/HEIC/PNG tests.
+- Camera, Vision face analysis, segmentation/refinement, calibrated quality checks.
+- Full VoiceOver/Voice Control task validation, Dynamic Type/contrast/motion matrix.
+- Share destinations and interrupted-share lifetime tests on device.
+- Physical print measurements at 100% scaling; PDF math alone does not prove printer accuracy.
+- Official profile schema/catalog and complete source-policy validation.
+
+The 80 MP / 150 MB / 16,384-pixel-edge input guards are provisional resource limits, not measured performance budgets. Export decoding is bounded to the resolution needed for the selected crop; Instruments must still establish its real device memory behavior.
+
+No third-party packages or project-generation tools are required. The image-only spike uses Core Graphics for its deterministic crop/scale; it does not create a CIContext. Core Image remains the planned composition layer when segmentation/background work is evaluated.

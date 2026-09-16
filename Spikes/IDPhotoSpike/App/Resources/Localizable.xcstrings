@@ -1,0 +1,580 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "26 × 32 mm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "26 × 32 mm"
+          }
+        }
+      }
+    },
+    "26 millimeters wide, 32 millimeters high" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "26 millimeters wide, 32 millimeters high"
+          }
+        }
+      }
+    },
+    "A6 · 6 copies · 26 × 32 mm each" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A6 · 6 copies · 26 × 32 mm each"
+          }
+        }
+      }
+    },
+    "Adjust crop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjust crop"
+          }
+        }
+      }
+    },
+    "Before you choose a photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before you choose a photo"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "Check the official guidance" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the official guidance"
+          }
+        }
+      }
+    },
+    "Check your face, lighting, and background. This prototype formats your photo; it does not check official acceptance." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your face, lighting, and background. This prototype formats your photo; it does not check official acceptance."
+          }
+        }
+      }
+    },
+    "Choose a portrait" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a portrait"
+          }
+        }
+      }
+    },
+    "Choose Photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Photo"
+          }
+        }
+      }
+    },
+    "Crop and export only. Your original background is preserved. Face analysis and background correction are not included yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crop and export only. Your original background is preserved. Face analysis and background correction are not included yet."
+          }
+        }
+      }
+    },
+    "Digital photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digital photo"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "Export" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
+          }
+        }
+      }
+    },
+    "Face and eyes clearly visible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face and eyes clearly visible"
+          }
+        }
+      }
+    },
+    "File dimensions were verified. Review your photo before using it for a document." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File dimensions were verified. Review your photo before using it for a document."
+          }
+        }
+      }
+    },
+    "Files prepared" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files prepared"
+          }
+        }
+      }
+    },
+    "Foto carnet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto carnet"
+          }
+        }
+      }
+    },
+    "Horizontal position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Horizontal position"
+          }
+        }
+      }
+    },
+    "Image resolution is an app setting, not an official upload requirement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image resolution is an app setting, not an official upload requirement."
+          }
+        }
+      }
+    },
+    "JPEG · 520 × 640 pixels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG · 520 × 640 pixels"
+          }
+        }
+      }
+    },
+    "Manual review needed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual review needed"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "Opening photo…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening photo…"
+          }
+        }
+      }
+    },
+    "Photo crop preview" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo crop preview"
+          }
+        }
+      }
+    },
+    "Photo requirements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo requirements"
+          }
+        }
+      }
+    },
+    "Plain, uniform white background" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plain, uniform white background"
+          }
+        }
+      }
+    },
+    "Prepare Export" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepare Export"
+          }
+        }
+      }
+    },
+    "Preparing files…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing files…"
+          }
+        }
+      }
+    },
+    "Print at Actual Size / 100%. Disable Fit to Page and measure a copy before use. Physical print accuracy still needs testing." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print at Actual Size / 100%. Disable Fit to Page and measure a copy before use. Physical print accuracy still needs testing."
+          }
+        }
+      }
+    },
+    "Print sheet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print sheet"
+          }
+        }
+      }
+    },
+    "Private photo storage could not be prepared. Reopen the app to try again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private photo storage could not be prepared. Reopen the app to try again."
+          }
+        }
+      }
+    },
+    "Recent color photo, facing forward" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent color photo, facing forward"
+          }
+        }
+      }
+    },
+    "Remove Photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Photo"
+          }
+        }
+      }
+    },
+    "Remove this photo and its crop?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove this photo and its crop?"
+          }
+        }
+      }
+    },
+    "Replace Photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Photo"
+          }
+        }
+      }
+    },
+    "Reset" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
+    },
+    "Share JPEG" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share JPEG"
+          }
+        }
+      }
+    },
+    "Share PDF" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share PDF"
+          }
+        }
+      }
+    },
+    "Source reviewed September 15, 2026. Other document types may have different requirements." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source reviewed September 15, 2026. Other document types may have different requirements."
+          }
+        }
+      }
+    },
+    "Spain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spain"
+          }
+        }
+      }
+    },
+    "Spanish Ministry of the Interior" : {
+      "comment" : "A link to the Spanish Ministry of the Interior.",
+      "isCommentAutoGenerated" : true
+    },
+    "Start with a recent, front-facing photo against a plain white background." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start with a recent, front-facing photo against a plain white background."
+          }
+        }
+      }
+    },
+    "The DNI guidance includes medical and religious exceptions for head coverings and glasses. Review the source for your situation." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The DNI guidance includes medical and religious exceptions for head coverings and glasses. Review the source for your situation."
+          }
+        }
+      }
+    },
+    "The exported file could not be verified. Please try again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The exported file could not be verified. Please try again."
+          }
+        }
+      }
+    },
+    "The operation could not be completed. Try again or choose another photo." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The operation could not be completed. Try again or choose another photo."
+          }
+        }
+      }
+    },
+    "The original in your photo library is kept." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The original in your photo library is kept."
+          }
+        }
+      }
+    },
+    "The photo could not be prepared. Try again or choose another photo." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The photo could not be prepared. Try again or choose another photo."
+          }
+        }
+      }
+    },
+    "This crop may look soft when printed. Zoom out or choose a higher-resolution photo." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This crop may look soft when printed. Zoom out or choose a higher-resolution photo."
+          }
+        }
+      }
+    },
+    "This image is too large for this prototype. Choose a photo under 80 megapixels and 150 MB." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This image is too large for this prototype. Choose a photo under 80 megapixels and 150 MB."
+          }
+        }
+      }
+    },
+    "This photo could not be opened. Choose a JPEG, HEIC, or PNG image." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This photo could not be opened. Choose a JPEG, HEIC, or PNG image."
+          }
+        }
+      }
+    },
+    "This photo is no longer available. Choose it again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This photo is no longer available. Choose it again."
+          }
+        }
+      }
+    },
+    "Unable to complete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to complete"
+          }
+        }
+      }
+    },
+    "Use the zoom and position controls below to adjust the crop." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the zoom and position controls below to adjust the crop."
+          }
+        }
+      }
+    },
+    "Vertical position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vertical position"
+          }
+        }
+      }
+    },
+    "What this prototype does" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What this prototype does"
+          }
+        }
+      }
+    },
+    "Your photo stays on your iPhone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your photo stays on your iPhone."
+          }
+        }
+      }
+    },
+    "Zoom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

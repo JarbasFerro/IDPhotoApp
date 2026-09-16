@@ -399,6 +399,8 @@ Record physical measurements and tolerance.
 
 ## 16. Device / OS matrix
 
+First available physical device, confirmed by the user on 2026-09-15: **iPhone 15 Pro Max running iOS 26.6.2**. Start camera, import, Vision, export, accessibility, and performance measurements here. Pairing/signing and test execution are not yet verified. This device alone does not complete the broader matrix or establish iOS 27 runtime behavior.
+
 Finalize after M1.
 
 Current proposal:

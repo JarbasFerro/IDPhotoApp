@@ -13,8 +13,8 @@ The goal is **not** to maximize the number of Apple framework logos in the archi
 Apple’s current developer baseline includes:
 
 - iOS 27 announced at WWDC26;
-- Xcode 27 beta with the iOS 27 SDK;
-- Swift 6.4 compiler in Xcode 27 beta;
+- Xcode 27 with the iOS 27 SDK;
+- Swift 6.4 compiler in Xcode 27;
 - refreshed Liquid Glass behavior and SwiftUI improvements;
 - expanded App Intents/Siri integration;
 - Foundation Models with image input and broader model support;
@@ -22,7 +22,7 @@ Apple’s current developer baseline includes:
 - Xcode/Instruments improvements for performance and concurrency diagnosis;
 - current privacy-manifest / required-reason API requirements.
 
-Because Xcode 27 is still beta at the time of this plan, development may use the beta SDK for technical exploration, but App Store release must use a non-beta toolchain accepted by App Store Connect.
+Xcode 27.0 (27A266a) was verified locally for the first prototype on 2026-09-16. App Store release must use a non-beta toolchain accepted by App Store Connect.
 
 ## 3. North-star experience
 
