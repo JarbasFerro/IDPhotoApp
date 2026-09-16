@@ -37,6 +37,8 @@ Shutter latency (user report, 0.5.1): a long delay between pressing the shutter 
 
 Device measurement (user, iPhone 15 Pro Max, iOS 26.6.2, version 0.5.2): camera start 273 ms, shutter to staged photo data 506 ms, and the press now feels immediate. This satisfies FR-021 for the first device class; the remaining hardware checks are listed below.
 
+Guidance defect (user screenshots, 0.6.0 and 0.6.1): "Keep your head level" stayed on with a visibly level head. Cause: the roll and yaw were read from the raw `AVMetadataFaceObject`, whose angles are relative to the unrotated (landscape) sensor picture, so a level head in portrait reads 90°. Fixed in 0.6.2 by taking the angles from the layer-transformed face object, which the preview layer expresses in preview space. Confirm on the phone that a level head now reaches "Hold still" and "Ready".
+
 Not yet measured, all of it on the phone: HEIF file size at 48 MP versus 12 MP front, orientation in all four device orientations, front-camera preview mirroring versus the unmirrored still, guidance behaviour and hint stability at arm's length, hardware button capture, interruption by a phone call, backgrounding and return, repeated sessions for thermal behaviour, and memory while camera, Vision, and segmentation run together.
 
 ## Findings

@@ -240,7 +240,7 @@ Dependencies: S1-002. Evaluate Deferred Start, responsive capture, `maxPhotoDime
 
 ## S1-021 — Document Tone and Studio Light check — P1 / M
 
-Dependencies: S1-009. Measure identity preservation and clipping for the auto-adjust chain; confirm on device that the Studio Light Info.plist opt-in does not affect stills. Design: [14-priority-feature-plan.md §2.1, §3.7](14-priority-feature-plan.md). Document Tone implemented 2026-09-16 (version 0.6.0) with synthetic and harness measurements; see [spike 06](spikes/06-document-tone.md). Open: warm-light evidence and the Studio Light device check.
+Dependencies: S1-009. Measure identity preservation and clipping for the auto-adjust chain; confirm on device that the Studio Light Info.plist opt-in does not affect stills. Design: [14-priority-feature-plan.md §2.1, §3.7](14-priority-feature-plan.md). Document Tone implemented 2026-09-16 (version 0.6.0) with synthetic and harness measurements; see [spike 06](spikes/06-document-tone.md). Studio Light confirmed unavailable to photo sessions on device (0.6.1). Open: warm-light evidence.
 
 ## S1-014 — Physical-device performance baseline — P0 / L
 

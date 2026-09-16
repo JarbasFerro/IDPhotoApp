@@ -564,7 +564,7 @@ Ship a single global, reversible correction built from `autoAdjustmentFilters`, 
 
 ### Evidence
 
-Implemented in [spike 06](spikes/06-document-tone.md) (2026-09-16): synthetic warm scene neutralised at strength 1 with face luminance preserved and no clipping; eight private portraits keep or lift face luminance with cast within ±0.015. Warm-light photos and the Studio Light device check are still open.
+Implemented in [spike 06](spikes/06-document-tone.md) (2026-09-16): synthetic warm scene neutralised at strength 1 with face luminance preserved and no clipping; eight private portraits keep or lift face luminance with cast within ±0.015. Studio Light confirmed on device to be a video-format effect unavailable to photo sessions (36 of 57 front-camera formats support it, none of them still formats). Warm-light photos are still open.
 
 ### Revisit trigger
 

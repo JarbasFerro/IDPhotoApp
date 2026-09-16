@@ -1,7 +1,7 @@
 # M1 spike 06 — Document Tone
 
 **Implemented:** 2026-09-16 (app version 0.6.0)  
-**Status:** Global tone correction, policy gate, strength and before/after controls, assessment, and export sharpening implemented; simulator suites and the macOS Vision harness pass. The Studio Light still-image check needs one device session.  
+**Status:** Global tone correction, policy gate, strength and before/after controls, assessment, and export sharpening implemented; simulator suites and the macOS Vision harness pass. Studio Light confirmed unavailable to photo sessions on device.  
 **Backlog:** S1-021; FR-150 to FR-152. Design: [14-priority-feature-plan.md §2.1, §3.7](../14-priority-feature-plan.md). Decision: ADR-038.
 
 ## Question
@@ -41,7 +41,7 @@ Both would have shipped without the synthetic test:
 | Harness, eight private portraits, default strength 0.6 | Face luminance unchanged or lifted (0.41 → 0.43, 0.43 → 0.46); background cast stays within ±0.015 (the walls were already near-neutral grey, reference ≈ 0.69/0.70/0.69, so white balance had little to do); no photo crosses the bright-clipping limit because of tone; the two photos flagged "clipped" were already clipped in the source |
 | Visual | `fixture-N-tone.jpg` versus `fixture-N-cutout.jpg`: slightly brighter, slightly more saturated skin, no visible halo or colour shift; identity is unchanged |
 
-Studio Light (user, iPhone 15 Pro Max, iOS 26.6.2, version 0.6.0): the overlay reported "Studio Light off" and Control Center offered no Studio Light control while the app's camera was open (Control Center shows the app row "Foto carnet ›" at the top; the effects panel behind it is where the toggle would be). Control Center only lists the effect when the active capture format supports it, and the `.photo` preset selects a still format. Version 0.6.1 adds to the overlay whether the active format supports Studio Light and how many of the device's formats do, to record the reason on device. Working conclusion, consistent with the plan: the plist opt-in does not give a photo session Studio Light, and stills are unaffected.
+Studio Light (user, iPhone 15 Pro Max, iOS 26.6.2, versions 0.6.0 and 0.6.1): closed. With the app's camera open, Control Center offered no Studio Light control; the app row at the top opened only the privacy panel ("Foto carnet · Camera"). The 0.6.1 overlay read "Studio Light off · format lacks it · 36/57 formats": the still format selected by the `.photo` preset does not support the effect, while 36 of the front camera's 57 formats (video formats) do. Conclusion: Studio Light is a video-format effect; the `NSCameraStudioLightEnabled` opt-in gives a photo session nothing and captured stills cannot carry it. The plist key and the diagnostic overlay text were removed in 0.6.2. ADR-038 stands: Document Tone is the only lighting correction.
 
 ## Findings
 
@@ -53,9 +53,9 @@ Studio Light (user, iPhone 15 Pro Max, iOS 26.6.2, version 0.6.0): the overlay r
 ## Limits and next evidence
 
 1. Photograph under warm and cool indoor light and confirm the white balance direction and magnitude on real skin.
-2. Studio Light device check (above).
+2. ~~Studio Light device check~~ closed (above).
 3. Face balance and red-eye from `autoAdjustmentFilters` were not observed on this corpus; verify their effect once a photo triggers them.
 4. Strength default 0.6 is a judgment; gather user feedback before M3 fixes it.
 5. The assessment thresholds are engineering values derived from ICAO guidance, not certified limits.
 
-**Outcome:** Keep. ADR-038 can move to Accepted after the warm-light and Studio Light checks are recorded.
+**Outcome:** Keep. ADR-038 can move to Accepted after the warm-light check is recorded; the Studio Light question is closed.

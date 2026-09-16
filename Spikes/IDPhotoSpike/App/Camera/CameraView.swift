@@ -128,7 +128,7 @@ struct CameraView: View {
             }
             #if DEBUG
             if let startup = camera.startupMilliseconds {
-                Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? "") + " · " + camera.studioLightStatus)
+                Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? ""))
                     .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
                     .accessibilityHidden(true)
             }

@@ -167,20 +167,6 @@ final class CameraController: NSObject {
         return try await StagedPhoto.stage(data: data)
     }
 
-    /// Spike 06 check: Studio Light is a user-toggled system video effect. Debug builds opt in through
-    /// `NSCameraStudioLightEnabled` so the Control Center toggle appears; this reports what the system says.
-    /// Control Center only offers the toggle while the active format supports the effect, so the overlay also
-    /// reports whether the current photo format does and how many of the device's formats do at all.
-    var studioLightStatus: String {
-        let enabled = AVCaptureDevice.isStudioLightEnabled
-        guard let device = videoInput?.device else { return "Studio Light \(enabled ? "on" : "off")" }
-        let active = device.isStudioLightActive
-        let formatSupports = device.activeFormat.isStudioLightSupported
-        let supporting = device.formats.filter(\.isStudioLightSupported).count
-        return "Studio Light \(enabled ? "on" : "off")\(active ? ", active" : "")"
-            + " · format \(formatSupports ? "supports" : "lacks") it · \(supporting)/\(device.formats.count) formats"
-    }
-
     // MARK: - Configuration (session queue only)
 
     nonisolated private func configureSession(position: AVCaptureDevice.Position) throws {
@@ -272,9 +258,11 @@ extension CameraController: @preconcurrency AVCaptureMetadataOutputObjectsDelega
             let faces = metadataObjects.compactMap { $0 as? AVMetadataFaceObject }
             let layerBounds = previewLayer.bounds
             guard layerBounds.width > 0, layerBounds.height > 0 else { return }
+            // Raw face angles are relative to the unrotated (landscape) sensor picture, so a level head reads
+            // 90° when the phone is upright. The layer-transformed object carries angles in preview space.
             let largest = faces.compactMap { face -> (CGRect, AVMetadataFaceObject)? in
-                guard let transformed = previewLayer.transformedMetadataObject(for: face) else { return nil }
-                return (transformed.bounds, face)
+                guard let transformed = previewLayer.transformedMetadataObject(for: face) as? AVMetadataFaceObject else { return nil }
+                return (transformed.bounds, transformed)
             }.max { $0.0.width * $0.0.height < $1.0.width * $1.0.height }
             let summary = FaceFrameSummary(
                 faceCount: faces.count,
