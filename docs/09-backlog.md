@@ -225,7 +225,7 @@ Acceptance:
 
 ## S1-019 — Print composer spike — P0 / L
 
-Dependencies: S1-010. Design: [14-priority-feature-plan.md §3.1–3.5](14-priority-feature-plan.md).
+Dependencies: S1-010. Design: [14-priority-feature-plan.md §3.1–3.5](14-priority-feature-plan.md). Implemented 2026-09-16 in the spike app; see [spike 02](spikes/02-print-composer.md). Physical measurement and AirPrint paper-list evidence remain open.
 
 Acceptance:
 

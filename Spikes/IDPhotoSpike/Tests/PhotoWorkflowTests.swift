@@ -29,7 +29,8 @@ struct PhotoWorkflowTests {
         model.prepareExport()
         await pipeline.waitForExport()
         model.cancel()
-        let result = PhotoExport(id: UUID(), jpeg: URL(fileURLWithPath: "/unused.jpg"), pdf: URL(fileURLWithPath: "/unused.pdf"))
+        let result = PhotoExport(id: UUID(), jpeg: URL(fileURLWithPath: "/unused.jpg"), pdf: URL(fileURLWithPath: "/unused.pdf"),
+                                 pages: [], layout: PrintLayout(pages: [], unplaced: [:]))
         await pipeline.completeExport(with: result)
         await pipeline.waitForExportDiscard(result.id)
         #expect(model.exported == nil)
@@ -62,7 +63,7 @@ private actor DelayedPipeline: PhotoProcessing {
         // Intentionally ignores cancellation, like a framework callback arriving late.
         try await withCheckedThrowingContinuation { imports.append($0) }
     }
-    func export(photo: PreparedPhoto, adjustment: CropAdjustment) async throws -> PhotoExport {
+    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport {
         try await withCheckedThrowingContinuation { pendingExport = $0 }
     }
     func discard(photoID: UUID) { discardedPhotos.insert(photoID) }

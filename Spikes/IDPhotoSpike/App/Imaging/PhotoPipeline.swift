@@ -5,7 +5,7 @@ import OSLog
 import UniformTypeIdentifiers
 
 enum PhotoError: Error, LocalizedError, Sendable {
-    case unreadable, tooLarge, renderFailed, verificationFailed, expired
+    case unreadable, tooLarge, renderFailed, verificationFailed, expired, emptySheet
 
     var errorDescription: String? {
         switch self {
@@ -14,6 +14,7 @@ enum PhotoError: Error, LocalizedError, Sendable {
         case .renderFailed: String(localized: "The photo could not be prepared. Try again or choose another photo.")
         case .verificationFailed: String(localized: "The exported file could not be verified. Please try again.")
         case .expired: String(localized: "This photo is no longer available. Choose it again.")
+        case .emptySheet: String(localized: "No photo fits on this paper. Choose a larger paper or fewer copies.")
         }
     }
 }
@@ -28,11 +29,13 @@ struct PhotoExport: Sendable, Identifiable {
     let id: UUID
     let jpeg: URL
     let pdf: URL
+    let pages: [URL]
+    let layout: PrintLayout
 }
 
 protocol PhotoProcessing: Sendable {
     func ingest(_ staged: StagedPhoto) async throws -> PreparedPhoto
-    func export(photo: PreparedPhoto, adjustment: CropAdjustment) async throws -> PhotoExport
+    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
 }
@@ -91,7 +94,8 @@ actor PhotoPipeline: PhotoProcessing {
         }
     }
 
-    func export(photo: PreparedPhoto, adjustment: CropAdjustment) throws -> PhotoExport {
+    /// Digital JPEG plus the print sheet (PDF and one JPEG per page) described by `job`.
+    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) throws -> PhotoExport {
         let interval = signposter.beginInterval("Export")
         defer { signposter.endInterval("Export", interval) }
         try Task.checkCancellation()
@@ -99,29 +103,43 @@ actor PhotoPipeline: PhotoProcessing {
         guard FileManager.default.fileExists(atPath: original.path) else { throw PhotoError.expired }
         let source = try open(original)
         let format = PhotoFormat.spainPrototype
-        let crop = adjustment.crop(in: photo.pixels)
-        // Decode enough pixels for this crop/output, rather than the entire 48 MP original.
-        let requiredWidth = Double(format.output.width) / crop.width
-        let requiredHeight = Double(format.output.height) / crop.height
-        let longEdge = Int(ceil(max(requiredWidth, requiredHeight)))
-        let image = try thumbnail(source, maxPixelSize: min(longEdge, max(photo.pixels.width, photo.pixels.height)))
-        let rendered = try render(image, crop: crop, output: format.output)
+        let rendered = try render(source, photo: photo, adjustment: adjustment, format: format, bleedMM: 0)
         try Task.checkCancellation()
+
+        let layoutInterval = signposter.beginInterval("Layout")
+        let layout = PrintLayoutSolver.solve(job)
+        signposter.endInterval("Layout", layoutInterval)
+        guard !layout.pages.isEmpty else { throw PhotoError.emptySheet }
+        var rasters: [PrintLayout.RasterKey: CGImage] = [:]
+        for key in layout.rasterKeys {
+            guard let item = job.items.first(where: { $0.id == key.itemID }) else { continue }
+            try Task.checkCancellation()
+            let itemFormat = PhotoFormat.format(widthMM: item.trimWidthMM, heightMM: item.trimHeightMM)
+            rasters[key] = try render(source, photo: photo, adjustment: adjustment, format: itemFormat,
+                                      bleedMM: PrintLayoutSolver.millimeters(key.bleedMicrometers))
+        }
+
         let id = UUID()
         let directory = exportDirectory(id)
         try PhotoFiles.createPrivateDirectory(directory)
-        let result = PhotoExport(id: id, jpeg: directory.appendingPathComponent("Foto-carnet.jpg"),
-                                 pdf: directory.appendingPathComponent("Foto-carnet-A6.pdf"))
+        let label = String(localized: "50 mm · print at Actual Size · measure before cutting")
         do {
-            try writeJPEG(rendered, to: result.jpeg)
-            try Self.verifyJPEG(result.jpeg, expected: format.output)
+            let jpeg = directory.appendingPathComponent("Foto-carnet.jpg")
+            try writeJPEG(rendered, to: jpeg, pixelsPerInch: format.pixelsPerInch)
+            try Self.verifyJPEG(jpeg, expected: format.output)
             try Task.checkCancellation()
-            try writePDF(rendered, to: result.pdf)
-            try Self.verifyPDF(result.pdf)
-            try PhotoFiles.protect(result.jpeg)
-            try PhotoFiles.protect(result.pdf)
+            let pdfInterval = signposter.beginInterval("PDF")
+            let pdf = directory.appendingPathComponent("Foto-carnet-sheet.pdf")
+            try SheetRenderer.writePDF(layout, rasters: rasters, to: pdf, calibrationLabel: label)
+            try SheetRenderer.verifyPDF(pdf, layout: layout)
+            signposter.endInterval("PDF", pdfInterval)
             try Task.checkCancellation()
-            return result
+            let pages = try SheetRenderer.writeJPEGPages(layout, rasters: rasters, in: directory,
+                                                         baseName: "Foto-carnet-sheet", calibrationLabel: label)
+            try SheetRenderer.verifyJPEGPages(pages, layout: layout)
+            for url in [jpeg, pdf] + pages { try PhotoFiles.protect(url) }
+            try Task.checkCancellation()
+            return PhotoExport(id: id, jpeg: jpeg, pdf: pdf, pages: pages, layout: layout)
         } catch {
             try? FileManager.default.removeItem(at: directory)
             throw error
@@ -160,6 +178,22 @@ actor PhotoPipeline: PhotoProcessing {
         return image
     }
 
+    /// Renders the trim crop plus `bleedMM` on every side at the format's pixels-per-millimetre.
+    private func render(_ source: CGImageSource, photo: PreparedPhoto, adjustment: CropAdjustment,
+                        format: PhotoFormat, bleedMM: Double) throws -> CGImage {
+        let trim = adjustment.crop(in: photo.pixels, format: format)
+        let crop = trim.expanded(byFractionX: bleedMM / format.widthMM, fractionY: bleedMM / format.heightMM)
+        let pixelsPerMM = Double(format.output.width) / format.widthMM
+        let output = OutputPixels(width: Int(((format.widthMM + 2 * bleedMM) * pixelsPerMM).rounded()),
+                                  height: Int(((format.heightMM + 2 * bleedMM) * pixelsPerMM).rounded()))
+        // Decode enough pixels for this crop/output, rather than the entire 48 MP original.
+        let requiredWidth = Double(output.width) / crop.width
+        let requiredHeight = Double(output.height) / crop.height
+        let longEdge = Int(ceil(max(requiredWidth, requiredHeight)))
+        let image = try thumbnail(source, maxPixelSize: min(longEdge, max(photo.pixels.width, photo.pixels.height)))
+        return try render(image, crop: crop, output: output)
+    }
+
     private func render(_ image: CGImage, crop: NormalizedCrop, output: OutputPixels) throws -> CGImage {
         let interval = signposter.beginInterval("Render")
         defer { signposter.endInterval("Render", interval) }
@@ -180,32 +214,17 @@ actor PhotoPipeline: PhotoProcessing {
         return result
     }
 
-    private func writeJPEG(_ image: CGImage, to url: URL) throws {
+    private func writeJPEG(_ image: CGImage, to url: URL, pixelsPerInch: Double) throws {
         guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.jpeg.identifier as CFString, 1, nil)
         else { throw PhotoError.renderFailed }
         // New image + explicit metadata whitelist; never copy source dictionaries.
         CGImageDestinationAddImage(destination, image, [
             kCGImageDestinationLossyCompressionQuality: 0.95,
             kCGImagePropertyOrientation: 1,
-            kCGImagePropertyDPIWidth: PhotoFormat.spainPrototype.pixelsPerInch,
-            kCGImagePropertyDPIHeight: PhotoFormat.spainPrototype.pixelsPerInch
+            kCGImagePropertyDPIWidth: pixelsPerInch,
+            kCGImagePropertyDPIHeight: pixelsPerInch
         ] as CFDictionary)
         guard CGImageDestinationFinalize(destination) else { throw PhotoError.renderFailed }
-    }
-
-    private func writePDF(_ image: CGImage, to url: URL) throws {
-        let interval = signposter.beginInterval("PDF")
-        defer { signposter.endInterval("PDF", interval) }
-        let layout = PrintLayout()
-        var box = CGRect(x: 0, y: 0, width: layout.pageWidth, height: layout.pageHeight)
-        guard let context = CGContext(url as CFURL, mediaBox: &box, nil) else { throw PhotoError.renderFailed }
-        context.beginPDFPage(nil)
-        for origin in layout.origins {
-            context.draw(image, in: CGRect(x: origin.x, y: origin.y,
-                                          width: layout.photoWidth, height: layout.photoHeight))
-        }
-        context.endPDFPage()
-        context.closePDF()
     }
 
     static func verifyJPEG(_ url: URL, expected: OutputPixels) throws {
@@ -224,15 +243,5 @@ actor PhotoPipeline: PhotoProcessing {
               exif[kCGImagePropertyExifDateTimeOriginal] == nil,
               tiff[kCGImagePropertyTIFFMake] == nil,
               tiff[kCGImagePropertyTIFFModel] == nil else { throw PhotoError.verificationFailed }
-    }
-
-    static func verifyPDF(_ url: URL) throws {
-        let layout = PrintLayout()
-        guard let document = CGPDFDocument(url as CFURL), document.numberOfPages == 1,
-              let page = document.page(at: 1) else { throw PhotoError.verificationFailed }
-        let box = page.getBoxRect(.mediaBox)
-        guard abs(box.width - layout.pageWidth) < 0.01, abs(box.height - layout.pageHeight) < 0.01 else {
-            throw PhotoError.verificationFailed
-        }
     }
 }

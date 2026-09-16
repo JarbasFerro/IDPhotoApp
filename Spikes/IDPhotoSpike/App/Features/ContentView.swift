@@ -5,6 +5,7 @@ struct ContentView: View {
     @Bindable var model: PhotoWorkflow
     @State private var selection: PhotosPickerItem?
     @State private var showRequirements = false
+    @State private var showComposer = false
     @State private var confirmRemove = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -55,6 +56,7 @@ struct ContentView: View {
                     }
 
                     if model.photo != nil {
+                        printSheetSummary
                         Button(action: model.prepareExport) {
                             Label("Prepare Export", systemImage: "square.and.arrow.up")
                                 .frame(maxWidth: .infinity)
@@ -96,8 +98,9 @@ struct ContentView: View {
                 Text("The original in your photo library is kept.")
             }
             .sheet(isPresented: $showRequirements) { RequirementsView() }
+            .sheet(isPresented: $showComposer) { PrintComposerView(model: model) }
             .sheet(item: $model.exported, onDismiss: model.finishExport) { result in
-                ExportView(result: result)
+                ExportView(result: result, paperName: PaperNames.name(for: model.printJob.paper))
             }
             .alert("Unable to complete", isPresented: Binding(
                 get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } }
@@ -110,6 +113,29 @@ struct ContentView: View {
                 selection = nil
             }
         }
+    }
+
+    private var printSheetSummary: some View {
+        let layout = model.layout
+        return Button { showComposer = true } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Print sheet", systemImage: "printer").font(.headline)
+                    Text("\(PaperNames.name(for: model.printJob.paper)) · \(layout.placedCount) copies · \(layout.pages.count) page(s)")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+            .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .disabled(model.activity != nil)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint("Choose paper, copies, and cutting options.")
+        .accessibilityIdentifier("printSheet")
     }
 
     private var adjustmentControls: some View {
@@ -173,6 +199,7 @@ private struct RequirementsView: View {
 
 private struct ExportView: View {
     let result: PhotoExport
+    let paperName: String
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -191,11 +218,21 @@ private struct ExportView: View {
                         .accessibilityIdentifier("shareJPEG")
                 }
                 Section("Print sheet") {
-                    Text("A6 · 6 copies · 26 × 32 mm each")
-                    Text("Print at Actual Size / 100%. Disable Fit to Page and measure a copy before use. Physical print accuracy still needs testing.")
+                    Text("\(paperName) · \(result.layout.placedCount) copies · \(result.layout.pages.count) page(s)")
+                    Text("Print at Actual Size / 100%. Disable Fit to Page and borderless printing, then measure the 50 mm bar and one copy before cutting.")
                         .font(.subheadline)
                     ShareLink(item: result.pdf) { Label("Share PDF", systemImage: "square.and.arrow.up") }
                         .accessibilityIdentifier("sharePDF")
+                    ShareLink(items: result.pages) { Label("Share page JPEGs for a photo lab", systemImage: "photo.on.rectangle.angled") }
+                        .accessibilityIdentifier("sharePages")
+                    if PrintController.isAvailable {
+                        Button {
+                            PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Foto carnet sheet"))
+                        } label: {
+                            Label("Print", systemImage: "printer")
+                        }
+                        .accessibilityIdentifier("print")
+                    }
                 }
             }
             .navigationTitle("Export")

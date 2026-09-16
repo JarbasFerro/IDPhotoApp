@@ -44,6 +44,39 @@ final class IDPhotoSpikeUITests: XCTestCase {
     }
 
     @MainActor
+    func testPrintComposerAddsASizeAndUpdatesTheSummary() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["cropPreview"].waitForExistence(timeout: 15))
+        let printSheet = app.buttons["printSheet"]
+        XCTAssertTrue(printSheet.waitForExistence(timeout: 5))
+        for _ in 0..<4 where !printSheet.isHittable {
+            let scroll = app.scrollViews.firstMatch
+            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.85))
+                .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.3)))
+        }
+        printSheet.tap()
+        XCTAssertTrue(app.navigationBars["Print sheet"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.scrollViews["sheetPreview"].waitForExistence(timeout: 10))
+        let summary = app.staticTexts["layoutSummary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 5))
+        let before = summary.label
+        let addButton = app.buttons["add-eu-35x45"]
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5))
+        addButton.tap()
+        XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 5))
+        XCTAssertNotEqual(app.staticTexts["layoutSummary"].label, before)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Print composer"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+        app.buttons["Done"].tap()
+        XCTAssertTrue(app.buttons["prepareExport"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testAccessibilityTextSizeCanReachExport() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture", "-UIPreferredContentSizeCategoryName",

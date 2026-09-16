@@ -97,7 +97,7 @@ Do not estimate a release date until device access is operational and M1 finding
 
 ## 6. Immediate next task
 
-The user's post-spike priorities (custom paper, optimized multi-photo sheets with bleed and cut marks, background replacement, automatic tone, face/eye alignment, iOS 26/27 adoption) are planned in [the priority feature plan](14-priority-feature-plan.md), which adds spikes S1-017 to S1-021 and ADR-036 to ADR-042. S1-019 (print composer) can start immediately from the spike 01 PDF code; S1-017/S1-018 need the fixture corpus.
+The user's post-spike priorities (custom paper, optimized multi-photo sheets with bleed and cut marks, background replacement, automatic tone, face/eye alignment, iOS 26/27 adoption) are planned in [the priority feature plan](14-priority-feature-plan.md), which adds spikes S1-017 to S1-021 and ADR-036 to ADR-042. S1-019 (print composer) is implemented in the spike app with simulator evidence on iOS 26.0 and 27.0 ([spike 02](spikes/02-print-composer.md)); its physical print measurement is the next hardware task. S1-017/S1-018 need the fixture corpus.
 
 The disposable harness and import/crop/export prototype are implemented; see [run instructions](../Spikes/IDPhotoSpike/README.md) and [validation results](spikes/01-import-crop-export.md). Complete physical launch on the iPhone 15 Pro Max / iOS 26.6.2, record performance, and proceed with the camera/Vision spikes. Broader physical-device coverage and the full M1 exit gate remain pending.
 

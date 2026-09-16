@@ -6,6 +6,7 @@ import Observation
 final class PhotoWorkflow {
     var photo: PreparedPhoto?
     var adjustment = CropAdjustment()
+    var printJob = PrintJob(paper: .photo10x15, items: [])
     var exported: PhotoExport?
     var errorMessage: String?
     private(set) var activity: Activity?
@@ -21,6 +22,9 @@ final class PhotoWorkflow {
     init(pipeline: any PhotoProcessing) { self.pipeline = pipeline }
 
     func setInitialized() { isInitialized = true }
+
+    /// Solved on demand; the solver is deterministic and takes microseconds for spike-sized jobs.
+    var layout: PrintLayout { PrintLayoutSolver.solve(printJob) }
 
     func importPhoto(loader: @escaping @Sendable () async throws -> StagedPhoto?) {
         cancel()
@@ -39,6 +43,7 @@ final class PhotoWorkflow {
                 let previous = photo
                 photo = result
                 adjustment = CropAdjustment()
+                resetPrintJob(for: result)
                 activity = nil
                 if let previous { await pipeline.discard(photoID: previous.id) }
             } catch {
@@ -52,11 +57,12 @@ final class PhotoWorkflow {
         cancel()
         let currentRevision = revision
         let edits = adjustment
+        let job = printJob
         activity = .exporting
         errorMessage = nil
         task = Task {
             do {
-                let result = try await pipeline.export(photo: photo, adjustment: edits)
+                let result = try await pipeline.export(photo: photo, adjustment: edits, job: job)
                 guard revision == currentRevision, !Task.isCancelled else {
                     await pipeline.discard(exportID: result.id)
                     return
@@ -89,7 +95,31 @@ final class PhotoWorkflow {
         let previous = photo
         photo = nil
         adjustment = CropAdjustment()
+        printJob.items = []
         if let previous { Task { await pipeline.discard(photoID: previous.id) } }
+    }
+
+    // MARK: - Print job editing
+
+    func resetPrintJob(for photo: PreparedPhoto) {
+        printJob = PrintJob(paper: printJob.paper, items: [
+            PrintItem(photoID: photo.id, trimWidthMM: PhotoFormat.spainPrototype.widthMM,
+                      trimHeightMM: PhotoFormat.spainPrototype.heightMM, copies: 8)
+        ], options: printJob.options)
+    }
+
+    func addPrintItem(format: PhotoFormat) {
+        guard let photo else { return }
+        printJob.items.append(PrintItem(photoID: photo.id, trimWidthMM: format.widthMM,
+                                        trimHeightMM: format.heightMM, copies: 4))
+    }
+
+    func removePrintItems(at offsets: IndexSet) {
+        printJob.items.remove(atOffsets: offsets)
+    }
+
+    func movePrintItems(from source: IndexSet, to destination: Int) {
+        printJob.items.move(fromOffsets: source, toOffset: destination)
     }
 
     var sourceIsSmall: Bool {

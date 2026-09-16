@@ -6,7 +6,7 @@ Native iPhone app for the first M1 import/render experiment. This is disposable 
 
 1. Open `IDPhotoSpike.xcodeproj` in Xcode 27 and select the shared `IDPhotoSpike` scheme.
 2. Choose an iPhone simulator running iOS 26 or later and run.
-3. Choose a photo, adjust its crop, and select **Prepare Export**.
+3. Choose a photo, adjust its crop, open **Print sheet** to set paper and copies, and select **Prepare Export**.
 
 For the user's iPhone 15 Pro Max / iOS 26.6.2: select a development team under Signing & Capabilities, use an available unique bundle identifier if needed, pair the phone, enable Developer Mode as required, and run. No signing identity is checked into the repository.
 
@@ -35,9 +35,11 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 - ImageIO orientation normalization and a preview bounded to a 1,600-pixel long edge.
 - Deterministic 13:16 portrait crop with drag/pinch, labeled adjustable sliders, and reset.
 - JPEG at 520 × 640 pixels, sRGB, with new whitelisted metadata. The resolution is an engineering choice, not a sourced official upload requirement.
-- One A6 PDF page with six 26 mm wide × 32 mm high copies, centered with 4 mm gutters.
+- Print composer ([spike 02](../../docs/spikes/02-print-composer.md)): paper catalog plus custom sizes, deterministic guillotine layout solver with per-size copy counts, automatic rotation and paper orientation, adaptive 0–1 mm bleed, corner cut ticks, 50 mm calibration bar, overflow pages, and two fill strategies.
+- Sheet output as a PDF with page boxes equal to the paper and one 300 ppi JPEG per page; both verified after writing.
+- AirPrint via `UIPrintInteractionController` with photo output type and a `choosePaper` delegate that logs offered papers and prefers bordered paper.
 - Post-encoding JPEG format/dimension/metadata checks and PDF page-size verification.
-- Native share sheets for JPEG and PDF; originals are never modified in Photos.
+- Native share sheets for JPEG, PDF, and page JPEGs; originals are never modified in Photos.
 - Cancellation/revision checks and stale-result cleanup; image processing runs on an actor away from the main actor.
 - String Catalog, minimal privacy manifest, Swift Testing, XCUITest, and privacy-safe signposts.
 
@@ -58,7 +60,8 @@ Tests generate colored geometry images at runtime, including EXIF rotations/mirr
 - Camera, Vision face analysis, segmentation/refinement, calibrated quality checks.
 - Full VoiceOver/Voice Control task validation, Dynamic Type/contrast/motion matrix.
 - Share destinations and interrupted-share lifetime tests on device.
-- Physical print measurements at 100% scaling; PDF math alone does not prove printer accuracy.
+- Physical print measurements at 100% scaling on two printers, plus the AirPrint paper-list log from a real printer; PDF math alone does not prove printer accuracy.
+- Multi-person print jobs in the UI (the solver and tests already handle several photos); copies-versus-bleed default decision.
 - Official profile schema/catalog and complete source-policy validation.
 
 The 80 MP / 150 MB / 16,384-pixel-edge input guards are provisional resource limits, not measured performance budgets. Export decoding is bounded to the resolution needed for the selected crop; Instruments must still establish its real device memory behavior.

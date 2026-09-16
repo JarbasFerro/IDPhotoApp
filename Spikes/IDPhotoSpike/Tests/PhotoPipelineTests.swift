@@ -31,7 +31,7 @@ struct PhotoPipelineTests {
         let pipeline = PhotoPipeline(root: root)
         let staged = try await SyntheticFixture.staged(encoding: encoding, wideGamut: true)
         let photo = try await pipeline.ingest(staged)
-        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment())
+        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment(), job: defaultJob(photo))
         try PhotoPipeline.verifyJPEG(result.jpeg, expected: PhotoFormat.spainPrototype.output)
         let source = try #require(CGImageSourceCreateWithURL(result.jpeg as CFURL, nil))
         let image = try #require(CGImageSourceCreateImageAtIndex(source, 0, nil))
@@ -50,9 +50,10 @@ struct PhotoPipelineTests {
         #expect(photo.pixels == (orientation >= 5 ? SourcePixels(width: 1_000, height: 800)
                                                   : SourcePixels(width: 800, height: 1_000)))
         #expect(max(photo.preview.width, photo.preview.height) <= 1_600)
-        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment())
+        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment(), job: defaultJob(photo))
         try PhotoPipeline.verifyJPEG(result.jpeg, expected: PhotoFormat.spainPrototype.output)
-        try PhotoPipeline.verifyPDF(result.pdf)
+        try SheetRenderer.verifyPDF(result.pdf, layout: result.layout)
+        try SheetRenderer.verifyJPEGPages(result.pages, layout: result.layout)
         let copy = root.appendingPathComponent("photos/" + photo.id.uuidString + "/original")
         #expect(try Data(contentsOf: copy) == original)
         let source = try #require(CGImageSourceCreateWithURL(result.jpeg as CFURL, nil))
@@ -81,7 +82,7 @@ struct PhotoPipelineTests {
         let photo = try await pipeline.ingest(SyntheticFixture.staged())
         for y in [0.0, 1.0] {
             let edit = CropAdjustment(zoom: 4, horizontal: 0, vertical: y)
-            let result = try await pipeline.export(photo: photo, adjustment: edit)
+            let result = try await pipeline.export(photo: photo, adjustment: edit, job: defaultJob(photo))
             let source = try #require(CGImageSourceCreateWithURL(result.jpeg as CFURL, nil))
             let image = try #require(CGImageSourceCreateImageAtIndex(source, 0, nil))
             let crop = edit.crop(in: photo.pixels)
@@ -125,8 +126,41 @@ struct PhotoPipelineTests {
         let photo = try await pipeline.ingest(staged)
         #expect(photo.pixels == SourcePixels(width: 8_000, height: 6_000))
         #expect(max(photo.preview.width, photo.preview.height) == 1_600)
-        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment(zoom: 4))
+        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment(zoom: 4), job: defaultJob(photo))
         try PhotoPipeline.verifyJPEG(result.jpeg, expected: PhotoFormat.spainPrototype.output)
+    }
+
+    @Test func mixedSheetExportsEveryPageAndCleansUp() async throws {
+        let root = isolatedRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pipeline = PhotoPipeline(root: root)
+        let photo = try await pipeline.ingest(SyntheticFixture.staged())
+        let job = PrintJob(paper: .photo10x15, items: [
+            PrintItem(photoID: photo.id, trimWidthMM: 35, trimHeightMM: 45, copies: 4),
+            PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 20)
+        ])
+        // Bleed at the source edge draws white outside the photo instead of failing.
+        let result = try await pipeline.export(photo: photo, adjustment: CropAdjustment(zoom: 1, horizontal: 0, vertical: 0), job: job)
+        #expect(result.layout.isComplete)
+        #expect(result.pages.count == result.layout.pages.count && result.pages.count >= 2)
+        for url in [result.jpeg, result.pdf] + result.pages {
+            #expect(FileManager.default.fileExists(atPath: url.path))
+        }
+        await pipeline.discard(exportID: result.id)
+        #expect(!FileManager.default.fileExists(atPath: result.pdf.path))
+    }
+
+    @Test func emptySheetIsAnErrorNotACrash() async throws {
+        let root = isolatedRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pipeline = PhotoPipeline(root: root)
+        let photo = try await pipeline.ingest(SyntheticFixture.staged())
+        let job = PrintJob(paper: .photo9x13, items: [PrintItem(photoID: photo.id, trimWidthMM: 120, trimHeightMM: 160, copies: 1)])
+        await #expect(throws: PhotoError.self) { try await pipeline.export(photo: photo, adjustment: CropAdjustment(), job: job) }
+    }
+
+    private func defaultJob(_ photo: PreparedPhoto) -> PrintJob {
+        PrintJob(paper: .photo10x15, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 8)])
     }
 
     /// Rasterizes into an explicit RGBA layout. Returned coordinates are top-left.

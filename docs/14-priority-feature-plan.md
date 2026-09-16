@@ -101,15 +101,19 @@ Algorithm:
 
 Recommended defaults: margin 4 mm to the bleed edge (so the trim edge sits ≥ 5 mm from the paper edge, inside Canon's 5 mm unprintable zone), gutter 2 mm, bleed adaptive 0–1 mm. A "Max copies" option allows zero gutter with shared cut lines, off by default because a cut error then produces one oversize and one undersize photo.
 
-Verified counts with those defaults (paper portrait/landscape and photo rotation chosen automatically):
+Counts produced by the implemented solver (spike 02) with those defaults; paper orientation, photo rotation, and bleed are chosen automatically, and mixed-orientation columns beat the plain grid on several papers:
 
-| Paper | 26 × 32 | 35 × 45 | 51 × 51 | 50 × 70 |
-|---|---|---|---|---|
-| 10 × 15 / 4 × 6 | 12 (3 × 4) | 6 (2 × 3) | 2 | 2 |
-| 13 × 18 | 20 (4 × 5) | 9 (3 × 3) | 6 | 4 |
-| A6 | 12 | 6 (rotated) | 2 | 2 |
-| A4 | 60 (rotated) | 30 | 15 | 12 |
-| US Letter | 56 | 28 (rotated) | 15 | 12 |
+| Paper | 26 × 32 | 35 × 45 | 51 × 51 | 50 × 70 | 30 × 40 |
+|---|---|---|---|---|---|
+| 10 × 15 / 4 × 6 | 12 (bleed 1) | 6 (bleed 0.5, rotated) | 2 | 2 | 8 |
+| 13 × 18 | 20 (bleed 0, rotated) | 9 (bleed 1) | 6 | 4 | 14 |
+| 9 × 13 | 8 | 4 | 2 | 2 | 5 |
+| A6 | 14 (bleed 0, mixed) | 6 | 2 | 2 | 9 |
+| A5 | 30 (bleed 0) | 15 (bleed 0) | 6 | 5 | – |
+| A4 | 60 (bleed 0) | 30 (bleed 0.5) | 15 | 14 | 42 |
+| US Letter | 56 (bleed 0) | 29 (bleed 0, mixed) | 15 | 14 | 38 |
+
+The solver ranks copies first, then bleed, then the calibration bar (§3.5). Where a zero-bleed mixed layout adds copies over the bleed grid (A6 holds 14 instead of 12), it wins; whether users should be offered the bleed-first alternative is an open UX question for S1-019's physical print review.
 
 Mixed example on 10 × 15 with margin 4, gutter 2, bleed 0.5: four 35 × 45 plus six 26 × 32 → page 1 holds two rows of 2 × 35 × 45 (94 mm) plus one row of 3 × 26 × 32 (33 mm), page 2 holds the remaining three.
 
