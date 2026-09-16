@@ -184,10 +184,13 @@ struct PortraitView: View {
             let adjustment = showsOriginal ? CropAdjustment() : entry.adjustment
             let crop = adjustment.crop(in: entry.photo.pixels)
             let hasPreview = !showsOriginal && entry.backgroundPreview != nil
+            // Both layers stay mounted and move together; only their opacity crossfades. Inserting the white
+            // layer on demand made it appear at its final geometry while the other layer was still animating.
             ZStack(alignment: .topLeading) {
                 layer(entry.photo.preview, crop: crop, adjustment: adjustment, in: geometry.size)
-                if hasPreview, let preview = entry.backgroundPreview {
+                if let preview = entry.backgroundPreview {
                     layer(preview, crop: crop, adjustment: adjustment, in: geometry.size)
+                        .opacity(hasPreview ? 1 : 0)
                         .transition(.opacity)
                 }
             }

@@ -81,7 +81,7 @@ struct HomeView: View {
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Your sheet").font(.headline)
-                    Text("\(model.entries.count) \(model.entries.count == 1 ? String(localized: "person") : String(localized: "people")) · \(model.layout.placedCount) copies · \(PaperNames.name(for: model.printJob.paper))")
+                    Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.name(for: model.printJob.paper))")
                         .font(.subheadline).foregroundStyle(.secondary)
                 }
                 Spacer()

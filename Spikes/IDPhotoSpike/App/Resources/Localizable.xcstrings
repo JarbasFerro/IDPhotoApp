@@ -3853,6 +3853,116 @@
           }
         }
       }
+    },
+    "%@ · ^[%lld copy](inflect: true) · ^[%lld page](inflect: true)": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · ^[%2$lld copia](inflect: true) · ^[%3$lld página](inflect: true)"
+          }
+        }
+      }
+    },
+    "%@ · ^[%lld page](inflect: true) · %lld of %lld copies placed": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · ^[%2$lld página](inflect: true) · %3$lld de %4$lld copias colocadas"
+          }
+        }
+      }
+    },
+    "^[%lld person](inflect: true) · ^[%lld copy](inflect: true) · %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "^[%1$lld persona](inflect: true) · ^[%2$lld copia](inflect: true) · %3$@"
+          }
+        }
+      }
+    },
+    "Lab JPEG": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG para laboratorio"
+          }
+        }
+      }
+    },
+    "Share all": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir todas"
+          }
+        }
+      }
+    },
+    "JPEG, 520 × 640 pixels, for online forms. Tap a photo to share it.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JPEG, 520 × 640 píxeles, para trámites en línea. Toca una foto para compartirla."
+          }
+        }
+      }
+    },
+    "Share JPEG, photo %lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir JPEG, foto %lld"
+          }
+        }
+      }
+    },
+    "Auto: when the ring closes, a 3-second countdown runs and the photo is taken for you. Off, you press the shutter yourself.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto: cuando el anillo se cierra, empieza una cuenta atrás de 3 segundos y la foto se hace sola. Desactivado, pulsas tú el disparador."
+          }
+        }
+      }
+    },
+    "The ring around the shutter checks four things, one after another, in this order. Grey: not yet. Orange: needs attention; the message at the top tells you what to do. Green: fine. When all four are green the ring closes.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El anillo alrededor del disparador comprueba cuatro cosas, una tras otra, en este orden. Gris: todavía no. Naranja: necesita atención; el mensaje de arriba te dice qué hacer. Verde: bien. Cuando las cuatro están en verde, el anillo se cierra."
+          }
+        }
+      }
+    },
+    "Don't show this again": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No volver a mostrar"
+          }
+        }
+      }
+    },
+    "Before you start": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antes de empezar"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

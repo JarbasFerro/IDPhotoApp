@@ -51,8 +51,8 @@ enum CaptureHint: String, Sendable, Hashable, CaseIterable {
     case holdStill, ready
 }
 
-/// Which readiness segment a hint belongs to, for the four-part indicator.
-enum ReadinessGroup: String, Sendable, Hashable, CaseIterable { case framing, pose, light, distance }
+/// Which readiness segment a hint belongs to, in the order the ring reveals them (and the hints are given).
+enum ReadinessGroup: String, Sendable, Hashable, CaseIterable { case framing, distance, pose, light }
 
 struct CaptureReadiness: Sendable, Hashable {
     enum State: Sendable, Hashable { case unknown, attention, ok }
@@ -70,6 +70,25 @@ struct CaptureReadiness: Sendable, Hashable {
         case .light: light
         case .distance: distance
         }
+    }
+
+    /// The same states revealed one check at a time: a segment shows its state only once every earlier segment
+    /// is fine (an unmeasured earlier segment counts as fine, so a missing signal never blocks the sequence).
+    var staged: CaptureReadiness {
+        var result = CaptureReadiness()
+        var blocked = false
+        for group in ReadinessGroup.allCases {
+            let state = self[group]
+            let shown: State = blocked ? .unknown : state
+            switch group {
+            case .framing: result.framing = shown
+            case .distance: result.distance = shown
+            case .pose: result.pose = shown
+            case .light: result.light = shown
+            }
+            if state == .attention { blocked = true }
+        }
+        return result
     }
 }
 
@@ -144,7 +163,7 @@ struct GuidanceTracker: Sendable, Hashable {
         return hint
     }
 
-    /// Hints in priority order: presence, size, distance, position, head pose relative to the camera, light.
+    /// Hints in priority order: presence, size, position, distance, head pose relative to the camera, light.
     private func rawHint(for frame: FaceFrameSummary) -> CaptureHint {
         let t = thresholds
         if frame.faceCount == 0 || frame.bounds == nil { return .noFace }
@@ -155,9 +174,9 @@ struct GuidanceTracker: Sendable, Hashable {
         let maxHeight = t.maxFaceHeight - (hint == .moveBack ? t.sizeHysteresis : 0)
         if box.height < minHeight { return .moveCloser }
         if box.height > maxHeight { return .moveBack }
-        if let distance = frame.distanceCM, distance < t.minDistanceCM { return .tooClose }
         let centerX = box.x + box.width / 2, centerY = box.y + box.height / 2
         if abs(centerX - 0.5) > t.horizontalTolerance || abs(centerY - t.targetCenterY) > t.verticalTolerance { return .centerFace }
+        if let distance = frame.distanceCM, distance < t.minDistanceCM { return .tooClose }
         // Relative pose errors, attributed to whichever is tilted: the phone or the head.
         if let roll = frame.rollDegrees, abs(roll) > t.maxRollDegrees {
             return abs(frame.device?.rollDegrees ?? 0) > t.deviceRollAttribution ? .levelPhone : .keepLevel
