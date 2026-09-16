@@ -169,10 +169,16 @@ final class CameraController: NSObject {
 
     /// Spike 06 check: Studio Light is a user-toggled system video effect. Debug builds opt in through
     /// `NSCameraStudioLightEnabled` so the Control Center toggle appears; this reports what the system says.
+    /// Control Center only offers the toggle while the active format supports the effect, so the overlay also
+    /// reports whether the current photo format does and how many of the device's formats do at all.
     var studioLightStatus: String {
         let enabled = AVCaptureDevice.isStudioLightEnabled
-        let active = videoInput?.device.isStudioLightActive ?? false
+        guard let device = videoInput?.device else { return "Studio Light \(enabled ? "on" : "off")" }
+        let active = device.isStudioLightActive
+        let formatSupports = device.activeFormat.isStudioLightSupported
+        let supporting = device.formats.filter(\.isStudioLightSupported).count
         return "Studio Light \(enabled ? "on" : "off")\(active ? ", active" : "")"
+            + " · format \(formatSupports ? "supports" : "lacks") it · \(supporting)/\(device.formats.count) formats"
     }
 
     // MARK: - Configuration (session queue only)

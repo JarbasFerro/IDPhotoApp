@@ -41,7 +41,7 @@ Both would have shipped without the synthetic test:
 | Harness, eight private portraits, default strength 0.6 | Face luminance unchanged or lifted (0.41 → 0.43, 0.43 → 0.46); background cast stays within ±0.015 (the walls were already near-neutral grey, reference ≈ 0.69/0.70/0.69, so white balance had little to do); no photo crosses the bright-clipping limit because of tone; the two photos flagged "clipped" were already clipped in the source |
 | Visual | `fixture-N-tone.jpg` versus `fixture-N-cutout.jpg`: slightly brighter, slightly more saturated skin, no visible halo or colour shift; identity is unchanged |
 
-Studio Light: not yet checked. With the debug build's camera open on the iPhone 15 Pro Max, enable Studio Light in Control Center and compare the preview with the captured still; the overlay reports "studio light on/off · active yes/no". The plan's assumption is that stills are unaffected (the effect is a video effect); record the answer here and keep or drop the plist key accordingly.
+Studio Light (user, iPhone 15 Pro Max, iOS 26.6.2, version 0.6.0): the overlay reported "Studio Light off" and Control Center offered no Studio Light control while the app's camera was open (Control Center shows the app row "Foto carnet ›" at the top; the effects panel behind it is where the toggle would be). Control Center only lists the effect when the active capture format supports it, and the `.photo` preset selects a still format. Version 0.6.1 adds to the overlay whether the active format supports Studio Light and how many of the device's formats do, to record the reason on device. Working conclusion, consistent with the plan: the plist opt-in does not give a photo session Studio Light, and stills are unaffected.
 
 ## Findings
 
