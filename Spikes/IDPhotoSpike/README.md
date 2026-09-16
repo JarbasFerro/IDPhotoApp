@@ -44,6 +44,10 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 - Cancellation/revision checks and stale-result cleanup; image processing runs on an actor away from the main actor.
 - String Catalog, minimal privacy manifest, Swift Testing, XCUITest, and privacy-safe signposts.
 
+## Versions
+
+The main screen shows `marketing version (build)`, for example `0.3.0 (34)`. The marketing version tracks the spike number (`0.<spike>.<fix>`), and the build number is the git commit count set by `scripts/bump-version.sh <version>` before committing. Commits handed to a device are tagged `v<version>`; `git log --oneline | tail -n +1 | sed -n "$(( $(git rev-list --count HEAD) - <build> + 1 ))p"` maps a build number back to its commit.
+
 ## Data lifetime
 
 Imported provider files are copied while their transfer URL is valid. Staged files are removed after ingestion, including failure/cancellation. Replaced/removed sources are deleted. Export files are retained while the export sheet and its system sharing interaction are active, then removed when the export sheet closes. Abandoned working files are cleared on the next app launch. Backgrounding cancels work; active source storage uses complete file protection. No account, backend, analytics, or photo logging exists.

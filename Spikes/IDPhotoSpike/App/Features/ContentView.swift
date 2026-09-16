@@ -81,6 +81,11 @@ struct ContentView: View {
                     Label("Your photo stays on your iPhone.", systemImage: "lock")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                    Text(AppVersion.display)
+                        .font(.footnote.monospacedDigit())
+                        .foregroundStyle(.tertiary)
+                        .accessibilityLabel(Text("Version \(AppVersion.display)"))
+                        .accessibilityIdentifier("appVersion")
                 }
                 .padding()
             }
@@ -287,5 +292,16 @@ private struct ExportView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
+    }
+}
+
+/// Marketing version and build number from the bundle, e.g. "0.3.0 (34)". The build number is the git
+/// commit count set by scripts/bump-version.sh, so a screenshot identifies the exact commit.
+enum AppVersion {
+    static var display: String {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let version = info["CFBundleShortVersionString"] as? String ?? "0"
+        let build = info["CFBundleVersion"] as? String ?? "0"
+        return "\(version) (\(build))"
     }
 }

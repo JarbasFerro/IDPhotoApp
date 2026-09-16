@@ -212,7 +212,14 @@ Any new non-Apple dependency must document:
 
 `Package.resolved` should be committed for the application so dependency versions remain reproducible.
 
-## 17. Pull-request acceptance questions
+## 17. Versioning
+
+- The spike app and, later, the production app show `marketing version (build)` on their main screen.
+- Marketing version follows `0.<spike or milestone>.<fix>` until release; build number is the git commit count.
+- Run `scripts/bump-version.sh <version>` before committing app changes, and tag commits handed to a device with `v<version>`.
+- Never ship two different binaries with the same version and build.
+
+## 18. Pull-request acceptance questions
 
 Before considering work complete, ask:
 

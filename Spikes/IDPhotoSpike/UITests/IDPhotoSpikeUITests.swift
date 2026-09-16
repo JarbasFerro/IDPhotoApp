@@ -12,6 +12,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["prepareExport"].exists)
+        let version = app.staticTexts["appVersion"]
+        XCTAssertTrue(version.exists)
+        XCTAssertTrue(version.label.range(of: #"^\d+\.\d+\.\d+ \(\d+\)$"#, options: .regularExpression) != nil, version.label)
         app.buttons["Photo requirements"].tap()
         XCTAssertTrue(app.staticTexts["Before you choose a photo"].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
