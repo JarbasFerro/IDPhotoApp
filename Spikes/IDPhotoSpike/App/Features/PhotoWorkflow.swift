@@ -18,6 +18,8 @@ final class PhotoWorkflow {
     private(set) var analysisUnavailable = false
     var exported: PhotoExport?
     var errorMessage: String?
+    /// Timings from the last in-app capture, shown in debug builds for the camera spike.
+    var lastCameraMetrics: CameraMetrics?
     private(set) var activity: Activity?
     private(set) var isInitialized = false
 

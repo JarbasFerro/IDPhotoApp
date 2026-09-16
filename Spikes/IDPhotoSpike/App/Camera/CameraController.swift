@@ -59,6 +59,9 @@ final class CameraController: NSObject {
         previewLayer.videoGravity = .resizeAspectFill
     }
 
+    /// 12.6 MP: covers 4032 x 3024 stills while excluding 24 and 48 MP modes.
+    nonisolated static let maxStillPixels = 12_600_000
+
     static var isSupported: Bool {
         AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) != nil
             || AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil
@@ -150,7 +153,7 @@ final class CameraController: NSObject {
                     settings = AVCapturePhotoSettings()
                 }
                 settings.maxPhotoDimensions = photoOutput.maxPhotoDimensions
-                settings.photoQualityPrioritization = photoOutput.maxPhotoQualityPrioritization
+                        settings.photoQualityPrioritization = .balanced
                 if let connection = photoOutput.connection(with: .video), connection.isVideoRotationAngleSupported(rotation) {
                     connection.videoRotationAngle = rotation
                 }
@@ -184,11 +187,15 @@ final class CameraController: NSObject {
             guard session.canAddOutput(photoOutput) else { throw CameraError.configurationFailed }
             session.addOutput(photoOutput)
         }
-        // Largest still the active format offers (48 MP on the main camera of recent Pro models).
-        if let largest = device.activeFormat.supportedMaxPhotoDimensions.max(by: { $0.width * $0.height < $1.width * $1.height }) {
-            photoOutput.maxPhotoDimensions = largest
+        // An ID photo needs at most about 12 MP (a 35 x 45 mm print at 600 ppi is under 1 MP). Requesting the
+        // sensor's 48 MP maximum with quality prioritization added seconds of processing per shot on the first
+        // device run, so cap the still at the largest format up to 12 MP and use balanced processing.
+        let dimensions = device.activeFormat.supportedMaxPhotoDimensions
+        let capped = dimensions.filter { Int($0.width) * Int($0.height) <= Self.maxStillPixels }
+        if let chosen = (capped.isEmpty ? dimensions : capped).max(by: { $0.width * $0.height < $1.width * $1.height }) {
+            photoOutput.maxPhotoDimensions = chosen
         }
-        photoOutput.maxPhotoQualityPrioritization = .quality
+        photoOutput.maxPhotoQualityPrioritization = .balanced
         if photoOutput.isResponsiveCaptureSupported { photoOutput.isResponsiveCaptureEnabled = true }
         // Captured stills are never mirrored, even from the front camera; the preview mirrors itself.
         photoOutput.connection(with: .video)?.isVideoMirrored = false

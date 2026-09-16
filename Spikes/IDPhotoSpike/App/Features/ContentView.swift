@@ -76,6 +76,13 @@ struct ContentView: View {
                     Label("Your photo stays on your iPhone.", systemImage: "lock")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                    #if DEBUG
+                    if let metrics = model.lastCameraMetrics {
+                        Text("Camera: start \(metrics.startupMilliseconds ?? 0) ms · capture \(metrics.captureMilliseconds ?? 0) ms")
+                            .font(.footnote.monospacedDigit()).foregroundStyle(.tertiary)
+                            .accessibilityIdentifier("cameraMetrics")
+                    }
+                    #endif
                     Text(AppVersion.display)
                         .font(.footnote.monospacedDigit())
                         .foregroundStyle(.tertiary)
@@ -101,8 +108,9 @@ struct ContentView: View {
             .sheet(isPresented: $showRequirements) { RequirementsView() }
             .sheet(isPresented: $showComposer) { PrintComposerView(model: model) }
             .fullScreenCover(isPresented: $showCamera) {
-                CameraView { staged in
+                CameraView { staged, metrics in
                     showCamera = false
+                    model.lastCameraMetrics = metrics
                     model.importPhoto { staged }
                 }
             }

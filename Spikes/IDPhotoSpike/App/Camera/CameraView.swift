@@ -36,10 +36,17 @@ struct CameraPreviewView: UIViewRepresentable {
 }
 
 /// Guided camera: edge-to-edge preview, one calm hint, a head guide, and a large shutter (Signature 1).
+/// Start-up and shutter timings from the last camera session, for the spike report.
+struct CameraMetrics: Sendable, Hashable {
+    let startupMilliseconds: Int?
+    let captureMilliseconds: Int?
+}
+
 struct CameraView: View {
-    let onCapture: (StagedPhoto) -> Void
+    let onCapture: (StagedPhoto, CameraMetrics) -> Void
     @State private var camera = CameraController()
     @State private var errorMessage: String?
+    @State private var flash = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -54,6 +61,9 @@ struct CameraView: View {
                     .accessibilityHidden(true)
                 headGuide
                 overlayControls
+                // Immediate acknowledgement of the shutter press while the still is processed.
+                Color.white.ignoresSafeArea().opacity(flash ? 0.85 : 0).allowsHitTesting(false)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: flash)
             case .denied:
                 deniedView
             case .unavailable:
@@ -73,6 +83,7 @@ struct CameraView: View {
         .onCameraCaptureEvent(isEnabled: camera.state == .running) { event in
             if event.phase == .ended { takePhoto() }
         }
+        .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .onChange(of: camera.hint) { _, hint in
             // One spoken update per hint change; hints are already debounced.
             AccessibilityNotification.Announcement(String(localized: CameraPresentation.text(for: hint))).post()
@@ -115,6 +126,13 @@ struct CameraView: View {
                 Text("Camera paused. It resumes when the interruption ends.")
                     .font(.footnote).padding(8).background(.regularMaterial, in: Capsule())
             }
+            #if DEBUG
+            if let startup = camera.startupMilliseconds {
+                Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? ""))
+                    .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
+                    .accessibilityHidden(true)
+            }
+            #endif
             Spacer()
             HStack {
                 Button("Cancel") { dismiss() }
@@ -177,10 +195,16 @@ struct CameraView: View {
 
     private func takePhoto() {
         guard camera.state == .running, !camera.isCapturing else { return }
+        flash = true
+        Task {
+            try? await Task.sleep(for: .milliseconds(120))
+            flash = false
+        }
         Task {
             do {
                 let staged = try await camera.capture()
-                onCapture(staged)
+                onCapture(staged, CameraMetrics(startupMilliseconds: camera.startupMilliseconds,
+                                                captureMilliseconds: camera.lastCaptureMilliseconds))
             } catch {
                 errorMessage = (error as? CameraError)?.errorDescription ?? CameraError.captureFailed.errorDescription
             }
