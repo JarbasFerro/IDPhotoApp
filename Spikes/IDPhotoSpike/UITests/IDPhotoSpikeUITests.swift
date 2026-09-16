@@ -14,7 +14,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertFalse(app.buttons["prepareExport"].exists)
         let version = app.staticTexts["appVersion"]
         XCTAssertTrue(version.exists)
-        XCTAssertTrue(version.label.range(of: #"^\d+\.\d+\.\d+ \(\d+\)$"#, options: .regularExpression) != nil, version.label)
+        // The accessibility label reads "Version 0.3.0 (34)".
+        XCTAssertTrue(version.label.range(of: #"\d+\.\d+\.\d+ \(\d+\)$"#, options: .regularExpression) != nil, version.label)
         app.buttons["Photo requirements"].tap()
         XCTAssertTrue(app.staticTexts["Before you choose a photo"].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
