@@ -9,6 +9,8 @@ struct PhotoCheckView: View {
     @State private var showAdjust = false
     @State private var confirmRemove = false
     @State private var comparing = false
+    /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
+    @State private var landed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -48,6 +50,14 @@ struct PhotoCheckView: View {
         } message: { Text("The original in your photo library is kept.") }
         .sheet(isPresented: $showAdjust) { AdjustSheet(model: model, photoID: photoID) }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
+        .task(id: photoID) {
+            // Landing: show the uncropped photo first, wait for the push to settle and the check to finish, then frame it.
+            landed = false
+            try? await Task.sleep(for: .milliseconds(reduceMotion ? 50 : 650))
+            while (entry?.isAnalyzing ?? false), !Task.isCancelled { try? await Task.sleep(for: .milliseconds(50)) }
+            guard !Task.isCancelled else { return }
+            withAnimation(reduceMotion ? nil : .spring(duration: 0.8, bounce: 0.12)) { landed = true }
+        }
         .accessibilityIdentifier("photoCheck")
     }
 
@@ -55,20 +65,22 @@ struct PhotoCheckView: View {
     /// crop animates into the official frame and the white background fades in: "we found you and framed you".
     /// Press and hold to see the original.
     private func portrait(_ entry: PhotoEntry) -> some View {
-        let checking = entry.isAnalyzing
+        let checking = entry.isAnalyzing || !landed
         let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 340 : 300)
         return VStack(spacing: 8) {
-            PortraitView(entry: entry, showsOriginal: comparing, label: comparing ? "Original photo" : "Framed photo",
+            PortraitView(entry: entry, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
                          animated: !reduceMotion)
                 .frame(maxWidth: width)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
-                .animation(reduceMotion ? nil : .spring(duration: 0.7, bounce: 0.12), value: checking)
-                .sensoryFeedback(.impact(weight: .light), trigger: checking) { old, new in old && !new }
-                .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in comparing = pressing }
+                .animation(reduceMotion ? nil : .spring(duration: 0.8, bounce: 0.12), value: checking)
+                .sensoryFeedback(.impact(weight: .light), trigger: landed) { old, new in !old && new }
+                .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
+                    withAnimation(reduceMotion ? nil : .spring(duration: 0.5, bounce: 0.1)) { comparing = pressing }
+                }
                 .accessibilityHint("Press and hold to compare with the original.")
                 .accessibilityAction(named: Text("Compare with original")) { comparing.toggle() }
                 .accessibilityIdentifier("portrait")
-            Text(comparing ? "Original" : checking ? "Finding your face…" : "Hold to compare with the original")
+            Text(comparing ? "Original" : entry.isAnalyzing ? "Finding your face…" : !landed ? "Framing…" : "Hold to compare with the original")
                 .font(.caption).foregroundStyle(.secondary)
                 .animation(nil, value: checking)
         }

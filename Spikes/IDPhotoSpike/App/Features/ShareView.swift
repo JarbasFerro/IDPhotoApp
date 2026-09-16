@@ -12,13 +12,16 @@ struct ShareView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 if let result = model.exported {
-                    HStack(spacing: 10) {
+                    VStack(spacing: 10) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.title2)
+                            .font(.system(size: 56))
                             .foregroundStyle(.green)
                             .symbolEffect(.bounce, options: .nonRepeating, isActive: celebrated && !reduceMotion)
-                        Text("Your files are ready.").font(.headline)
+                        Text("Your files are ready.").font(.title2.weight(.semibold))
+                        Text("Print the sheet or share the photos.").font(.subheadline).foregroundStyle(.secondary)
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
                     .accessibilityElement(children: .combine)
                     .onAppear { celebrated = true }
                     printCard(result)

@@ -50,6 +50,8 @@ struct CameraView: View {
     @State private var countdown: Int?
     @AppStorage("autoCapture") private var autoCapture = true
     @AppStorage(DeveloperMode.key) private var developerMode = false
+    @AppStorage("ringExplained") private var ringExplained = false
+    @State private var showRingHelp = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -93,7 +95,8 @@ struct CameraView: View {
         .task(id: "\(camera.hint.rawValue)-\(autoCapture)") {
             // Auto capture: two seconds of "ready" with a visible countdown; any hint change cancels it.
             guard autoCapture, camera.hint == .ready, camera.state == .running, !camera.isCapturing else { countdown = nil; return }
-            for value in [2, 1] {
+            // Three seconds: enough to stop reading the screen and look at the lens.
+            for value in [3, 2, 1] {
                 countdown = value
                 AccessibilityNotification.Announcement("\(value)").post()
                 try? await Task.sleep(for: .seconds(1))
@@ -109,6 +112,7 @@ struct CameraView: View {
         .alert("Unable to take the photo", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: { Text(errorMessage ?? "") }
+        .sheet(isPresented: $showRingHelp) { RingHelpView() }
         .preferredColorScheme(.dark)
         .statusBarHidden()
     }
@@ -175,7 +179,8 @@ struct CameraView: View {
         VStack {
             HStack {
                 Spacer()
-                Label(CameraPresentation.text(for: camera.hint), systemImage: CameraPresentation.symbol(for: camera.hint))
+                Label(countdown != nil ? LocalizedStringResource("Look at the lens") : CameraPresentation.text(for: camera.hint),
+                      systemImage: countdown != nil ? "eye" : CameraPresentation.symbol(for: camera.hint))
                     .font(.subheadline.weight(.medium))
                     .padding(.horizontal, 14).padding(.vertical, 8)
                     .background(.regularMaterial, in: Capsule())
@@ -193,6 +198,11 @@ struct CameraView: View {
             }
             HStack {
                 Spacer()
+                Button { showRingHelp = true } label: { Image(systemName: "questionmark.circle").frame(width: 30, height: 30) }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .accessibilityLabel("What the ring around the shutter means")
+                    .accessibilityIdentifier("ringHelp")
                 Toggle(isOn: $autoCapture) { Label("Auto", systemImage: autoCapture ? "timer" : "timer.slash") }
                     .toggleStyle(.button)
                     .buttonStyle(.bordered)
@@ -202,6 +212,19 @@ struct CameraView: View {
             }
             .padding(.top, 6)
             .padding(.trailing, 16)
+            if !ringExplained, camera.state == .running {
+                // One-time callout; the "?" button brings the full explanation back at any time.
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "circle.dashed")
+                    Text("The ring around the shutter shows framing, head position, light and distance. Green means fine; when it closes, the photo is taken for you.")
+                        .font(.footnote)
+                    Button("OK") { ringExplained = true }.font(.footnote.weight(.semibold))
+                }
+                .padding(12)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                .padding(.horizontal, 16).padding(.top, 8)
+                .accessibilityIdentifier("ringCallout")
+            }
             if camera.state == .interrupted {
                 Text("Camera paused. It resumes when the interruption ends.")
                     .font(.footnote).padding(8).background(.regularMaterial, in: Capsule())
@@ -362,6 +385,15 @@ enum CameraPresentation {
         }
     }
 
+    static func explanation(for group: ReadinessGroup) -> LocalizedStringResource {
+        switch group {
+        case .framing: "One face, big enough and centred in the oval."
+        case .pose: "Head straight and level, looking at the camera. If the phone is tilted, the hint tells you to move the phone, not your head."
+        case .light: "Face bright enough, not lit from behind. One-sided light only shows a tip."
+        case .distance: "About an arm's length or more. Too close distorts the nose."
+        }
+    }
+
     static func symbol(for hint: CaptureHint) -> String {
         switch hint {
         case .ready: "checkmark.circle"
@@ -381,7 +413,43 @@ enum CameraPresentation {
 }
 
 
-/// Four arcs around the shutter, one per readiness group; closes into a full green ring when ready.
+/// What each arc of the readiness ring means; opened from the "?" button on the camera.
+struct RingHelpView: View {
+    @Environment(\.dismiss) private var dismiss
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    HStack {
+                        Spacer()
+                        ReadinessRing(readiness: CaptureReadiness(framing: .ok, pose: .ok, light: .attention, distance: .unknown), ready: false, animated: false)
+                            .frame(width: 110, height: 110)
+                        Spacer()
+                    }
+                    .listRowBackground(Color.clear)
+                    .accessibilityHidden(true)
+                } footer: {
+                    Text("Each part of the ring is one check. Grey: not measured yet. Orange: needs attention. Green: fine. When all four are green the ring closes, the countdown runs and the photo is taken for you (Auto).")
+                }
+                Section {
+                    ForEach(ReadinessGroup.allCases, id: \.self) { group in
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(CameraPresentation.name(for: group)).font(.headline)
+                                Text(CameraPresentation.explanation(for: group)).font(.subheadline).foregroundStyle(.secondary)
+                            }
+                        } icon: { Image(systemName: CameraPresentation.symbol(for: group)) }
+                    }
+                }
+            }
+            .navigationTitle("The ring")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+}
+
+/// Four arcs around the shutter, one per readiness group, each with its icon; closes into a full green ring when ready.
 struct ReadinessRing: View {
     let readiness: CaptureReadiness
     let ready: Bool
@@ -397,6 +465,16 @@ struct ReadinessRing: View {
                     .trim(from: Double(index) * span + gap / 2, to: Double(index + 1) * span - gap / 2)
                     .stroke(color(for: ready ? .ok : readiness[group]), style: StrokeStyle(lineWidth: 5, lineCap: gap == 0 ? .butt : .round))
                     .rotationEffect(.degrees(-90))
+                // Icon just outside the arc's midpoint, so the ring explains itself.
+                GeometryReader { geometry in
+                    let radius = min(geometry.size.width, geometry.size.height) / 2 + 12
+                    let angle = (Double(index) + 0.5) * span * 2 * .pi - .pi / 2
+                    Image(systemName: CameraPresentation.symbol(for: group))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(ready ? Color.green : color(for: readiness[group]).opacity(readiness[group] == .unknown ? 1 : 1))
+                        .shadow(color: .black.opacity(0.6), radius: 2)
+                        .position(x: geometry.size.width / 2 + cos(angle) * radius, y: geometry.size.height / 2 + sin(angle) * radius)
+                }
             }
         }
         .animation(animated ? .easeInOut(duration: 0.3) : nil, value: readiness)

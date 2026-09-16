@@ -261,18 +261,20 @@ struct SheetPageView: View {
     var animated = true
 
     private struct Key: Hashable { let item: UUID; let copy: Int }
+    private struct Keyed: Identifiable { let id: Key; let placement: Placement }
+    private var keyed: [Keyed] { page.placements.map { Keyed(id: Key(item: $0.itemID, copy: $0.copyIndex), placement: $0) } }
 
     var body: some View {
         GeometryReader { geometry in
             let scale = min(geometry.size.width / page.widthMM, geometry.size.height / page.heightMM)
             ZStack(alignment: .topLeading) {
                 Color.white
-                ForEach(page.placements, id: \.self) { placement in
+                ForEach(keyed) { item in
+                    let placement = item.placement
                     placementView(placement, scale: scale)
                         .frame(width: placement.bleed.width * scale, height: placement.bleed.height * scale)
                         .position(x: (placement.bleed.x + placement.bleed.width / 2) * scale,
                                   y: (placement.bleed.y + placement.bleed.height / 2) * scale)
-                        .id(Key(item: placement.itemID, copy: placement.copyIndex))
                         .transition(.opacity.combined(with: .scale(scale: 0.8)))
                 }
                 Canvas { context, _ in
