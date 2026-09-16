@@ -2,6 +2,8 @@ import SwiftUI
 
 struct CropPreview: View {
     let photo: PreparedPhoto
+    /// Preview with the selected background applied; defaults to the plain preview.
+    var image: CGImage?
     @Binding var adjustment: CropAdjustment
     @State private var dragStart: CropAdjustment?
     @State private var pinchStart: CropAdjustment?
@@ -9,7 +11,7 @@ struct CropPreview: View {
     var body: some View {
         GeometryReader { geometry in
             let crop = adjustment.crop(in: photo.pixels)
-            Image(decorative: photo.preview, scale: 1)
+            Image(decorative: image ?? photo.preview, scale: 1)
                 .resizable()
                 .frame(width: geometry.size.width / crop.width, height: geometry.size.height / crop.height)
                 // SwiftUI rotates clockwise for positive angles; the model stores counter-clockwise degrees.

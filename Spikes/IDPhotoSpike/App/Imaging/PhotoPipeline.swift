@@ -36,6 +36,8 @@ struct PhotoExport: Sendable, Identifiable {
 protocol PhotoProcessing: Sendable {
     func ingest(_ staged: StagedPhoto) async throws -> PreparedPhoto
     func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis
+    func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult?
+    func previewImage(photo: PreparedPhoto, adjustment: CropAdjustment) async -> CGImage
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
@@ -45,6 +47,8 @@ protocol PhotoProcessing: Sendable {
 actor PhotoPipeline: PhotoProcessing {
     private let root: URL
     private let signposter = OSSignposter(subsystem: "com.jarbasferro.IDPhotoSpike", category: "ImagePipeline")
+    /// Preview-resolution masks per prepared photo; dropped with the photo. Never written to disk.
+    private var masks: [UUID: CGImage] = [:]
 
     init(root: URL = FileManager.default.temporaryDirectory.appendingPathComponent("IDPhotoSpike")) {
         self.root = root
@@ -100,6 +104,29 @@ actor PhotoPipeline: PhotoProcessing {
         try await FaceAnalyzer.analyze(preview: photo.preview, source: photo.pixels)
     }
 
+    /// Foreground mask for background replacement, kept in memory for this photo.
+    func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult? {
+        let result = await BackgroundSegmenter.segment(preview: photo.preview, faceBox: faceBox, faceCenter: faceCenter)
+        if let result, result.quality.state != .fail { masks[photo.id] = result.mask } else { masks[photo.id] = nil }
+        return result
+    }
+
+    /// Test hook: install a mask without running Vision.
+    func setMask(_ mask: CGImage?, for photoID: UUID) { masks[photoID] = mask }
+
+    /// The preview with the selected background applied, for the editor.
+    func previewImage(photo: PreparedPhoto, adjustment: CropAdjustment) -> CGImage {
+        applyBackground(to: photo.preview, photoID: photo.id, adjustment: adjustment)
+    }
+
+    private func applyBackground(to image: CGImage, photoID: UUID, adjustment: CropAdjustment) -> CGImage {
+        guard case .color(let color) = adjustment.background, let mask = masks[photoID] else { return image }
+        let interval = signposter.beginInterval("Composite")
+        defer { signposter.endInterval("Composite", interval) }
+        return BackgroundCompositor.shared.composite(image: image, mask: mask, color: color,
+                                                     softness: adjustment.clamped().edgeSoftness) ?? image
+    }
+
     /// Digital JPEG plus the print sheet (PDF and one JPEG per page) described by `job`.
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) throws -> PhotoExport {
         let interval = signposter.beginInterval("Export")
@@ -152,7 +179,10 @@ actor PhotoPipeline: PhotoProcessing {
         }
     }
 
-    func discard(photoID: UUID) { try? FileManager.default.removeItem(at: photoDirectory(photoID)) }
+    func discard(photoID: UUID) {
+        masks[photoID] = nil
+        try? FileManager.default.removeItem(at: photoDirectory(photoID))
+    }
     func discard(exportID: UUID) { try? FileManager.default.removeItem(at: exportDirectory(exportID)) }
 
     private func photoDirectory(_ id: UUID) -> URL { root.appendingPathComponent("photos/" + id.uuidString) }
@@ -196,7 +226,9 @@ actor PhotoPipeline: PhotoProcessing {
         let requiredWidth = Double(output.width) / crop.width
         let requiredHeight = Double(output.height) / crop.height
         let longEdge = Int(ceil(max(requiredWidth, requiredHeight)))
-        let image = try thumbnail(source, maxPixelSize: min(longEdge, max(photo.pixels.width, photo.pixels.height)))
+        let decoded = try thumbnail(source, maxPixelSize: min(longEdge, max(photo.pixels.width, photo.pixels.height)))
+        // The mask was made from the preview; Core Image scales it to the decoded size before blending.
+        let image = applyBackground(to: decoded, photoID: photo.id, adjustment: adjustment)
         return try render(image, crop: crop, output: output, rotationDegrees: adjustment.clamped().rotationDegrees)
     }
 

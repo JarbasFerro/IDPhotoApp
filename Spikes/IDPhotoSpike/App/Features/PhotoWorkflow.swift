@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import Observation
 
@@ -9,6 +10,10 @@ final class PhotoWorkflow {
     var printJob = PrintJob(paper: .photo10x15, items: [])
     private(set) var analysis: FaceAnalysis?
     private(set) var isAnalyzing = false
+    private(set) var segmentation: SegmentationResult?
+    private(set) var isSegmenting = false
+    /// Preview with the chosen background applied; nil means show the plain preview.
+    private(set) var backgroundPreview: CGImage?
     /// Vision could not run (for example in the simulator); manual crop remains available.
     private(set) var analysisUnavailable = false
     var exported: PhotoExport?
@@ -21,6 +26,7 @@ final class PhotoWorkflow {
     @ObservationIgnored private let pipeline: any PhotoProcessing
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored private var analysisTask: Task<Void, Never>?
+    @ObservationIgnored private var previewTask: Task<Void, Never>?
     @ObservationIgnored private var revision = UUID()
     @ObservationIgnored private var exportLease: UUID?
 
@@ -64,6 +70,9 @@ final class PhotoWorkflow {
         analysis = nil
         analysisUnavailable = false
         isAnalyzing = true
+        segmentation = nil
+        backgroundPreview = nil
+        isSegmenting = true
         analysisTask = Task {
             let result = try? await pipeline.analyze(photo: photo)
             guard !Task.isCancelled, self.photo?.id == photo.id else { return }
@@ -73,6 +82,35 @@ final class PhotoWorkflow {
             if let solution = result?.solution, result?.faceCount == 1 {
                 adjustment = solution.adjustment
             }
+            let geometry = result?.geometry
+            let segmented = await pipeline.segment(photo: photo, faceBox: geometry?.faceBox, faceCenter: geometry?.eyeMidpoint)
+            guard !Task.isCancelled, self.photo?.id == photo.id else { return }
+            isSegmenting = false
+            segmentation = segmented
+            // Spain requires white; offer it by default when the mask is trustworthy and the original is not already plain.
+            if let segmented, segmented.quality.state == .pass, segmented.background.state != .pass {
+                adjustment.background = .color(.white)
+            }
+            refreshBackgroundPreview()
+        }
+    }
+
+    var canReplaceBackground: Bool {
+        guard let segmentation else { return false }
+        return segmentation.quality.state != .fail
+    }
+
+    /// Recomposites the preview when the background choice or softness changes.
+    func refreshBackgroundPreview() {
+        previewTask?.cancel()
+        guard let photo else { backgroundPreview = nil; return }
+        guard case .color = adjustment.background, canReplaceBackground else { backgroundPreview = nil; return }
+        let edits = adjustment
+        previewTask = Task {
+            let image = await pipeline.previewImage(photo: photo, adjustment: edits)
+            guard !Task.isCancelled, self.photo?.id == photo.id, self.adjustment.background == edits.background,
+                  self.adjustment.edgeSoftness == edits.edgeSoftness else { return }
+            backgroundPreview = image
         }
     }
 
@@ -81,7 +119,12 @@ final class PhotoWorkflow {
         analysis?.faceCount == 1 ? (analysis?.solution?.adjustment ?? CropAdjustment()) : CropAdjustment()
     }
 
-    func resetCrop() { adjustment = automaticAdjustment }
+    func resetCrop() {
+        let background = adjustment.background, softness = adjustment.edgeSoftness
+        adjustment = automaticAdjustment
+        adjustment.background = background
+        adjustment.edgeSoftness = softness
+    }
 
     func prepareExport() {
         guard let photo, activity == nil else { return }
@@ -126,7 +169,9 @@ final class PhotoWorkflow {
         cancelWork()
         analysisTask?.cancel()
         analysisTask = nil
+        previewTask?.cancel()
         isAnalyzing = false
+        isSegmenting = false
     }
 
     func removePhoto() {
@@ -136,6 +181,8 @@ final class PhotoWorkflow {
         adjustment = CropAdjustment()
         analysis = nil
         analysisUnavailable = false
+        segmentation = nil
+        backgroundPreview = nil
         printJob.items = []
         if let previous { Task { await pipeline.discard(photoID: previous.id) } }
     }

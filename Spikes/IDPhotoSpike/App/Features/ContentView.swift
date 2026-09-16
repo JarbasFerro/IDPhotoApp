@@ -20,11 +20,12 @@ struct ContentView: View {
                         Text("26 × 32 mm").foregroundStyle(.secondary)
                     }
                     if let photo = model.photo {
-                        CropPreview(photo: photo, adjustment: $model.adjustment)
+                        CropPreview(photo: photo, image: model.backgroundPreview, adjustment: $model.adjustment)
                             .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 200 : 320)
                             .frame(maxWidth: .infinity)
                             .disabled(model.activity != nil)
                         alignmentStatus
+                        backgroundControls
                         adjustmentControls
                     } else {
                         ContentUnavailableView {
@@ -181,6 +182,52 @@ struct ContentView: View {
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("alignmentStatus")
         }
+    }
+
+    @ViewBuilder private var backgroundControls: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Background").font(.headline)
+            if model.isSegmenting {
+                HStack(spacing: 8) { ProgressView(); Text("Separating the background…").font(.subheadline).foregroundStyle(.secondary) }
+                    .accessibilityElement(children: .combine)
+            } else if let segmentation = model.segmentation {
+                statusLabel(BackgroundPresentation.originalMessage(segmentation.background), symbol: AlignmentPresentation.symbol(for: segmentation.background.state))
+                    .font(.subheadline)
+                if segmentation.quality.state != .pass {
+                    statusLabel(BackgroundPresentation.maskMessage(segmentation.quality), symbol: AlignmentPresentation.symbol(for: segmentation.quality.state))
+                        .font(.subheadline)
+                }
+            } else if model.analysis != nil || model.analysisUnavailable {
+                Label("Background separation is not available for this photo. The original background is kept.", systemImage: "info.circle")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            }
+            Picker("Background", selection: backgroundSelection) {
+                Text("Original").tag(false)
+                Text("White").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .disabled(!model.canReplaceBackground)
+            .accessibilityIdentifier("backgroundPicker")
+            if case .color = model.adjustment.background {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Edge softness").font(.subheadline)
+                    Slider(value: Binding(get: { model.adjustment.edgeSoftness }, set: { model.adjustment.edgeSoftness = $0 }),
+                           in: 0...1, step: 0.1, onEditingChanged: { editing in if !editing { model.refreshBackgroundPreview() } }) { Text("Edge softness") }
+                        .accessibilityValue(model.adjustment.edgeSoftness.formatted(.number.precision(.fractionLength(1))))
+                }
+                Text("White is the Spain DNI requirement. Check hair and shoulder edges in the preview; the original is kept until export.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+        .disabled(model.activity != nil)
+    }
+
+    private var backgroundSelection: Binding<Bool> {
+        Binding(get: { if case .color = model.adjustment.background { return true } else { return false } },
+                set: { white in
+                    model.adjustment.background = white ? .color(.white) : .original
+                    model.refreshBackgroundPreview()
+                })
     }
 
     private func statusLabel(_ text: LocalizedStringResource, symbol: String) -> some View {

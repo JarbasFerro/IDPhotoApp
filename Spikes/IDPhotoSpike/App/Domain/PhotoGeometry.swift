@@ -61,12 +61,17 @@ struct CropAdjustment: Sendable, Hashable {
     var vertical: Double = 0.5
     /// Counter-clockwise rotation of the source around the crop centre, used to level the eyes.
     var rotationDegrees: Double = 0
+    /// Original background, or a replacement colour from the document profile (Spain: white).
+    var background: BackgroundChoice = .original
+    /// Feather width for the replaced background edge, 0...1.
+    var edgeSoftness: Double = 0.5
 
     static let rotationRange: ClosedRange<Double> = -15...15
 
     func clamped() -> Self {
         Self(zoom: Self.bound(zoom, 1...4), horizontal: Self.bound(horizontal, 0...1),
-             vertical: Self.bound(vertical, 0...1), rotationDegrees: Self.bound(rotationDegrees, Self.rotationRange))
+             vertical: Self.bound(vertical, 0...1), rotationDegrees: Self.bound(rotationDegrees, Self.rotationRange),
+             background: background, edgeSoftness: Self.bound(edgeSoftness, 0...1))
     }
 
     func crop(in source: SourcePixels, format: PhotoFormat = .spainPrototype) -> NormalizedCrop {

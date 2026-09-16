@@ -214,7 +214,7 @@ Acceptance:
 
 ## S1-018 — Segmentation, composition, and iOS 27 refinement — P0 / XL
 
-Dependencies: S1-006. Supersedes the scope split of S1-007/S1-008 by evaluating them together. Design: [14-priority-feature-plan.md §3.6](14-priority-feature-plan.md).
+Dependencies: S1-006. Supersedes the scope split of S1-007/S1-008 by evaluating them together. Design: [14-priority-feature-plan.md §3.6](14-priority-feature-plan.md). Automatic mask, quality score, original-background assessment, and white replacement implemented 2026-09-16; see [spike 04](spikes/04-background-replacement.md). iOS 27 tap-to-refine, the accessible refinement alternative, and hard-case fixtures (long hair, glasses, busy background) remain open.
 
 Acceptance:
 

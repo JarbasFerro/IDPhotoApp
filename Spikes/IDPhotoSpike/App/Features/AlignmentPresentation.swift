@@ -54,3 +54,26 @@ enum AlignmentPresentation {
         }
     }
 }
+
+enum BackgroundPresentation {
+    static func originalMessage(_ assessment: BackgroundAssessment) -> LocalizedStringResource {
+        switch assessment.state {
+        case .pass: return "Original background is plain and light"
+        case .warn:
+            if assessment.issues.contains(.dark) { return "Original background is plain but not white; white replacement recommended" }
+            return "Original background is light but not perfectly even; white replacement recommended"
+        case .fail: return "Original background is uneven or dark; use white or retake against a plain wall"
+        case .manualCheck: return "Too little background visible to judge it"
+        }
+    }
+
+    static func maskMessage(_ quality: MaskQuality) -> LocalizedStringResource {
+        switch quality.state {
+        case .pass: return "Background separation looks clean"
+        case .warn:
+            if quality.reasons.contains(.headCutOff) { return "The top of the head touches the edge; separation may be incomplete" }
+            return "Hair or shoulder edges may be soft; check the preview closely"
+        case .fail, .manualCheck: return "The background could not be separated reliably; the original is kept"
+        }
+    }
+}

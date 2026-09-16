@@ -73,6 +73,23 @@ for (index, url) in pictures.enumerated() {
     try writeAnnotated(preview: preview, geometry: g, crop: crop, to: outputFolder.appendingPathComponent("fixture-\(index)-annotated.jpg"))
     try writeAligned(preview: preview, crop: crop, rotationDegrees: solution.adjustment.rotationDegrees,
                      to: outputFolder.appendingPathComponent("fixture-\(index)-aligned.jpg"))
+
+    // Background separation (spike 04): method, mask statistics, original-background assessment, white cutout.
+    let segmentStart = Date()
+    if let segmentation = await BackgroundSegmenter.segment(preview: preview, faceBox: g.faceBox, faceCenter: g.eyeMidpoint) {
+        let st = segmentation.statistics, bg = segmentation.background
+        lines.append(String(format: "    background: %@ | coverage %.2f face %.2f uncertain %.2f top %.2f | mask %@ %@ | original lum %.2f sd %.2f (%@) | %.2f s",
+                            segmentation.method.rawValue, st.coverage, st.faceCoverage, st.uncertainRatio, st.topEdgeForeground,
+                            segmentation.quality.state.rawValue, segmentation.quality.reasons.map(\.rawValue).joined(separator: ","),
+                            bg.meanLuminance, bg.luminanceDeviation, bg.state.rawValue, Date().timeIntervalSince(segmentStart)))
+        try writeJPEG(segmentation.mask, to: outputFolder.appendingPathComponent("fixture-\(index)-fgmask.jpg"))
+        if let cutout = BackgroundCompositor.shared.composite(image: preview, mask: segmentation.mask, color: .white, softness: 0.5) {
+            try writeAligned(preview: cutout, crop: crop, rotationDegrees: solution.adjustment.rotationDegrees,
+                             to: outputFolder.appendingPathComponent("fixture-\(index)-cutout.jpg"))
+        }
+    } else {
+        lines.append("    background: no mask")
+    }
 }
 lines.append("FACE-REPORT-END")
 print(lines.joined(separator: "\n"))
@@ -120,6 +137,9 @@ func writeAnnotated(preview: CGImage, geometry g: FaceGeometry, crop: Normalized
         context.setStrokeColor(CGColor(srgbRed: 1, green: 1, blue: 0, alpha: 1)); context.setLineWidth(3)
         context.strokeEllipse(in: CGRect(x: eye.x * w - 8, y: eye.y * h - 8, width: 16, height: 16))
     }
+    // Vision face box (magenta) to verify mask-coverage statistics.
+    context.setStrokeColor(CGColor(srgbRed: 1, green: 0, blue: 1, alpha: 1)); context.setLineWidth(2); context.setLineDash(phase: 0, lengths: [])
+    context.stroke(CGRect(x: g.faceBox.x * w, y: g.faceBox.y * h, width: g.faceBox.width * w, height: g.faceBox.height * h))
     let cropRect = CGRect(x: crop.x * w, y: crop.y * h, width: crop.width * w, height: crop.height * h)
     context.setStrokeColor(CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 1)); context.setLineWidth(4); context.stroke(cropRect)
     context.setStrokeColor(CGColor(srgbRed: 0, green: 0, blue: 0, alpha: 1)); context.setLineWidth(1.5); context.stroke(cropRect)

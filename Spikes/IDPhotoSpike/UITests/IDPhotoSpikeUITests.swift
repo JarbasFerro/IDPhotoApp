@@ -33,6 +33,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         cropScreenshot.name = "Crop editor"
         cropScreenshot.lifetime = .keepAlways
         add(cropScreenshot)
+        // Background control is present; in the simulator Vision is unavailable so it stays disabled.
+        XCTAssertTrue(app.segmentedControls["backgroundPicker"].waitForExistence(timeout: 10))
         let zoom = app.sliders["Zoom"]
         zoom.adjust(toNormalizedSliderPosition: 0.3)
         app.swipeUp()
