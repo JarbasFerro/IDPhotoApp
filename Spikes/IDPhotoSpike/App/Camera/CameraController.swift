@@ -34,6 +34,8 @@ final class CameraController: NSObject {
     private(set) var state: State = .idle
     private(set) var hint: CaptureHint = .noFace
     private(set) var readiness = CaptureReadiness()
+    /// Non-blocking tip shown under the hint while the frame is otherwise good.
+    private(set) var advisory: CaptureHint?
     /// Head roll relative to the camera from the last frame, for the eye-line indicator.
     private(set) var faceRollDegrees: Double?
     /// Phone attitude from Core Motion, nil until the first sample.
@@ -144,6 +146,7 @@ final class CameraController: NSObject {
         tracker = GuidanceTracker()
         hint = .noFace
         readiness = CaptureReadiness()
+        advisory = nil
         faceRollDegrees = nil
     }
 
@@ -369,6 +372,7 @@ extension CameraController: @preconcurrency AVCaptureMetadataOutputObjectsDelega
             if faces.count == 1, let raw = faces.first { meterOnFace(rawBounds: raw.bounds) }
             let next = tracker.update(summary)
             readiness = tracker.readiness
+            if advisory != tracker.advisory { advisory = tracker.advisory }
             if faceRollDegrees != summary.rollDegrees { faceRollDegrees = summary.rollDegrees }
             if next != hint { hint = next }
         }

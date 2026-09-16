@@ -73,37 +73,40 @@ struct CaptureReadiness: Sendable, Hashable {
     }
 }
 
+/// Tolerances are deliberately forgiving: the goal is a usable photo from an unskilled user, not perfection.
+/// The crop solver levels up to 15° of roll afterwards, the shutter is always available, and the readiness
+/// segments show what could still be better without blocking "Ready".
 struct CaptureGuidanceThresholds: Sendable, Hashable {
     /// Face rectangle height as a fraction of the visible preview height. The source photo is cropped later, so
-    /// arm's-length framing (face about a fifth to two fifths of a tall phone screen) is enough; the first device
-    /// run showed 0.30 forced the phone uncomfortably close.
-    var minFaceHeight = 0.18
-    var maxFaceHeight = 0.42
+    /// arm's-length framing (face about a sixth to almost half of a tall phone screen) is enough.
+    var minFaceHeight = 0.16
+    var maxFaceHeight = 0.46
     /// Margin added when leaving a size hint, so a face near the limit does not toggle.
     var sizeHysteresis = 0.03
-    var horizontalTolerance = 0.12
-    var verticalTolerance = 0.15
+    var horizontalTolerance = 0.16
+    var verticalTolerance = 0.20
     /// Preferred face centre, slightly above the middle so shoulders fit below.
     var targetCenterY = 0.45
-    var maxRollDegrees = 8.0
-    var maxYawDegrees = 15.0
+    /// Head roll in the frame; the solver straightens this much afterwards.
+    var maxRollDegrees = 12.0
+    var maxYawDegrees = 20.0
     /// Face pitch relative to the camera beyond this means the camera is above or below the eyes, or leaning.
-    var maxPitchDegrees = 10.0
+    var maxPitchDegrees = 15.0
     /// Phone attitude beyond which a head roll or pitch error is blamed on the phone rather than the head.
     var deviceRollAttribution = 4.0
     var devicePitchAttribution = 8.0
     /// Below this the wide front lens distorts the nose and hides the ears.
-    var minDistanceCM = 45.0
-    /// |ln(left/right)| beyond this is a one-sided light; 0.29 is a 4:3 ratio.
-    var maxLightImbalance = 0.29
+    var minDistanceCM = 40.0
+    /// |ln(left/right)| beyond this is a one-sided light; 0.41 is a 3:2 ratio. Advisory only: it never blocks.
+    var maxLightImbalance = 0.41
     /// Background brighter than the face by this factor is backlight.
-    var backlightRatio = 1.8
+    var backlightRatio = 2.2
     /// Face luminance (0...1) below this is too dark for a document photo.
-    var minFaceLuminance = 0.22
+    var minFaceLuminance = 0.18
     /// Consecutive frames a new hint must persist before it is shown.
     var switchFrames = 5
-    /// Consecutive good frames before "hold still" becomes "ready".
-    var readyFrames = 15
+    /// Consecutive good frames before "hold still" becomes "ready" (a third of a second at 30 fps).
+    var readyFrames = 10
 
     static let `default` = CaptureGuidanceThresholds()
 }
@@ -112,9 +115,13 @@ struct CaptureGuidanceThresholds: Sendable, Hashable {
 struct GuidanceTracker: Sendable, Hashable {
     private(set) var hint: CaptureHint = .noFace
     private(set) var readiness = CaptureReadiness()
+    /// A non-blocking tip (one-sided light) shown under the hint once framing and pose are fine.
+    private(set) var advisory: CaptureHint?
     private var candidate: CaptureHint = .noFace
     private var streak = 0
     private var goodStreak = 0
+    private var advisoryCandidate: CaptureHint?
+    private var advisoryStreak = 0
     let thresholds: CaptureGuidanceThresholds
 
     init(thresholds: CaptureGuidanceThresholds = .default) { self.thresholds = thresholds }
@@ -125,6 +132,7 @@ struct GuidanceTracker: Sendable, Hashable {
         readiness = Self.readiness(for: frame, thresholds: thresholds)
         if raw == candidate { streak += 1 } else { candidate = raw; streak = 1 }
         goodStreak = raw == .ready ? goodStreak + 1 : 0
+        updateAdvisory(for: frame, raw: raw)
 
         if raw == .ready {
             // Good framing: ask the user to hold still, then confirm.
@@ -161,12 +169,21 @@ struct GuidanceTracker: Sendable, Hashable {
         if let light = frame.lighting {
             if light.backgroundRatio > t.backlightRatio, light.faceMean < 0.45 { return .backlit }
             if light.faceMean < t.minFaceLuminance { return .moreLight }
-            let imbalance = log(max(light.leftRightRatio, 0.01))
-            if abs(imbalance) > t.maxLightImbalance { return imbalance > 0 ? .turnLeft : .turnRight }
         } else if frame.lowLight {
             return .moreLight
         }
         return .ready
+    }
+
+    /// One-sided light is worth a tip, not a block: the tip appears only while the frame is otherwise good.
+    private mutating func updateAdvisory(for frame: FaceFrameSummary, raw: CaptureHint) {
+        var next: CaptureHint?
+        if raw == .ready, let light = frame.lighting {
+            let imbalance = log(max(light.leftRightRatio, 0.01))
+            if abs(imbalance) > thresholds.maxLightImbalance { next = imbalance > 0 ? .turnLeft : .turnRight }
+        }
+        if next == advisoryCandidate { advisoryStreak += 1 } else { advisoryCandidate = next; advisoryStreak = 1 }
+        if advisoryStreak >= thresholds.switchFrames { advisory = next }
     }
 
     static func readiness(for frame: FaceFrameSummary, thresholds t: CaptureGuidanceThresholds) -> CaptureReadiness {

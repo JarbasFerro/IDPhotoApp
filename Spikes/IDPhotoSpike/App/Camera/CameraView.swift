@@ -182,6 +182,14 @@ struct CameraView: View {
                 Spacer()
             }
             .padding(.top, 12)
+            if let advisory = camera.advisory, camera.hint == .holdStill || camera.hint == .ready {
+                Label(CameraPresentation.text(for: advisory), systemImage: CameraPresentation.symbol(for: advisory))
+                    .font(.footnote)
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(.regularMaterial, in: Capsule())
+                    .padding(.top, 6)
+                    .accessibilityIdentifier("cameraTip")
+            }
             HStack {
                 readinessRow
                 Toggle(isOn: $autoCapture) { Text("Auto") }
@@ -321,8 +329,8 @@ enum CameraPresentation {
         case .eyeLevel: "Hold the phone at eye level"
         case .backlit: "Move away from the bright light behind you"
         case .moreLight: "Find more light on your face"
-        case .turnLeft: "Turn slightly to your left, towards the light"
-        case .turnRight: "Turn slightly to your right, towards the light"
+        case .turnLeft: "Tip: turn slightly to your left, towards the light"
+        case .turnRight: "Tip: turn slightly to your right, towards the light"
         case .holdStill: "Hold still"
         case .ready: "Ready. Take the photo."
         }

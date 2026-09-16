@@ -31,7 +31,7 @@ struct CaptureGuidanceTests {
         var tracker = GuidanceTracker()
         let good = face(height: 0.3)
         #expect(feed(&tracker, good, times: 5) == .holdStill)
-        #expect(feed(&tracker, good, times: 9) == .holdStill)
+        #expect(feed(&tracker, good, times: 4) == .holdStill)
         #expect(feed(&tracker, good, times: 1) == .ready)
         // Losing the face for a few frames keeps "ready" until the switch threshold, then reports it.
         #expect(feed(&tracker, .empty, times: 4) == .ready)
@@ -40,10 +40,10 @@ struct CaptureGuidanceTests {
 
     @Test func sizeHysteresisPreventsToggling() {
         var tracker = GuidanceTracker()
-        _ = feed(&tracker, face(height: 0.15), times: 5)
+        _ = feed(&tracker, face(height: 0.13), times: 5)
         #expect(tracker.hint == .moveCloser)
         // Just over the limit is not enough to leave "move closer".
-        #expect(feed(&tracker, face(height: 0.19), times: 6) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.17), times: 6) == .moveCloser)
         #expect(feed(&tracker, face(height: 0.22), times: 5) == .holdStill)
     }
 
@@ -60,7 +60,7 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, face(height: 0.3, yaw: 30), times: 5) == .faceCamera)
         tracker = GuidanceTracker()
         // Unknown angles do not block readiness.
-        #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 15) == .ready)
+        #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 10) == .ready)
     }
 
     @Test func poseErrorsAreRelativeAndBlamedOnWhateverIsTilted() {
@@ -71,7 +71,7 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, frame, times: 5) == .holdStill)
         #expect(tracker.readiness.pose == .ok && tracker.readiness.framing == .ok)
         // Head rolled in the frame while the phone is tilted: move the phone.
-        frame.rollDegrees = 12
+        frame.rollDegrees = 14
         #expect(feed(&tracker, frame, times: 5) == .levelPhone)
         // Same head roll with a level phone: move the head.
         frame.device = DeviceLevel(rollDegrees: 1, pitchDegrees: 0)
@@ -79,7 +79,7 @@ struct CaptureGuidanceTests {
         #expect(tracker.readiness.pose == .attention)
         // Pitch: a leaning phone is straightened; an upright phone is raised or lowered.
         frame.rollDegrees = 0
-        frame.pitchDegrees = 15
+        frame.pitchDegrees = 18
         frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: 20)
         #expect(feed(&tracker, frame, times: 5) == .uprightPhone)
         frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: 3)
@@ -110,20 +110,34 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, frame, times: 5) == .tooClose)
         #expect(tracker.readiness.distance == .attention)
         frame.distanceCM = 65
-        frame.pitchDegrees = 16
+        frame.pitchDegrees = 18
         #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
         #expect(tracker.readiness.pose == .attention && tracker.readiness.distance == .ok)
         frame.pitchDegrees = -4
         #expect(feed(&tracker, frame, times: 5) == .holdStill)
     }
 
-    @Test func lightingHintsPointTowardsTheLight() {
+    @Test func oneSidedLightIsATipThatNeverBlocksReady() {
         var tracker = GuidanceTracker()
         var frame = face(height: 0.3)
-        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 1.6, backgroundRatio: 1.0)
-        #expect(feed(&tracker, frame, times: 5) == .turnLeft)
-        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 0.6, backgroundRatio: 1.0)
-        #expect(feed(&tracker, frame, times: 5) == .turnRight)
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 1.8, backgroundRatio: 1.0)
+        #expect(feed(&tracker, frame, times: 5) == .holdStill)
+        #expect(tracker.advisory == .turnLeft && tracker.readiness.light == .attention)
+        #expect(feed(&tracker, frame, times: 5) == .ready)
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 0.5, backgroundRatio: 1.0)
+        #expect(feed(&tracker, frame, times: 5) == .ready && tracker.advisory == .turnRight)
+        // A mild imbalance (under 3:2) is not even a tip.
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 1.3, backgroundRatio: 1.0)
+        #expect(feed(&tracker, frame, times: 5) == .ready && tracker.advisory == nil && tracker.readiness.light == .ok)
+        // The tip disappears while a blocking hint is showing.
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 1.8, backgroundRatio: 1.0)
+        frame.yawDegrees = 30
+        #expect(feed(&tracker, frame, times: 5) == .faceCamera && tracker.advisory == nil)
+    }
+
+    @Test func backlightAndDarknessStillBlock() {
+        var tracker = GuidanceTracker()
+        var frame = face(height: 0.3)
         frame.lighting = LightingSummary(faceMean: 0.30, leftRightRatio: 1.0, backgroundRatio: 2.5)
         #expect(feed(&tracker, frame, times: 5) == .backlit)
         frame.lighting = LightingSummary(faceMean: 0.10, leftRightRatio: 1.0, backgroundRatio: 1.0)
