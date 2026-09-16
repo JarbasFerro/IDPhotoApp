@@ -25,12 +25,21 @@ struct PreparedPhoto: Sendable {
     let preview: CGImage
 }
 
+/// One person's photo with its edits, as handed to export.
+struct PhotoEdit: Sendable {
+    let photo: PreparedPhoto
+    let adjustment: CropAdjustment
+}
+
 struct PhotoExport: Sendable, Identifiable {
     let id: UUID
-    let jpeg: URL
+    /// One digital JPEG per exported photo, in session order.
+    let jpegs: [URL]
     let pdf: URL
     let pages: [URL]
     let layout: PrintLayout
+
+    var jpeg: URL { jpegs[0] }
 }
 
 protocol PhotoProcessing: Sendable {
@@ -39,9 +48,18 @@ protocol PhotoProcessing: Sendable {
     func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult?
     func previewImage(photo: PreparedPhoto, adjustment: CropAdjustment) async -> CGImage
     func toneMetrics(photo: PreparedPhoto, adjustment: CropAdjustment, faceBox: NormalizedCrop?) async -> ToneMetrics
-    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport
+    /// Small crop at the given trim format, for the sheet preview.
+    func thumbnail(photo: PreparedPhoto, adjustment: CropAdjustment, format: PhotoFormat) async -> CGImage?
+    /// Digital JPEGs for every edit plus the print sheet described by `job`, whose items reference the edits' photos.
+    func export(edits: [PhotoEdit], job: PrintJob) async throws -> PhotoExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
+}
+
+extension PhotoProcessing {
+    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport {
+        try await export(edits: [PhotoEdit(photo: photo, adjustment: adjustment)], job: job)
+    }
 }
 
 /// Serializes expensive work off the main actor and bounds decoded image sizes.
@@ -151,17 +169,34 @@ actor PhotoPipeline: PhotoProcessing {
         return ToneAdjuster.metrics(of: image, faceBox: faceBox, mask: masks[photo.id])
     }
 
-    /// Digital JPEG plus the print sheet (PDF and one JPEG per page) described by `job`.
-    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) throws -> PhotoExport {
+    /// Small crop of the preview at the trim format's aspect, for the sheet preview (never the original file).
+    func thumbnail(photo: PreparedPhoto, adjustment: CropAdjustment, format: PhotoFormat) -> CGImage? {
+        let image = applyBackground(to: photo.preview, photoID: photo.id, adjustment: adjustment)
+        let crop = adjustment.crop(in: photo.pixels, format: format)
+        let scale = 160 / max(format.widthMM, format.heightMM)
+        let output = OutputPixels(width: max(1, Int((format.widthMM * scale).rounded())),
+                                  height: max(1, Int((format.heightMM * scale).rounded())))
+        return try? render(image, crop: crop, output: output, rotationDegrees: adjustment.clamped().rotationDegrees)
+    }
+
+    /// One digital JPEG per edit plus the print sheet (PDF and one JPEG per page) described by `job`.
+    func export(edits: [PhotoEdit], job: PrintJob) throws -> PhotoExport {
         let interval = signposter.beginInterval("Export")
         defer { signposter.endInterval("Export", interval) }
+        guard !edits.isEmpty else { throw PhotoError.expired }
         try Task.checkCancellation()
-        let original = photoDirectory(photo.id).appendingPathComponent("original")
-        guard FileManager.default.fileExists(atPath: original.path) else { throw PhotoError.expired }
-        let source = try open(original)
+        var sources: [UUID: CGImageSource] = [:]
+        for edit in edits {
+            let original = photoDirectory(edit.photo.id).appendingPathComponent("original")
+            guard FileManager.default.fileExists(atPath: original.path) else { throw PhotoError.expired }
+            sources[edit.photo.id] = try open(original)
+        }
         let format = PhotoFormat.spainPrototype
-        let rendered = try render(source, photo: photo, adjustment: adjustment, format: format, bleedMM: 0)
-        try Task.checkCancellation()
+        var rendered: [CGImage] = []
+        for edit in edits {
+            rendered.append(try render(sources[edit.photo.id]!, photo: edit.photo, adjustment: edit.adjustment, format: format, bleedMM: 0))
+            try Task.checkCancellation()
+        }
 
         let layoutInterval = signposter.beginInterval("Layout")
         let layout = PrintLayoutSolver.solve(job)
@@ -169,10 +204,12 @@ actor PhotoPipeline: PhotoProcessing {
         guard !layout.pages.isEmpty else { throw PhotoError.emptySheet }
         var rasters: [PrintLayout.RasterKey: CGImage] = [:]
         for key in layout.rasterKeys {
-            guard let item = job.items.first(where: { $0.id == key.itemID }) else { continue }
+            guard let item = job.items.first(where: { $0.id == key.itemID }),
+                  let edit = edits.first(where: { $0.photo.id == item.photoID }),
+                  let source = sources[edit.photo.id] else { continue }
             try Task.checkCancellation()
             let itemFormat = PhotoFormat.format(widthMM: item.trimWidthMM, heightMM: item.trimHeightMM)
-            rasters[key] = try render(source, photo: photo, adjustment: adjustment, format: itemFormat,
+            rasters[key] = try render(source, photo: edit.photo, adjustment: edit.adjustment, format: itemFormat,
                                       bleedMM: PrintLayoutSolver.millimeters(key.bleedMicrometers))
         }
 
@@ -181,10 +218,15 @@ actor PhotoPipeline: PhotoProcessing {
         try PhotoFiles.createPrivateDirectory(directory)
         let label = String(localized: "50 mm · print at Actual Size · measure before cutting")
         do {
-            let jpeg = directory.appendingPathComponent("Foto-carnet.jpg")
-            try writeJPEG(rendered, to: jpeg, pixelsPerInch: format.pixelsPerInch)
-            try Self.verifyJPEG(jpeg, expected: format.output)
-            try Task.checkCancellation()
+            var jpegs: [URL] = []
+            for (index, image) in rendered.enumerated() {
+                let name = rendered.count == 1 ? "Foto-carnet.jpg" : "Foto-carnet-\(index + 1).jpg"
+                let jpeg = directory.appendingPathComponent(name)
+                try writeJPEG(image, to: jpeg, pixelsPerInch: format.pixelsPerInch)
+                try Self.verifyJPEG(jpeg, expected: format.output)
+                jpegs.append(jpeg)
+                try Task.checkCancellation()
+            }
             let pdfInterval = signposter.beginInterval("PDF")
             let pdf = directory.appendingPathComponent("Foto-carnet-sheet.pdf")
             try SheetRenderer.writePDF(layout, rasters: rasters, to: pdf, calibrationLabel: label)
@@ -194,9 +236,9 @@ actor PhotoPipeline: PhotoProcessing {
             let pages = try SheetRenderer.writeJPEGPages(layout, rasters: rasters, in: directory,
                                                          baseName: "Foto-carnet-sheet", calibrationLabel: label)
             try SheetRenderer.verifyJPEGPages(pages, layout: layout)
-            for url in [jpeg, pdf] + pages { try PhotoFiles.protect(url) }
+            for url in jpegs + [pdf] + pages { try PhotoFiles.protect(url) }
             try Task.checkCancellation()
-            return PhotoExport(id: id, jpeg: jpeg, pdf: pdf, pages: pages, layout: layout)
+            return PhotoExport(id: id, jpegs: jpegs, pdf: pdf, pages: pages, layout: layout)
         } catch {
             try? FileManager.default.removeItem(at: directory)
             throw error

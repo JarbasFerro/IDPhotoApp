@@ -39,6 +39,7 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 - Guided camera ([spike 05](../../docs/spikes/05-guided-camera.md)): AVFoundation front/back capture with permission at point of use, full-quality HEIF stills into the same private staging path as imports, horizon-level rotation, interruption handling, a debounced one-line hint driven by face metadata, a head guide, volume/Action-button capture, and a lens-smudge advisory after import. Needs a physical iPhone; simulators show the no-camera screen.
 - Background replacement ([spike 04](../../docs/spikes/04-background-replacement.md)): foreground-instance mask cross-checked with person segmentation, a mask-quality score that keeps the original when separation is unreliable, an assessment of the original background, and a white composite (Spain DNI) with an edge-softness control, applied identically to the preview, the digital JPEG, and the print sheet.
 - Automatic alignment ([spike 03](../../docs/spikes/03-face-alignment.md)): pinned-revision Vision landmarks, person-mask plus anatomical crown estimate, ICAO-default composition solver, eye levelling with a Straighten control, and a status card with pass/warn/fail/manual checks. Real-face evidence comes from `scripts/face-harness.sh` on macOS because the simulators here cannot run Vision.
+- Several people per sheet ([spike 02 addendum](../../docs/spikes/02-print-composer.md)): up to six photos in one session, each with its own crop, background, tone, sizes, and copies; one digital JPEG per person and one sheet for all; the sheet preview draws the real crops.
 - Print composer ([spike 02](../../docs/spikes/02-print-composer.md)): paper catalog plus custom sizes, deterministic guillotine layout solver with per-size copy counts, automatic rotation and paper orientation, adaptive 0–1 mm bleed, corner cut ticks, 50 mm calibration bar, overflow pages, and two fill strategies.
 - Sheet output as a PDF with page boxes equal to the paper and one 300 ppi JPEG per page; both verified after writing.
 - AirPrint via `UIPrintInteractionController` with photo output type and a `choosePaper` delegate that logs offered papers and prefers bordered paper.
@@ -73,7 +74,7 @@ Tests generate colored geometry images at runtime, including EXIF rotations/mirr
 - Full VoiceOver/Voice Control task validation, Dynamic Type/contrast/motion matrix.
 - Share destinations and interrupted-share lifetime tests on device.
 - Physical print measurements at 100% scaling on two printers, plus the AirPrint paper-list log from a real printer; PDF math alone does not prove printer accuracy.
-- Multi-person print jobs in the UI (the solver and tests already handle several photos); copies-versus-bleed default decision.
+- Copies-versus-bleed default decision.
 - Official profile schema/catalog and complete source-policy validation.
 
 The 80 MP / 150 MB / 16,384-pixel-edge input guards are provisional resource limits, not measured performance budgets. Export decoding is bounded to the resolution needed for the selected crop; Instruments must still establish its real device memory behavior.

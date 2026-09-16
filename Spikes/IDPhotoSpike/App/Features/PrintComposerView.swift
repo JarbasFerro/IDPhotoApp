@@ -13,7 +13,7 @@ struct PrintComposerView: View {
         NavigationStack {
             List {
                 Section {
-                    SheetPreview(layout: layout)
+                    SheetPreview(layout: layout, thumbnails: model.sheetThumbnails)
                         .frame(maxWidth: .infinity)
                         .listRowInsets(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
                     Text(summary(layout))
@@ -56,27 +56,46 @@ struct PrintComposerView: View {
                     }
                 }
 
-                Section {
-                    ForEach($model.printJob.items) { $item in
-                        Stepper(value: $item.copies, in: 0...50) {
-                            LabeledContent(formatName(item), value: "\(item.copies)")
+                ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
+                    Section {
+                        ForEach($model.printJob.items) { $item in
+                            if item.photoID == entry.id {
+                                Stepper(value: $item.copies, in: 0...50) {
+                                    LabeledContent(formatName(item), value: "\(item.copies)")
+                                }
+                                .accessibilityIdentifier("copies-\(item.id.uuidString)")
+                                .swipeActions(edge: .trailing) {
+                                    Button(role: .destructive) { model.removePrintItem(id: item.id) } label: { Label("Remove", systemImage: "trash") }
+                                }
+                            }
                         }
-                        .accessibilityIdentifier("copies-\(item.id.uuidString)")
-                    }
-                    .onDelete(perform: model.removePrintItems)
-                    .onMove(perform: model.movePrintItems)
-                    ForEach(PhotoFormat.presets) { format in
-                        Button {
-                            model.addPrintItem(format: format)
-                        } label: {
-                            Label(String(localized: "Add \(formatName(format))"), systemImage: "plus")
+                        ForEach(PhotoFormat.presets) { format in
+                            Button {
+                                model.addPrintItem(format: format, photoID: entry.id)
+                            } label: {
+                                Label(String(localized: "Add \(formatName(format))"), systemImage: "plus")
+                            }
+                            .accessibilityIdentifier("add-\(format.id)-\(index + 1)")
                         }
-                        .accessibilityIdentifier("add-\(format.id)")
+                    } header: {
+                        HStack(spacing: 10) {
+                            Image(decorative: entry.photo.preview, scale: 1)
+                                .resizable().scaledToFill()
+                                .frame(width: 28, height: 35)
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                            Text("Photo \(index + 1)")
+                            if model.entries.count > 1 {
+                                Text("· \(model.printItems(for: entry.id).reduce(0) { $0 + $1.copies }) copies").foregroundStyle(.secondary)
+                            }
+                        }
+                        .accessibilityElement(children: .combine)
+                    } footer: {
+                        if index == model.entries.count - 1 {
+                            Text(model.entries.count > 1
+                                 ? "Each person keeps their own crop, background, and tone. Add another person from the main screen."
+                                 : "Add another person from the main screen to print several people on one sheet.")
+                        }
                     }
-                } header: {
-                    Text("Photos on this sheet")
-                } footer: {
-                    Text("This prototype places crops of the same photo. Different people per sheet use the same layout engine.")
                 }
 
                 Section("Cutting") {
@@ -93,9 +112,10 @@ struct PrintComposerView: View {
             .navigationTitle("Print sheet")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) { EditButton() }
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
             }
+            .task { model.refreshSheetThumbnails() }
+            .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
         }
     }
 
@@ -173,6 +193,8 @@ enum PaperNames {
 /// Schematic pages drawn from the layout: trim rectangles, bleed, ticks, and the calibration bar.
 struct SheetPreview: View {
     let layout: PrintLayout
+    /// Crops per print item; placements without one are drawn as grey boxes.
+    var thumbnails: [UUID: CGImage] = [:]
 
     var body: some View {
         ScrollView(.horizontal) {
@@ -192,7 +214,22 @@ struct SheetPreview: View {
                             context.stroke(Path(paper), with: .color(.secondary), lineWidth: 1)
                             for placement in page.placements {
                                 context.fill(Path(rect(placement.bleed)), with: .color(.gray.opacity(0.25)))
-                                context.fill(Path(rect(placement.trim)), with: .color(.gray.opacity(0.6)))
+                                let trim = rect(placement.trim)
+                                if let thumbnail = thumbnails[placement.itemID] {
+                                    context.drawLayer { layer in
+                                        layer.clip(to: Path(trim))
+                                        if placement.rotated {
+                                            layer.translateBy(x: trim.midX, y: trim.midY)
+                                            layer.rotate(by: .degrees(90))
+                                            layer.draw(Image(decorative: thumbnail, scale: 1),
+                                                       in: CGRect(x: -trim.height / 2, y: -trim.width / 2, width: trim.height, height: trim.width))
+                                        } else {
+                                            layer.draw(Image(decorative: thumbnail, scale: 1), in: trim)
+                                        }
+                                    }
+                                } else {
+                                    context.fill(Path(trim), with: .color(.gray.opacity(0.6)))
+                                }
                             }
                             var ticks = Path()
                             for tick in page.cornerTicks {

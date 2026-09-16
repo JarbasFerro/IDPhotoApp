@@ -21,8 +21,14 @@ struct IDPhotoSpikeApp: App {
                         try await pipeline.prepareSession()
                         model.setInitialized()
                         #if DEBUG
-                        if ProcessInfo.processInfo.arguments.contains("--uitesting-fixture") {
-                            model.importPhoto { try await SyntheticFixture.staged() }
+                        // "--uitesting-fixture" loads one generated photo; "--uitesting-fixture-2" loads two people.
+                        let arguments = ProcessInfo.processInfo.arguments
+                        let fixtures = arguments.contains("--uitesting-fixture-2") ? 2 : arguments.contains("--uitesting-fixture") ? 1 : 0
+                        for index in 0..<fixtures {
+                            let palette: [CGColor] = index == 0 ? SyntheticFixture.defaultPalette
+                                : Array(repeating: CGColor(red: 1, green: 0, blue: 1, alpha: 1), count: 4)
+                            model.importPhoto(mode: .add) { try await SyntheticFixture.staged(palette: palette) }
+                            while model.activity == .importing { try? await Task.sleep(for: .milliseconds(20)) }
                         }
                         #endif
                     } catch {

@@ -80,7 +80,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
         let summary = app.staticTexts["layoutSummary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 5))
         let before = summary.label
-        let addButton = app.buttons["add-eu-35x45"]
+        let addButton = app.buttons["add-eu-35x45-1"]
         XCTAssertTrue(addButton.waitForExistence(timeout: 5))
         addButton.tap()
         XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 5))
@@ -92,6 +92,46 @@ final class IDPhotoSpikeUITests: XCTestCase {
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
         app.buttons["Done"].tap()
         XCTAssertTrue(app.buttons["prepareExport"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testTwoPeopleShareOneSheetAndExportTwoJPEGs() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture-2"]
+        app.launch()
+        XCTAssertTrue(app.otherElements["cropPreview"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.buttons["photoTile-2"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts["editingLabel"].label.contains("2"))
+        // Selecting the first tile switches the editor to the first person.
+        app.buttons["photoTile-1"].tap()
+        XCTAssertTrue(app.staticTexts["editingLabel"].label.contains("1"))
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Two people"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        let printSheet = app.buttons["printSheet"]
+        for _ in 0..<4 where !printSheet.isHittable {
+            let scroll = app.scrollViews.firstMatch
+            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.85))
+                .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.3)))
+        }
+        printSheet.tap()
+        XCTAssertTrue(app.navigationBars["Print sheet"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["add-eu-35x45-1"].waitForExistence(timeout: 5))
+        app.swipeUp()
+        XCTAssertTrue(app.buttons["add-eu-35x45-2"].waitForExistence(timeout: 5))
+        let composer = XCTAttachment(screenshot: app.screenshot())
+        composer.name = "Print composer, two people"
+        composer.lifetime = .keepAlways
+        add(composer)
+        app.buttons["Done"].tap()
+        let export = app.buttons["prepareExport"]
+        XCTAssertTrue(export.waitForExistence(timeout: 5))
+        export.tap()
+        XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.buttons["shareJPEG-2"].exists)
+        XCTAssertTrue(app.buttons["shareAllJPEGs"].exists)
+        app.buttons["Done"].tap()
     }
 
     @MainActor

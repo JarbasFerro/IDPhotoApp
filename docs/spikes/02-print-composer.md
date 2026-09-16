@@ -62,9 +62,17 @@ Fixed during the spike: the column-major search initially reported the photo ori
 
 1. Print the PDF on at least two printers (one Canon, one Epson or HP), bordered and borderless, on 10 × 15 and A4; measure the 50 mm bar and one trim with calipers; record the tolerance (ADR-026). The `choosePaper` log lines record the printer's offered papers and the chosen one.
 2. Verify on a physical iPhone that the AirPrint sheet keeps the PDF at 100 % when the paper matches, and record what happens when only a borderless 4 × 6 paper is offered for a 100 × 150 page.
-3. The composer places crops of one photo; the multi-person flow (several prepared photos in one job) is supported by the domain model and tests but not yet by the spike UI.
+3. ~~The composer places crops of one photo; the multi-person flow is supported by the domain model and tests but not yet by the spike UI.~~ Done in version 0.7.0 (2026-09-16): the session holds up to six people, each with their own crop, background, tone, sizes, and copies; see the addendum below.
 4. Custom paper and Instax-style sizes are export-only; AirPrint snaps to the nearest containing paper.
 5. The command-line build did not add the composer's new strings to `Localizable.xcstrings`; sync the catalog from Xcode and review the copy before any localization work.
 6. Before promotion: decide the copies-versus-bleed default, move `PaperNames` into localized catalog data, and add VoiceOver task testing of the stepper and preview on device.
+
+## Addendum, 2026-09-16: several people on one sheet (version 0.7.0)
+
+- `PhotoWorkflow` now holds a list of `PhotoEntry` values (photo, crop, analysis, segmentation, tone state) with a selected entry the editor controls; analysis and preview tasks are keyed by photo so a late result lands on the right person even after the selection changes. "Add Another Person" (camera or library) appends an entry; "Retake"/"Replace" swaps the selected one and re-points that person's print items to the new photo, keeping their sizes and copies. Removing a person removes their items. Limit: six per session.
+- `PhotoPipeline.export(edits:job:)` renders one digital JPEG per person (`Foto-carnet-1.jpg`, `Foto-carnet-2.jpg`, …) and one raster per print item from that item's own photo and edits; the solver and renderer were already multi-item.
+- Composer: one section per person with a thumbnail, that person's sizes and copies, and per-person "Add size" buttons. The sheet preview now draws each placement's actual crop (rendered from the preview at the item's trim aspect) instead of a grey box, rotated where the solver rotated it.
+- Export sheet: one share row per JPEG plus "Share all JPEGs".
+- Tests: workflow (second person keeps the first's edits and copies, removal drops items and selects the neighbour, replacement keeps sizes and copies, six is the limit), pipeline (two people export two JPEGs and each placement on the page shows its own person's colour), UI (two generated people share one sheet, the composer shows both sections, export offers both JPEGs).
 
 **Outcome:** Keep. The solver and renderer are candidates for promotion into the production `Domain/PrintLayout` and `ImagePipeline/Rendering` modules after physical measurement; ADR-036 remains Proposed until then.

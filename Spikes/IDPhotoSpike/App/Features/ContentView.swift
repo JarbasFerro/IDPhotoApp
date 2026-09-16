@@ -7,6 +7,8 @@ struct ContentView: View {
     @State private var showRequirements = false
     @State private var showComposer = false
     @State private var showCamera = false
+    @State private var showPicker = false
+    @State private var importMode: PhotoWorkflow.ImportMode = .replace
     @State private var confirmRemove = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -20,8 +22,17 @@ struct ContentView: View {
                         Spacer()
                         Text("26 × 32 mm").foregroundStyle(.secondary)
                     }
+                    if !model.entries.isEmpty {
+                        photoStrip
+                    }
                     if let photo = model.photo {
+                        if model.entries.count > 1 {
+                            Text("Editing \(model.label(for: photo.id)) of \(model.entries.count)")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                                .accessibilityIdentifier("editingLabel")
+                        }
                         CropPreview(photo: photo, image: model.showsOriginal ? nil : model.backgroundPreview, adjustment: $model.adjustment)
+                            .id(photo.id)
                             .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 200 : 320)
                             .frame(maxWidth: .infinity)
                             .disabled(model.activity != nil)
@@ -101,18 +112,19 @@ struct ContentView: View {
                     }
                 }
             }
-            .confirmationDialog("Remove this photo and its crop?", isPresented: $confirmRemove, titleVisibility: .visible) {
+            .confirmationDialog("Remove this photo, its crop, and its copies on the sheet?", isPresented: $confirmRemove, titleVisibility: .visible) {
                 Button("Remove Photo", role: .destructive, action: model.removePhoto)
             } message: {
                 Text("The original in your photo library is kept.")
             }
+            .photosPicker(isPresented: $showPicker, selection: $selection, matching: .images, preferredItemEncoding: .current)
             .sheet(isPresented: $showRequirements) { RequirementsView() }
             .sheet(isPresented: $showComposer) { PrintComposerView(model: model) }
             .fullScreenCover(isPresented: $showCamera) {
                 CameraView { staged, metrics in
                     showCamera = false
                     model.lastCameraMetrics = metrics
-                    model.importPhoto { staged }
+                    model.importPhoto(mode: importMode) { staged }
                 }
             }
             .sheet(item: $model.exported, onDismiss: model.finishExport) { result in
@@ -125,7 +137,7 @@ struct ContentView: View {
             } message: { Text(model.errorMessage ?? "") }
             .onChange(of: selection) { _, item in
                 guard let item else { return }
-                model.importPhoto { try await item.loadTransferable(type: StagedPhoto.self) }
+                model.importPhoto(mode: importMode) { try await item.loadTransferable(type: StagedPhoto.self) }
                 selection = nil
             }
         }
@@ -134,7 +146,7 @@ struct ContentView: View {
     @ViewBuilder private func acquisitionButtons(hasPhoto: Bool) -> some View {
         let disabled = !model.isInitialized || model.activity != nil
         if hasPhoto {
-            Button { showCamera = true } label: {
+            Button { importMode = .replace; showCamera = true } label: {
                 Label("Retake Photo", systemImage: "camera").frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
@@ -142,7 +154,7 @@ struct ContentView: View {
             .disabled(disabled)
             .accessibilityIdentifier("takePhoto")
         } else {
-            Button { showCamera = true } label: {
+            Button { importMode = .replace; showCamera = true } label: {
                 Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -150,7 +162,7 @@ struct ContentView: View {
             .disabled(disabled)
             .accessibilityIdentifier("takePhoto")
         }
-        PhotosPicker(selection: $selection, matching: .images, preferredItemEncoding: .current) {
+        Button { importMode = .replace; showPicker = true } label: {
             Label(hasPhoto ? LocalizedStringKey("Replace Photo") : LocalizedStringKey("Choose Photo"), systemImage: "photo.on.rectangle")
                 .frame(maxWidth: .infinity)
         }
@@ -158,6 +170,58 @@ struct ContentView: View {
         .controlSize(.large)
         .disabled(disabled)
         .accessibilityIdentifier("choosePhoto")
+        if hasPhoto {
+            addPersonMenu
+                .disabled(disabled || !model.canAddPhoto)
+        }
+    }
+
+    /// Adds another person to the same sheet; each person keeps their own crop, background, tone, and copies.
+    private var addPersonMenu: some View {
+        Menu {
+            Button { importMode = .add; showCamera = true } label: { Label("Take Photo", systemImage: "camera") }
+                .accessibilityIdentifier("addPersonCamera")
+            Button { importMode = .add; showPicker = true } label: { Label("Choose Photo", systemImage: "photo.on.rectangle") }
+                .accessibilityIdentifier("addPersonLibrary")
+        } label: {
+            Label(model.canAddPhoto ? LocalizedStringKey("Add Another Person") : LocalizedStringKey("Sheet is full (\(PhotoWorkflow.maxPhotos) photos)"),
+                  systemImage: "person.badge.plus")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+        .accessibilityIdentifier("addPerson")
+    }
+
+    /// One tile per person; tap to edit that person's photo.
+    private var photoStrip: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 12) {
+                ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
+                    let selected = entry.id == model.selectedID
+                    Button { model.selectedID = entry.id; model.showsOriginal = false } label: {
+                        VStack(spacing: 4) {
+                            Image(decorative: entry.photo.preview, scale: 1)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 56, height: 70)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 3))
+                            Text("Photo \(index + 1)").font(.caption2)
+                                .foregroundStyle(selected ? Color.accentColor : .secondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Photo \(index + 1) of \(model.entries.count)"))
+                    .accessibilityAddTraits(selected ? [.isSelected] : [])
+                    .accessibilityIdentifier("photoTile-\(index + 1)")
+                }
+            }
+            .padding(.vertical, 2)
+        }
+        .scrollIndicators(.hidden)
+        .disabled(model.activity != nil)
+        .accessibilityIdentifier("photoStrip")
     }
 
     private var printSheetSummary: some View {
@@ -385,12 +449,20 @@ private struct ExportView: View {
                         .font(.headline)
                     Text("File dimensions were verified. Review your photo before using it for a document.")
                 }
-                Section("Digital photo") {
-                    Text("JPEG · 520 × 640 pixels")
+                Section(result.jpegs.count == 1 ? "Digital photo" : "Digital photos") {
+                    Text(result.jpegs.count == 1 ? "JPEG · 520 × 640 pixels" : "\(result.jpegs.count) JPEGs · 520 × 640 pixels each")
                     Text("Image resolution is an app setting, not an official upload requirement.")
                         .font(.footnote).foregroundStyle(.secondary)
-                    ShareLink(item: result.jpeg) { Label("Share JPEG", systemImage: "square.and.arrow.up") }
-                        .accessibilityIdentifier("shareJPEG")
+                    ForEach(Array(result.jpegs.enumerated()), id: \.offset) { index, url in
+                        ShareLink(item: url) {
+                            Label(result.jpegs.count == 1 ? "Share JPEG" : "Share JPEG · Photo \(index + 1)", systemImage: "square.and.arrow.up")
+                        }
+                        .accessibilityIdentifier(index == 0 ? "shareJPEG" : "shareJPEG-\(index + 1)")
+                    }
+                    if result.jpegs.count > 1 {
+                        ShareLink(items: result.jpegs) { Label("Share all JPEGs", systemImage: "square.and.arrow.up.on.square") }
+                            .accessibilityIdentifier("shareAllJPEGs")
+                    }
                 }
                 Section("Print sheet") {
                     Text("\(paperName) · \(result.layout.placedCount) copies · \(result.layout.pages.count) page(s)")

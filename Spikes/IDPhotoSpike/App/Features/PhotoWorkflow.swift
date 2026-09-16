@@ -2,25 +2,37 @@ import CoreGraphics
 import Foundation
 import Observation
 
+/// One person's photo in the session with everything the editor knows about it.
+struct PhotoEntry: Identifiable {
+    let photo: PreparedPhoto
+    var adjustment = CropAdjustment()
+    var analysis: FaceAnalysis?
+    /// Vision could not run (for example in the simulator); manual crop remains available.
+    var analysisUnavailable = false
+    var isAnalyzing = false
+    var segmentation: SegmentationResult?
+    var isSegmenting = false
+    /// Preview with the chosen background and tone applied; nil means show the plain preview.
+    var backgroundPreview: CGImage?
+    /// Exposure and colour-cast assessment of the current preview.
+    var toneAssessment: ToneAssessment?
+
+    var id: UUID { photo.id }
+}
+
 @MainActor
 @Observable
 final class PhotoWorkflow {
-    var photo: PreparedPhoto?
-    var adjustment = CropAdjustment()
+    /// Photos in the session, in the order they were added. Every one can appear on the print sheet.
+    private(set) var entries: [PhotoEntry] = []
+    /// The photo the editor controls.
+    var selectedID: UUID?
     var printJob = PrintJob(paper: .photo10x15, items: [])
-    private(set) var analysis: FaceAnalysis?
-    private(set) var isAnalyzing = false
-    private(set) var segmentation: SegmentationResult?
-    private(set) var isSegmenting = false
-    /// Preview with the chosen background and tone applied; nil means show the plain preview.
-    private(set) var backgroundPreview: CGImage?
-    /// Exposure and colour-cast assessment of the current preview.
-    private(set) var toneAssessment: ToneAssessment?
+    /// Sheet-preview crops per print item, rendered on demand.
+    private(set) var sheetThumbnails: [UUID: CGImage] = [:]
     /// When true the editor shows the untouched preview (before/after comparison).
     var showsOriginal = false
     let policy = DocumentPolicy.spainEngineering
-    /// Vision could not run (for example in the simulator); manual crop remains available.
-    private(set) var analysisUnavailable = false
     var exported: PhotoExport?
     var errorMessage: String?
     /// Timings from the last in-app capture, shown in debug builds for the camera spike.
@@ -29,11 +41,16 @@ final class PhotoWorkflow {
     private(set) var isInitialized = false
 
     enum Activity { case importing, exporting }
+    /// Whether an incoming photo replaces the selected one or joins the session as another person.
+    enum ImportMode { case replace, add }
+
+    static let maxPhotos = 6
 
     @ObservationIgnored private let pipeline: any PhotoProcessing
     @ObservationIgnored private var task: Task<Void, Never>?
-    @ObservationIgnored private var analysisTask: Task<Void, Never>?
-    @ObservationIgnored private var previewTask: Task<Void, Never>?
+    @ObservationIgnored private var analysisTasks: [UUID: Task<Void, Never>] = [:]
+    @ObservationIgnored private var previewTasks: [UUID: Task<Void, Never>] = [:]
+    @ObservationIgnored private var thumbnailTask: Task<Void, Never>?
     @ObservationIgnored private var revision = UUID()
     @ObservationIgnored private var exportLease: UUID?
 
@@ -41,11 +58,43 @@ final class PhotoWorkflow {
 
     func setInitialized() { isInitialized = true }
 
+    // MARK: - Selected entry
+
+    private var selectedIndex: Int? {
+        guard let selectedID else { return nil }
+        return entries.firstIndex { $0.id == selectedID }
+    }
+
+    private func index(of photoID: UUID) -> Int? { entries.firstIndex { $0.id == photoID } }
+
+    var selected: PhotoEntry? { selectedIndex.map { entries[$0] } }
+    var photo: PreparedPhoto? { selected?.photo }
+    var adjustment: CropAdjustment {
+        get { selected?.adjustment ?? CropAdjustment() }
+        set { if let index = selectedIndex { entries[index].adjustment = newValue } }
+    }
+    var analysis: FaceAnalysis? { selected?.analysis }
+    var analysisUnavailable: Bool { selected?.analysisUnavailable ?? false }
+    var isAnalyzing: Bool { selected?.isAnalyzing ?? false }
+    var segmentation: SegmentationResult? { selected?.segmentation }
+    var isSegmenting: Bool { selected?.isSegmenting ?? false }
+    var backgroundPreview: CGImage? { selected?.backgroundPreview }
+    var toneAssessment: ToneAssessment? { selected?.toneAssessment }
+    var canAddPhoto: Bool { entries.count < Self.maxPhotos }
+
+    /// "Photo 2" style label; positions are stable while the session lasts.
+    func label(for photoID: UUID) -> String {
+        guard let index = index(of: photoID) else { return String(localized: "Photo") }
+        return String(localized: "Photo \(index + 1)")
+    }
+
     /// Solved on demand; the solver is deterministic and takes microseconds for spike-sized jobs.
     var layout: PrintLayout { PrintLayoutSolver.solve(printJob) }
 
-    func importPhoto(loader: @escaping @Sendable () async throws -> StagedPhoto?) {
-        cancel()
+    // MARK: - Import
+
+    func importPhoto(mode: ImportMode = .replace, loader: @escaping @Sendable () async throws -> StagedPhoto?) {
+        cancelWork()
         let currentRevision = revision
         activity = .importing
         errorMessage = nil
@@ -58,49 +107,71 @@ final class PhotoWorkflow {
                     await pipeline.discard(photoID: result.id)
                     return
                 }
-                let previous = photo
-                photo = result
-                adjustment = CropAdjustment()
-                resetPrintJob(for: result)
                 activity = nil
-                analyze(result)
-                if let previous { await pipeline.discard(photoID: previous.id) }
+                install(result, mode: mode)
             } catch {
                 handle(error, revision: currentRevision)
             }
         }
     }
 
+    /// Adds `photo` to the session (or replaces the selected one), selects it, and starts its analysis.
+    func install(_ photo: PreparedPhoto, mode: ImportMode) {
+        let entry = PhotoEntry(photo: photo)
+        if mode == .add, canAddPhoto || selectedIndex == nil {
+            entries.append(entry)
+            appendDefaultPrintItem(for: photo, copies: entries.count == 1 ? 8 : 4)
+        } else if let index = selectedIndex {
+            let previous = entries[index]
+            stopWork(for: previous.id)
+            entries[index] = entry
+            // The replacement inherits the sizes and copies chosen for the person it replaces.
+            for itemIndex in printJob.items.indices where printJob.items[itemIndex].photoID == previous.id {
+                printJob.items[itemIndex].photoID = photo.id
+            }
+            Task { await pipeline.discard(photoID: previous.id) }
+        } else {
+            entries.append(entry)
+            appendDefaultPrintItem(for: photo, copies: 8)
+        }
+        selectedID = photo.id
+        showsOriginal = false
+        analyze(photo)
+    }
+
     /// Runs Vision on the bounded preview and applies the automatic composition once per photo.
     private func analyze(_ photo: PreparedPhoto) {
-        analysisTask?.cancel()
-        analysis = nil
-        analysisUnavailable = false
-        isAnalyzing = true
-        segmentation = nil
-        backgroundPreview = nil
-        isSegmenting = true
-        analysisTask = Task {
+        analysisTasks[photo.id]?.cancel()
+        update(photo.id) { $0.analysis = nil; $0.analysisUnavailable = false; $0.isAnalyzing = true
+                            $0.segmentation = nil; $0.backgroundPreview = nil; $0.isSegmenting = true }
+        analysisTasks[photo.id] = Task { [policy] in
             let result = try? await pipeline.analyze(photo: photo)
-            guard !Task.isCancelled, self.photo?.id == photo.id else { return }
-            isAnalyzing = false
-            analysis = result
-            analysisUnavailable = result == nil
-            if let solution = result?.solution, result?.faceCount == 1 {
-                adjustment = solution.adjustment
+            guard !Task.isCancelled, index(of: photo.id) != nil else { return }
+            update(photo.id) {
+                $0.isAnalyzing = false
+                $0.analysis = result
+                $0.analysisUnavailable = result == nil
+                if let solution = result?.solution, result?.faceCount == 1 { $0.adjustment = solution.adjustment }
             }
             let geometry = result?.geometry
             let segmented = await pipeline.segment(photo: photo, faceBox: geometry?.faceBox, faceCenter: geometry?.eyeMidpoint)
-            guard !Task.isCancelled, self.photo?.id == photo.id else { return }
-            isSegmenting = false
-            segmentation = segmented
-            // Spain requires white; offer it by default when the mask is trustworthy and the original is not already plain.
-            if let segmented, segmented.quality.state == .pass, segmented.background.state != .pass {
-                adjustment.background = .color(.white)
+            guard !Task.isCancelled, index(of: photo.id) != nil else { return }
+            update(photo.id) {
+                $0.isSegmenting = false
+                $0.segmentation = segmented
+                // Spain requires white; offer it by default when the mask is trustworthy and the original is not already plain.
+                if let segmented, segmented.quality.state == .pass, segmented.background.state != .pass {
+                    $0.adjustment.background = .color(.white)
+                }
+                $0.adjustment.tone = policy.alteration == .allowed ? ToneSettings() : .off
             }
-            adjustment.tone = policy.alteration == .allowed ? ToneSettings() : .off
-            refreshBackgroundPreview()
+            refreshBackgroundPreview(for: photo.id)
         }
+    }
+
+    private func update(_ photoID: UUID, _ change: (inout PhotoEntry) -> Void) {
+        guard let index = index(of: photoID) else { return }
+        change(&entries[index])
     }
 
     var canReplaceBackground: Bool {
@@ -110,21 +181,30 @@ final class PhotoWorkflow {
 
     var canAdjustTone: Bool { policy.alteration != .forbidden && photo != nil }
 
-    /// Recomposites the preview when the background choice, softness, or tone changes.
+    /// Recomposites the selected photo's preview when the background choice, softness, or tone changes.
     func refreshBackgroundPreview() {
-        previewTask?.cancel()
-        guard let photo else { backgroundPreview = nil; toneAssessment = nil; return }
-        var edits = adjustment
-        if case .color = edits.background, !canReplaceBackground { edits.background = .original }
+        guard let selectedID else { return }
+        refreshBackgroundPreview(for: selectedID)
+    }
+
+    private func refreshBackgroundPreview(for photoID: UUID) {
+        previewTasks[photoID]?.cancel()
+        guard let index = index(of: photoID) else { return }
+        let entry = entries[index]
+        var edits = entry.adjustment
+        let canReplace = entry.segmentation.map { $0.quality.state != .fail } ?? false
+        if case .color = edits.background, !canReplace { edits.background = .original }
         let needsWork = edits.tone.isEnabled || { if case .color = edits.background { return true } else { return false } }()
-        let faceBox = analysis?.geometry?.faceBox
-        previewTask = Task {
+        let faceBox = entry.analysis?.geometry?.faceBox
+        let photo = entry.photo
+        previewTasks[photoID] = Task {
             let image = needsWork ? await pipeline.previewImage(photo: photo, adjustment: edits) : nil
             let metrics = await pipeline.toneMetrics(photo: photo, adjustment: edits, faceBox: faceBox)
-            guard !Task.isCancelled, self.photo?.id == photo.id, self.adjustment.background == edits.background,
-                  self.adjustment.edgeSoftness == edits.edgeSoftness, self.adjustment.tone == edits.tone else { return }
-            backgroundPreview = image
-            toneAssessment = ToneAssessment.assess(metrics)
+            guard !Task.isCancelled, let current = self.index(of: photoID) else { return }
+            let now = entries[current].adjustment
+            guard now.background == edits.background, now.edgeSoftness == edits.edgeSoftness, now.tone == edits.tone else { return }
+            entries[current].backgroundPreview = image
+            entries[current].toneAssessment = ToneAssessment.assess(metrics)
         }
     }
 
@@ -141,17 +221,19 @@ final class PhotoWorkflow {
         adjustment.tone = tone
     }
 
+    // MARK: - Export
+
     func prepareExport() {
-        guard let photo, activity == nil else { return }
+        guard !entries.isEmpty, activity == nil else { return }
         cancelWork()
         let currentRevision = revision
-        let edits = adjustment
+        let edits = entries.map { PhotoEdit(photo: $0.photo, adjustment: $0.adjustment) }
         let job = printJob
         activity = .exporting
         errorMessage = nil
         task = Task {
             do {
-                let result = try await pipeline.export(photo: photo, adjustment: edits, job: job)
+                let result = try await pipeline.export(edits: edits, job: job)
                 guard revision == currentRevision, !Task.isCancelled else {
                     await pipeline.discard(exportID: result.id)
                     return
@@ -172,7 +254,9 @@ final class PhotoWorkflow {
         Task { await pipeline.discard(exportID: id) }
     }
 
-    /// Cancels import/export work only; a running face analysis for the current photo continues.
+    // MARK: - Cancellation and removal
+
+    /// Cancels import/export work only; running analyses continue.
     private func cancelWork() {
         revision = UUID()
         task?.cancel()
@@ -180,51 +264,79 @@ final class PhotoWorkflow {
         activity = nil
     }
 
-    func cancel() {
-        cancelWork()
-        analysisTask?.cancel()
-        analysisTask = nil
-        previewTask?.cancel()
-        isAnalyzing = false
-        isSegmenting = false
+    private func stopWork(for photoID: UUID) {
+        analysisTasks[photoID]?.cancel()
+        analysisTasks[photoID] = nil
+        previewTasks[photoID]?.cancel()
+        previewTasks[photoID] = nil
     }
 
+    /// Cancels everything in flight; entries keep whatever results have already arrived.
+    func cancel() {
+        cancelWork()
+        for id in Set(analysisTasks.keys).union(previewTasks.keys) { stopWork(for: id) }
+        thumbnailTask?.cancel()
+        for index in entries.indices { entries[index].isAnalyzing = false; entries[index].isSegmenting = false }
+    }
+
+    /// Removes the selected photo and its print items; the neighbour becomes selected.
     func removePhoto() {
-        cancel()
-        let previous = photo
-        photo = nil
-        adjustment = CropAdjustment()
-        analysis = nil
-        analysisUnavailable = false
-        segmentation = nil
-        backgroundPreview = nil
-        toneAssessment = nil
+        guard let index = selectedIndex else { return }
+        cancelWork()
+        let removed = entries.remove(at: index)
+        stopWork(for: removed.id)
+        printJob.items.removeAll { $0.photoID == removed.id }
+        sheetThumbnails = sheetThumbnails.filter { key, _ in printJob.items.contains { $0.id == key } }
+        selectedID = entries.isEmpty ? nil : entries[min(index, entries.count - 1)].id
         showsOriginal = false
-        printJob.items = []
-        if let previous { Task { await pipeline.discard(photoID: previous.id) } }
+        Task { await pipeline.discard(photoID: removed.id) }
     }
 
     // MARK: - Print job editing
 
-    func resetPrintJob(for photo: PreparedPhoto) {
-        printJob = PrintJob(paper: printJob.paper, items: [
-            PrintItem(photoID: photo.id, trimWidthMM: PhotoFormat.spainPrototype.widthMM,
-                      trimHeightMM: PhotoFormat.spainPrototype.heightMM, copies: 8)
-        ], options: printJob.options)
+    private func appendDefaultPrintItem(for photo: PreparedPhoto, copies: Int) {
+        printJob.items.append(PrintItem(photoID: photo.id, trimWidthMM: PhotoFormat.spainPrototype.widthMM,
+                                        trimHeightMM: PhotoFormat.spainPrototype.heightMM, copies: copies))
     }
 
-    func addPrintItem(format: PhotoFormat) {
-        guard let photo else { return }
-        printJob.items.append(PrintItem(photoID: photo.id, trimWidthMM: format.widthMM,
+    func addPrintItem(format: PhotoFormat, photoID: UUID? = nil) {
+        guard let photoID = photoID ?? selectedID, index(of: photoID) != nil else { return }
+        printJob.items.append(PrintItem(photoID: photoID, trimWidthMM: format.widthMM,
                                         trimHeightMM: format.heightMM, copies: 4))
     }
+
+    func printItems(for photoID: UUID) -> [PrintItem] { printJob.items.filter { $0.photoID == photoID } }
 
     func removePrintItems(at offsets: IndexSet) {
         printJob.items.remove(atOffsets: offsets)
     }
 
+    func removePrintItem(id: UUID) {
+        printJob.items.removeAll { $0.id == id }
+        sheetThumbnails[id] = nil
+    }
+
     func movePrintItems(from source: IndexSet, to destination: Int) {
         printJob.items.move(fromOffsets: source, toOffset: destination)
+    }
+
+    /// Renders (or re-renders) the small crops the sheet preview draws inside each placement.
+    func refreshSheetThumbnails() {
+        thumbnailTask?.cancel()
+        let items = printJob.items
+        let edits = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, PhotoEdit(photo: $0.photo, adjustment: $0.adjustment)) })
+        thumbnailTask = Task {
+            var result: [UUID: CGImage] = [:]
+            for item in items {
+                guard let edit = edits[item.photoID] else { continue }
+                let format = PhotoFormat.format(widthMM: item.trimWidthMM, heightMM: item.trimHeightMM)
+                if let image = await pipeline.thumbnail(photo: edit.photo, adjustment: edit.adjustment, format: format) {
+                    result[item.id] = image
+                }
+                if Task.isCancelled { return }
+            }
+            sheetThumbnails = result
+        }
     }
 
     var sourceIsSmall: Bool {

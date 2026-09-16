@@ -159,6 +159,40 @@ struct PhotoPipelineTests {
         await #expect(throws: PhotoError.self) { try await pipeline.export(photo: photo, adjustment: CropAdjustment(), job: job) }
     }
 
+    @Test func exportsOneJPEGPerPersonAndPlacesEachPersonsOwnCrop() async throws {
+        let root = isolatedRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pipeline = PhotoPipeline(root: root)
+        let first = try await pipeline.ingest(SyntheticFixture.staged())
+        let magenta = Array(repeating: CGColor(red: 1, green: 0, blue: 1, alpha: 1), count: 4)
+        let second = try await pipeline.ingest(SyntheticFixture.staged(palette: magenta))
+        let job = PrintJob(paper: .photo10x15, items: [
+            PrintItem(photoID: first.id, trimWidthMM: 26, trimHeightMM: 32, copies: 2),
+            PrintItem(photoID: second.id, trimWidthMM: 26, trimHeightMM: 32, copies: 2)
+        ])
+        let edits = [PhotoEdit(photo: first, adjustment: CropAdjustment()), PhotoEdit(photo: second, adjustment: CropAdjustment())]
+        let export = try await pipeline.export(edits: edits, job: job)
+        #expect(export.jpegs.count == 2)
+        #expect(export.jpegs.map(\.lastPathComponent) == ["Foto-carnet-1.jpg", "Foto-carnet-2.jpg"])
+        for url in export.jpegs { try PhotoPipeline.verifyJPEG(url, expected: PhotoFormat.spainPrototype.output) }
+        let secondSource = try #require(CGImageSourceCreateWithURL(export.jpegs[1] as CFURL, nil))
+        let secondJPEG = try #require(CGImageSourceCreateImageAtIndex(secondSource, 0, nil))
+        let centre = try pixel(secondJPEG, x: 0.5, y: 0.5)
+        #expect(centre[0] > 200 && centre[1] < 110 && centre[2] > 200, "second JPEG is the magenta person: \(centre)")
+
+        // On the sheet, the second person's placements are magenta and the first's are not.
+        let pageSource = try #require(CGImageSourceCreateWithURL(export.pages[0] as CFURL, nil))
+        let page = try #require(CGImageSourceCreateImageAtIndex(pageSource, 0, nil))
+        let layoutPage = export.layout.pages[0]
+        for placement in layoutPage.placements {
+            let sample = try pixel(page, x: (placement.trim.x + placement.trim.width / 2) / layoutPage.widthMM,
+                                   y: (placement.trim.y + placement.trim.height / 2) / layoutPage.heightMM)
+            let isMagenta = sample[0] > 200 && sample[1] < 110 && sample[2] > 200
+            #expect(isMagenta == (placement.itemID == job.items[1].id), "placement \(placement.itemID) sample \(sample)")
+        }
+        await pipeline.discard(exportID: export.id)
+    }
+
     private func defaultJob(_ photo: PreparedPhoto) -> PrintJob {
         PrintJob(paper: .photo10x15, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 8)])
     }
