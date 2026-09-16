@@ -21,14 +21,29 @@ struct PhotoCheckView: View {
     }
 
     var body: some View {
-        ScrollView {
+        Group {
             if let entry {
-                VStack(alignment: .leading, spacing: 24) {
-                    portrait(entry)
-                    summaryBlock(entry)
-                    actions
+                if dynamicTypeSize.isAccessibilitySize {
+                    // Large text: everything scrolls, actions included, so nothing can be pushed off screen.
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 20) { portrait(entry); summaryBlock(entry); actions }.padding()
+                    }
+                } else {
+                    // One screen, no scrolling: the portrait takes whatever height the summary leaves.
+                    VStack(alignment: .leading, spacing: 16) {
+                        portrait(entry).frame(maxHeight: .infinity)
+                        summaryBlock(entry).fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .safeAreaInset(edge: .bottom) {
+                        actions
+                            .padding(.horizontal)
+                            .padding(.top, 10)
+                            .padding(.bottom, 6)
+                            .background(.bar)
+                    }
                 }
-                .padding()
             } else {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
             }
@@ -58,7 +73,6 @@ struct PhotoCheckView: View {
             guard !Task.isCancelled else { return }
             withAnimation(reduceMotion ? nil : .spring(duration: 0.8, bounce: 0.12)) { landed = true }
         }
-        .accessibilityIdentifier("photoCheck")
     }
 
     /// The final look. While the photo is being checked it sits wide and uncropped; when the face is found the
@@ -67,10 +81,11 @@ struct PhotoCheckView: View {
     private func portrait(_ entry: PhotoEntry) -> some View {
         let checking = entry.isAnalyzing || !landed
         let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 340 : 300)
-        return VStack(spacing: 8) {
+        return VStack(spacing: 6) {
             PortraitView(entry: entry, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
                          animated: !reduceMotion)
                 .frame(maxWidth: width)
+                .frame(maxHeight: .infinity)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
                 .animation(reduceMotion ? nil : .spring(duration: 0.8, bounce: 0.12), value: checking)
                 .sensoryFeedback(.impact(weight: .light), trigger: landed) { old, new in !old && new }
@@ -83,6 +98,8 @@ struct PhotoCheckView: View {
             Text(comparing ? "Original" : entry.isAnalyzing ? "Finding your face…" : !landed ? "Framing…" : "Hold to compare with the original")
                 .font(.caption).foregroundStyle(.secondary)
                 .animation(nil, value: checking)
+                // Leaf element that marks the screen for UI tests; identifiers on containers hide their children.
+                .accessibilityIdentifier("photoCheck")
         }
         .frame(maxWidth: .infinity)
     }
@@ -90,7 +107,7 @@ struct PhotoCheckView: View {
     private func summaryBlock(_ entry: PhotoEntry) -> some View {
         let whiteApplied: Bool = { if case .color = entry.adjustment.background { return true } else { return false } }()
         let summary = CheckPresentation.summary(for: entry, whiteApplied: whiteApplied, sourceIsSmall: model.sourceIsSmall)
-        return VStack(alignment: .leading, spacing: 14) {
+        return VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 if summary.headline == .checking {
                     ProgressView()
@@ -99,22 +116,21 @@ struct PhotoCheckView: View {
                         .font(.title2)
                         .foregroundStyle(headlineTint(summary.headline))
                 }
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(CheckPresentation.title(for: summary.headline)).font(.title3.weight(.semibold))
-                    Text(CheckPresentation.subtitle(for: summary.headline)).font(.subheadline).foregroundStyle(.secondary)
+                    Text(CheckPresentation.subtitle(for: summary.headline)).font(.footnote).foregroundStyle(.secondary)
                 }
             }
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("checkHeadline")
             ForEach(summary.rows) { row in
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Image(systemName: AlignmentPresentation.symbol(for: row.state))
                         .foregroundStyle(rowTint(row.state))
-                        .frame(width: 22)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(row.title).font(.subheadline.weight(.medium))
-                        Text(row.detail).font(.subheadline).foregroundStyle(.secondary)
-                    }
+                        .frame(width: 20)
+                    Text(row.title).font(.subheadline.weight(.semibold))
+                    Text(row.detail).font(.footnote).foregroundStyle(.secondary)
+                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
                 }
                 .accessibilityElement(children: .combine)
             }
@@ -131,7 +147,8 @@ struct PhotoCheckView: View {
             .controlSize(.large)
             .disabled(model.activity != nil)
             .accessibilityIdentifier("addToSheet")
-            HStack(spacing: 12) {
+            let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout(spacing: 12))
+            layout {
                 Button { showAdjust = true } label: {
                     Label("Adjust", systemImage: "slider.horizontal.3").frame(maxWidth: .infinity)
                 }

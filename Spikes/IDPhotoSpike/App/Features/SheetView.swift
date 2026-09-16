@@ -183,7 +183,8 @@ struct SheetView: View {
     private func summary(_ layout: PrintLayout) -> String {
         let pages = layout.pages.count
         let paper = PaperNames.name(for: model.printJob.paper)
-        return String(localized: "\(paper) · ^[\(pages) page](inflect: true) · \(layout.placedCount) of \(model.printJob.requestedCopies) copies placed")
+        // AttributedString applies the ^[…](inflect: true) grammar; String(localized:) would show the markup.
+        return String(AttributedString(localized: "\(paper) · ^[\(pages) page](inflect: true) · \(layout.placedCount) of \(model.printJob.requestedCopies) copies placed").characters)
     }
 
     private func formatName(_ item: PrintItem) -> String {

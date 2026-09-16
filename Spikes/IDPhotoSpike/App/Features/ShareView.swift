@@ -87,7 +87,7 @@ struct ShareView: View {
                 ShareLink(item: result.pdf) { Label("Share PDF", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("sharePDF")
-                ShareLink(items: result.pages) { Label("Lab JPEG", systemImage: "photo.on.rectangle.angled").frame(maxWidth: .infinity) }
+                ShareLink(items: result.pages) { Label("Share JPEG", systemImage: "photo.on.rectangle.angled").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("sharePages")
             }
@@ -127,8 +127,9 @@ struct ShareView: View {
                                         .foregroundStyle(.white, Color.accentColor)
                                         .offset(x: 8, y: 6)
                                 }
-                                Text(result.jpegs.count == 1 ? LocalizedStringKey("Share") : LocalizedStringKey("Photo \(index + 1)"))
-                                    .font(.caption).foregroundStyle(.primary)
+                                if result.jpegs.count > 1 {
+                                    Text("Photo \(index + 1)").font(.caption).foregroundStyle(.primary)
+                                }
                             }
                             .padding(.top, 4).padding(.trailing, 8)
                         }

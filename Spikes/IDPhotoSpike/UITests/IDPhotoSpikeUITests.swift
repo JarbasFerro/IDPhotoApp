@@ -11,7 +11,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
     @MainActor
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, attempts: Int = 8) {
         for _ in 0..<attempts where !(element.exists && element.isHittable) {
-            let scroll = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch : app.collectionViews.firstMatch
+            let scroll = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch
+                : app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : nil
+            guard let scroll else { return }
             scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.85))
                 .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.3)))
         }
@@ -95,6 +97,12 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["takePhoto"].waitForExistence(timeout: 10))
         app.buttons["takePhoto"].tap()
+        // The instructions come first (two pages) unless dismissed for good on this simulator.
+        if app.buttons["introNext"].waitForExistence(timeout: 5) {
+            app.buttons["introNext"].tap()
+            XCTAssertTrue(app.buttons["introStart"].waitForExistence(timeout: 5))
+            app.buttons["introStart"].tap()
+        }
         // Simulators have no camera; the screen must explain and offer the import path.
         XCTAssertTrue(app.buttons["cameraUnavailableChoose"].waitForExistence(timeout: 10))
         app.buttons["cameraUnavailableChoose"].tap()
