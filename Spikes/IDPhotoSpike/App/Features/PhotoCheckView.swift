@@ -10,6 +10,7 @@ struct PhotoCheckView: View {
     @State private var confirmRemove = false
     @State private var comparing = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
     private var position: (Int, Int)? {
@@ -50,18 +51,26 @@ struct PhotoCheckView: View {
         .accessibilityIdentifier("photoCheck")
     }
 
-    /// The final look. Press and hold to see the original.
+    /// The final look. While the photo is being checked it sits wide and uncropped; when the face is found the
+    /// crop animates into the official frame and the white background fades in: "we found you and framed you".
+    /// Press and hold to see the original.
     private func portrait(_ entry: PhotoEntry) -> some View {
-        VStack(spacing: 8) {
-            PortraitView(entry: entry, showsOriginal: comparing, label: comparing ? "Original photo" : "Framed photo")
-                .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 220 : 300)
-                .shadow(color: .black.opacity(0.12), radius: 12, y: 6)
+        let checking = entry.isAnalyzing
+        let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 340 : 300)
+        return VStack(spacing: 8) {
+            PortraitView(entry: entry, showsOriginal: comparing, label: comparing ? "Original photo" : "Framed photo",
+                         animated: !reduceMotion)
+                .frame(maxWidth: width)
+                .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
+                .animation(reduceMotion ? nil : .spring(duration: 0.7, bounce: 0.12), value: checking)
+                .sensoryFeedback(.impact(weight: .light), trigger: checking) { old, new in old && !new }
                 .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in comparing = pressing }
                 .accessibilityHint("Press and hold to compare with the original.")
                 .accessibilityAction(named: Text("Compare with original")) { comparing.toggle() }
                 .accessibilityIdentifier("portrait")
-            Text(comparing ? "Original" : "Hold to compare with the original")
+            Text(comparing ? "Original" : checking ? "Finding your face…" : "Hold to compare with the original")
                 .font(.caption).foregroundStyle(.secondary)
+                .animation(nil, value: checking)
         }
         .frame(maxWidth: .infinity)
     }
@@ -155,19 +164,25 @@ struct PortraitView: View {
     var showsOriginal = false
     /// Without a label the portrait is decorative and hidden from assistive technologies.
     var label: LocalizedStringResource? = nil
+    /// Animate crop changes (the landing) and the background fade; off under Reduce Motion.
+    var animated = false
 
     var body: some View {
         GeometryReader { geometry in
             let adjustment = showsOriginal ? CropAdjustment() : entry.adjustment
             let crop = adjustment.crop(in: entry.photo.pixels)
-            Image(decorative: showsOriginal ? entry.photo.preview : (entry.backgroundPreview ?? entry.photo.preview), scale: 1)
-                .resizable()
-                .frame(width: geometry.size.width / crop.width, height: geometry.size.height / crop.height)
-                .rotationEffect(.degrees(-adjustment.clamped().rotationDegrees),
-                                anchor: UnitPoint(x: crop.x + crop.width / 2, y: crop.y + crop.height / 2))
-                .offset(x: -crop.x / crop.width * geometry.size.width, y: -crop.y / crop.height * geometry.size.height)
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
-                .clipped()
+            let hasPreview = !showsOriginal && entry.backgroundPreview != nil
+            ZStack(alignment: .topLeading) {
+                layer(entry.photo.preview, crop: crop, adjustment: adjustment, in: geometry.size)
+                if hasPreview, let preview = entry.backgroundPreview {
+                    layer(preview, crop: crop, adjustment: adjustment, in: geometry.size)
+                        .transition(.opacity)
+                }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
+            .clipped()
+            .animation(animated ? .easeInOut(duration: 0.45) : nil, value: hasPreview)
+            .animation(animated ? .spring(duration: 0.7, bounce: 0.1) : nil, value: adjustment)
         }
         .aspectRatio(PhotoFormat.spainPrototype.aspectRatio, contentMode: .fit)
         .environment(\.layoutDirection, .leftToRight)
@@ -177,5 +192,14 @@ struct PortraitView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(label ?? ""))
         .accessibilityHidden(label == nil)
+    }
+
+    private func layer(_ image: CGImage, crop: NormalizedCrop, adjustment: CropAdjustment, in size: CGSize) -> some View {
+        Image(decorative: image, scale: 1)
+            .resizable()
+            .frame(width: size.width / crop.width, height: size.height / crop.height)
+            .rotationEffect(.degrees(-adjustment.clamped().rotationDegrees),
+                            anchor: UnitPoint(x: crop.x + crop.width / 2, y: crop.y + crop.height / 2))
+            .offset(x: -crop.x / crop.width * size.width, y: -crop.y / crop.height * size.height)
     }
 }

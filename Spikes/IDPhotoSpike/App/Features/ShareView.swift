@@ -5,11 +5,22 @@ struct ShareView: View {
     @Bindable var model: PhotoWorkflow
     @Binding var path: [Route]
     @State private var completed = false
+    @State private var celebrated = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 if let result = model.exported {
+                    HStack(spacing: 10) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.green)
+                            .symbolEffect(.bounce, options: .nonRepeating, isActive: celebrated && !reduceMotion)
+                        Text("Your files are ready.").font(.headline)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .onAppear { celebrated = true }
                     printCard(result)
                     digitalCard(result)
                     Button {

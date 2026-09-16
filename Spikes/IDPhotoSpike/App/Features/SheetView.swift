@@ -215,64 +215,26 @@ enum PaperNames {
     }
 }
 
-/// Schematic pages drawn from the layout: trim rectangles, bleed, ticks, and the calibration bar.
+/// Pages drawn from the layout: each placement is a view keyed by item and copy, so a change of copies or paper
+/// animates every photo to its new position; ticks and the calibration bar are drawn in a Canvas on top.
 struct SheetPreview: View {
     let layout: PrintLayout
     /// Crops per print item; placements without one are drawn as grey boxes.
     var thumbnails: [UUID: CGImage] = [:]
     /// First page only, no captions, for cards.
     var compact = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        let pages = compact ? Array(layout.pages.prefix(1)) : layout.pages
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 16) {
-                ForEach(Array((compact ? Array(layout.pages.prefix(1)) : layout.pages).enumerated()), id: \.offset) { index, page in
+                ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
                     VStack(spacing: 4) {
-                        Canvas { context, size in
-                            let scale = min(size.width / page.widthMM, size.height / page.heightMM)
-                            let origin = CGPoint(x: (size.width - page.widthMM * scale) / 2,
-                                                 y: (size.height - page.heightMM * scale) / 2)
-                            func rect(_ r: MillimeterRect) -> CGRect {
-                                CGRect(x: origin.x + r.x * scale, y: origin.y + r.y * scale,
-                                       width: r.width * scale, height: r.height * scale)
-                            }
-                            let paper = CGRect(origin: origin, size: CGSize(width: page.widthMM * scale, height: page.heightMM * scale))
-                            context.fill(Path(paper), with: .color(.white))
-                            context.stroke(Path(paper), with: .color(.secondary), lineWidth: 1)
-                            for placement in page.placements {
-                                context.fill(Path(rect(placement.bleed)), with: .color(.gray.opacity(0.25)))
-                                let trim = rect(placement.trim)
-                                if let thumbnail = thumbnails[placement.itemID] {
-                                    context.drawLayer { layer in
-                                        layer.clip(to: Path(trim))
-                                        if placement.rotated {
-                                            layer.translateBy(x: trim.midX, y: trim.midY)
-                                            layer.rotate(by: .degrees(90))
-                                            layer.draw(Image(decorative: thumbnail, scale: 1),
-                                                       in: CGRect(x: -trim.height / 2, y: -trim.width / 2, width: trim.height, height: trim.width))
-                                        } else {
-                                            layer.draw(Image(decorative: thumbnail, scale: 1), in: trim)
-                                        }
-                                    }
-                                } else {
-                                    context.fill(Path(trim), with: .color(.gray.opacity(0.6)))
-                                }
-                            }
-                            var ticks = Path()
-                            for tick in page.cornerTicks {
-                                ticks.move(to: CGPoint(x: origin.x + tick.fromX * scale, y: origin.y + tick.fromY * scale))
-                                ticks.addLine(to: CGPoint(x: origin.x + tick.toX * scale, y: origin.y + tick.toY * scale))
-                            }
-                            context.stroke(ticks, with: .color(.primary), lineWidth: 1)
-                            if let bar = page.calibrationBar {
-                                var path = Path()
-                                path.move(to: CGPoint(x: origin.x + bar.x * scale, y: origin.y + bar.y * scale))
-                                path.addLine(to: CGPoint(x: origin.x + (bar.x + bar.lengthMM) * scale, y: origin.y + bar.y * scale))
-                                context.stroke(path, with: .color(.primary), lineWidth: 1)
-                            }
-                        }
-                        .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
-                        .frame(height: compact ? 130 : 220)
+                        SheetPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion)
+                            .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
+                            .frame(height: compact ? 130 : 220)
+                            .shadow(color: .black.opacity(compact ? 0 : 0.10), radius: 6, y: 3)
                         if !compact { Text("Page \(index + 1) of \(layout.pages.count)").font(.caption) }
                     }
                     .accessibilityElement(children: .ignore)
@@ -285,9 +247,70 @@ struct SheetPreview: View {
                 }
             }
             .padding(.horizontal, 4)
+            .padding(.vertical, 6)
         }
         .scrollIndicators(compact ? .hidden : .visible)
         .scrollDisabled(compact)
         .accessibilityIdentifier(compact ? "sheetThumbnail" : "sheetPreview")
+    }
+}
+
+struct SheetPageView: View {
+    let page: PrintPage
+    let thumbnails: [UUID: CGImage]
+    var animated = true
+
+    private struct Key: Hashable { let item: UUID; let copy: Int }
+
+    var body: some View {
+        GeometryReader { geometry in
+            let scale = min(geometry.size.width / page.widthMM, geometry.size.height / page.heightMM)
+            ZStack(alignment: .topLeading) {
+                Color.white
+                ForEach(page.placements, id: \.self) { placement in
+                    placementView(placement, scale: scale)
+                        .frame(width: placement.bleed.width * scale, height: placement.bleed.height * scale)
+                        .position(x: (placement.bleed.x + placement.bleed.width / 2) * scale,
+                                  y: (placement.bleed.y + placement.bleed.height / 2) * scale)
+                        .id(Key(item: placement.itemID, copy: placement.copyIndex))
+                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                }
+                Canvas { context, _ in
+                    var ticks = Path()
+                    for tick in page.cornerTicks {
+                        ticks.move(to: CGPoint(x: tick.fromX * scale, y: tick.fromY * scale))
+                        ticks.addLine(to: CGPoint(x: tick.toX * scale, y: tick.toY * scale))
+                    }
+                    context.stroke(ticks, with: .color(.primary), lineWidth: 1)
+                    if let bar = page.calibrationBar {
+                        var path = Path()
+                        path.move(to: CGPoint(x: bar.x * scale, y: bar.y * scale))
+                        path.addLine(to: CGPoint(x: (bar.x + bar.lengthMM) * scale, y: bar.y * scale))
+                        context.stroke(path, with: .color(.primary), lineWidth: 1)
+                    }
+                }
+                .allowsHitTesting(false)
+            }
+            .animation(animated ? .spring(duration: 0.55, bounce: 0.12) : nil, value: page.placements)
+        }
+        .overlay(Rectangle().strokeBorder(.secondary, lineWidth: 1))
+        .clipped()
+    }
+
+    @ViewBuilder private func placementView(_ placement: Placement, scale: CGFloat) -> some View {
+        let trimWidth = placement.trim.width * scale, trimHeight = placement.trim.height * scale
+        ZStack {
+            Rectangle().fill(Color.gray.opacity(0.25))
+            if let thumbnail = thumbnails[placement.itemID] {
+                Image(decorative: thumbnail, scale: 1)
+                    .resizable()
+                    .frame(width: placement.rotated ? trimHeight : trimWidth, height: placement.rotated ? trimWidth : trimHeight)
+                    .rotationEffect(.degrees(placement.rotated ? 90 : 0))
+                    .frame(width: trimWidth, height: trimHeight)
+                    .clipped()
+            } else {
+                Rectangle().fill(Color.gray.opacity(0.6)).frame(width: trimWidth, height: trimHeight)
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 # 15 — Experience plan: beautiful, easy, fun
 
 **Date:** 2026-09-16  
-**Status:** In progress. Decisions in §8 taken with the defaults on 2026-09-16; stage A shipped as version 0.9.0.  
+**Status:** In progress. Decisions in §8 taken with the defaults on 2026-09-16; stage A shipped as 0.9.0, stage B as 0.10.0.  
 **Builds on:** [04-ux-ui.md](04-ux-ui.md) (principles and screen catalogue), [11-ios-excellence-strategy.md](11-ios-excellence-strategy.md) (signature experiences), the spike app at version 0.8.2.
 
 ## 1. Where we are
@@ -104,7 +104,7 @@ Each stage ships to the user's iPhone as a version and is judged there. Work sta
 | Stage | Version | Deliverable | Judged by |
 |---|---|---|---|
 | A. Structure and words | 0.9 | Done in 0.9.0: four-step flow (Home, Photo Check, Your Sheet, Share) with the Adjust sheet; session card on Home; plain-language checks from one pure mapping with tests; Spanish and English complete (301 strings, Info.plist names); developer details behind a long press on the version line | Can a friend go launch-to-share unaided? Are both languages complete? |
-| B. Moments | 0.10 | Capture-to-frame landing, readiness ring around the shutter with countdown, sheet re-flow animation, hold-to-compare, success tick, haptics, Reduce Motion paths | Does each moment explain something? Nothing flickers or lags on the phone |
+| B. Moments | 0.10 | Done in 0.10.0: the portrait lands into its frame on Photo Check (wide and uncropped while checking, then the crop springs to the solved framing and the white background fades in, with a light haptic); the readiness ring around the shutter (four arcs that turn green, close into a full ring when ready, and host the 2-1 countdown; the shutter turns green and shows a tick while capturing); the sheet preview re-flows with a spring when copies or paper change (each placement is a view keyed by item and copy); "Your files are ready" with a bouncing tick and a success haptic on Share; hold-to-compare from stage A. Every animation is off under Reduce Motion | Does each moment explain something? Nothing flickers or lags on the phone |
 | C. Look | 0.11 | App icon, accent colour, glass control cluster in Adjust, paper chips, people row, light and dark, Dynamic Type and VoiceOver audits, App Store-style screenshots from UI tests | Side-by-side screenshots against Apple's own apps; audits green |
 | D. Ease and reach | 0.12 | TipKit tips, App Intent, Spotlight for the document profile, print-flow polish, final copy pass, then the M2 production project with the spike code promoted | Launch-to-share under 60 s for a new user; M1 exit checklist |
 

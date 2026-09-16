@@ -65,13 +65,6 @@ struct CameraView: View {
                 headGuide
                 eyeLine
                 overlayControls
-                if let countdown {
-                    Text("\(countdown)")
-                        .font(.system(size: 96, weight: .bold, design: .rounded)).monospacedDigit()
-                        .foregroundStyle(.white).shadow(radius: 8)
-                        .transition(.scale.combined(with: .opacity))
-                        .accessibilityIdentifier("countdown")
-                }
                 // Immediate acknowledgement of the shutter press while the still is processed.
                 Color.white.ignoresSafeArea().opacity(flash ? 0.85 : 0).allowsHitTesting(false)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: flash)
@@ -96,6 +89,7 @@ struct CameraView: View {
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
+        .sensoryFeedback(.success, trigger: camera.hint) { _, hint in hint == .ready }
         .task(id: "\(camera.hint.rawValue)-\(autoCapture)") {
             // Auto capture: two seconds of "ready" with a visible countdown; any hint change cancels it.
             guard autoCapture, camera.hint == .ready, camera.state == .running, !camera.isCapturing else { countdown = nil; return }
@@ -152,23 +146,29 @@ struct CameraView: View {
         }
     }
 
-    /// Four segments: framing, head pose relative to the camera, light, distance. Unknown stays grey; only the hint speaks.
-    private var readinessRow: some View {
-        HStack(spacing: 10) {
-            ForEach(ReadinessGroup.allCases, id: \.self) { group in
-                let state = camera.readiness[group]
-                Image(systemName: CameraPresentation.symbol(for: group))
-                    .font(.caption.weight(.semibold))
-                    .frame(width: 30, height: 30)
-                    .background(state == .ok ? Color.green.opacity(0.85) : state == .attention ? Color.orange.opacity(0.85) : Color.white.opacity(0.18), in: Circle())
-                    .accessibilityLabel(Text(CameraPresentation.name(for: group)))
-                    .accessibilityValue(Text(state == .ok ? "OK" : state == .attention ? "Needs attention" : "Unknown"))
+    /// The shutter with the readiness ring around it: four arcs (framing, head position, light, distance) that
+    /// turn green as checks pass; when everything is ready the ring closes and the countdown runs inside.
+    private var shutter: some View {
+        let ready = camera.hint == .ready
+        return ZStack {
+            ReadinessRing(readiness: camera.readiness, ready: ready, animated: !reduceMotion)
+                .frame(width: 100, height: 100)
+            Circle().strokeBorder(.white, lineWidth: 4).frame(width: 76, height: 76)
+            Circle().fill(ready ? Color.green : .white).frame(width: 62, height: 62)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: ready)
+            if let countdown {
+                Text("\(countdown)")
+                    .font(.system(size: 34, weight: .bold, design: .rounded)).monospacedDigit()
+                    .foregroundStyle(.black)
+                    .contentTransition(.numericText(countsDown: true))
+                    .animation(reduceMotion ? nil : .snappy, value: countdown)
+                    .accessibilityIdentifier("countdown")
+            } else if camera.isCapturing {
+                Image(systemName: "checkmark").font(.title.weight(.bold)).foregroundStyle(.black)
+                    .transition(.scale.combined(with: .opacity))
             }
         }
-        .padding(6)
-        .background(.regularMaterial, in: Capsule())
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("readiness")
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: camera.isCapturing)
     }
 
     private var overlayControls: some View {
@@ -192,14 +192,16 @@ struct CameraView: View {
                     .accessibilityIdentifier("cameraTip")
             }
             HStack {
-                readinessRow
-                Toggle(isOn: $autoCapture) { Text("Auto") }
+                Spacer()
+                Toggle(isOn: $autoCapture) { Label("Auto", systemImage: autoCapture ? "timer" : "timer.slash") }
                     .toggleStyle(.button)
                     .buttonStyle(.bordered)
+                    .controlSize(.small)
                     .accessibilityLabel("Automatic capture when ready")
                     .accessibilityIdentifier("autoCapture")
             }
             .padding(.top, 6)
+            .padding(.trailing, 16)
             if camera.state == .interrupted {
                 Text("Camera paused. It resumes when the interruption ends.")
                     .font(.footnote).padding(8).background(.regularMaterial, in: Capsule())
@@ -220,15 +222,10 @@ struct CameraView: View {
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("cameraCancel")
                 Spacer()
-                Button(action: takePhoto) {
-                    ZStack {
-                        Circle().strokeBorder(.white, lineWidth: 4).frame(width: 76, height: 76)
-                        Circle().fill(.white).frame(width: 62, height: 62)
-                    }
-                }
+                Button(action: takePhoto) { shutter }
                 .disabled(camera.state != .running || camera.isCapturing)
-                .opacity(camera.isCapturing ? 0.5 : 1)
                 .accessibilityLabel("Take Photo")
+                .accessibilityValue(Text(CameraPresentation.readinessSummary(camera.readiness)))
                 .accessibilityHint(Text(CameraPresentation.text(for: camera.hint)))
                 .accessibilityIdentifier("shutter")
                 Spacer()
@@ -344,6 +341,18 @@ enum CameraPresentation {
         }
     }
 
+    /// One sentence for VoiceOver: "Framing OK, head position needs attention, lighting unknown, distance OK".
+    static func readinessSummary(_ readiness: CaptureReadiness) -> String {
+        ReadinessGroup.allCases.map { group in
+            let state: String = switch readiness[group] {
+            case .ok: String(localized: "OK")
+            case .attention: String(localized: "needs attention")
+            case .unknown: String(localized: "not measured")
+            }
+            return "\(String(localized: name(for: group))) \(state)"
+        }.joined(separator: ", ")
+    }
+
     static func name(for group: ReadinessGroup) -> LocalizedStringResource {
         switch group {
         case .framing: "Framing"
@@ -367,6 +376,39 @@ enum CameraPresentation {
         case .backlit, .moreLight: "sun.max"
         case .turnLeft: "arrow.turn.up.left"
         case .turnRight: "arrow.turn.up.right"
+        }
+    }
+}
+
+
+/// Four arcs around the shutter, one per readiness group; closes into a full green ring when ready.
+struct ReadinessRing: View {
+    let readiness: CaptureReadiness
+    let ready: Bool
+    var animated = true
+
+    var body: some View {
+        let groups = ReadinessGroup.allCases
+        let gap = ready ? 0.0 : 0.035
+        let span = 1.0 / Double(groups.count)
+        ZStack {
+            ForEach(Array(groups.enumerated()), id: \.element) { index, group in
+                Circle()
+                    .trim(from: Double(index) * span + gap / 2, to: Double(index + 1) * span - gap / 2)
+                    .stroke(color(for: ready ? .ok : readiness[group]), style: StrokeStyle(lineWidth: 5, lineCap: gap == 0 ? .butt : .round))
+                    .rotationEffect(.degrees(-90))
+            }
+        }
+        .animation(animated ? .easeInOut(duration: 0.3) : nil, value: readiness)
+        .animation(animated ? .spring(duration: 0.45, bounce: 0.2) : nil, value: ready)
+        .accessibilityHidden(true)
+    }
+
+    private func color(for state: CaptureReadiness.State) -> Color {
+        switch state {
+        case .ok: .green
+        case .attention: .orange
+        case .unknown: .white.opacity(0.28)
         }
     }
 }
