@@ -1,4 +1,5 @@
 @preconcurrency import AVFoundation
+import CoreMotion
 import Foundation
 import Observation
 import OSLog
@@ -32,6 +33,11 @@ final class CameraController: NSObject {
 
     private(set) var state: State = .idle
     private(set) var hint: CaptureHint = .noFace
+    private(set) var readiness = CaptureReadiness()
+    /// Phone attitude from Core Motion, nil until the first sample.
+    private(set) var deviceLevel: DeviceLevel?
+    /// Latest slow-pass result, for the debug overlay.
+    private(set) var lastSlowFrame: SlowFrameResult?
     private(set) var position: AVCaptureDevice.Position = .front
     private(set) var isCapturing = false
     /// Milliseconds from `start()` to the running session, for the spike report.
@@ -42,7 +48,12 @@ final class CameraController: NSObject {
     nonisolated(unsafe) let session = AVCaptureSession()
     nonisolated(unsafe) private let photoOutput = AVCapturePhotoOutput()
     nonisolated(unsafe) private let metadataOutput = AVCaptureMetadataOutput()
+    nonisolated(unsafe) private let videoDataOutput = AVCaptureVideoDataOutput()
     @ObservationIgnored nonisolated(unsafe) private var videoInput: AVCaptureDeviceInput?
+    @ObservationIgnored nonisolated(unsafe) private var frameAnalyzer: FrameAnalyzer?
+    @ObservationIgnored private let motionManager = CMMotionManager()
+    @ObservationIgnored private var slowFrame: (result: SlowFrameResult, at: ContinuousClock.Instant)?
+    @ObservationIgnored private var lastExposurePoint: (point: CGPoint, at: ContinuousClock.Instant)?
     private let sessionQueue = DispatchQueue(label: "com.jarbasferro.IDPhotoSpike.camera", qos: .userInitiated)
     private let signposter = OSSignposter(subsystem: "com.jarbasferro.IDPhotoSpike", category: "Camera")
     private let logger = Logger(subsystem: "com.jarbasferro.IDPhotoSpike", category: "Camera")
@@ -57,6 +68,9 @@ final class CameraController: NSObject {
         super.init()
         previewLayer.session = session
         previewLayer.videoGravity = .resizeAspectFill
+        frameAnalyzer = FrameAnalyzer { [weak self] result in
+            Task { @MainActor in self?.receive(result) }
+        }
     }
 
     /// 12.6 MP: covers 4032 x 3024 stills while excluding 24 and 48 MP modes.
@@ -110,6 +124,8 @@ final class CameraController: NSObject {
             startupMilliseconds = Int(started.duration(to: .now) / .milliseconds(1))
             state = .running
             installRotationCoordinator()
+            startMotionUpdates()
+            if let format = videoInput?.device.activeFormat { frameAnalyzer?.setFieldOfView(degrees: Double(format.videoFieldOfView)) }
         case .failure(let error):
             state = .failed(error.localizedDescription)
         }
@@ -120,8 +136,12 @@ final class CameraController: NSObject {
             if session.isRunning { session.stopRunning() }
         }
         if state == .running || state == .interrupted || state == .configuring { state = .idle }
+        motionManager.stopDeviceMotionUpdates()
+        deviceLevel = nil
+        slowFrame = nil
         tracker = GuidanceTracker()
         hint = .noFace
+        readiness = CaptureReadiness()
     }
 
     func switchCamera() {
@@ -129,10 +149,61 @@ final class CameraController: NSObject {
         let next: AVCaptureDevice.Position = position == .front ? .back : .front
         position = next
         tracker = GuidanceTracker()
+        slowFrame = nil
         sessionQueue.async { [self] in
             do { try configureSession(position: next) } catch { logger.error("Camera switch failed") }
         }
         installRotationCoordinator()
+        if let format = videoInput?.device.activeFormat { frameAnalyzer?.setFieldOfView(degrees: Double(format.videoFieldOfView)) }
+    }
+
+    // MARK: - Motion (phone attitude)
+
+    private func startMotionUpdates() {
+        guard motionManager.isDeviceMotionAvailable, !motionManager.isDeviceMotionActive else { return }
+        motionManager.deviceMotionUpdateInterval = 1 / 15
+        motionManager.startDeviceMotionUpdates(to: .main) { [weak self] motion, _ in
+            guard let motion else { return }
+            let g = motion.gravity
+            // Device axes: x right, y towards the top edge, z out of the screen. Upright portrait: gravity (0, −1, 0).
+            let roll = atan2(g.x, -g.y) * 180 / .pi
+            let pitch = atan2(-g.z, sqrt(g.x * g.x + g.y * g.y)) * 180 / .pi
+            MainActor.assumeIsolated { self?.deviceLevel = DeviceLevel(rollDegrees: roll, pitchDegrees: pitch) }
+        }
+    }
+
+    // MARK: - Slow frame results
+
+    private func receive(_ result: SlowFrameResult) {
+        lastSlowFrame = result
+        slowFrame = (result, .now)
+    }
+
+    /// Slow-pass values are folded into the per-frame summary while they are fresh (under a second).
+    private var freshSlowFrame: SlowFrameResult? {
+        guard let slowFrame, .now - slowFrame.at < .seconds(1), slowFrame.result.faceFound else { return nil }
+        return slowFrame.result
+    }
+
+    /// Meter exposure and focus on the face so skin, not the wall, sets the exposure (throttled).
+    private func meterOnFace(rawBounds: CGRect) {
+        let point = CGPoint(x: rawBounds.midX, y: rawBounds.midY)
+        let now = ContinuousClock.now
+        if let last = lastExposurePoint, hypot(point.x - last.point.x, point.y - last.point.y) < 0.08, now - last.at < .seconds(1.5) { return }
+        lastExposurePoint = (point, now)
+        guard let device = videoInput?.device else { return }
+        sessionQueue.async {
+            guard (try? device.lockForConfiguration()) != nil else { return }
+            defer { device.unlockForConfiguration() }
+            if device.isExposurePointOfInterestSupported, device.isExposureModeSupported(.continuousAutoExposure) {
+                device.exposurePointOfInterest = point
+                device.exposureMode = .continuousAutoExposure
+            }
+            if device.isFocusPointOfInterestSupported, device.isFocusModeSupported(.continuousAutoFocus) {
+                device.focusPointOfInterest = point
+                device.focusMode = .continuousAutoFocus
+            }
+        }
     }
 
     /// Full-quality still into the same private staging path as an import.
@@ -207,6 +278,19 @@ final class CameraController: NSObject {
         if metadataOutput.availableMetadataObjectTypes.contains(.face) {
             metadataOutput.metadataObjectTypes = [.face]
         }
+
+        // Slow analysis frames: luma plane only, late frames dropped, delivered upright and unmirrored so the
+        // analyser's left/right and pitch signs match the subject.
+        if !session.outputs.contains(videoDataOutput), session.canAddOutput(videoDataOutput) {
+            videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
+            videoDataOutput.alwaysDiscardsLateVideoFrames = true
+            if let analyzer = frameAnalyzer { videoDataOutput.setSampleBufferDelegate(analyzer, queue: analyzer.queue) }
+            session.addOutput(videoDataOutput)
+        }
+        if let connection = videoDataOutput.connection(with: .video) {
+            if connection.isVideoRotationAngleSupported(90) { connection.videoRotationAngle = 90 }
+            if connection.isVideoMirroringSupported { connection.isVideoMirrored = false }
+        }
     }
 
     private func installRotationCoordinator() {
@@ -264,13 +348,24 @@ extension CameraController: @preconcurrency AVCaptureMetadataOutputObjectsDelega
                 guard let transformed = previewLayer.transformedMetadataObject(for: face) as? AVMetadataFaceObject else { return nil }
                 return (transformed.bounds, transformed)
             }.max { $0.0.width * $0.0.height < $1.0.width * $1.0.height }
-            let summary = FaceFrameSummary(
+            var summary = FaceFrameSummary(
                 faceCount: faces.count,
                 bounds: largest.map { NormalizedCrop(x: $0.0.minX / layerBounds.width, y: $0.0.minY / layerBounds.height,
                                                      width: $0.0.width / layerBounds.width, height: $0.0.height / layerBounds.height) },
                 rollDegrees: largest?.1.hasRollAngle == true ? largest?.1.rollAngle.normalizedRoll : nil,
                 yawDegrees: largest?.1.hasYawAngle == true ? largest?.1.yawAngle.normalizedRoll : nil)
+            summary.device = deviceLevel
+            if let slow = freshSlowFrame {
+                summary.pitchDegrees = slow.pitchDegrees
+                summary.distanceCM = slow.distanceCM
+                summary.lighting = slow.lighting
+            }
+            if let device = videoInput?.device {
+                summary.lowLight = device.iso >= device.activeFormat.maxISO * 0.8
+            }
+            if faces.count == 1, let raw = faces.first { meterOnFace(rawBounds: raw.bounds) }
             let next = tracker.update(summary)
+            readiness = tracker.readiness
             if next != hint { hint = next }
         }
     }

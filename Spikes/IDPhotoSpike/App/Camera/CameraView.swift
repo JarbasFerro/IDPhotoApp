@@ -47,6 +47,8 @@ struct CameraView: View {
     @State private var camera = CameraController()
     @State private var errorMessage: String?
     @State private var flash = false
+    @State private var countdown: Int?
+    @AppStorage("autoCapture") private var autoCapture = true
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -60,7 +62,15 @@ struct CameraView: View {
                     .ignoresSafeArea()
                     .accessibilityHidden(true)
                 headGuide
+                horizonLine
                 overlayControls
+                if let countdown {
+                    Text("\(countdown)")
+                        .font(.system(size: 96, weight: .bold, design: .rounded)).monospacedDigit()
+                        .foregroundStyle(.white).shadow(radius: 8)
+                        .transition(.scale.combined(with: .opacity))
+                        .accessibilityIdentifier("countdown")
+                }
                 // Immediate acknowledgement of the shutter press while the still is processed.
                 Color.white.ignoresSafeArea().opacity(flash ? 0.85 : 0).allowsHitTesting(false)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: flash)
@@ -84,6 +94,19 @@ struct CameraView: View {
             if event.phase == .ended { takePhoto() }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
+        .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
+        .task(id: "\(camera.hint.rawValue)-\(autoCapture)") {
+            // Auto capture: two seconds of "ready" with a visible countdown; any hint change cancels it.
+            guard autoCapture, camera.hint == .ready, camera.state == .running, !camera.isCapturing else { countdown = nil; return }
+            for value in [2, 1] {
+                countdown = value
+                AccessibilityNotification.Announcement("\(value)").post()
+                try? await Task.sleep(for: .seconds(1))
+                if Task.isCancelled { countdown = nil; return }
+            }
+            countdown = nil
+            takePhoto()
+        }
         .onChange(of: camera.hint) { _, hint in
             // One spoken update per hint change; hints are already debounced.
             AccessibilityNotification.Announcement(String(localized: CameraPresentation.text(for: hint))).post()
@@ -110,6 +133,42 @@ struct CameraView: View {
         .accessibilityHidden(true)
     }
 
+    /// A world-horizontal line through the guide, shown only near level; green when within tolerance.
+    @ViewBuilder private var horizonLine: some View {
+        if let level = camera.deviceLevel, abs(level.rollDegrees) < 12 {
+            GeometryReader { geometry in
+                let ok = camera.readiness.level == .ok
+                Rectangle()
+                    .fill(ok ? Color.green : Color.white.opacity(0.8))
+                    .frame(width: ok ? 140 : 110, height: 2)
+                    .rotationEffect(.degrees(-level.rollDegrees))
+                    .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: ok)
+            }
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
+    }
+
+    /// Four segments: phone level, head pose, light, distance. Unknown stays grey; only the hint speaks.
+    private var readinessRow: some View {
+        HStack(spacing: 10) {
+            ForEach(ReadinessGroup.allCases, id: \.self) { group in
+                let state = camera.readiness[group]
+                Image(systemName: CameraPresentation.symbol(for: group))
+                    .font(.caption.weight(.semibold))
+                    .frame(width: 30, height: 30)
+                    .background(state == .ok ? Color.green.opacity(0.85) : state == .attention ? Color.orange.opacity(0.85) : Color.white.opacity(0.18), in: Circle())
+                    .accessibilityLabel(Text(CameraPresentation.name(for: group)))
+                    .accessibilityValue(Text(state == .ok ? "OK" : state == .attention ? "Needs attention" : "Unknown"))
+            }
+        }
+        .padding(6)
+        .background(.regularMaterial, in: Capsule())
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("readiness")
+    }
+
     private var overlayControls: some View {
         VStack {
             HStack {
@@ -122,6 +181,15 @@ struct CameraView: View {
                 Spacer()
             }
             .padding(.top, 12)
+            HStack {
+                readinessRow
+                Toggle(isOn: $autoCapture) { Text("Auto") }
+                    .toggleStyle(.button)
+                    .buttonStyle(.bordered)
+                    .accessibilityLabel("Automatic capture when ready")
+                    .accessibilityIdentifier("autoCapture")
+            }
+            .padding(.top, 6)
             if camera.state == .interrupted {
                 Text("Camera paused. It resumes when the interruption ends.")
                     .font(.footnote).padding(8).background(.regularMaterial, in: Capsule())
@@ -132,6 +200,9 @@ struct CameraView: View {
                     .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
                     .accessibilityHidden(true)
             }
+            Text(debugLine)
+                .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
+                .accessibilityHidden(true)
             #endif
             Spacer()
             HStack {
@@ -193,6 +264,27 @@ struct CameraView: View {
         .foregroundStyle(.white)
     }
 
+    #if DEBUG
+    /// Raw numbers behind the hints, so a device screenshot can validate signs and thresholds.
+    private var debugLine: String {
+        var parts: [String] = []
+        if let level = camera.deviceLevel {
+            parts.append(String(format: "roll %.1f° tilt %.1f°", level.rollDegrees, level.pitchDegrees))
+        }
+        if let slow = camera.lastSlowFrame {
+            if let pitch = slow.pitchDegrees { parts.append(String(format: "pitch %+.1f°", pitch)) }
+            if let distance = slow.distanceCM { parts.append(String(format: "%.0f cm", distance)) }
+            if let light = slow.lighting {
+                parts.append(String(format: "L/R %.2f bg %.2f face %.2f", light.leftRightRatio, light.backgroundRatio, light.faceMean))
+            }
+            parts.append("\(slow.processingMilliseconds) ms")
+        } else {
+            parts.append("no live analysis")
+        }
+        return parts.joined(separator: " · ")
+    }
+    #endif
+
     private func takePhoto() {
         guard camera.state == .running, !camera.isCapturing else { return }
         flash = true
@@ -219,11 +311,37 @@ enum CameraPresentation {
         case .multipleFaces: "Only one person in the frame"
         case .moveCloser: "Move a little closer"
         case .moveBack: "Move a little farther away"
+        case .tooClose: "Too close: move back, or ask someone to take it"
         case .centerFace: "Centre your face in the oval"
+        case .levelPhone: "Level the phone"
+        case .uprightPhone: "Hold the phone upright"
         case .keepLevel: "Keep your head level"
         case .faceCamera: "Look straight at the camera"
+        case .eyeLevel: "Hold the phone at eye level"
+        case .backlit: "Move away from the bright light behind you"
+        case .moreLight: "Find more light on your face"
+        case .turnLeft: "Turn slightly to your left, towards the light"
+        case .turnRight: "Turn slightly to your right, towards the light"
         case .holdStill: "Hold still"
         case .ready: "Ready. Take the photo."
+        }
+    }
+
+    static func symbol(for group: ReadinessGroup) -> String {
+        switch group {
+        case .level: "level"
+        case .face: "face.dashed"
+        case .light: "sun.max"
+        case .distance: "ruler"
+        }
+    }
+
+    static func name(for group: ReadinessGroup) -> LocalizedStringResource {
+        switch group {
+        case .level: "Phone level"
+        case .face: "Head position"
+        case .light: "Lighting"
+        case .distance: "Distance"
         }
     }
 
@@ -232,10 +350,15 @@ enum CameraPresentation {
         case .ready: "checkmark.circle"
         case .holdStill: "hand.raised"
         case .noFace, .multipleFaces: "person.crop.circle.badge.questionmark"
-        case .moveCloser, .moveBack: "arrow.up.left.and.arrow.down.right"
+        case .moveCloser, .moveBack, .tooClose: "arrow.up.left.and.arrow.down.right"
         case .centerFace: "scope"
+        case .levelPhone, .uprightPhone: "iphone"
         case .keepLevel: "level"
         case .faceCamera: "face.dashed"
+        case .eyeLevel: "arrow.up.and.down"
+        case .backlit, .moreLight: "sun.max"
+        case .turnLeft: "arrow.turn.up.left"
+        case .turnRight: "arrow.turn.up.right"
         }
     }
 }

@@ -41,6 +41,22 @@ Guidance defect (user screenshots, 0.6.0 and 0.6.1): "Keep your head level" stay
 
 Not yet measured, all of it on the phone: HEIF file size at 48 MP versus 12 MP front, orientation in all four device orientations, front-camera preview mirroring versus the unmirrored still, guidance behaviour and hint stability at arm's length, hardware button capture, interruption by a phone call, backgrounding and return, repeated sessions for thermal behaviour, and memory while camera, Vision, and segmentation run together.
 
+## Addendum, 2026-09-16: capture aids, phase 1 (version 0.8.0)
+
+Goal: help the user get the camera at eye level, the phone and the head level on three axes, the light from the front, and the face well exposed, before the shutter. Everything runs on iOS 26 with public API; each aid is a measured signal, not a guess.
+
+- **Phone attitude** (`CMMotionManager`, 15 Hz): roll from gravity's x/y gives a spirit level; pitch from gravity's z gives lean back/forward. Hints "Level the phone" (over 3°) and "Hold the phone upright" (over 10°). A world-horizontal line appears through the guide when within 12° and turns green when level.
+- **Slow Vision pass** (`FrameAnalyzer`, `AVCaptureVideoDataOutput`, luma-only 420 frames, late frames dropped, at most five processed frames per second): face landmarks revision 3 on the upright, unmirrored frame give face **pitch** ("Hold the phone at eye level" beyond 10°) and the pupils. Interpupillary distance in pixels with the active format's field of view gives the **distance** ("Too close: move back, or ask someone to take it" under 45 cm, where the wide lens distorts the nose). The luma plane gives the **lighting**: subject-left versus subject-right cheek ratio ("Turn slightly to your left/right, towards the light" beyond 4:3), background ring versus face ("Move away from the bright light behind you"), and face mean ("Find more light on your face"; also raised when the sensor is at 80 % of its maximum ISO).
+- **Face-metered exposure**: exposure and focus points of interest follow the largest face (throttled to movements over 8 % or 1.5 s), so skin sets the exposure rather than the wall.
+- **Readiness row**: four segments (phone level, head position, lighting, distance) under the hint; grey when unmeasured, green when within tolerance, orange when not. The single hint remains the only text.
+- **Auto capture** (toggle "Auto", on by default, remembered): two seconds of "Ready" with a visible 2, 1 countdown and a tick per second; any hint change cancels it.
+- Hint priority: presence, size, distance, position, phone attitude, head roll, yaw, pitch, backlight, darkness, one-sided light, hold still, ready.
+- Debug overlay prints roll, tilt, face pitch, distance, L/R ratio, background ratio, face luminance, and the analysis time per frame, so a device screenshot validates the signs and thresholds.
+
+Simulator evidence: ten guidance unit tests cover the priority order, hysteresis, phone attitude, distance, pitch, lighting direction, the luma analysis on a synthetic frame, and the focal-length arithmetic. Live analysis cannot run in the simulator (no camera, no Vision inference context); the analyser stops after the first failure.
+
+Device evidence needed: sign of face pitch (raise versus lower), sign of the lighting direction with the front and back cameras, the per-frame analysis time and thermal behaviour over a two-minute session, whether the readiness segments flicker, and whether the auto-capture countdown feels right.
+
 ## Findings
 
 1. **Face metadata is the right source for live guidance.** It costs nothing extra, arrives at frame rate, and includes roll and yaw when the device provides them; Vision on video frames stays reserved for a later, measured decision (C9-002).

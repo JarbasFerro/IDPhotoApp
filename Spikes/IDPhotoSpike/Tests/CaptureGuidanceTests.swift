@@ -63,6 +63,87 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 15) == .ready)
     }
 
+    @Test func phoneAttitudeHintsComeBeforeHeadHintsAndClearWhenLevel() {
+        var tracker = GuidanceTracker()
+        var frame = face(height: 0.3, roll: 20)
+        frame.device = DeviceLevel(rollDegrees: 6, pitchDegrees: 0)
+        #expect(feed(&tracker, frame, times: 5) == .levelPhone)
+        frame.device = DeviceLevel(rollDegrees: 1, pitchDegrees: 20)
+        #expect(feed(&tracker, frame, times: 5) == .uprightPhone)
+        frame.device = DeviceLevel(rollDegrees: 1, pitchDegrees: 5)
+        #expect(feed(&tracker, frame, times: 5) == .keepLevel)
+        frame.rollDegrees = 0
+        #expect(feed(&tracker, frame, times: 5) == .holdStill)
+        #expect(tracker.readiness.level == .ok && tracker.readiness.face == .ok)
+        #expect(tracker.readiness.light == .unknown && tracker.readiness.distance == .unknown)
+    }
+
+    @Test func distanceAndPitchHints() {
+        var tracker = GuidanceTracker()
+        var frame = face(height: 0.3)
+        frame.distanceCM = 30
+        #expect(feed(&tracker, frame, times: 5) == .tooClose)
+        #expect(tracker.readiness.distance == .attention)
+        frame.distanceCM = 65
+        frame.pitchDegrees = 16
+        #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
+        #expect(tracker.readiness.face == .attention && tracker.readiness.distance == .ok)
+        frame.pitchDegrees = -4
+        #expect(feed(&tracker, frame, times: 5) == .holdStill)
+    }
+
+    @Test func lightingHintsPointTowardsTheLight() {
+        var tracker = GuidanceTracker()
+        var frame = face(height: 0.3)
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 1.6, backgroundRatio: 1.0)
+        #expect(feed(&tracker, frame, times: 5) == .turnLeft)
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 0.6, backgroundRatio: 1.0)
+        #expect(feed(&tracker, frame, times: 5) == .turnRight)
+        frame.lighting = LightingSummary(faceMean: 0.30, leftRightRatio: 1.0, backgroundRatio: 2.5)
+        #expect(feed(&tracker, frame, times: 5) == .backlit)
+        frame.lighting = LightingSummary(faceMean: 0.10, leftRightRatio: 1.0, backgroundRatio: 1.0)
+        #expect(feed(&tracker, frame, times: 5) == .moreLight)
+        #expect(tracker.readiness.light == .attention)
+        frame.lighting = LightingSummary(faceMean: 0.45, leftRightRatio: 1.1, backgroundRatio: 1.2)
+        #expect(feed(&tracker, frame, times: 5) == .holdStill)
+        #expect(tracker.readiness.light == .ok)
+        // Without a luminance measurement, the sensor gain limit alone asks for light.
+        var dark = face(height: 0.3)
+        dark.lowLight = true
+        tracker = GuidanceTracker()
+        #expect(feed(&tracker, dark, times: 5) == .moreLight)
+    }
+
+    @Test func lightingAnalysisReadsSubjectSidesAndBackground() throws {
+        // 200 x 200 luma: dark background (40), face box 60..140 with image-left 80 and image-right 160.
+        let width = 200, height = 200
+        var luma = [UInt8](repeating: 40, count: width * height)
+        for y in 60..<140 { for x in 60..<140 { luma[y * width + x] = x < 100 ? 80 : 160 } }
+        let summary = try #require(luma.withUnsafeBufferPointer {
+            FaceLighting.analyze(luma: $0, width: width, height: height, bytesPerRow: width, face: (x: 60, y: 60, width: 80, height: 80))
+        })
+        // Image-right is the subject's left, so the ratio is above one.
+        #expect(summary.leftRightRatio > 1.8 && summary.leftRightRatio < 2.2, "\(summary.leftRightRatio)")
+        #expect(summary.backgroundRatio < 0.5)
+        #expect(abs(summary.faceMean - 120.0 / 255) < 0.03)
+        // Bright ring means backlight.
+        var backlit = luma
+        for y in 0..<height { for x in 0..<width where !(60..<140 ~= x && y >= 60) { backlit[y * width + x] = 250 } }
+        let ratio = try #require(backlit.withUnsafeBufferPointer {
+            FaceLighting.analyze(luma: $0, width: width, height: height, bytesPerRow: width, face: (x: 60, y: 60, width: 80, height: 80))
+        }).backgroundRatio
+        #expect(ratio > 1.9)
+    }
+
+    @Test func distanceFromInterpupillaryDistance() throws {
+        let focal = try #require(FaceLighting.focalLengthPixels(fieldOfViewDegrees: 60, longSidePixels: 640))
+        #expect(abs(focal - 554.3) < 0.5)
+        let distance = try #require(FaceLighting.distanceCM(interpupillaryPixels: 55, focalLengthPixels: focal))
+        #expect(abs(distance - 63.5) < 0.5)
+        #expect(FaceLighting.distanceCM(interpupillaryPixels: 0, focalLengthPixels: focal) == nil)
+        #expect(FaceLighting.focalLengthPixels(fieldOfViewDegrees: 0, longSidePixels: 640) == nil)
+    }
+
     @Test func capturedDataStagesLikeAnImport() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("CameraStaging-" + UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
