@@ -210,8 +210,14 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-016 — Initial launch jurisdictions
 
-**Status:** Deferred  
-**Decision needed:** deliberately small first country/document set based on demand and authoritative-source availability.
+**Status:** Accepted for initial country and format
+**Date:** 2026-09-15
+
+**Decision:** Start with Spain and the user-requested “foto carnet”, 32 × 26 mm in portrait orientation: width 26 mm, height 32 mm. Use DNI as the first official research reference; exact document-compliance claims require a validated, sourced profile.
+
+**Evidence:** User selected Spain/foto carnet as the first-release scope. [Initial source review](13-spain-foto-carnet.md) records the DNI reference and unresolved requirements.
+
+**Consequences:** Deliver this single format end to end before expanding countries or document variants. Shared dimensions alone do not establish equivalence with passport, driving-licence, or residence-card requirements. Child/baby coverage remains governed by ADR-017. Digital export is an app capability, not evidence of an official online-submission channel.
 
 ---
 
@@ -493,6 +499,127 @@ Use PhotosUI/PhotosPicker for normal photo import. Do not request broad Photo Li
 
 ---
 
+## ADR-036 — Print sheet composer and paper catalog
+
+**Status:** Proposed  
+**Date:** 2026-09-16
+
+### Context
+
+The user requires customizable paper sizes, placement re-optimized per paper, mixed photos per page with per-photo copies, overflow pages, and bleed/cut marks. Consumer printing scales silently (borderless +~2 %, AirPrint snaps to the smallest containing paper, kiosks fill-crop) and iOS cannot create custom AirPrint papers.
+
+### Decision
+
+Implement a versioned `PaperSize` catalog plus custom sizes; a deterministic two-stage guillotine row solver in the domain layer; adaptive 0–1 mm bleed, 4 mm margin to the bleed edge, 2 mm gutter, corner ticks, and a 50 mm calibration bar; PDF with page box equal to the paper and a 300 ppi exact-aspect JPEG per page; `UIPrintInfo.outputType = .photo` with a `choosePaper` delegate preferring bordered papers. Zero-gutter "Max copies" is opt-in.
+
+### Evidence
+
+[14-priority-feature-plan.md §2.5, §3.1–3.5](14-priority-feature-plan.md); printer-vendor borderless documentation; AirPrint paper-selection behaviour; packing-algorithm survey.
+
+### Alternatives considered
+
+MaxRects/Skyline packing (better density, non-guillotine cuts); through-lines instead of ticks (marks survive cut errors on the photo); borderless-first printing (dimensional error).
+
+### Consequences
+
+Print geometry becomes a tested domain module; physical measurement remains the release gate (ADR-026).
+
+### Revisit trigger
+
+Apple adds custom AirPrint paper support or documented scaling control.
+
+---
+
+## ADR-037 — Background replacement colour is profile data
+
+**Status:** Proposed  
+**Date:** 2026-09-16
+
+### Decision
+
+The replacement colour, uniformity/contrast rule, and `replacementPolicy` come from the document profile. Spain (DNI) defaults to white per the official wording; UK-style cream/grey and German neutral-grey rules are represented as data. Profiles also carry `alterationPolicy` so jurisdictions requiring unaltered photos default replacement off with an explanation.
+
+### Evidence
+
+Official wording for Spain, UK, Germany, Canada, ICAO TR; see [14-priority-feature-plan.md §2.2](14-priority-feature-plan.md).
+
+### Consequences
+
+No global "make white" behaviour; the compositor is colour-agnostic; semantic validation rejects replacement enabled without a colour.
+
+---
+
+## ADR-038 — Tonal correction policy (Document Tone)
+
+**Status:** Proposed  
+**Date:** 2026-09-16
+
+### Context
+
+The user requested Apple presets "like Studio Light". Studio Light is a read-only, user-toggled video effect; Portrait Lighting exists in Core Image only as private filters; PhotoKit exposes no lighting adjustment.
+
+### Decision
+
+Ship a single global, reversible correction built from `autoAdjustmentFilters`, neutral white balance, an exposure clamp, and mild export-time sharpening, with strength and before/after. No Portrait Lighting or Studio Light claims, no private filters, no face-local retouching (ADR-011). Gated by profile `alterationPolicy`.
+
+### Revisit trigger
+
+Apple publishes a still-image relighting API, or product evidence shows the correction is not worth its policy cost.
+
+---
+
+## ADR-039 — Face alignment estimator
+
+**Status:** Proposed  
+**Date:** 2026-09-16
+
+### Decision
+
+Eye line and chin come from pinned-revision Vision landmarks; crown is a fused estimate (segmentation-mask top vs anthropometric extrapolation from eye line and chin, with a hair-volume divergence rule); the solver levels eyes within the permitted roll range, scales to the head-height target, then places by eye-line/top-margin bands; crown/chin handles are always exposed and overrides logged for calibration. Spain uses labelled ICAO engineering defaults until official numbers exist.
+
+### Evidence
+
+No Apple API returns the top of the head; ICAO TR and German rules define crown ignoring hair. See [14-priority-feature-plan.md §2.3, §3.8](14-priority-feature-plan.md).
+
+---
+
+## ADR-040 — Vision request revision pinning
+
+**Status:** Proposed  
+**Date:** 2026-09-16
+
+### Decision
+
+Pin `DetectFaceLandmarksRequest` and `DetectFaceRectanglesRequest` to `.revision3` on all supported OS versions until a calibrated migration to revision 4 (iOS 27, 98 landmarks, tighter boxes) is evaluated with fixtures. Segmentation and iterative-segmentation revisions are recorded per result.
+
+### Rationale
+
+FR-072 determinism across iOS 26 and 27.
+
+---
+
+## ADR-041 — iOS 27 iterative segmentation as the refinement path
+
+**Status:** Proposed; refines ADR-004  
+**Date:** 2026-09-16
+
+### Decision
+
+Use `GenerateIterativeSegmentationRequest` (seed box plus include/exclude points, on-demand model assets) as the Refine interaction on iOS 27, availability-gated; iOS 26 falls back to candidate-mask switching, choke/feather, original background, or retake. Official correctness never depends on the iOS 27 API (FR-065).
+
+---
+
+## ADR-042 — Foundation Models image input is advisory only
+
+**Status:** Proposed; refines ADR-032  
+**Date:** 2026-09-16
+
+### Decision
+
+If the optional Photo Coach ships, it uses on-device `SystemLanguageModel` with image attachments for explanation and coaching only (for example glare or shadow hints), with `@Generable` structured output, an Evaluations-framework suite, and a clean unavailable path. `PrivateCloudComputeLanguageModel` is not used for identity photos without a new privacy decision (FR-135).
+
+---
+
 # Open decisions before production implementation
 
 Immediate M1 decisions:
@@ -503,11 +630,12 @@ Immediate M1 decisions:
 4. ADR-024 — minimum iOS version.
 5. ADR-034 — final AVFoundation camera architecture.
 6. performance/memory budgets derived from device measurements.
+7. ADR-036 to ADR-042 — print composer, background colour policy, Document Tone, alignment estimator, revision pinning, iterative segmentation, Foundation Models boundary (from [the priority feature plan](14-priority-feature-plan.md)).
 
 Product decisions that can proceed in parallel:
 
 1. ADR-015 — monetization.
-2. ADR-016 — launch jurisdictions.
+2. ADR-016 — country/format accepted; complete Spain profile source validation before publication.
 3. ADR-017 — child/baby launch coverage.
 4. ADR-018 — generic/custom size in MVP.
 5. ADR-020 — diagnostics/analytics.

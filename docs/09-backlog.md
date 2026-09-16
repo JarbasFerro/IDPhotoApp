@@ -34,12 +34,12 @@ Done when:
 
 ## P0-002 — Select launch rule-research shortlist — P0 / M
 
-Choose a deliberately small set of high-demand jurisdictions/document profiles.
+Selected on 2026-09-15: **Spain — foto carnet, width 26 mm × height 32 mm** (ADR-016). Use DNI as the first official research reference; see [source review](13-spain-foto-carnet.md). Source validation and child/baby scope remain open; selection alone does not complete this item.
 
 Acceptance:
 
 - authoritative sources identifiable;
-- at least one digital workflow;
+- digital file export workflow, with no implied official online-submission support;
 - at least one physical print workflow where practical;
 - child/baby scope explicit per profile.
 
@@ -60,6 +60,8 @@ StoreKit only if monetization is introduced; guardrails remain mandatory.
 # EPIC 1 — M1 native technical spikes
 
 ## S1-001 — Bootstrap disposable Xcode 27 spike app — P0 / M
+
+Implementation started 2026-09-16: [native prototype and test targets](../Spikes/IDPhotoSpike/README.md) are present. Simulator validation is recorded in [spike 01](spikes/01-import-crop-export.md); physical-device launch remains open.
 
 Acceptance:
 
@@ -200,6 +202,46 @@ Only if a concrete problem is selected.
 
 Test structured warning explanation or profile selection. Controlled evaluation required.
 
+## S1-017 — Face geometry and crown estimator benchmark — P0 / L
+
+Dependencies: S1-004. Design: [14-priority-feature-plan.md §3.8](14-priority-feature-plan.md).
+
+Acceptance:
+
+- pinned landmark/rectangle revisions produce identical geometry on iOS 26 and 27;
+- fused crown (mask + anthropometric) median error documented against labelled fixtures;
+- failure-mode fixtures (tall hair, head covering, bald, beard, infant, tilt, glasses) each map to a defined state.
+
+## S1-018 — Segmentation, composition, and iOS 27 refinement — P0 / XL
+
+Dependencies: S1-006. Supersedes the scope split of S1-007/S1-008 by evaluating them together. Design: [14-priority-feature-plan.md §3.6](14-priority-feature-plan.md).
+
+Acceptance:
+
+- foreground-instance vs person-segmentation `.accurate` quality rubric documented;
+- mask uncertainty score defined with pass/warn/fallback thresholds;
+- `GenerateIterativeSegmentationRequest` include/exclude taps prototyped with asset download handling and an iOS 26 fallback;
+- compositor leaves face-region pixels untouched.
+
+## S1-019 — Print composer spike — P0 / L
+
+Dependencies: S1-010. Design: [14-priority-feature-plan.md §3.1–3.5](14-priority-feature-plan.md).
+
+Acceptance:
+
+- guillotine row solver passes the parameterized count table;
+- PDF and 300 ppi JPEG sheets render ticks, adaptive bleed, and calibration bar;
+- AirPrint `choosePaper` behaviour recorded for bordered vs borderless papers;
+- physical measurement on two printers (10 × 15 and A4) recorded with tolerance.
+
+## S1-020 — Camera with iOS 26 capture features — P0 / XL
+
+Dependencies: S1-002. Evaluate Deferred Start, responsive capture, `maxPhotoDimensions`, `.onCameraCaptureEvent`, front-camera dynamic aspect ratio on iPhone 17, and `DetectLensSmudgeRequest` as a pre-capture warning.
+
+## S1-021 — Document Tone and Studio Light check — P1 / M
+
+Dependencies: S1-009. Measure identity preservation and clipping for the auto-adjust chain; confirm on device that the Studio Light Info.plist opt-in does not affect stills. Design: [14-priority-feature-plan.md §2.1, §3.7](14-priority-feature-plan.md).
+
 ## S1-014 — Physical-device performance baseline — P0 / L
 
 Dependencies: S1-002, S1-003, S1-005, S1-007, S1-009.
@@ -314,9 +356,15 @@ Types:
 
 `pass / warn / fail / manual_check`.
 
-## D3-007 — print-grid geometry — P0 / L
+## D3-007 — print layout solver — P0 / L
+
+Replaces the fixed grid: `PaperSize`, `PrintJob`, `PrintLayoutSolver`, adaptive bleed, overflow paging, fill strategies (FR-140–FR-146).
 
 ## D3-008 — Swift Testing parameterized boundary suite — P0 / M
+
+## D3-009 — Face geometry and crop solution types — P0 / M
+
+`FaceGeometry` with crown method/confidence, `CropSolution` with residuals, rotation in `EditParameters` (FR-153–FR-155).
 
 ---
 
@@ -390,6 +438,14 @@ Availability-gated with iOS 26 fallback.
 
 ## B6-007 — segmentation regression fixture suite — P0 / L
 
+## B6-008 — opportunistic capture/HEIC mattes — P1 / M
+
+Read hair/skin/portrait mattes from `AVCapturePhoto` and ImageIO auxiliary data as a prior; never a dependency.
+
+## B6-009 — original-background compliance check — P1 / M
+
+Measure uniformity/colour of the original background and recommend "Original" when it already satisfies the profile.
+
 ---
 
 # EPIC 7 — Rules engine
@@ -424,6 +480,14 @@ Availability-gated with iOS 26 fallback.
 
 ## R7-015 — rules CI validation — P0 / M
 
+## R7-016 — background colour, contrast, and alteration policy fields — P0 / M
+
+## R7-017 — composition bands with crown definition and targets — P0 / M
+
+Head-height band, hard-reject band, target, `crownDefinition`, eye line, top margin, centring; Spain uses labelled ICAO engineering defaults.
+
+## R7-018 — digital submission presets schema — P1 / M
+
 ---
 
 # EPIC 8 — Rendering/editor engine
@@ -442,9 +506,13 @@ Availability-gated with iOS 26 fallback.
 
 ## E8-007 — reset/automatic composition — P0 / S
 
-## E8-008 — limited tonal correction only if approved — P1 / L
+## E8-008 — Document Tone — P1 / L
 
-No beautification.
+Global, reversible auto-adjust chain with strength and before/after; gated by profile `alterationPolicy` (FR-150–FR-152). No beautification, no relighting.
+
+## E8-009 — fused crown estimator and eye levelling in the crop solver — P0 / L
+
+## E8-010 — crown/chin manual handles with override logging — P0 / M
 
 ---
 
@@ -452,7 +520,7 @@ No beautification.
 
 ## C9-001 — define real-time guidance rules — P0 / L
 
-Only high-confidence, actionable guidance.
+Only high-confidence, actionable guidance. Include head-pose hints from roll/yaw/pitch and a lens-smudge warning (iOS 26).
 
 ## C9-002 — low-resolution Vision frame analysis — P0 / L
 
@@ -492,7 +560,9 @@ Content first, minimal chrome.
 
 ## U10-009 — digital export UI — P0 / M
 
-## U10-010 — print setup UI — P0 / L
+## U10-010 — print composer UI — P0 / XL
+
+Person cards with copy steppers (adjustable actions), paper picker, live sheet preview, page indicator, reorder (iOS 27 `reorderable` with Move Up/Down fallback), bleed/marks options, Actual Size guidance.
 
 ## U10-011 — source/provenance detail — P0 / M
 
@@ -543,6 +613,16 @@ VoiceOver, Voice Control, Dynamic Type, Reduce Motion, contrast, non-color state
 ## P12-005 — physical size QA — P0 / L
 
 ## P12-006 — user Actual Size guidance — P0 / S
+
+## P12-007 — paper catalog and custom sizes — P0 / M
+
+## P12-008 — sheet renderer: ticks, adaptive bleed, calibration bar — P0 / L
+
+## P12-009 — lab-ready 300 ppi sheet JPEG — P1 / M
+
+## P12-010 — AirPrint `choosePaper` delegate and bordered-paper preference — P0 / M
+
+## P12-011 — overflow paging and fill strategies — P0 / M
 
 ---
 

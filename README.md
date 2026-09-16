@@ -2,7 +2,11 @@
 
 A privacy-first **native iOS application** for creating standards-compliant identity photos for passports, visas, ID cards, driving licences, residence permits, CVs, and other official or professional uses.
 
-> Project status: **planning / pre-implementation**. The repository is intentionally specification-first. Production code begins only after the native iOS technical spikes establish image quality, performance, accessibility, and export fidelity.
+> Project status: **M1 — native feasibility prototypes**. The first [SwiftUI import/crop/export prototype](Spikes/IDPhotoSpike/README.md) is implemented. Production code begins only after the native iOS technical spikes establish image quality, performance, accessibility, and export fidelity.
+
+## Run the first prototype
+
+Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone simulator. It supports photo import, a 26 × 32 mm portrait crop, JPEG sharing, and an A6 PDF with six copies. See [setup and tests](Spikes/IDPhotoSpike/README.md) and [validation evidence](docs/spikes/01-import-crop-export.md).
 
 ## Product ambition
 
@@ -22,7 +26,7 @@ Development baseline as of September 2026:
 
 - **Platform:** iOS / iPhone only.
 - **UI:** SwiftUI-first.
-- **Language:** Swift 6 language mode, using the Swift 6.4 compiler available with Xcode 27 beta during pre-release development.
+- **Language:** Swift 6 language mode, using the Swift 6.4 compiler in Xcode 27.
 - **SDK:** iOS 27 SDK / Xcode 27 during development; ship using a non-beta Xcode release accepted by App Store Connect.
 - **Minimum deployment target:** proposed iOS 26.0, with iOS 27 enhancements adopted through availability-gated APIs until the final deployment decision is validated.
 - **Design system:** Apple Human Interface Guidelines, native controls, refreshed Liquid Glass behavior, SF Symbols, Dynamic Type, semantic materials, and system navigation/toolbars.
@@ -147,6 +151,8 @@ MVP must include:
 
 Detailed entry/exit criteria are in [`docs/06-delivery-plan.md`](docs/06-delivery-plan.md).
 
+For the local environment findings, first implementation batches, and open kickoff decisions, see [`docs/12-implementation-kickoff.md`](docs/12-implementation-kickoff.md). The research-backed plan for print sheets, alignment, background replacement, tonal adjustment, and iOS 26/27 adoption is in [`docs/14-priority-feature-plan.md`](docs/14-priority-feature-plan.md).
+
 ## Definition of done
 
 A feature is not done when it renders in one simulator. It is done when:
@@ -166,7 +172,7 @@ A feature is not done when it renders in one simulator. It is done when:
 
 ## Immediate next action
 
-Execute the revised **M1 native-iOS spike program** before final production UI work. The first code should validate:
+Continue the **M1 native-iOS spike program** before final production UI work. See the [first spike report](docs/spikes/01-import-crop-export.md) for implemented behavior and outstanding evidence. M1 must validate:
 
 1. responsive AVFoundation capture and PhotosPicker import;
 2. Vision face geometry;

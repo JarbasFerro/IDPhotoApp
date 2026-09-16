@@ -215,7 +215,7 @@ Do not replace/alter background when the selected document profile disallows or 
 
 ### FR-062 — Background replacement — P0
 
-Where permitted, compose an approved background deterministically.
+Where permitted, compose an approved background deterministically. The replacement colour, contrast rule, and permission come from the document profile; white is the Spain default, not a global default (see [14-priority-feature-plan.md §2.2](14-priority-feature-plan.md)).
 
 ### FR-063 — Edge quality — P0
 
@@ -298,7 +298,7 @@ No face reshaping, eye enlargement, synthetic makeup, beautification smoothing, 
 
 ### FR-081 — Limited tonal correction — P1
 
-Brightness/white-balance/contrast normalization may be introduced only if it preserves appearance and product/rule policy approves it.
+Brightness/white-balance/contrast normalization may be introduced only if it preserves appearance and product/rule policy approves it. Specified as Document Tone in FR-150–FR-152.
 
 ### FR-082 — Before/after — P1
 
@@ -741,3 +741,79 @@ A production feature is complete only when relevant requirements above are satis
 - physical-device behavior is verified when hardware/performance relevant;
 - iOS 26/iOS 27 availability behavior is verified where applicable;
 - documentation/ADRs are updated after foundational changes.
+
+---
+
+## 24. Print sheet composer
+
+Detailed design: [14-priority-feature-plan.md §3.1–3.5](14-priority-feature-plan.md).
+
+### FR-140 — Paper catalog — P0
+
+Versioned paper presets covering at least 10 × 15 cm (100 × 150), 4 × 6 in (101.6 × 152.4), 13 × 18 cm / 5 × 7 in, 9 × 13 cm, A6, A4, and US Letter, with localized names showing both naming orders.
+
+### FR-141 — Custom paper size — P1
+
+User-entered width/height in mm or inches, validated, clearly marked custom, usable for PDF/JPEG export; AirPrint may snap to the nearest containing paper and the UI says so.
+
+### FR-142 — Deterministic layout solver — P0
+
+A pure-domain guillotine row solver places items to maximize copies per page, evaluating both paper orientations and photo rotation. Identical inputs produce identical layouts.
+
+### FR-143 — Re-optimization on paper change — P0
+
+Changing paper, margins, or gutters re-solves immediately without repeating acquisition or editing (UXP-05).
+
+### FR-144 — Multiple photos and per-photo copies — P0
+
+A print job holds several prepared photos, possibly with different trim sizes, each with its own copy count and reorderable fill order.
+
+### FR-145 — Overflow paging — P0
+
+When copies exceed one page, additional pages are added up to a documented cap, using a by-type or interleaved fill strategy.
+
+### FR-146 — Bleed and cut marks — P0
+
+Corner ticks (never lines across a photo), adaptive 0–1 mm bleed, a 50 mm calibration bar, and an Actual Size instruction on every sheet. PDF ticks at 0.25 pt; JPEG ticks 1 px pure black at 300 ppi.
+
+### FR-147 — Lab-ready sheet JPEG — P1
+
+One JPEG per page at exactly the paper's aspect ratio at 300 ppi, sRGB, in addition to the PDF.
+
+### FR-148 — AirPrint paper handling — P0
+
+Use `outputType = .photo`, a PDF page box equal to the paper, and the `choosePaper` delegate preferring a bordered paper over a borderless one; explain scaling risk when the printer offers no matching paper.
+
+---
+
+## 25. Alignment and tonal adjustment
+
+Detailed design: [14-priority-feature-plan.md §3.7–3.8](14-priority-feature-plan.md).
+
+### FR-150 — Document Tone — P1
+
+A single reversible, global tonal correction (auto adjustment filters, neutral white balance, exposure clamp, mild export-time sharpening) with strength control and before/after. No local retouching, no relighting.
+
+### FR-151 — Alteration policy gate — P0
+
+Profiles declare `alterationPolicy` (`allowed | discouraged | forbidden`); Document Tone and background replacement default off and explain why when a jurisdiction requires unaltered photos.
+
+### FR-152 — No Portrait Lighting claims — P0
+
+The app never presents Studio Light or other Portrait Lighting effects as a feature for still photos; no private Core Image filters are used.
+
+### FR-153 — Pinned Vision revisions — P0
+
+Face landmark and rectangle requests use an explicitly pinned revision so geometry is identical on iOS 26 and iOS 27.
+
+### FR-154 — Fused crown estimate — P0
+
+Crown position is estimated from the segmentation mask and an anthropometric extrapolation from eye line and chin, with a method and confidence recorded and a manual handle exposed.
+
+### FR-155 — Eye levelling — P1
+
+The solver may rotate within the profile's permitted roll range to level the eyes; rotation is a stored edit parameter and reversible.
+
+### FR-156 — Alignment failure modes — P0
+
+Tall hair, head coverings, bald heads, beards, infants, tilt, and glasses each have fixtures and a defined resulting state (`pass`, `warn`, or `manual_check`).
