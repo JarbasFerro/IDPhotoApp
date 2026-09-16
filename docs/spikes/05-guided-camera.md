@@ -1,6 +1,6 @@
 # M1 spike 05 — Guided camera
 
-**Implemented:** 2026-09-16 (app version 0.5.0)  
+**Implemented:** 2026-09-16 (app versions 0.5.0 and 0.5.1)  
 **Status:** Camera controller, preview, guidance, capture-to-staging, and the no-camera/denied states implemented; simulator checks cover the deterministic parts. Every hardware measurement is pending the physical iPhone 15 Pro Max.  
 **Backlog:** S1-020 (implementation half of S1-002); FR-020 to FR-023, C9-001 to C9-004. Design: [14-priority-feature-plan.md §3.9](../14-priority-feature-plan.md), [11-ios-excellence-strategy.md](../11-ios-excellence-strategy.md) Signature 1. Decision: ADR-034.
 
@@ -10,7 +10,7 @@ Can an AVFoundation session start quickly, guide the user with one calm hint per
 
 ## Implementation
 
-- `App/Camera/CaptureGuidance.swift` — pure Swift. `FaceFrameSummary` (face count, largest face in preview-normalized coordinates, roll, yaw) feeds `GuidanceTracker`, which returns one `CaptureHint`: no face, more than one person, move closer or farther (face height 30–55 % of the preview, with 3 % hysteresis), centre, keep level (roll > 8°), face the camera (yaw > 15°), hold still, ready. A new hint needs 5 consecutive frames; "ready" needs 15 good frames, so nothing flickers (FR-022).
+- `App/Camera/CaptureGuidance.swift` — pure Swift. `FaceFrameSummary` (face count, largest face in preview-normalized coordinates, roll, yaw) feeds `GuidanceTracker`, which returns one `CaptureHint`: no face, more than one person, move closer or farther (face height 18–42 % of the visible preview, with 3 % hysteresis), centre, keep level (roll > 8°), face the camera (yaw > 15°), hold still, ready. A new hint needs 5 consecutive frames; "ready" needs 15 good frames, so nothing flickers (FR-022).
 - `App/Camera/CameraController.swift` — `@MainActor @Observable` controller. Authorization is requested only when the user opens the camera; denied and unavailable are explicit states. Configuration, start, stop, and capture run on a private serial queue; the threading contract is documented at the top of the file, and the two `@unchecked Sendable`/`nonisolated(unsafe)` uses carry their safety argument. Session preset `.photo`, front camera first, `maxPhotoDimensions` set to the largest the active format offers (48 MP on the main camera of recent Pro models), quality prioritization `.quality`, responsive capture when supported, stills never mirrored. Horizon-level preview and capture rotation come from `AVCaptureDevice.RotationCoordinator`. Face metadata (`AVCaptureMetadataOutput`, `.face`) is delivered on the main queue and converted through the preview layer, so guidance geometry matches what the user sees. Interruptions, interruption end, and runtime errors update the state. Start-up and shutter-to-data times are recorded for the spike report.
 - `App/Camera/CameraView.swift` — edge-to-edge preview under a dashed head oval (green when ready), one hint capsule, Cancel, a 76 pt shutter, and Switch Camera. Volume buttons, the Action button, and Camera Control trigger capture through `onCameraCaptureEvent`. Hints are announced to VoiceOver once per change. Denied shows Open Settings and Choose Photo Instead; no camera shows Choose Photo Instead. Backgrounding stops the session; returning restarts it.
 - `App/Imaging/PhotoFiles.swift` — `StagedPhoto.stage(data:)` writes captured HEIF or JPEG bytes into the same protected staging directory used by imports, so capture enters the identical ingest, analysis, segmentation, and export path (FR-020).
@@ -21,7 +21,7 @@ Can an AVFoundation session start quickly, guide the user with one calm hint per
 
 - Xcode 27.0 (27A266a), Swift 6.4, Swift 6 language mode, strict concurrency; iOS 27 SDK; deployment target iOS 26.0.
 - Simulators: iPhone 17 Pro on iOS 26.0 and "IDPhoto iPhone 15 Pro Max iOS 27" on iOS 27.0. Neither has a camera, so the app shows the no-camera screen there.
-- Physical device: iPhone 15 Pro Max, iOS 26.6.2, provisioned by the user. No camera run recorded yet.
+- Physical device: iPhone 15 Pro Max, iOS 26.6.2, provisioned by the user. First camera run on 2026-09-16 (version 0.5.0).
 
 ## Validation evidence
 
@@ -30,6 +30,8 @@ Can an AVFoundation session start quickly, guide the user with one calm hint per
 | Unit suites (both simulators) | 49 Swift Testing tests pass: guidance needs several frames to switch, good framing goes through hold-still to ready, size hysteresis prevents toggling, each condition maps to its own hint in priority order, unknown angles do not block readiness, and captured data stages and ingests exactly like an import |
 | UI flows (both simulators) | Five XCUITests pass, including the new one: Take Photo on a simulator shows the no-camera screen and Choose Photo Instead returns to the import path |
 | Build | No concurrency warnings; the delegate conformance uses `@preconcurrency` with a main-queue delivery contract rather than silencing the checker |
+
+First device run (user, version 0.5.0): preview, hints, shutter, and hand-off to analysis worked. Two defects were found and fixed in 0.5.1: the size thresholds (face 30–55 % of the screen) forced the phone uncomfortably close, now 18–42 % with a smaller guide oval; and locking then unlocking the phone froze the preview because the interruption-ended notification marked the session running after the app had stopped it, so the controller now restarts the session explicitly and `start()` is safe to call again.
 
 Not yet measured, all of it on the phone: time to first frame, shutter-to-data latency, HEIF file size at 48 MP versus 12 MP front, orientation in all four device orientations, front-camera preview mirroring versus the unmirrored still, guidance behaviour and hint stability at arm's length, hardware button capture, interruption by a phone call, backgrounding and return, repeated sessions for thermal behaviour, and memory while camera, Vision, and segmentation run together.
 

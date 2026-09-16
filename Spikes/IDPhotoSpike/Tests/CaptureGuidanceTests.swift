@@ -20,16 +20,16 @@ struct CaptureGuidanceTests {
     @Test func hintsNeedSeveralFramesBeforeTheySwitch() {
         var tracker = GuidanceTracker()
         #expect(tracker.hint == .noFace)
-        #expect(feed(&tracker, face(height: 0.2), times: 4) == .noFace)
-        #expect(feed(&tracker, face(height: 0.2), times: 1) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.12), times: 4) == .noFace)
+        #expect(feed(&tracker, face(height: 0.12), times: 1) == .moveCloser)
         // A single odd frame does not change the hint.
         #expect(feed(&tracker, .empty, times: 1) == .moveCloser)
-        #expect(feed(&tracker, face(height: 0.2), times: 1) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.12), times: 1) == .moveCloser)
     }
 
     @Test func goodFramingGoesThroughHoldStillToReady() {
         var tracker = GuidanceTracker()
-        let good = face(height: 0.4)
+        let good = face(height: 0.3)
         #expect(feed(&tracker, good, times: 5) == .holdStill)
         #expect(feed(&tracker, good, times: 9) == .holdStill)
         #expect(feed(&tracker, good, times: 1) == .ready)
@@ -40,27 +40,27 @@ struct CaptureGuidanceTests {
 
     @Test func sizeHysteresisPreventsToggling() {
         var tracker = GuidanceTracker()
-        _ = feed(&tracker, face(height: 0.25), times: 5)
+        _ = feed(&tracker, face(height: 0.15), times: 5)
         #expect(tracker.hint == .moveCloser)
         // Just over the limit is not enough to leave "move closer".
-        #expect(feed(&tracker, face(height: 0.31), times: 6) == .moveCloser)
-        #expect(feed(&tracker, face(height: 0.34), times: 5) == .holdStill)
+        #expect(feed(&tracker, face(height: 0.19), times: 6) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.22), times: 5) == .holdStill)
     }
 
     @Test func eachConditionHasItsOwnHintInPriorityOrder() {
         var tracker = GuidanceTracker()
-        #expect(feed(&tracker, face(height: 0.4, count: 2), times: 5) == .multipleFaces)
+        #expect(feed(&tracker, face(height: 0.3, count: 2), times: 5) == .multipleFaces)
         tracker = GuidanceTracker()
-        #expect(feed(&tracker, face(height: 0.7), times: 5) == .moveBack)
+        #expect(feed(&tracker, face(height: 0.5), times: 5) == .moveBack)
         tracker = GuidanceTracker()
-        #expect(feed(&tracker, face(height: 0.4, centerX: 0.8), times: 5) == .centerFace)
+        #expect(feed(&tracker, face(height: 0.3, centerX: 0.8), times: 5) == .centerFace)
         tracker = GuidanceTracker()
-        #expect(feed(&tracker, face(height: 0.4, roll: 20), times: 5) == .keepLevel)
+        #expect(feed(&tracker, face(height: 0.3, roll: 20), times: 5) == .keepLevel)
         tracker = GuidanceTracker()
-        #expect(feed(&tracker, face(height: 0.4, yaw: 30), times: 5) == .faceCamera)
+        #expect(feed(&tracker, face(height: 0.3, yaw: 30), times: 5) == .faceCamera)
         tracker = GuidanceTracker()
         // Unknown angles do not block readiness.
-        #expect(feed(&tracker, face(height: 0.4, roll: nil, yaw: nil), times: 15) == .ready)
+        #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 15) == .ready)
     }
 
     @Test func capturedDataStagesLikeAnImport() async throws {

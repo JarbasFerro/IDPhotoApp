@@ -19,10 +19,11 @@ enum CaptureHint: String, Sendable, Hashable, CaseIterable {
 }
 
 struct CaptureGuidanceThresholds: Sendable, Hashable {
-    /// Face rectangle height as a fraction of the preview height. The face box excludes hair, so 0.30–0.55 leaves
-    /// room above the head for the official crop.
-    var minFaceHeight = 0.30
-    var maxFaceHeight = 0.55
+    /// Face rectangle height as a fraction of the visible preview height. The source photo is cropped later, so
+    /// arm's-length framing (face about a fifth to two fifths of a tall phone screen) is enough; the first device
+    /// run showed 0.30 forced the phone uncomfortably close.
+    var minFaceHeight = 0.18
+    var maxFaceHeight = 0.42
     /// Margin added when leaving a size hint, so a face near the limit does not toggle.
     var sizeHysteresis = 0.03
     var horizontalTolerance = 0.12

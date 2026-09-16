@@ -51,6 +51,7 @@ final class CameraController: NSObject {
     @ObservationIgnored private var rotationObservation: NSKeyValueObservation?
     @ObservationIgnored private var notificationTokens: [NSObjectProtocol] = []
     @ObservationIgnored private var inFlight: [Int64: PhotoCaptureProcessor] = [:]
+    @ObservationIgnored private var isStarting = false
 
     override init() {
         super.init()
@@ -65,9 +66,13 @@ final class CameraController: NSObject {
 
     // MARK: - Lifecycle
 
-    /// Requests access at point of use, configures once, and starts the session.
+    /// Requests access at point of use, configures once, and starts (or restarts) the session.
+    /// Safe to call again after an interruption, a lock/unlock cycle, or a denied-then-granted permission.
     func start() async {
-        guard state == .idle || state == .interrupted || state == .denied else { return }
+        guard !isStarting, state != .unavailable else { return }
+        if state == .running, session.isRunning { return }
+        isStarting = true
+        defer { isStarting = false }
         guard Self.isSupported else { state = .unavailable; return }
         let started = ContinuousClock.now
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -111,7 +116,7 @@ final class CameraController: NSObject {
         sessionQueue.async { [self] in
             if session.isRunning { session.stopRunning() }
         }
-        if state == .running { state = .idle }
+        if state == .running || state == .interrupted || state == .configuring { state = .idle }
         tracker = GuidanceTracker()
         hint = .noFace
     }
@@ -218,7 +223,12 @@ final class CameraController: NSObject {
             MainActor.assumeIsolated { self?.state = .interrupted }
         })
         notificationTokens.append(center.addObserver(forName: AVCaptureSession.interruptionEndedNotification, object: session, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { if self?.state == .interrupted { self?.state = .running } }
+            MainActor.assumeIsolated {
+                guard let self, self.state == .interrupted else { return }
+                // Locking the phone interrupts the session and we stop it on background; on unlock the
+                // interruption ends before the scene is active again, so restart explicitly.
+                if self.session.isRunning { self.state = .running } else { self.state = .idle; Task { await self.start() } }
+            }
         })
         notificationTokens.append(center.addObserver(forName: AVCaptureSession.runtimeErrorNotification, object: session, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.state = .failed(CameraError.configurationFailed.localizedDescription) }

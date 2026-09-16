@@ -86,12 +86,13 @@ struct CameraView: View {
 
     private var headGuide: some View {
         GeometryReader { geometry in
-            let height = geometry.size.height * 0.42
-            let width = height * 0.75
+            // Sized for a comfortable arm's-length framing; the guide is a composition aid, not the final crop.
+            let height = geometry.size.height * 0.32
+            let width = height * 0.78
             Ellipse()
                 .strokeBorder(camera.hint == .ready ? Color.green : Color.white.opacity(0.7), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
                 .frame(width: width, height: height)
-                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.45)
+                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: camera.hint == .ready)
         }
         .allowsHitTesting(false)
