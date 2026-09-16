@@ -65,13 +65,15 @@ struct CropAdjustment: Sendable, Hashable {
     var background: BackgroundChoice = .original
     /// Feather width for the replaced background edge, 0...1.
     var edgeSoftness: Double = 0.5
+    /// Document Tone: global, reversible tonal correction.
+    var tone: ToneSettings = .off
 
     static let rotationRange: ClosedRange<Double> = -15...15
 
     func clamped() -> Self {
         Self(zoom: Self.bound(zoom, 1...4), horizontal: Self.bound(horizontal, 0...1),
              vertical: Self.bound(vertical, 0...1), rotationDegrees: Self.bound(rotationDegrees, Self.rotationRange),
-             background: background, edgeSoftness: Self.bound(edgeSoftness, 0...1))
+             background: background, edgeSoftness: Self.bound(edgeSoftness, 0...1), tone: tone.clamped())
     }
 
     func crop(in source: SourcePixels, format: PhotoFormat = .spainPrototype) -> NormalizedCrop {

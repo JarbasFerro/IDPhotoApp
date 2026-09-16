@@ -562,6 +562,10 @@ The user requested Apple presets "like Studio Light". Studio Light is a read-onl
 
 Ship a single global, reversible correction built from `autoAdjustmentFilters`, neutral white balance, an exposure clamp, and mild export-time sharpening, with strength and before/after. No Portrait Lighting or Studio Light claims, no private filters, no face-local retouching (ADR-011). Gated by profile `alterationPolicy`.
 
+### Evidence
+
+Implemented in [spike 06](spikes/06-document-tone.md) (2026-09-16): synthetic warm scene neutralised at strength 1 with face luminance preserved and no clipping; eight private portraits keep or lift face luminance with cast within ±0.015. Warm-light photos and the Studio Light device check are still open.
+
 ### Revisit trigger
 
 Apple publishes a still-image relighting API, or product evidence shows the correction is not worth its policy cost.

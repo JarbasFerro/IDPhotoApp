@@ -14,13 +14,15 @@ export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Develope
 
 mkdir -p "$repo_root/build"
 xcrun --sdk macosx swiftc -O -swift-version 6 -strict-concurrency=complete \
-  -target arm64-apple-macos15.0 \
+  -target arm64-apple-macos26.0 \
   -framework Vision -framework CoreImage \
   "$repo_root/Spikes/IDPhotoSpike/App/Domain/PhotoGeometry.swift" \
   "$repo_root/Spikes/IDPhotoSpike/App/Domain/FaceGeometry.swift" \
   "$repo_root/Spikes/IDPhotoSpike/App/Domain/Background.swift" \
+  "$repo_root/Spikes/IDPhotoSpike/App/Domain/Tone.swift" \
   "$repo_root/Spikes/IDPhotoSpike/App/Imaging/FaceAnalyzer.swift" \
   "$repo_root/Spikes/IDPhotoSpike/App/Imaging/BackgroundSegmenter.swift" \
+  "$repo_root/Spikes/IDPhotoSpike/App/Imaging/ToneAdjuster.swift" \
   "$repo_root/scripts/face-harness/main.swift" \
   -o "$repo_root/build/face-harness"
 

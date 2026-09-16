@@ -21,12 +21,13 @@ struct ContentView: View {
                         Text("26 × 32 mm").foregroundStyle(.secondary)
                     }
                     if let photo = model.photo {
-                        CropPreview(photo: photo, image: model.backgroundPreview, adjustment: $model.adjustment)
+                        CropPreview(photo: photo, image: model.showsOriginal ? nil : model.backgroundPreview, adjustment: $model.adjustment)
                             .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 200 : 320)
                             .frame(maxWidth: .infinity)
                             .disabled(model.activity != nil)
                         alignmentStatus
                         backgroundControls
+                        toneControls
                         adjustmentControls
                     } else {
                         ContentUnavailableView {
@@ -257,6 +258,39 @@ struct ContentView: View {
                         .accessibilityValue(model.adjustment.edgeSoftness.formatted(.number.precision(.fractionLength(1))))
                 }
                 Text("White is the Spain DNI requirement. Check hair and shoulder edges in the preview; the original is kept until export.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+        .disabled(model.activity != nil)
+    }
+
+    @ViewBuilder private var toneControls: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Document Tone").font(.headline)
+            if model.policy.alteration == .forbidden {
+                Label("This document requires an unaltered photo, so tonal correction is off.", systemImage: "info.circle")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            } else {
+                Toggle("Automatic exposure and colour", isOn: Binding(
+                    get: { model.adjustment.tone.isEnabled },
+                    set: { model.adjustment.tone.isEnabled = $0; model.refreshBackgroundPreview() }))
+                    .disabled(!model.canAdjustTone)
+                    .accessibilityIdentifier("toneToggle")
+                if model.adjustment.tone.isEnabled {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Strength").font(.subheadline)
+                        Slider(value: Binding(get: { model.adjustment.tone.strength }, set: { model.adjustment.tone.strength = $0 }),
+                               in: 0...1, step: 0.1, onEditingChanged: { editing in if !editing { model.refreshBackgroundPreview() } }) { Text("Strength") }
+                            .accessibilityValue("\(Int((model.adjustment.tone.strength * 100).rounded())) percent")
+                    }
+                    Toggle("Show original for comparison", isOn: $model.showsOriginal)
+                        .accessibilityIdentifier("showOriginal")
+                }
+                if let assessment = model.toneAssessment {
+                    statusLabel(TonePresentation.message(for: assessment), symbol: AlignmentPresentation.symbol(for: assessment.state))
+                        .font(.subheadline)
+                }
+                Text("Global exposure, white balance, and mild sharpening only. No retouching, no relighting; the original is kept.")
                     .font(.footnote).foregroundStyle(.secondary)
             }
         }

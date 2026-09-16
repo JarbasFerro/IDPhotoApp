@@ -38,6 +38,7 @@ protocol PhotoProcessing: Sendable {
     func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis
     func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult?
     func previewImage(photo: PreparedPhoto, adjustment: CropAdjustment) async -> CGImage
+    func toneMetrics(photo: PreparedPhoto, adjustment: CropAdjustment, faceBox: NormalizedCrop?) async -> ToneMetrics
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
@@ -49,6 +50,9 @@ actor PhotoPipeline: PhotoProcessing {
     private let signposter = OSSignposter(subsystem: "com.jarbasferro.IDPhotoSpike", category: "ImagePipeline")
     /// Preview-resolution masks per prepared photo; dropped with the photo. Never written to disk.
     private var masks: [UUID: CGImage] = [:]
+    /// Mean colour of the original background per photo, the neutral reference for Document Tone.
+    private var backgroundReferences: [UUID: BackgroundColor] = [:]
+    private var faceBoxes: [UUID: NormalizedCrop] = [:]
 
     init(root: URL = FileManager.default.temporaryDirectory.appendingPathComponent("IDPhotoSpike")) {
         self.root = root
@@ -106,8 +110,15 @@ actor PhotoPipeline: PhotoProcessing {
 
     /// Foreground mask for background replacement, kept in memory for this photo.
     func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult? {
+        faceBoxes[photo.id] = faceBox
         let result = await BackgroundSegmenter.segment(preview: photo.preview, faceBox: faceBox, faceCenter: faceCenter)
-        if let result, result.quality.state != .fail { masks[photo.id] = result.mask } else { masks[photo.id] = nil }
+        if let result, result.quality.state != .fail {
+            masks[photo.id] = result.mask
+            backgroundReferences[photo.id] = ToneAdjuster.backgroundReference(of: photo.preview, mask: result.mask)
+        } else {
+            masks[photo.id] = nil
+            backgroundReferences[photo.id] = nil
+        }
         return result
     }
 
@@ -119,12 +130,25 @@ actor PhotoPipeline: PhotoProcessing {
         applyBackground(to: photo.preview, photoID: photo.id, adjustment: adjustment)
     }
 
+    /// Tone first (so a replaced background stays exactly the profile colour), then the background composite.
     private func applyBackground(to image: CGImage, photoID: UUID, adjustment: CropAdjustment) -> CGImage {
-        guard case .color(let color) = adjustment.background, let mask = masks[photoID] else { return image }
+        var working = image
+        if adjustment.tone.isEnabled {
+            working = ToneAdjuster.shared.adjusted(image: working, settings: adjustment.tone,
+                                                   backgroundReference: backgroundReferences[photoID],
+                                                   faceBox: faceBoxes[photoID]) ?? working
+        }
+        guard case .color(let color) = adjustment.background, let mask = masks[photoID] else { return working }
         let interval = signposter.beginInterval("Composite")
         defer { signposter.endInterval("Composite", interval) }
-        return BackgroundCompositor.shared.composite(image: image, mask: mask, color: color,
-                                                     softness: adjustment.clamped().edgeSoftness) ?? image
+        return BackgroundCompositor.shared.composite(image: working, mask: mask, color: color,
+                                                     softness: adjustment.clamped().edgeSoftness) ?? working
+    }
+
+    /// Tone metrics on the preview with the current edits, for the status card.
+    func toneMetrics(photo: PreparedPhoto, adjustment: CropAdjustment, faceBox: NormalizedCrop?) -> ToneMetrics {
+        let image = applyBackground(to: photo.preview, photoID: photo.id, adjustment: adjustment)
+        return ToneAdjuster.metrics(of: image, faceBox: faceBox, mask: masks[photo.id])
     }
 
     /// Digital JPEG plus the print sheet (PDF and one JPEG per page) described by `job`.
@@ -181,6 +205,8 @@ actor PhotoPipeline: PhotoProcessing {
 
     func discard(photoID: UUID) {
         masks[photoID] = nil
+        backgroundReferences[photoID] = nil
+        faceBoxes[photoID] = nil
         try? FileManager.default.removeItem(at: photoDirectory(photoID))
     }
     func discard(exportID: UUID) { try? FileManager.default.removeItem(at: exportDirectory(exportID)) }
@@ -229,7 +255,9 @@ actor PhotoPipeline: PhotoProcessing {
         let decoded = try thumbnail(source, maxPixelSize: min(longEdge, max(photo.pixels.width, photo.pixels.height)))
         // The mask was made from the preview; Core Image scales it to the decoded size before blending.
         let image = applyBackground(to: decoded, photoID: photo.id, adjustment: adjustment)
-        return try render(image, crop: crop, output: output, rotationDegrees: adjustment.clamped().rotationDegrees)
+        let rendered = try render(image, crop: crop, output: output, rotationDegrees: adjustment.clamped().rotationDegrees)
+        // Sharpening belongs at output resolution, after resampling.
+        return ToneAdjuster.shared.sharpened(image: rendered, settings: adjustment.tone) ?? rendered
     }
 
     private func render(_ image: CGImage, crop: NormalizedCrop, output: OutputPixels, rotationDegrees: Double = 0) throws -> CGImage {

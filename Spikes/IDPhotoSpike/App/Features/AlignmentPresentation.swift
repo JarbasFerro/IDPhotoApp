@@ -77,3 +77,13 @@ enum BackgroundPresentation {
         }
     }
 }
+
+enum TonePresentation {
+    static func message(for assessment: ToneAssessment) -> LocalizedStringResource {
+        if assessment.issues.isEmpty { return "Exposure and colour look right" }
+        if assessment.issues.contains(.clipped) { return "Parts of the face are blown out or black; softer, more even light is needed" }
+        if assessment.issues.contains(.underexposed) { return "The face is dark; more light on the face would help" }
+        if assessment.issues.contains(.overexposed) { return "The face is very bright; reduce the light or move away from the window" }
+        return "A colour cast is visible; the correction neutralises it"
+    }
+}

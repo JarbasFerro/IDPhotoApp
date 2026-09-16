@@ -12,8 +12,13 @@ final class PhotoWorkflow {
     private(set) var isAnalyzing = false
     private(set) var segmentation: SegmentationResult?
     private(set) var isSegmenting = false
-    /// Preview with the chosen background applied; nil means show the plain preview.
+    /// Preview with the chosen background and tone applied; nil means show the plain preview.
     private(set) var backgroundPreview: CGImage?
+    /// Exposure and colour-cast assessment of the current preview.
+    private(set) var toneAssessment: ToneAssessment?
+    /// When true the editor shows the untouched preview (before/after comparison).
+    var showsOriginal = false
+    let policy = DocumentPolicy.spainEngineering
     /// Vision could not run (for example in the simulator); manual crop remains available.
     private(set) var analysisUnavailable = false
     var exported: PhotoExport?
@@ -93,6 +98,7 @@ final class PhotoWorkflow {
             if let segmented, segmented.quality.state == .pass, segmented.background.state != .pass {
                 adjustment.background = .color(.white)
             }
+            adjustment.tone = policy.alteration == .allowed ? ToneSettings() : .off
             refreshBackgroundPreview()
         }
     }
@@ -102,17 +108,23 @@ final class PhotoWorkflow {
         return segmentation.quality.state != .fail
     }
 
-    /// Recomposites the preview when the background choice or softness changes.
+    var canAdjustTone: Bool { policy.alteration != .forbidden && photo != nil }
+
+    /// Recomposites the preview when the background choice, softness, or tone changes.
     func refreshBackgroundPreview() {
         previewTask?.cancel()
-        guard let photo else { backgroundPreview = nil; return }
-        guard case .color = adjustment.background, canReplaceBackground else { backgroundPreview = nil; return }
-        let edits = adjustment
+        guard let photo else { backgroundPreview = nil; toneAssessment = nil; return }
+        var edits = adjustment
+        if case .color = edits.background, !canReplaceBackground { edits.background = .original }
+        let needsWork = edits.tone.isEnabled || { if case .color = edits.background { return true } else { return false } }()
+        let faceBox = analysis?.geometry?.faceBox
         previewTask = Task {
-            let image = await pipeline.previewImage(photo: photo, adjustment: edits)
+            let image = needsWork ? await pipeline.previewImage(photo: photo, adjustment: edits) : nil
+            let metrics = await pipeline.toneMetrics(photo: photo, adjustment: edits, faceBox: faceBox)
             guard !Task.isCancelled, self.photo?.id == photo.id, self.adjustment.background == edits.background,
-                  self.adjustment.edgeSoftness == edits.edgeSoftness else { return }
+                  self.adjustment.edgeSoftness == edits.edgeSoftness, self.adjustment.tone == edits.tone else { return }
             backgroundPreview = image
+            toneAssessment = ToneAssessment.assess(metrics)
         }
     }
 
@@ -122,10 +134,11 @@ final class PhotoWorkflow {
     }
 
     func resetCrop() {
-        let background = adjustment.background, softness = adjustment.edgeSoftness
+        let background = adjustment.background, softness = adjustment.edgeSoftness, tone = adjustment.tone
         adjustment = automaticAdjustment
         adjustment.background = background
         adjustment.edgeSoftness = softness
+        adjustment.tone = tone
     }
 
     func prepareExport() {
@@ -185,6 +198,8 @@ final class PhotoWorkflow {
         analysisUnavailable = false
         segmentation = nil
         backgroundPreview = nil
+        toneAssessment = nil
+        showsOriginal = false
         printJob.items = []
         if let previous { Task { await pipeline.discard(photoID: previous.id) } }
     }

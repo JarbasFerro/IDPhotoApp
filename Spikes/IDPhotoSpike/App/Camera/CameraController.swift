@@ -167,6 +167,14 @@ final class CameraController: NSObject {
         return try await StagedPhoto.stage(data: data)
     }
 
+    /// Spike 06 check: Studio Light is a user-toggled system video effect. Debug builds opt in through
+    /// `NSCameraStudioLightEnabled` so the Control Center toggle appears; this reports what the system says.
+    var studioLightStatus: String {
+        let enabled = AVCaptureDevice.isStudioLightEnabled
+        let active = videoInput?.device.isStudioLightActive ?? false
+        return "Studio Light \(enabled ? "on" : "off")\(active ? ", active" : "")"
+    }
+
     // MARK: - Configuration (session queue only)
 
     nonisolated private func configureSession(position: AVCaptureDevice.Position) throws {

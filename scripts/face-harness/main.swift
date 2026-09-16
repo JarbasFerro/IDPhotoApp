@@ -87,6 +87,22 @@ for (index, url) in pictures.enumerated() {
             try writeAligned(preview: cutout, crop: crop, rotationDegrees: solution.adjustment.rotationDegrees,
                              to: outputFolder.appendingPathComponent("fixture-\(index)-cutout.jpg"))
         }
+        // Document Tone (spike 06): tone first, then the white background; metrics before and after.
+        let reference = ToneAdjuster.backgroundReference(of: preview, mask: segmentation.mask)
+        let before = ToneAdjuster.metrics(of: preview, faceBox: g.faceBox, mask: segmentation.mask)
+        if let toned = ToneAdjuster.shared.adjusted(image: preview, settings: ToneSettings(), backgroundReference: reference, faceBox: g.faceBox),
+           let composed = BackgroundCompositor.shared.composite(image: toned, mask: segmentation.mask, color: .white, softness: 0.5) {
+            let after = ToneAdjuster.metrics(of: toned, faceBox: g.faceBox, mask: segmentation.mask)
+            lines.append(String(format: "    tone: face lum %.2f -> %.2f | clipped bright %.4f -> %.4f | cast %.3f -> %.3f | reference %@ | %@ -> %@ | smudge %@",
+                                before.faceMeanLuminance, after.faceMeanLuminance, before.faceClippedBright, after.faceClippedBright,
+                                before.backgroundCast, after.backgroundCast,
+                                reference.map { String(format: "(%.2f %.2f %.2f)", $0.red, $0.green, $0.blue) } ?? "none",
+                                ToneAssessment.assess(before).issues.map(\.rawValue).joined(separator: ",").isEmpty ? "ok" : ToneAssessment.assess(before).issues.map(\.rawValue).joined(separator: ","),
+                                ToneAssessment.assess(after).issues.map(\.rawValue).joined(separator: ",").isEmpty ? "ok" : ToneAssessment.assess(after).issues.map(\.rawValue).joined(separator: ","),
+                                analysis.lensSmudgeConfidence.map { String(format: "%.2f", $0) } ?? "–"))
+            try writeAligned(preview: composed, crop: crop, rotationDegrees: solution.adjustment.rotationDegrees,
+                             to: outputFolder.appendingPathComponent("fixture-\(index)-tone.jpg"))
+        }
     } else {
         lines.append("    background: no mask")
     }

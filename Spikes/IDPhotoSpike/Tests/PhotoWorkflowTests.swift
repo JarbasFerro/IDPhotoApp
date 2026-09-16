@@ -68,6 +68,9 @@ private actor DelayedPipeline: PhotoProcessing {
     }
     func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult? { nil }
     func previewImage(photo: PreparedPhoto, adjustment: CropAdjustment) async -> CGImage { photo.preview }
+    func toneMetrics(photo: PreparedPhoto, adjustment: CropAdjustment, faceBox: NormalizedCrop?) async -> ToneMetrics {
+        ToneMetrics(faceMeanLuminance: 0.5, faceClippedDark: 0, faceClippedBright: 0, backgroundCast: 0)
+    }
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport {
         try await withCheckedThrowingContinuation { pendingExport = $0 }
     }
