@@ -35,7 +35,9 @@ First device run (user, version 0.5.0): preview, hints, shutter, and hand-off to
 
 Shutter latency (user report, 0.5.1): a long delay between pressing the shutter and the photo being taken. Cause: the still was requested at the sensor's largest dimensions (48 MP on the rear camera) with `.quality` prioritization, which triggers multi-second computational processing, and there was no acknowledgement of the press. Changes in 0.5.2: stills capped at the largest format up to 12.6 MP (4032 × 3024) with `.balanced` prioritization, a 120 ms white flash and a haptic on press, and the measured start-up and shutter-to-data times shown in debug builds (camera overlay and main screen) so the next device run yields numbers.
 
-Not yet measured, all of it on the phone: time to first frame, shutter-to-data latency, HEIF file size at 48 MP versus 12 MP front, orientation in all four device orientations, front-camera preview mirroring versus the unmirrored still, guidance behaviour and hint stability at arm's length, hardware button capture, interruption by a phone call, backgrounding and return, repeated sessions for thermal behaviour, and memory while camera, Vision, and segmentation run together.
+Device measurement (user, iPhone 15 Pro Max, iOS 26.6.2, version 0.5.2): camera start 273 ms, shutter to staged photo data 506 ms, and the press now feels immediate. This satisfies FR-021 for the first device class; the remaining hardware checks are listed below.
+
+Not yet measured, all of it on the phone: HEIF file size at 48 MP versus 12 MP front, orientation in all four device orientations, front-camera preview mirroring versus the unmirrored still, guidance behaviour and hint stability at arm's length, hardware button capture, interruption by a phone call, backgrounding and return, repeated sessions for thermal behaviour, and memory while camera, Vision, and segmentation run together.
 
 ## Findings
 
