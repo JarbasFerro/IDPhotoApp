@@ -55,8 +55,8 @@ for (index, url) in pictures.enumerated() {
         continue
     }
     let iedPx = g.interEyeDistancePixels
-    let divergence = g.crown.maskY.map { ($0 - g.crown.anthropometricY) * Double(g.source.height) / iedPx }
-    let impliedK = g.crown.maskY.map { (g.chin.y - $0) / (g.chin.y - g.eyeMidpoint.y) }
+    let divergence = g.crown.maskDistance.map { ($0 - g.crown.anthropometricDistance) / iedPx }
+    let impliedK = g.crown.maskDistance.map { ($0 + g.eyeToChinPixels) / g.eyeToChinPixels }
     let nonPass = solution.checks.filter { $0.state != .pass }.map { "\($0.kind.rawValue):\($0.state.rawValue)" }.joined(separator: ",")
     lines.append(String(format: "%d | %dx%d | %d | %.0f | %.1f/%.1f | %.1f | %.1f | %@ %.2f | %@ | %@ | %.0f | %.0f | %.2f | %.1f | %@ | %@ | %.2f s",
                         index, g.source.width, g.source.height, analysis.faceCount, iedPx, g.rollDegrees, analysis.visionRollDegrees ?? 0,
@@ -102,11 +102,18 @@ func writeAnnotated(preview: CGImage, geometry g: FaceGeometry, crop: Normalized
         context.setLineDash(phase: 0, lengths: dashed ? [8, 6] : [])
         context.move(to: CGPoint(x: x0 * w, y: y0 * h)); context.addLine(to: CGPoint(x: x1 * w, y: y1 * h)); context.strokePath()
     }
-    let x0 = max(0, g.eyeMidpoint.x - 0.12), x1 = min(1, g.eyeMidpoint.x + 0.12)
-    if let maskY = g.crown.maskY { line(x0, maskY, x1, maskY, CGColor(srgbRed: 0, green: 0.4, blue: 1, alpha: 1), 3) }
-    line(x0, g.crown.anthropometricY, x1, g.crown.anthropometricY, CGColor(srgbRed: 1, green: 0.2, blue: 0.2, alpha: 1), 3, dashed: true)
-    line(x0, g.crown.y, x1, g.crown.y, CGColor(srgbRed: 0, green: 0.8, blue: 0.2, alpha: 1), 6)
-    line(g.chin.x - 0.05, g.chin.y, g.chin.x + 0.05, g.chin.y, CGColor(srgbRed: 1, green: 0.6, blue: 0, alpha: 1), 4)
+    // Crown and chin markers are drawn perpendicular to the head axis.
+    let frame = g.headFrame
+    func axisLine(distanceAboveEyes: Double, halfLength: Double, _ color: CGColor, _ lineWidth: CGFloat, dashed: Bool = false) {
+        let a = frame.toImage(ImagePoint(x: -halfLength, y: -distanceAboveEyes))
+        let b = frame.toImage(ImagePoint(x: halfLength, y: -distanceAboveEyes))
+        line(a.x / Double(g.source.width), a.y / Double(g.source.height), b.x / Double(g.source.width), b.y / Double(g.source.height), color, lineWidth, dashed: dashed)
+    }
+    let half = 1.2 * g.interEyeDistancePixels
+    if let mask = g.crown.maskDistance { axisLine(distanceAboveEyes: mask, halfLength: half, CGColor(srgbRed: 0, green: 0.4, blue: 1, alpha: 1), 3) }
+    axisLine(distanceAboveEyes: g.crown.anthropometricDistance, halfLength: half, CGColor(srgbRed: 1, green: 0.2, blue: 0.2, alpha: 1), 3, dashed: true)
+    axisLine(distanceAboveEyes: g.crown.distanceAboveEyes, halfLength: half, CGColor(srgbRed: 0, green: 0.8, blue: 0.2, alpha: 1), 6)
+    axisLine(distanceAboveEyes: -g.eyeToChinPixels, halfLength: half / 2, CGColor(srgbRed: 1, green: 0.6, blue: 0, alpha: 1), 4)
     line(g.rightEye.x, g.rightEye.y, g.leftEye.x, g.leftEye.y, CGColor(srgbRed: 1, green: 1, blue: 0, alpha: 1), 3)
     context.setLineDash(phase: 0, lengths: [])
     for eye in [g.leftEye, g.rightEye] {

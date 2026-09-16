@@ -225,6 +225,7 @@ private struct RequirementsView: View {
                     Label("Recent color photo, facing forward", systemImage: "person.crop.rectangle")
                     Label("Plain, uniform white background", systemImage: "rectangle")
                     Label("Face and eyes clearly visible", systemImage: "eye")
+                    Label("No headphones, earbuds, hats, or other accessories", systemImage: "headphones")
                 }
                 Section("Check the official guidance") {
                     Text("The DNI guidance includes medical and religious exceptions for head coverings and glasses. Review the source for your situation.")

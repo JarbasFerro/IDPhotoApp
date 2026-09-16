@@ -300,6 +300,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U97K67BK4R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
@@ -320,6 +321,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U97K67BK4R;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";

@@ -43,32 +43,39 @@ enum FaceAnalyzer {
             return normalized(CGPoint(x: sum.x / CGFloat(points.count), y: sum.y / CGFloat(points.count)))
         }
         guard let eyeA = centroid(landmarks.leftPupil) ?? centroid(landmarks.leftEye),
-              let eyeB = centroid(landmarks.rightPupil) ?? centroid(landmarks.rightEye),
-              let chinPoint = landmarks.faceContour.pointsInImageCoordinates(size, origin: .upperLeft).max(by: { $0.y < $1.y })
-        else {
+              let eyeB = centroid(landmarks.rightPupil) ?? centroid(landmarks.rightEye) else {
             return FaceAnalysis(faceCount: faces.count, geometry: nil, solution: nil, visionRollDegrees: nil)
         }
         // Vision names eyes from the viewer's side. The domain stores the subject's left eye, which appears
         // on the image's right, so order by x rather than trusting the label.
         let (rightEye, leftEye) = eyeA.x < eyeB.x ? (eyeA, eyeB) : (eyeB, eyeA)
-        let chin = normalized(chinPoint)
         let box = face.boundingBox.toImageCoordinates(size, origin: .upperLeft)
         let faceBox = NormalizedCrop(x: box.minX / size.width, y: box.minY / size.height,
                                      width: box.width / size.width, height: box.height / size.height)
 
-        // Eye-line roll in screen space: positive = counter-clockwise, so levelling rotates by the negative.
+        // Head frame in source pixels; the preview is a uniformly scaled copy of the source.
+        let scale = Double(source.width) / size.width
+        let eyeMidPx = ImagePoint(x: (leftEye.x + rightEye.x) / 2 * Double(source.width),
+                                  y: (leftEye.y + rightEye.y) / 2 * Double(source.height))
         let dx = (leftEye.x - rightEye.x) * Double(source.width)
         let dy = (leftEye.y - rightEye.y) * Double(source.height)
-        let roll = atan2(-dy, dx) * 180 / .pi
-        let iedPreviewPixels = ((leftEye.x - rightEye.x) * size.width * (leftEye.x - rightEye.x) * size.width
-                                + (leftEye.y - rightEye.y) * size.height * (leftEye.y - rightEye.y) * size.height).squareRoot()
-        let eyeMid = ImagePoint(x: (leftEye.x + rightEye.x) / 2, y: (leftEye.y + rightEye.y) / 2)
-        let maskTop = mask.flatMap { maskTop($0, columnCenter: eyeMid.x, halfWidth: 0.6 * iedPreviewPixels / size.width) }
-        let iedSourcePixels = (dx * dx + dy * dy).squareRoot()
-        let crown = CrownEstimator.estimate(chinY: chin.y, eyeY: eyeMid.y, maskTopY: maskTop,
-                                            interEyeDistancePixels: iedSourcePixels, sourceHeight: source.height)
+        let frame = HeadFrame(center: eyeMidPx, angleRadians: atan2(dy, dx))
+        let ied = (dx * dx + dy * dy).squareRoot()
+
+        // Chin: the contour point farthest down the head axis, not simply the lowest on screen.
+        let contour = landmarks.faceContour.pointsInImageCoordinates(size, origin: .upperLeft)
+        guard let chinPx = contour.map({ ImagePoint(x: $0.x * scale, y: $0.y * scale) })
+                .max(by: { frame.toAligned($0).y < frame.toAligned($1).y }) else {
+            return FaceAnalysis(faceCount: faces.count, geometry: nil, solution: nil, visionRollDegrees: nil)
+        }
+        let eyeToChin = frame.toAligned(chinPx).y
+        let chin = ImagePoint(x: chinPx.x / Double(source.width), y: chinPx.y / Double(source.height))
+
+        let maskCrown = mask.flatMap { maskCrown($0, frame: frame, halfWidth: 0.6 * ied, source: source) }
+        let crown = CrownEstimator.estimate(eyeToChin: eyeToChin, maskAboveEyes: maskCrown?.distance,
+                                            maskTouchesEdge: maskCrown?.touchesEdge ?? false, interEyeDistancePixels: ied)
         let geometry = FaceGeometry(source: source, faceCount: faces.count, faceBox: faceBox, leftEye: leftEye,
-                                    rightEye: rightEye, chin: chin, crown: crown, rollDegrees: roll,
+                                    rightEye: rightEye, chin: chin, crown: crown, eyeToChinPixels: eyeToChin,
                                     yawDegrees: face.yaw.converted(to: .degrees).value,
                                     pitchDegrees: face.pitch.converted(to: .degrees).value)
         let solution = CropSolver.solve(geometry: geometry, format: format, spec: spec)
@@ -88,8 +95,10 @@ enum FaceAnalyzer {
         return nil
     }
 
-    /// Topmost row (normalized, top-left) where more than half of the column band is foreground.
-    static func maskTop(_ mask: CGImage, columnCenter: Double, halfWidth: Double) -> Double? {
+    /// Farthest foreground pixel above the eyes along the head axis, within a band of `halfWidth` source pixels
+    /// either side of the axis. Distances are in source pixels.
+    static func maskCrown(_ mask: CGImage, frame: HeadFrame, halfWidth: Double, source: SourcePixels)
+        -> (distance: Double, touchesEdge: Bool)? {
         let width = 192
         let height = max(1, Int((Double(width) * Double(mask.height) / Double(mask.width)).rounded()))
         var bytes = [UInt8](repeating: 0, count: width * height)
@@ -103,17 +112,21 @@ enum FaceAnalyzer {
             return true
         }
         guard drawn else { return nil }
-        let x0 = max(0, Int((columnCenter - halfWidth) * Double(width)))
-        let x1 = min(width - 1, Int((columnCenter + halfWidth) * Double(width)))
-        guard x1 >= x0 else { return nil }
-        // Bitmap memory row 0 is the top scanline even though Core Graphics draws with a bottom-left origin.
+        // The mask spans the whole image regardless of its own pixel aspect; bitmap row 0 is the top scanline.
+        let cellW = Double(source.width) / Double(width), cellH = Double(source.height) / Double(height)
+        var best: (distance: Double, point: ImagePoint)?
         for row in 0..<height {
-            var foreground = 0
-            for x in x0...x1 where bytes[row * width + x] >= 128 { foreground += 1 }
-            if Double(foreground) > 0.5 * Double(x1 - x0 + 1) {
-                return Double(row) / Double(height)
+            for column in 0..<width where bytes[row * width + column] >= 128 {
+                let p = ImagePoint(x: (Double(column) + 0.5) * cellW, y: (Double(row) + 0.5) * cellH)
+                let aligned = frame.toAligned(p)
+                guard abs(aligned.x) <= halfWidth, aligned.y < 0 else { continue }
+                if best == nil || -aligned.y > best!.distance { best = (-aligned.y, p) }
             }
         }
-        return nil
+        guard let best else { return nil }
+        let edge = 1.5 * max(cellW, cellH)
+        let touchesEdge = best.point.y <= edge || best.point.x <= edge
+            || best.point.x >= Double(source.width) - edge
+        return (best.distance, touchesEdge)
     }
 }

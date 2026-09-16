@@ -62,7 +62,7 @@ struct CropAdjustment: Sendable, Hashable {
     /// Counter-clockwise rotation of the source around the crop centre, used to level the eyes.
     var rotationDegrees: Double = 0
 
-    static let rotationRange: ClosedRange<Double> = -8...8
+    static let rotationRange: ClosedRange<Double> = -15...15
 
     func clamped() -> Self {
         Self(zoom: Self.bound(zoom, 1...4), horizontal: Self.bound(horizontal, 0...1),

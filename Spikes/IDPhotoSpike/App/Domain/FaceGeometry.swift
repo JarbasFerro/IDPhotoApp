@@ -1,31 +1,54 @@
 import Foundation
 
 // Face geometry and automatic alignment: pure Swift, no Vision or UI imports.
-// All points are normalized to the upright source image with a top-left origin
-// (`NormalizedImageSpace`). Distances are computed in source pixels through `SourcePixels`
-// because normalized axes are anisotropic.
+// Image-frame points are normalized to the upright source with a top-left origin (`NormalizedImageSpace`).
+// Head measurements are taken in the head-aligned frame (eye line horizontal) and expressed in source
+// pixels, so a tilted head is measured along its own axis rather than vertically.
 
 struct ImagePoint: Sendable, Hashable {
     var x: Double
     var y: Double
 }
 
+/// Maps between the image frame and the head-aligned frame. The aligned frame has its origin at the
+/// eye midpoint, x along the eye line towards the subject's left (image right), y down along the head axis.
+struct HeadFrame: Sendable, Hashable {
+    /// Eye midpoint in source pixels.
+    let center: ImagePoint
+    /// Eye-line angle in screen coordinates: positive when the image-right eye is lower (head tilted clockwise).
+    let angleRadians: Double
+
+    var rollDegrees: Double { -angleRadians * 180 / .pi }
+
+    func toAligned(_ p: ImagePoint) -> ImagePoint {
+        let dx = p.x - center.x, dy = p.y - center.y
+        let c = cos(angleRadians), s = sin(angleRadians)
+        return ImagePoint(x: dx * c + dy * s, y: -dx * s + dy * c)
+    }
+
+    func toImage(_ p: ImagePoint) -> ImagePoint {
+        let c = cos(angleRadians), s = sin(angleRadians)
+        return ImagePoint(x: center.x + p.x * c - p.y * s, y: center.y + p.x * s + p.y * c)
+    }
+}
+
 enum CrownMethod: String, Sendable, Hashable {
-    /// Top of the person mask inside the face column; used when it agrees with anatomy.
+    /// Top of the person mask along the head axis; used when it agrees with anatomy.
     case mask
     /// Extrapolated from chin and eye line; used when hair, headwear, or a bad mask disagree.
     case anthropometric
 }
 
 struct CrownEstimate: Sendable, Hashable {
-    let y: Double
+    /// Distance from the eye midpoint to the crown along the head axis, in source pixels.
+    let distanceAboveEyes: Double
     let method: CrownMethod
     /// 0...1; 0.9 when mask and anatomy agree, lower otherwise.
     let confidence: Double
-    let maskY: Double?
-    let anthropometricY: Double
-    /// True when the mask reaches the top row of the image: the head is probably cut off.
-    let headTouchesTop: Bool
+    let maskDistance: Double?
+    let anthropometricDistance: Double
+    /// True when the mask reaches the image edge above the head: the head is probably cut off.
+    let headTouchesEdge: Bool
     /// True when the mask sits well above the anatomical estimate: tall hair or headwear.
     let hairVolume: Bool
 }
@@ -35,11 +58,13 @@ struct FaceGeometry: Sendable, Hashable {
     let faceCount: Int
     /// Vision face rectangle, top-left normalized. Excludes hair.
     let faceBox: NormalizedCrop
+    /// Subject's left eye appears on the image's right.
     let leftEye: ImagePoint
     let rightEye: ImagePoint
     let chin: ImagePoint
     let crown: CrownEstimate
-    let rollDegrees: Double
+    /// Chin distance below the eye midpoint along the head axis, in source pixels.
+    let eyeToChinPixels: Double
     let yawDegrees: Double
     let pitchDegrees: Double
 
@@ -47,14 +72,38 @@ struct FaceGeometry: Sendable, Hashable {
         ImagePoint(x: (leftEye.x + rightEye.x) / 2, y: (leftEye.y + rightEye.y) / 2)
     }
 
+    var eyeMidpointPixels: ImagePoint {
+        ImagePoint(x: eyeMidpoint.x * Double(source.width), y: eyeMidpoint.y * Double(source.height))
+    }
+
+    var headFrame: HeadFrame {
+        let dx = (leftEye.x - rightEye.x) * Double(source.width)
+        let dy = (leftEye.y - rightEye.y) * Double(source.height)
+        return HeadFrame(center: eyeMidpointPixels, angleRadians: atan2(dy, dx))
+    }
+
+    /// Eye-line roll in degrees, positive counter-clockwise; the solver levels by rotating the opposite way.
+    var rollDegrees: Double { headFrame.rollDegrees }
+
     var interEyeDistancePixels: Double {
         let dx = (leftEye.x - rightEye.x) * Double(source.width)
         let dy = (leftEye.y - rightEye.y) * Double(source.height)
         return (dx * dx + dy * dy).squareRoot()
     }
 
-    /// Chin to crown in source pixels.
-    var headHeightPixels: Double { max(0, chin.y - crown.y) * Double(source.height) }
+    /// Crown to chin along the head axis, in source pixels.
+    var headHeightPixels: Double { max(0, crown.distanceAboveEyes + eyeToChinPixels) }
+
+    /// Crown position in the image frame (normalized), for display.
+    var crownPoint: ImagePoint {
+        let p = headFrame.toImage(ImagePoint(x: 0, y: -crown.distanceAboveEyes))
+        return ImagePoint(x: p.x / Double(source.width), y: p.y / Double(source.height))
+    }
+
+    func crownPoint(distance: Double) -> ImagePoint {
+        let p = headFrame.toImage(ImagePoint(x: 0, y: -distance))
+        return ImagePoint(x: p.x / Double(source.width), y: p.y / Double(source.height))
+    }
 }
 
 enum CrownEstimator {
@@ -63,26 +112,28 @@ enum CrownEstimator {
     /// Mask and anatomy are considered to agree when they differ by less than this many inter-eye distances.
     static let agreementInterEyeFraction = 0.35
 
-    static func estimate(chinY: Double, eyeY: Double, maskTopY: Double?, interEyeDistancePixels: Double,
-                         sourceHeight: Int, ratio: Double = defaultAdultRatio) -> CrownEstimate {
-        let anthropometric = max(0, chinY - ratio * (chinY - eyeY))
-        guard let maskTopY, interEyeDistancePixels > 0 else {
-            return CrownEstimate(y: anthropometric, method: .anthropometric, confidence: 0.5, maskY: maskTopY,
-                                 anthropometricY: anthropometric, headTouchesTop: false, hairVolume: false)
+    /// All distances in source pixels along the head axis.
+    static func estimate(eyeToChin: Double, maskAboveEyes: Double?, maskTouchesEdge: Bool = false,
+                         interEyeDistancePixels: Double, ratio: Double = defaultAdultRatio) -> CrownEstimate {
+        let anthropometric = max(0, (ratio - 1) * eyeToChin)
+        guard let maskAboveEyes, interEyeDistancePixels > 0 else {
+            return CrownEstimate(distanceAboveEyes: anthropometric, method: .anthropometric, confidence: 0.5,
+                                 maskDistance: maskAboveEyes, anthropometricDistance: anthropometric,
+                                 headTouchesEdge: false, hairVolume: false)
         }
-        let touchesTop = maskTopY <= 0.003
-        let divergencePixels = (maskTopY - anthropometric) * Double(sourceHeight)
+        let divergence = maskAboveEyes - anthropometric
         let tolerance = agreementInterEyeFraction * interEyeDistancePixels
-        if abs(divergencePixels) <= tolerance {
-            return CrownEstimate(y: maskTopY, method: .mask, confidence: touchesTop ? 0.4 : 0.9, maskY: maskTopY,
-                                 anthropometricY: anthropometric, headTouchesTop: touchesTop, hairVolume: false)
+        if abs(divergence) <= tolerance {
+            return CrownEstimate(distanceAboveEyes: maskAboveEyes, method: .mask, confidence: maskTouchesEdge ? 0.4 : 0.9,
+                                 maskDistance: maskAboveEyes, anthropometricDistance: anthropometric,
+                                 headTouchesEdge: maskTouchesEdge, hairVolume: false)
         }
         // Mask far above anatomy: hair volume or headwear; ICAO measures the crown ignoring hair.
         // Mask far below anatomy: the mask missed the head; anatomy is the safer guess.
-        let hairVolume = divergencePixels < 0
-        return CrownEstimate(y: anthropometric, method: .anthropometric, confidence: hairVolume ? 0.6 : 0.4,
-                             maskY: maskTopY, anthropometricY: anthropometric, headTouchesTop: touchesTop,
-                             hairVolume: hairVolume)
+        let hairVolume = divergence > 0
+        return CrownEstimate(distanceAboveEyes: anthropometric, method: .anthropometric, confidence: hairVolume ? 0.6 : 0.4,
+                             maskDistance: maskAboveEyes, anthropometricDistance: anthropometric,
+                             headTouchesEdge: maskTouchesEdge, hairVolume: hairVolume)
     }
 }
 
@@ -94,7 +145,10 @@ struct CompositionSpec: Sendable, Hashable {
     var eyeLineRange: ClosedRange<Double> = 0.30...0.50
     var eyeLineTarget = 0.42
     var horizontalTolerance = 0.05
+    /// ICAO roll limit for the finished portrait; larger measured tilts are reported.
     var maxRollDegrees = 8.0
+    /// Tilts up to this are levelled automatically; beyond it the photo is measured but not rotated.
+    var maxAutoLevelDegrees = 15.0
     var maxYawDegrees = 5.0
     var maxPitchDegrees = 5.0
     var minimumInterEyePixels = 90.0
@@ -132,8 +186,9 @@ struct CropSolution: Sendable, Hashable {
     }
 }
 
-/// Deterministic algebra: level the eyes, scale to the head-height target, place by eye line and headroom,
-/// centre horizontally, then express the crop in the editor's zoom/travel model.
+/// Deterministic algebra in the head-aligned frame: scale to the head-height target, place by eye line and
+/// headroom, centre on the eye midpoint, map the crop centre back to the image, level the eyes when the tilt
+/// is small enough, then express the crop in the editor's zoom/travel/rotation model.
 enum CropSolver {
     static func solve(geometry g: FaceGeometry, format: PhotoFormat = .spainPrototype,
                       spec: CompositionSpec = .icaoEngineeringDefault) -> CropSolution {
@@ -145,44 +200,52 @@ enum CropSolver {
         checks.append(AlignmentCheck(kind: .resolution,
                                      state: ied >= spec.recommendedInterEyePixels ? .pass : (ied >= spec.minimumInterEyePixels ? .warn : .fail),
                                      measured: ied))
-        checks.append(AlignmentCheck(kind: .roll, state: abs(g.rollDegrees) <= spec.maxRollDegrees ? .pass : .warn, measured: g.rollDegrees))
+        let roll = g.rollDegrees
+        checks.append(AlignmentCheck(kind: .roll, state: abs(roll) <= spec.maxRollDegrees ? .pass : .warn, measured: roll))
         checks.append(AlignmentCheck(kind: .yaw, state: abs(g.yawDegrees) <= spec.maxYawDegrees ? .pass : .warn, measured: g.yawDegrees))
         checks.append(AlignmentCheck(kind: .pitch, state: abs(g.pitchDegrees) <= spec.maxPitchDegrees ? .pass : .warn, measured: g.pitchDegrees))
         checks.append(AlignmentCheck(kind: .crown, state: g.crown.hairVolume ? .manualCheck : (g.crown.confidence >= 0.8 ? .pass : .warn),
                                      measured: g.crown.confidence))
-        if g.crown.headTouchesTop {
+        if g.crown.headTouchesEdge {
             checks.append(AlignmentCheck(kind: .headroom, state: .fail, measured: 0))
         }
 
-        // Rotation levels the eyes around the crop centre; large tilts are reported instead of corrected.
-        let rotation = abs(g.rollDegrees) <= spec.maxRollDegrees ? -g.rollDegrees : 0
+        // Rotation levels the eyes about the crop centre; large tilts are measured but left for a retake.
+        let levels = abs(roll) <= spec.maxAutoLevelDegrees
+        let rotation = levels ? -roll : 0
 
-        // Scale from head height (pixels), then keep the crop inside the source.
+        // Scale from head length along the head axis, bounded by the source.
         let headPx = max(g.headHeightPixels, 1)
         var cropH = headPx / spec.headHeightTarget
         var cropW = cropH * format.aspectRatio
         let maxScale = min(width / cropW, height / cropH, 1)
         if maxScale < 1 { cropW *= maxScale; cropH *= maxScale }
 
-        // Vertical: eye line at target, adjusted so the crown keeps headroom and the chin stays inside.
-        let eye = ImagePoint(x: g.eyeMidpoint.x * width, y: g.eyeMidpoint.y * height)
-        let crownY = g.crown.y * height, chinY = g.chin.y * height
-        var y = eye.y - spec.eyeLineTarget * cropH
-        let minY = max(chinY + 0.06 * cropH - cropH, eye.y - spec.eyeLineRange.upperBound * cropH)
-        let maxY = min(crownY - spec.minimumHeadroom * cropH, eye.y - spec.eyeLineRange.lowerBound * cropH)
-        if minY <= maxY { y = min(max(y, minY), maxY) }
-        y = min(max(y, 0), max(0, height - cropH))
-        var x = eye.x - cropW / 2
+        // Aligned frame: eyes at the origin, crown at -crownAbove, chin at +eyeToChin.
+        let crownAbove = g.crown.distanceAboveEyes, eyeToChin = g.eyeToChinPixels
+        var top = -spec.eyeLineTarget * cropH
+        let minTop = max(eyeToChin + 0.06 * cropH - cropH, -spec.eyeLineRange.upperBound * cropH)
+        let maxTop = min(-crownAbove - spec.minimumHeadroom * cropH, -spec.eyeLineRange.lowerBound * cropH)
+        if minTop <= maxTop { top = min(max(top, minTop), maxTop) }
+
+        // Map the aligned crop centre back to the image and keep the rectangle inside the source.
+        let alignedCenter = ImagePoint(x: 0, y: top + cropH / 2)
+        let center = levels ? g.headFrame.toImage(alignedCenter)
+                            : ImagePoint(x: g.eyeMidpointPixels.x, y: g.eyeMidpointPixels.y + alignedCenter.y)
+        var x = center.x - cropW / 2, y = center.y - cropH / 2
         x = min(max(x, 0), max(0, width - cropW))
+        y = min(max(y, 0), max(0, height - cropH))
 
         let headFraction = headPx / cropH
-        let eyeFraction = (eye.y - y) / cropH
+        // With levelling, the eyes sit where the aligned frame put them; otherwise measure in the image frame.
+        let eyeFraction = levels ? (-top - (center.y - cropH / 2 - y)) / cropH : (g.eyeMidpointPixels.y - y) / cropH
         checks.append(AlignmentCheck(kind: .headHeight, state: band(headFraction, spec.headHeightRange), measured: headFraction))
         checks.append(AlignmentCheck(kind: .eyeLine, state: band(eyeFraction, spec.eyeLineRange), measured: eyeFraction))
-        let centering = abs((eye.x - x) / cropW - 0.5)
+        let eyeX = levels ? center.x : g.eyeMidpointPixels.x
+        let centering = abs((eyeX - x) / cropW - 0.5)
         checks.append(AlignmentCheck(kind: .centering, state: centering <= spec.horizontalTolerance ? .pass : .warn, measured: centering))
-        let headroom = (crownY - y) / cropH
-        if !g.crown.headTouchesTop {
+        let headroom = (eyeFraction * cropH - crownAbove) / cropH
+        if !g.crown.headTouchesEdge {
             checks.append(AlignmentCheck(kind: .headroom, state: headroom >= spec.minimumHeadroom ? .pass : .warn, measured: headroom))
         }
 
