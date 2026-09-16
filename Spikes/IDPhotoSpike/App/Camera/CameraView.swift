@@ -48,7 +48,8 @@ struct CameraView: View {
     @State private var errorMessage: String?
     @State private var flash = false
     @State private var countdown: Int?
-    @AppStorage("autoCapture") private var autoCapture = false
+    /// New key on purpose: devices that ran 0.8 to 0.10.1 have the old key stored as true.
+    @AppStorage("autoCaptureEnabled") private var autoCapture = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("ringHelpDismissed") private var ringHelpDismissed = false
     @AppStorage("autoExplained") private var autoExplained = false
@@ -94,9 +95,10 @@ struct CameraView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
         .sensoryFeedback(.success, trigger: camera.hint) { _, hint in hint == .ready }
-        .task(id: "\(camera.hint.rawValue)-\(autoCapture)") {
-            // Auto capture: two seconds of "ready" with a visible countdown; any hint change cancels it.
-            guard autoCapture, camera.hint == .ready, camera.state == .running, !camera.isCapturing else { countdown = nil; return }
+        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showRingHelp)") {
+            // Auto capture: "ready" held through a visible countdown; any hint change cancels it. Never while the
+            // help sheet is open, and never in the first moments after the camera starts.
+            guard autoCapture, !showRingHelp, camera.hint == .ready, camera.state == .running, !camera.isCapturing else { countdown = nil; return }
             // Three seconds: enough to stop reading the screen and look at the lens.
             for value in [3, 2, 1] {
                 countdown = value
@@ -436,9 +438,17 @@ struct RingHelpView: View {
                     .listRowBackground(Color.clear)
                     .accessibilityHidden(true)
                 } footer: {
-                    Text("The ring around the shutter checks four things, one after another, in this order. Grey: not yet. Orange: needs attention; the message at the top tells you what to do. Green: fine. When all four are green the ring closes.")
+                    Text("The ring around the shutter checks four things, one after another, in this order.")
                 }
-                Section {
+                Section("Colours") {
+                    legendRow(.white.opacity(0.35), "Not checked yet")
+                    legendRow(.orange, "Needs attention. The message at the top tells you what to do.")
+                    legendRow(.green, "Fine")
+                    Label { Text("When all four are green, the ring closes.") } icon: {
+                        Circle().strokeBorder(Color.green, lineWidth: 4).frame(width: 22, height: 22)
+                    }
+                }
+                Section("The four checks") {
                     ForEach(ReadinessGroup.allCases, id: \.self) { group in
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
@@ -456,6 +466,13 @@ struct RingHelpView: View {
             .navigationTitle("Before you start")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityIdentifier("ringHelpDone") } }
+        }
+    }
+
+    private func legendRow(_ color: Color, _ text: LocalizedStringResource) -> some View {
+        Label { Text(text) } icon: {
+            Circle().trim(from: 0.55, to: 0.95).stroke(color, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .frame(width: 22, height: 22)
         }
     }
 }
