@@ -143,8 +143,8 @@ enum BackgroundSegmenter {
 /// Core Image compositing with one shared, Metal-backed context (AGENTS.md §8).
 final class BackgroundCompositor: Sendable {
     static let shared = BackgroundCompositor()
-    // CIContext is documented as thread-safe; it is immutable after creation.
-    nonisolated(unsafe) private let context = CIContext(options: [.cacheIntermediates: false])
+    // CIContext is thread-safe and Sendable; one shared, Metal-backed instance (AGENTS.md §8).
+    private let context = CIContext(options: [.cacheIntermediates: false])
     private let gray = CGColorSpace(name: CGColorSpace.linearGray)!
     private let srgb = CGColorSpace(name: CGColorSpace.sRGB)!
 
