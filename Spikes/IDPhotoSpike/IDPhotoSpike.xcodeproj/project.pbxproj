@@ -1,46 +1,434 @@
 // !$*UTF8*$!
 {
- archiveVersion = 1;
- classes = {};
- objectVersion = 77;
- objects = {
-  000000000000000000000065 = { isa = PBXFileSystemSynchronizedRootGroup; path = App; sourceTree = "<group>"; };
-  000000000000000000000066 = { isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IDPhotoSpike.app; sourceTree = BUILT_PRODUCTS_DIR; };
-  000000000000000000000068 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  000000000000000000000069 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  00000000000000000000006A = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  00000000000000000000006E = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_BUNDLE_IDENTIFIER = "com.jarbasferro.IDPhotoSpike"; PRODUCT_NAME = "$(TARGET_NAME)"; GENERATE_INFOPLIST_FILE = "YES"; CODE_SIGN_STYLE = "Automatic"; TARGETED_DEVICE_FAMILY = "1"; SWIFT_EMIT_LOC_STRINGS = "YES"; INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES"; INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = "YES"; INFOPLIST_KEY_UILaunchScreen_Generation = "YES"; INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"; MARKETING_VERSION = "0.1.0"; CURRENT_PROJECT_VERSION = "1"; }; name = Debug; };
-  00000000000000000000006F = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_BUNDLE_IDENTIFIER = "com.jarbasferro.IDPhotoSpike"; PRODUCT_NAME = "$(TARGET_NAME)"; GENERATE_INFOPLIST_FILE = "YES"; CODE_SIGN_STYLE = "Automatic"; TARGETED_DEVICE_FAMILY = "1"; SWIFT_EMIT_LOC_STRINGS = "YES"; INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet"; INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = "YES"; INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = "YES"; INFOPLIST_KEY_UILaunchScreen_Generation = "YES"; INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"; MARKETING_VERSION = "0.1.0"; CURRENT_PROJECT_VERSION = "1"; }; name = Release; };
-  000000000000000000000067 = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000006E,00000000000000000000006F,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-  000000000000000000000064 = { isa = PBXNativeTarget; buildConfigurationList = 000000000000000000000067; buildPhases = (000000000000000000000068,00000000000000000000006A,000000000000000000000069,); buildRules = (); dependencies = (); fileSystemSynchronizedGroups = (000000000000000000000065,); name = IDPhotoSpike; packageProductDependencies = (); productName = IDPhotoSpike; productReference = 000000000000000000000066; productType = "com.apple.product-type.application"; };
-  0000000000000000000000C9 = { isa = PBXFileSystemSynchronizedRootGroup; path = Tests; sourceTree = "<group>"; };
-  0000000000000000000000CA = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IDPhotoSpikeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-  0000000000000000000000CC = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  0000000000000000000000CD = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  0000000000000000000000CE = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  0000000000000000000000CF = { isa = PBXContainerItemProxy; containerPortal = 000000000000000000000001; proxyType = 1; remoteGlobalIDString = 000000000000000000000064; remoteInfo = IDPhotoSpike; };
-  0000000000000000000000D0 = { isa = PBXTargetDependency; target = 000000000000000000000064; targetProxy = 0000000000000000000000CF; };
-  0000000000000000000000D2 = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_BUNDLE_IDENTIFIER = "com.jarbasferro.IDPhotoSpikeTests"; PRODUCT_NAME = "$(TARGET_NAME)"; GENERATE_INFOPLIST_FILE = "YES"; CODE_SIGN_STYLE = "Automatic"; TARGETED_DEVICE_FAMILY = "1"; SWIFT_EMIT_LOC_STRINGS = "YES"; BUNDLE_LOADER = "$(TEST_HOST)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IDPhotoSpike.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IDPhotoSpike"; }; name = Debug; };
-  0000000000000000000000D3 = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_BUNDLE_IDENTIFIER = "com.jarbasferro.IDPhotoSpikeTests"; PRODUCT_NAME = "$(TARGET_NAME)"; GENERATE_INFOPLIST_FILE = "YES"; CODE_SIGN_STYLE = "Automatic"; TARGETED_DEVICE_FAMILY = "1"; SWIFT_EMIT_LOC_STRINGS = "YES"; BUNDLE_LOADER = "$(TEST_HOST)"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IDPhotoSpike.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IDPhotoSpike"; }; name = Release; };
-  0000000000000000000000CB = { isa = XCConfigurationList; buildConfigurations = (0000000000000000000000D2,0000000000000000000000D3,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-  0000000000000000000000C8 = { isa = PBXNativeTarget; buildConfigurationList = 0000000000000000000000CB; buildPhases = (0000000000000000000000CC,0000000000000000000000CE,0000000000000000000000CD,); buildRules = (); dependencies = (0000000000000000000000D0,); fileSystemSynchronizedGroups = (0000000000000000000000C9,); name = IDPhotoSpikeTests; packageProductDependencies = (); productName = IDPhotoSpikeTests; productReference = 0000000000000000000000CA; productType = "com.apple.product-type.bundle.unit-test"; };
-  00000000000000000000012D = { isa = PBXFileSystemSynchronizedRootGroup; path = UITests; sourceTree = "<group>"; };
-  00000000000000000000012E = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IDPhotoSpikeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-  000000000000000000000130 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  000000000000000000000131 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  000000000000000000000132 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-  000000000000000000000133 = { isa = PBXContainerItemProxy; containerPortal = 000000000000000000000001; proxyType = 1; remoteGlobalIDString = 000000000000000000000064; remoteInfo = IDPhotoSpike; };
-  000000000000000000000134 = { isa = PBXTargetDependency; target = 000000000000000000000064; targetProxy = 000000000000000000000133; };
-  000000000000000000000136 = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_BUNDLE_IDENTIFIER = "com.jarbasferro.IDPhotoSpikeUITests"; PRODUCT_NAME = "$(TARGET_NAME)"; GENERATE_INFOPLIST_FILE = "YES"; CODE_SIGN_STYLE = "Automatic"; TARGETED_DEVICE_FAMILY = "1"; SWIFT_EMIT_LOC_STRINGS = "YES"; TEST_TARGET_NAME = "IDPhotoSpike"; }; name = Debug; };
-  000000000000000000000137 = { isa = XCBuildConfiguration; buildSettings = { PRODUCT_BUNDLE_IDENTIFIER = "com.jarbasferro.IDPhotoSpikeUITests"; PRODUCT_NAME = "$(TARGET_NAME)"; GENERATE_INFOPLIST_FILE = "YES"; CODE_SIGN_STYLE = "Automatic"; TARGETED_DEVICE_FAMILY = "1"; SWIFT_EMIT_LOC_STRINGS = "YES"; TEST_TARGET_NAME = "IDPhotoSpike"; }; name = Release; };
-  00000000000000000000012F = { isa = XCConfigurationList; buildConfigurations = (000000000000000000000136,000000000000000000000137,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-  00000000000000000000012C = { isa = PBXNativeTarget; buildConfigurationList = 00000000000000000000012F; buildPhases = (000000000000000000000130,000000000000000000000132,000000000000000000000131,); buildRules = (); dependencies = (000000000000000000000134,); fileSystemSynchronizedGroups = (00000000000000000000012D,); name = IDPhotoSpikeUITests; packageProductDependencies = (); productName = IDPhotoSpikeUITests; productReference = 00000000000000000000012E; productType = "com.apple.product-type.bundle.ui-testing"; };
-  000000000000000000000002 = { isa = PBXGroup; children = (000000000000000000000065,0000000000000000000000C9,00000000000000000000012D,000000000000000000000003,); sourceTree = "<group>"; };
-  000000000000000000000003 = { isa = PBXGroup; children = (000000000000000000000066,0000000000000000000000CA,00000000000000000000012E,); name = Products; sourceTree = "<group>"; };
-  00000000000000000000000A = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = "iphoneos"; IPHONEOS_DEPLOYMENT_TARGET = "26.0"; SWIFT_VERSION = "6.0"; SWIFT_STRICT_CONCURRENCY = "complete"; SWIFT_DEFAULT_ACTOR_ISOLATION = "nonisolated"; CLANG_ENABLE_MODULES = "YES"; CLANG_ENABLE_OBJC_ARC = "YES"; ENABLE_USER_SCRIPT_SANDBOXING = "YES"; LOCALIZATION_PREFERS_STRING_CATALOGS = "YES"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; DEBUG_INFORMATION_FORMAT = "dwarf"; ENABLE_TESTABILITY = "YES"; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; ONLY_ACTIVE_ARCH = "YES"; }; name = Debug; };
-  00000000000000000000000B = { isa = XCBuildConfiguration; buildSettings = { SDKROOT = "iphoneos"; IPHONEOS_DEPLOYMENT_TARGET = "26.0"; SWIFT_VERSION = "6.0"; SWIFT_STRICT_CONCURRENCY = "complete"; SWIFT_DEFAULT_ACTOR_ISOLATION = "nonisolated"; CLANG_ENABLE_MODULES = "YES"; CLANG_ENABLE_OBJC_ARC = "YES"; ENABLE_USER_SCRIPT_SANDBOXING = "YES"; LOCALIZATION_PREFERS_STRING_CATALOGS = "YES"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_OPTIMIZATION_LEVEL = "-O"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; }; name = Release; };
-  000000000000000000000004 = { isa = XCConfigurationList; buildConfigurations = (00000000000000000000000A,00000000000000000000000B,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
-  000000000000000000000001 = { isa = PBXProject; attributes = { BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700; }; buildConfigurationList = 000000000000000000000004; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, es, Base,); mainGroup = 000000000000000000000002; minimizedProjectReferenceProxies = 1; preferredProjectObjectVersion = 77; productRefGroup = 000000000000000000000003; projectDirPath = ""; projectRoot = ""; targets = (000000000000000000000064,0000000000000000000000C8,00000000000000000000012C,); };
- };
- rootObject = 000000000000000000000001;
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		0000000000000000000000CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000000000064;
+			remoteInfo = IDPhotoSpike;
+		};
+		000000000000000000000133 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000000000064;
+			remoteInfo = IDPhotoSpike;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		000000000000000000000066 /* IDPhotoSpike.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IDPhotoSpike.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0000000000000000000000CA /* IDPhotoSpikeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IDPhotoSpikeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00000000000000000000012E /* IDPhotoSpikeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IDPhotoSpikeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		000000000000000000000065 /* App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = App;
+			sourceTree = "<group>";
+		};
+		0000000000000000000000C9 /* Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		00000000000000000000012D /* UITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = UITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		00000000000000000000006A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0000000000000000000000CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		000000000000000000000132 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000065 /* App */,
+				0000000000000000000000C9 /* Tests */,
+				00000000000000000000012D /* UITests */,
+				000000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000066 /* IDPhotoSpike.app */,
+				0000000000000000000000CA /* IDPhotoSpikeTests.xctest */,
+				00000000000000000000012E /* IDPhotoSpikeUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000000064 /* IDPhotoSpike */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000000067 /* Build configuration list for PBXNativeTarget "IDPhotoSpike" */;
+			buildPhases = (
+				000000000000000000000068 /* Sources */,
+				00000000000000000000006A /* Frameworks */,
+				000000000000000000000069 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000065 /* App */,
+			);
+			name = IDPhotoSpike;
+			packageProductDependencies = (
+			);
+			productName = IDPhotoSpike;
+			productReference = 000000000000000000000066 /* IDPhotoSpike.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0000000000000000000000C8 /* IDPhotoSpikeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0000000000000000000000CB /* Build configuration list for PBXNativeTarget "IDPhotoSpikeTests" */;
+			buildPhases = (
+				0000000000000000000000CC /* Sources */,
+				0000000000000000000000CE /* Frameworks */,
+				0000000000000000000000CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0000000000000000000000D0 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				0000000000000000000000C9 /* Tests */,
+			);
+			name = IDPhotoSpikeTests;
+			packageProductDependencies = (
+			);
+			productName = IDPhotoSpikeTests;
+			productReference = 0000000000000000000000CA /* IDPhotoSpikeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		00000000000000000000012C /* IDPhotoSpikeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00000000000000000000012F /* Build configuration list for PBXNativeTarget "IDPhotoSpikeUITests" */;
+			buildPhases = (
+				000000000000000000000130 /* Sources */,
+				000000000000000000000132 /* Frameworks */,
+				000000000000000000000131 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				000000000000000000000134 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				00000000000000000000012D /* UITests */,
+			);
+			name = IDPhotoSpikeUITests;
+			packageProductDependencies = (
+			);
+			productName = IDPhotoSpikeUITests;
+			productReference = 00000000000000000000012E /* IDPhotoSpikeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2700;
+			};
+			buildConfigurationList = 000000000000000000000004 /* Build configuration list for PBXProject "IDPhotoSpike" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				es,
+				Base,
+			);
+			mainGroup = 000000000000000000000002;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 000000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000000064 /* IDPhotoSpike */,
+				0000000000000000000000C8 /* IDPhotoSpikeTests */,
+				00000000000000000000012C /* IDPhotoSpikeUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000000069 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0000000000000000000000CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		000000000000000000000131 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000000068 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0000000000000000000000CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		000000000000000000000130 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0000000000000000000000D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 000000000000000000000064 /* IDPhotoSpike */;
+			targetProxy = 0000000000000000000000CF /* PBXContainerItemProxy */;
+		};
+		000000000000000000000134 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 000000000000000000000064 /* IDPhotoSpike */;
+			targetProxy = 000000000000000000000133 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		00000000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		00000000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		00000000000000000000006E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhotoSpike;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		00000000000000000000006F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhotoSpike;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		0000000000000000000000D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhotoSpikeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IDPhotoSpike.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IDPhotoSpike";
+			};
+			name = Debug;
+		};
+		0000000000000000000000D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhotoSpikeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IDPhotoSpike.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IDPhotoSpike";
+			};
+			name = Release;
+		};
+		000000000000000000000136 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhotoSpikeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = IDPhotoSpike;
+			};
+			name = Debug;
+		};
+		000000000000000000000137 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhotoSpikeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = IDPhotoSpike;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000000004 /* Build configuration list for PBXProject "IDPhotoSpike" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000000A /* Debug */,
+				00000000000000000000000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000000067 /* Build configuration list for PBXNativeTarget "IDPhotoSpike" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				00000000000000000000006E /* Debug */,
+				00000000000000000000006F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0000000000000000000000CB /* Build configuration list for PBXNativeTarget "IDPhotoSpikeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0000000000000000000000D2 /* Debug */,
+				0000000000000000000000D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00000000000000000000012F /* Build configuration list for PBXNativeTarget "IDPhotoSpikeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000136 /* Debug */,
+				000000000000000000000137 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000000000000000000000001 /* Project object */;
 }

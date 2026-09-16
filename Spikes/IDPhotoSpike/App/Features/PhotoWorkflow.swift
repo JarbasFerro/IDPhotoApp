@@ -7,6 +7,10 @@ final class PhotoWorkflow {
     var photo: PreparedPhoto?
     var adjustment = CropAdjustment()
     var printJob = PrintJob(paper: .photo10x15, items: [])
+    private(set) var analysis: FaceAnalysis?
+    private(set) var isAnalyzing = false
+    /// Vision could not run (for example in the simulator); manual crop remains available.
+    private(set) var analysisUnavailable = false
     var exported: PhotoExport?
     var errorMessage: String?
     private(set) var activity: Activity?
@@ -16,6 +20,7 @@ final class PhotoWorkflow {
 
     @ObservationIgnored private let pipeline: any PhotoProcessing
     @ObservationIgnored private var task: Task<Void, Never>?
+    @ObservationIgnored private var analysisTask: Task<Void, Never>?
     @ObservationIgnored private var revision = UUID()
     @ObservationIgnored private var exportLease: UUID?
 
@@ -45,6 +50,7 @@ final class PhotoWorkflow {
                 adjustment = CropAdjustment()
                 resetPrintJob(for: result)
                 activity = nil
+                analyze(result)
                 if let previous { await pipeline.discard(photoID: previous.id) }
             } catch {
                 handle(error, revision: currentRevision)
@@ -52,9 +58,34 @@ final class PhotoWorkflow {
         }
     }
 
+    /// Runs Vision on the bounded preview and applies the automatic composition once per photo.
+    private func analyze(_ photo: PreparedPhoto) {
+        analysisTask?.cancel()
+        analysis = nil
+        analysisUnavailable = false
+        isAnalyzing = true
+        analysisTask = Task {
+            let result = try? await pipeline.analyze(photo: photo)
+            guard !Task.isCancelled, self.photo?.id == photo.id else { return }
+            isAnalyzing = false
+            analysis = result
+            analysisUnavailable = result == nil
+            if let solution = result?.solution, result?.faceCount == 1 {
+                adjustment = solution.adjustment
+            }
+        }
+    }
+
+    /// Automatic composition when a single face was found; otherwise the default crop.
+    var automaticAdjustment: CropAdjustment {
+        analysis?.faceCount == 1 ? (analysis?.solution?.adjustment ?? CropAdjustment()) : CropAdjustment()
+    }
+
+    func resetCrop() { adjustment = automaticAdjustment }
+
     func prepareExport() {
         guard let photo, activity == nil else { return }
-        cancel()
+        cancelWork()
         let currentRevision = revision
         let edits = adjustment
         let job = printJob
@@ -83,11 +114,19 @@ final class PhotoWorkflow {
         Task { await pipeline.discard(exportID: id) }
     }
 
-    func cancel() {
+    /// Cancels import/export work only; a running face analysis for the current photo continues.
+    private func cancelWork() {
         revision = UUID()
         task?.cancel()
         task = nil
         activity = nil
+    }
+
+    func cancel() {
+        cancelWork()
+        analysisTask?.cancel()
+        analysisTask = nil
+        isAnalyzing = false
     }
 
     func removePhoto() {
@@ -95,6 +134,8 @@ final class PhotoWorkflow {
         let previous = photo
         photo = nil
         adjustment = CropAdjustment()
+        analysis = nil
+        analysisUnavailable = false
         printJob.items = []
         if let previous { Task { await pipeline.discard(photoID: previous.id) } }
     }

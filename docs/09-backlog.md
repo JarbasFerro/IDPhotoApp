@@ -204,7 +204,7 @@ Test structured warning explanation or profile selection. Controlled evaluation 
 
 ## S1-017 — Face geometry and crown estimator benchmark — P0 / L
 
-Dependencies: S1-004. Design: [14-priority-feature-plan.md §3.8](14-priority-feature-plan.md).
+Dependencies: S1-004. Design: [14-priority-feature-plan.md §3.8](14-priority-feature-plan.md). Implemented 2026-09-16 with a macOS fixture harness and automatic alignment in the spike editor; see [spike 03](spikes/03-face-alignment.md). Device run and a wider fixture corpus remain open.
 
 Acceptance:
 

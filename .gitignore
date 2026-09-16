@@ -48,6 +48,8 @@ Local.xcconfig
 # Local/private fixtures and generated image artifacts
 /tmp/
 /test_data/private/
+/pics/
+/Artifacts/face-report/
 /test_data/local/
 /TestData/Private/
 /TestData/Local/

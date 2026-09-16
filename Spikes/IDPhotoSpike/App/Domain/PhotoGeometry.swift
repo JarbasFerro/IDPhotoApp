@@ -1,7 +1,7 @@
 import Foundation
 
 /// Dimensions of the orientation-corrected source, never raw EXIF storage axes.
-struct SourcePixels: Sendable, Equatable {
+struct SourcePixels: Sendable, Hashable {
     let width: Int
     let height: Int
 }
@@ -13,7 +13,7 @@ struct OutputPixels: Sendable, Hashable {
 
 /// Top-left origin, relative to the upright source image. May extend outside 0...1 when bleed is added;
 /// the renderer paints white where no source pixels exist.
-struct NormalizedCrop: Sendable, Equatable {
+struct NormalizedCrop: Sendable, Hashable {
     let x: Double
     let y: Double
     let width: Double
@@ -54,15 +54,19 @@ struct PhotoFormat: Sendable, Hashable, Identifiable {
     static func pdfPoints(mm: Double) -> Double { mm / 25.4 * 72 }
 }
 
-struct CropAdjustment: Sendable, Equatable {
+struct CropAdjustment: Sendable, Hashable {
     var zoom: Double = 1
     /// Fractions of the available horizontal/vertical travel, not source coordinates.
     var horizontal: Double = 0.5
     var vertical: Double = 0.5
+    /// Counter-clockwise rotation of the source around the crop centre, used to level the eyes.
+    var rotationDegrees: Double = 0
+
+    static let rotationRange: ClosedRange<Double> = -8...8
 
     func clamped() -> Self {
         Self(zoom: Self.bound(zoom, 1...4), horizontal: Self.bound(horizontal, 0...1),
-             vertical: Self.bound(vertical, 0...1))
+             vertical: Self.bound(vertical, 0...1), rotationDegrees: Self.bound(rotationDegrees, Self.rotationRange))
     }
 
     func crop(in source: SourcePixels, format: PhotoFormat = .spainPrototype) -> NormalizedCrop {
@@ -92,7 +96,7 @@ struct CropAdjustment: Sendable, Equatable {
     }
 
     private static func bound(_ value: Double, _ range: ClosedRange<Double>) -> Double {
-        guard value.isFinite else { return range.lowerBound }
+        guard value.isFinite else { return range.contains(0) ? 0 : range.lowerBound }
         return min(range.upperBound, max(range.lowerBound, value))
     }
 }

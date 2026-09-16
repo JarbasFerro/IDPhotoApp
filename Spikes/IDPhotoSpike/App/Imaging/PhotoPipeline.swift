@@ -35,6 +35,7 @@ struct PhotoExport: Sendable, Identifiable {
 
 protocol PhotoProcessing: Sendable {
     func ingest(_ staged: StagedPhoto) async throws -> PreparedPhoto
+    func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
@@ -92,6 +93,11 @@ actor PhotoPipeline: PhotoProcessing {
             try? FileManager.default.removeItem(at: directory)
             throw error
         }
+    }
+
+    /// Face geometry and the automatic crop, from the bounded preview; never touches the original file.
+    func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis {
+        try await FaceAnalyzer.analyze(preview: photo.preview, source: photo.pixels)
     }
 
     /// Digital JPEG plus the print sheet (PDF and one JPEG per page) described by `job`.
@@ -191,10 +197,10 @@ actor PhotoPipeline: PhotoProcessing {
         let requiredHeight = Double(output.height) / crop.height
         let longEdge = Int(ceil(max(requiredWidth, requiredHeight)))
         let image = try thumbnail(source, maxPixelSize: min(longEdge, max(photo.pixels.width, photo.pixels.height)))
-        return try render(image, crop: crop, output: output)
+        return try render(image, crop: crop, output: output, rotationDegrees: adjustment.clamped().rotationDegrees)
     }
 
-    private func render(_ image: CGImage, crop: NormalizedCrop, output: OutputPixels) throws -> CGImage {
+    private func render(_ image: CGImage, crop: NormalizedCrop, output: OutputPixels, rotationDegrees: Double = 0) throws -> CGImage {
         let interval = signposter.beginInterval("Render")
         defer { signposter.endInterval("Render", interval) }
         guard let space = CGColorSpace(name: CGColorSpace.sRGB),
@@ -206,6 +212,12 @@ actor PhotoPipeline: PhotoProcessing {
         context.setFillColor(CGColor(gray: 1, alpha: 1))
         context.fill(CGRect(x: 0, y: 0, width: width, height: height))
         context.interpolationQuality = .high
+        if rotationDegrees != 0 {
+            // Level the eyes: rotate the source about the crop centre, which maps to the output centre.
+            context.translateBy(x: width / 2, y: height / 2)
+            context.rotate(by: rotationDegrees * .pi / 180)
+            context.translateBy(x: -width / 2, y: -height / 2)
+        }
         // CGContext uses a bottom-left origin. Crop coordinates are explicitly top-left.
         context.draw(image, in: CGRect(x: -crop.x / crop.width * width,
             y: -(1 - crop.y - crop.height) / crop.height * height,

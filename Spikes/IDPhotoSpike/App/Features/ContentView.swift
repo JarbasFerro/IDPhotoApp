@@ -24,6 +24,7 @@ struct ContentView: View {
                             .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 200 : 320)
                             .frame(maxWidth: .infinity)
                             .disabled(model.activity != nil)
+                        alignmentStatus
                         adjustmentControls
                     } else {
                         ContentUnavailableView {
@@ -138,18 +139,64 @@ struct ContentView: View {
         .accessibilityIdentifier("printSheet")
     }
 
+    @ViewBuilder private var alignmentStatus: some View {
+        if model.isAnalyzing {
+            HStack(spacing: 8) {
+                ProgressView()
+                Text("Finding face…").font(.subheadline).foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+        } else if model.analysisUnavailable {
+            Label("Automatic alignment is not available on this device. Adjust the crop by hand.", systemImage: "info.circle")
+                .font(.subheadline).foregroundStyle(.secondary)
+                .accessibilityIdentifier("alignmentStatus")
+        } else if let analysis = model.analysis {
+            VStack(alignment: .leading, spacing: 8) {
+                if let solution = analysis.solution, analysis.faceCount == 1 {
+                    statusLabel(AlignmentPresentation.title(for: solution.overall), symbol: AlignmentPresentation.symbol(for: solution.overall))
+                        .font(.headline)
+                        .accessibilityIdentifier("alignmentTitle")
+                    ForEach(solution.checks.filter { $0.state != .pass }) { check in
+                        statusLabel(AlignmentPresentation.message(for: check), symbol: AlignmentPresentation.symbol(for: check.state))
+                            .font(.subheadline)
+                    }
+                    if solution.checks.allSatisfy({ $0.state == .pass }) {
+                        Text(AlignmentPresentation.message(for: solution.checks.first { $0.kind == .headHeight }!))
+                            .font(.subheadline).foregroundStyle(.secondary)
+                    }
+                } else {
+                    statusLabel(AlignmentPresentation.message(for: AlignmentCheck(kind: .faceCount, state: .fail, measured: Double(analysis.faceCount))),
+                                symbol: AlignmentPresentation.symbol(for: .fail))
+                        .font(.subheadline)
+                        .accessibilityIdentifier("alignmentTitle")
+                }
+                Text("Automatic alignment uses ICAO portrait proportions as engineering defaults, not official DNI numbers.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("alignmentStatus")
+        }
+    }
+
+    private func statusLabel(_ text: LocalizedStringResource, symbol: String) -> some View {
+        Label { Text(text) } icon: { Image(systemName: symbol) }
+    }
+
     private var adjustmentControls: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Adjust crop").font(.headline)
                 Spacer()
-                Button { model.adjustment = CropAdjustment() } label: {
-                    Text("Reset").frame(minWidth: 44, minHeight: 44)
+                Button { model.resetCrop() } label: {
+                    Text(model.analysis?.solution != nil ? LocalizedStringKey("Align automatically") : LocalizedStringKey("Reset"))
+                        .frame(minWidth: 44, minHeight: 44)
                 }
+                .accessibilityIdentifier("resetCrop")
             }
             cropSlider("Zoom", value: $model.adjustment.zoom, range: 1...4, step: 0.05)
             cropSlider("Horizontal position", value: $model.adjustment.horizontal, range: 0...1, step: 0.025)
             cropSlider("Vertical position", value: $model.adjustment.vertical, range: 0...1, step: 0.025)
+            cropSlider("Straighten", value: $model.adjustment.rotationDegrees, range: CropAdjustment.rotationRange, step: 0.5)
             if model.sourceIsSmall {
                 Label("This crop may look soft when printed. Zoom out or choose a higher-resolution photo.",
                       systemImage: "exclamationmark.triangle")

@@ -35,6 +35,7 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 - ImageIO orientation normalization and a preview bounded to a 1,600-pixel long edge.
 - Deterministic 13:16 portrait crop with drag/pinch, labeled adjustable sliders, and reset.
 - JPEG at 520 × 640 pixels, sRGB, with new whitelisted metadata. The resolution is an engineering choice, not a sourced official upload requirement.
+- Automatic alignment ([spike 03](../../docs/spikes/03-face-alignment.md)): pinned-revision Vision landmarks, person-mask plus anatomical crown estimate, ICAO-default composition solver, eye levelling with a Straighten control, and a status card with pass/warn/fail/manual checks. Real-face evidence comes from `scripts/face-harness.sh` on macOS because the simulators here cannot run Vision.
 - Print composer ([spike 02](../../docs/spikes/02-print-composer.md)): paper catalog plus custom sizes, deterministic guillotine layout solver with per-size copy counts, automatic rotation and paper orientation, adaptive 0–1 mm bleed, corner cut ticks, 50 mm calibration bar, overflow pages, and two fill strategies.
 - Sheet output as a PDF with page boxes equal to the paper and one 300 ppi JPEG per page; both verified after writing.
 - AirPrint via `UIPrintInteractionController` with photo output type and a `choosePaper` delegate that logs offered papers and prefers bordered paper.
@@ -48,6 +49,10 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 Imported provider files are copied while their transfer URL is valid. Staged files are removed after ingestion, including failure/cancellation. Replaced/removed sources are deleted. Export files are retained while the export sheet and its system sharing interaction are active, then removed when the export sheet closes. Abandoned working files are cleared on the next app launch. Backgrounding cancels work; active source storage uses complete file protection. No account, backend, analytics, or photo logging exists.
 
 Files deliberately saved/shared by the user are owned by their destination and are not deleted by the app. A photo held only in iCloud may require a system download before import; already-local inputs can be processed offline.
+
+## Private portraits
+
+Put consented test portraits in `<repo>/pics/` (git-ignored) and run `scripts/face-harness.sh`. It writes a report, annotated previews, raw masks, and aligned crops to `Artifacts/face-report/` (git-ignored). The iOS test target contains the same harness; it records a known issue on simulators that cannot create a Vision inference context and runs fully on a physical device.
 
 ## Test fixtures
 

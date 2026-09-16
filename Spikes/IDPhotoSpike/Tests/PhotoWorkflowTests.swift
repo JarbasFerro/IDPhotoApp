@@ -63,6 +63,9 @@ private actor DelayedPipeline: PhotoProcessing {
         // Intentionally ignores cancellation, like a framework callback arriving late.
         try await withCheckedThrowingContinuation { imports.append($0) }
     }
+    func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis {
+        FaceAnalysis(faceCount: 0, geometry: nil, solution: nil, visionRollDegrees: nil)
+    }
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport {
         try await withCheckedThrowingContinuation { pendingExport = $0 }
     }

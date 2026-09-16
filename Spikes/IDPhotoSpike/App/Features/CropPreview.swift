@@ -12,6 +12,9 @@ struct CropPreview: View {
             Image(decorative: photo.preview, scale: 1)
                 .resizable()
                 .frame(width: geometry.size.width / crop.width, height: geometry.size.height / crop.height)
+                // SwiftUI rotates clockwise for positive angles; the model stores counter-clockwise degrees.
+                .rotationEffect(.degrees(-adjustment.clamped().rotationDegrees),
+                                anchor: UnitPoint(x: crop.x + crop.width / 2, y: crop.y + crop.height / 2))
                 .offset(x: -crop.x / crop.width * geometry.size.width,
                         y: -crop.y / crop.height * geometry.size.height)
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
