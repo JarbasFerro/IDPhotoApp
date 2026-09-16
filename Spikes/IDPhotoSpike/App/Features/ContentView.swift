@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var selection: PhotosPickerItem?
     @State private var showRequirements = false
     @State private var showComposer = false
+    @State private var showCamera = false
     @State private var confirmRemove = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -47,14 +48,7 @@ struct ContentView: View {
                     }
 
                     if model.photo == nil || model.activity == nil {
-                        PhotosPicker(selection: $selection, matching: .images, preferredItemEncoding: .current) {
-                            Label(hasPhoto ? LocalizedStringKey("Replace Photo") : LocalizedStringKey("Choose Photo"), systemImage: "photo.on.rectangle")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .disabled(!model.isInitialized || model.activity != nil)
-                        .accessibilityIdentifier("choosePhoto")
+                        acquisitionButtons(hasPhoto: hasPhoto)
                     }
 
                     if model.photo != nil {
@@ -106,6 +100,12 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showRequirements) { RequirementsView() }
             .sheet(isPresented: $showComposer) { PrintComposerView(model: model) }
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraView { staged in
+                    showCamera = false
+                    model.importPhoto { staged }
+                }
+            }
             .sheet(item: $model.exported, onDismiss: model.finishExport) { result in
                 ExportView(result: result, paperName: PaperNames.name(for: model.printJob.paper))
             }
@@ -120,6 +120,35 @@ struct ContentView: View {
                 selection = nil
             }
         }
+    }
+
+    @ViewBuilder private func acquisitionButtons(hasPhoto: Bool) -> some View {
+        let disabled = !model.isInitialized || model.activity != nil
+        if hasPhoto {
+            Button { showCamera = true } label: {
+                Label("Retake Photo", systemImage: "camera").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .disabled(disabled)
+            .accessibilityIdentifier("takePhoto")
+        } else {
+            Button { showCamera = true } label: {
+                Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(disabled)
+            .accessibilityIdentifier("takePhoto")
+        }
+        PhotosPicker(selection: $selection, matching: .images, preferredItemEncoding: .current) {
+            Label(hasPhoto ? LocalizedStringKey("Replace Photo") : LocalizedStringKey("Choose Photo"), systemImage: "photo.on.rectangle")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+        .disabled(disabled)
+        .accessibilityIdentifier("choosePhoto")
     }
 
     private var printSheetSummary: some View {
@@ -164,6 +193,10 @@ struct ContentView: View {
                         .accessibilityIdentifier("alignmentTitle")
                     ForEach(solution.checks.filter { $0.state != .pass }) { check in
                         statusLabel(AlignmentPresentation.message(for: check), symbol: AlignmentPresentation.symbol(for: check.state))
+                            .font(.subheadline)
+                    }
+                    if let smudge = analysis.lensSmudgeConfidence, smudge >= FaceAnalysis.smudgeThreshold {
+                        statusLabel("The lens may be smudged. Clean it and retake for a sharper photo.", symbol: "camera.filters")
                             .font(.subheadline)
                     }
                     if solution.checks.allSatisfy({ $0.state == .pass }) {

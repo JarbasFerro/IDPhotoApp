@@ -50,6 +50,18 @@ final class IDPhotoSpikeUITests: XCTestCase {
     }
 
     @MainActor
+    func testCameraUnavailableOffersPhotoImport() throws {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["takePhoto"].waitForExistence(timeout: 10))
+        app.buttons["takePhoto"].tap()
+        // Simulators have no camera; the screen must explain and offer the import path.
+        XCTAssertTrue(app.buttons["cameraUnavailableChoose"].waitForExistence(timeout: 10))
+        app.buttons["cameraUnavailableChoose"].tap()
+        XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testPrintComposerAddsASizeAndUpdatesTheSummary() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture"]

@@ -9,6 +9,11 @@ struct FaceAnalysis: Sendable, Hashable {
     let solution: CropSolution?
     /// Vision's own roll estimate, kept for comparison with the eye-line roll used by the solver.
     let visionRollDegrees: Double?
+    /// iOS 26 lens-smudge confidence 0...1; nil when the request is unavailable.
+    var lensSmudgeConfidence: Double? = nil
+
+    /// Above this, the source photo probably came through a dirty lens.
+    static let smudgeThreshold = 0.75
 }
 
 /// Vision adapter. Converts observations to top-left normalized domain geometry immediately (FR-042)
@@ -27,12 +32,13 @@ enum FaceAnalyzer {
         // cannot create an inference context, and the estimator then falls back to anatomy.
         let mask = await personMask(handler)
         try Task.checkCancellation()
+        let smudge = (try? await handler.perform(DetectLensSmudgeRequest())).map { Double($0.confidence) }
 
         let size = CGSize(width: preview.width, height: preview.height)
         guard let face = faces.max(by: { $0.boundingBox.cgRect.width * $0.boundingBox.cgRect.height
                                             < $1.boundingBox.cgRect.width * $1.boundingBox.cgRect.height }),
               let landmarks = face.landmarks else {
-            return FaceAnalysis(faceCount: faces.count, geometry: nil, solution: nil, visionRollDegrees: nil)
+            return FaceAnalysis(faceCount: faces.count, geometry: nil, solution: nil, visionRollDegrees: nil, lensSmudgeConfidence: smudge)
         }
 
         func normalized(_ point: CGPoint) -> ImagePoint { ImagePoint(x: point.x / size.width, y: point.y / size.height) }
@@ -80,7 +86,7 @@ enum FaceAnalyzer {
                                     pitchDegrees: face.pitch.converted(to: .degrees).value)
         let solution = CropSolver.solve(geometry: geometry, format: format, spec: spec)
         return FaceAnalysis(faceCount: faces.count, geometry: geometry, solution: solution,
-                            visionRollDegrees: face.roll.converted(to: .degrees).value)
+                            visionRollDegrees: face.roll.converted(to: .degrees).value, lensSmudgeConfidence: smudge)
     }
 
     /// Accurate person mask, falling back to the balanced model and then to no mask.

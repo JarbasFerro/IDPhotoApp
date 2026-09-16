@@ -6,7 +6,7 @@ Native iPhone app for the first M1 import/render experiment. This is disposable 
 
 1. Open `IDPhotoSpike.xcodeproj` in Xcode 27 and select the shared `IDPhotoSpike` scheme.
 2. Choose an iPhone simulator running iOS 26 or later and run.
-3. Choose a photo, adjust its crop, open **Print sheet** to set paper and copies, and select **Prepare Export**.
+3. Take or choose a photo, review the automatic alignment and background, open **Print sheet** to set paper and copies, and select **Prepare Export**.
 
 For the user's iPhone 15 Pro Max / iOS 26.6.2: select a development team under Signing & Capabilities, use an available unique bundle identifier if needed, pair the phone, enable Developer Mode as required, and run. No signing identity is checked into the repository.
 
@@ -35,6 +35,7 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 - ImageIO orientation normalization and a preview bounded to a 1,600-pixel long edge.
 - Deterministic 13:16 portrait crop with drag/pinch, labeled adjustable sliders, and reset.
 - JPEG at 520 × 640 pixels, sRGB, with new whitelisted metadata. The resolution is an engineering choice, not a sourced official upload requirement.
+- Guided camera ([spike 05](../../docs/spikes/05-guided-camera.md)): AVFoundation front/back capture with permission at point of use, full-quality HEIF stills into the same private staging path as imports, horizon-level rotation, interruption handling, a debounced one-line hint driven by face metadata, a head guide, volume/Action-button capture, and a lens-smudge advisory after import. Needs a physical iPhone; simulators show the no-camera screen.
 - Background replacement ([spike 04](../../docs/spikes/04-background-replacement.md)): foreground-instance mask cross-checked with person segmentation, a mask-quality score that keeps the original when separation is unreliable, an assessment of the original background, and a white composite (Spain DNI) with an edge-softness control, applied identically to the preview, the digital JPEG, and the print sheet.
 - Automatic alignment ([spike 03](../../docs/spikes/03-face-alignment.md)): pinned-revision Vision landmarks, person-mask plus anatomical crown estimate, ICAO-default composition solver, eye levelling with a Straighten control, and a status card with pass/warn/fail/manual checks. Real-face evidence comes from `scripts/face-harness.sh` on macOS because the simulators here cannot run Vision.
 - Print composer ([spike 02](../../docs/spikes/02-print-composer.md)): paper catalog plus custom sizes, deterministic guillotine layout solver with per-size copy counts, automatic rotation and paper orientation, adaptive 0–1 mm bleed, corner cut ticks, 50 mm calibration bar, overflow pages, and two fill strategies.

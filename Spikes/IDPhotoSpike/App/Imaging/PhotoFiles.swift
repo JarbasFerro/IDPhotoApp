@@ -38,6 +38,27 @@ struct StagedPhoto: Transferable, Sendable {
     }
 }
 
+extension StagedPhoto {
+    /// Stages captured photo data (HEIF or JPEG) exactly like an imported file.
+    @concurrent
+    static func stage(data: Data) async throws -> StagedPhoto {
+        try Task.checkCancellation()
+        guard !data.isEmpty, data.count <= 150_000_000 else { throw PhotoError.tooLarge }
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent("IDPhotoIncoming")
+        let directory = root.appendingPathComponent(UUID().uuidString)
+        try PhotoFiles.createPrivateDirectory(directory)
+        do {
+            let result = StagedPhoto(directory: directory)
+            try data.write(to: result.url, options: [.atomic, .completeFileProtection])
+            try Task.checkCancellation()
+            return result
+        } catch {
+            try? FileManager.default.removeItem(at: directory)
+            throw error
+        }
+    }
+}
+
 enum PhotoFiles {
     static func createPrivateDirectory(_ url: URL) throws {
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true,
