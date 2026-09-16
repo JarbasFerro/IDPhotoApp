@@ -1,122 +1,148 @@
 import SwiftUI
 
-/// Paper, copies, and sheet options with a live preview of the solved layout.
-struct PrintComposerView: View {
+/// Step 3: the live sheet is the hero; people, paper and options below; Continue leads to Share.
+struct SheetView: View {
     @Bindable var model: PhotoWorkflow
-    @Environment(\.dismiss) private var dismiss
+    @Binding var path: [Route]
+    let acquire: Acquire
     @State private var customWidth = 100.0
     @State private var customHeight = 150.0
     @State private var customError = false
+    @State private var showOptions = false
+    @State private var addingSizeFor: UUID?
 
     var body: some View {
         let layout = model.layout
-        NavigationStack {
-            List {
-                Section {
-                    SheetPreview(layout: layout, thumbnails: model.sheetThumbnails)
-                        .frame(maxWidth: .infinity)
-                        .listRowInsets(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
-                    Text(summary(layout))
+        List {
+            Section {
+                SheetPreview(layout: layout, thumbnails: model.sheetThumbnails)
+                    .frame(maxWidth: .infinity)
+                    .listRowInsets(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
+                Text(summary(layout))
+                    .font(.subheadline)
+                    .accessibilityIdentifier("layoutSummary")
+                if !layout.isComplete {
+                    StatusLabel(text: "\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.", state: .warn)
                         .font(.subheadline)
-                        .accessibilityIdentifier("layoutSummary")
-                    if !layout.isComplete {
-                        Label("\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.",
-                              systemImage: "exclamationmark.triangle")
-                            .font(.subheadline)
-                    }
                 }
+            }
 
-                Section("Paper") {
-                    Picker("Paper size", selection: paperSelection) {
-                        ForEach(PaperSize.presets) { paper in
-                            Text(PaperNames.name(for: paper)).tag(paper.id)
+            ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
+                Section {
+                    ForEach($model.printJob.items) { $item in
+                        if item.photoID == entry.id {
+                            Stepper(value: $item.copies, in: 0...50) {
+                                LabeledContent(formatName(item), value: "\(item.copies)")
+                            }
+                            .accessibilityIdentifier("copies-\(item.id.uuidString)")
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) { model.removePrintItem(id: item.id) } label: { Label("Remove", systemImage: "trash") }
+                            }
                         }
-                        Text("Custom").tag("custom")
                     }
-                    if model.printJob.paper.isCustom {
-                        LabeledContent("Width (mm)") {
-                            TextField("Width", value: $customWidth, format: .number).keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing).frame(width: 90)
-                        }
-                        LabeledContent("Height (mm)") {
-                            TextField("Height", value: $customHeight, format: .number).keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing).frame(width: 90)
-                        }
-                        Button("Apply custom size") { applyCustom() }
-                        if customError {
-                            Text("Enter sizes between 50 and 500 mm.").font(.footnote).foregroundStyle(.secondary)
-                        }
-                        Text("AirPrint uses the nearest paper your printer offers; share the PDF or JPEG for other sizes.")
-                            .font(.footnote).foregroundStyle(.secondary)
+                    Button { addingSizeFor = entry.id } label: {
+                        Label("Add another size", systemImage: "plus")
                     }
+                    .accessibilityIdentifier("addSize-\(index + 1)")
+                } header: {
+                    HStack(spacing: 10) {
+                        PortraitView(entry: entry).frame(width: 28)
+                        Text(model.entries.count > 1 ? LocalizedStringKey("Photo \(index + 1)") : LocalizedStringKey("Your photo"))
+                        Spacer()
+                        Button { path.append(.check(entry.id)) } label: {
+                            Text("Check").font(.subheadline).textCase(nil).frame(minWidth: 44, minHeight: 44)
+                        }
+                        .accessibilityIdentifier("person-\(index + 1)")
+                    }
+                    .accessibilityElement(children: .contain)
+                }
+            }
+
+            Section {
+                Menu {
+                    Button { acquire(.camera, .add) } label: { Label("Take Photo", systemImage: "camera") }
+                        .accessibilityIdentifier("addPersonCamera")
+                    Button { acquire(.library, .add) } label: { Label("Choose Photo", systemImage: "photo.on.rectangle") }
+                        .accessibilityIdentifier("addPersonLibrary")
+                } label: {
+                    Label(model.canAddPhoto ? LocalizedStringKey("Add another person") : LocalizedStringKey("Sheet is full (\(PhotoWorkflow.maxPhotos) people)"),
+                          systemImage: "person.badge.plus")
+                }
+                .disabled(!model.canAddPhoto || model.activity != nil)
+                .accessibilityIdentifier("addPerson")
+            } footer: {
+                Text("Each person keeps their own framing, background and light. Everyone shares the sheet.")
+            }
+
+            Section("Paper") {
+                Picker("Paper size", selection: paperSelection) {
+                    ForEach(PaperSize.presets) { paper in
+                        Text(PaperNames.name(for: paper)).tag(paper.id)
+                    }
+                    Text("Custom").tag("custom")
+                }
+                if model.printJob.paper.isCustom {
+                    LabeledContent("Width (mm)") {
+                        TextField("Width", value: $customWidth, format: .number).keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing).frame(width: 90)
+                    }
+                    LabeledContent("Height (mm)") {
+                        TextField("Height", value: $customHeight, format: .number).keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing).frame(width: 90)
+                    }
+                    Button("Apply custom size") { applyCustom() }
+                    if customError {
+                        Text("Enter sizes between 50 and 500 mm.").font(.footnote).foregroundStyle(.secondary)
+                    }
+                    Text("AirPrint uses the nearest paper your printer offers; share the PDF or JPEG for other sizes.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+            }
+
+            Section {
+                DisclosureGroup("Cutting options", isExpanded: $showOptions) {
                     Picker("Orientation", selection: $model.printJob.options.orientation) {
                         Text("Automatic").tag(PageOrientation.automatic)
                         Text("Portrait").tag(PageOrientation.portrait)
                         Text("Landscape").tag(PageOrientation.landscape)
                     }
-                }
-
-                ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
-                    Section {
-                        ForEach($model.printJob.items) { $item in
-                            if item.photoID == entry.id {
-                                Stepper(value: $item.copies, in: 0...50) {
-                                    LabeledContent(formatName(item), value: "\(item.copies)")
-                                }
-                                .accessibilityIdentifier("copies-\(item.id.uuidString)")
-                                .swipeActions(edge: .trailing) {
-                                    Button(role: .destructive) { model.removePrintItem(id: item.id) } label: { Label("Remove", systemImage: "trash") }
-                                }
-                            }
-                        }
-                        ForEach(PhotoFormat.presets) { format in
-                            Button {
-                                model.addPrintItem(format: format, photoID: entry.id)
-                            } label: {
-                                Label(String(localized: "Add \(formatName(format))"), systemImage: "plus")
-                            }
-                            .accessibilityIdentifier("add-\(format.id)-\(index + 1)")
-                        }
-                    } header: {
-                        HStack(spacing: 10) {
-                            Image(decorative: entry.photo.preview, scale: 1)
-                                .resizable().scaledToFill()
-                                .frame(width: 28, height: 35)
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                            Text("Photo \(index + 1)")
-                            if model.entries.count > 1 {
-                                Text("· \(model.printItems(for: entry.id).reduce(0) { $0 + $1.copies }) copies").foregroundStyle(.secondary)
-                            }
-                        }
-                        .accessibilityElement(children: .combine)
-                    } footer: {
-                        if index == model.entries.count - 1 {
-                            Text(model.entries.count > 1
-                                 ? "Each person keeps their own crop, background, and tone. Add another person from the main screen."
-                                 : "Add another person from the main screen to print several people on one sheet.")
-                        }
-                    }
-                }
-
-                Section("Cutting") {
-                    Toggle("Bleed up to 1 mm", isOn: bleedBinding)
+                    Toggle("Safety margin around each photo", isOn: bleedBinding)
                     Toggle("Corner cut marks", isOn: $model.printJob.options.cornerTicks)
-                    Toggle("50 mm calibration bar", isOn: $model.printJob.options.calibrationBar)
-                    Toggle("Maximum copies (shared cuts, no bleed)", isOn: maximumCopiesBinding)
-                    Picker("Fill order", selection: $model.printJob.options.fillStrategy) {
+                    Toggle("50 mm check bar", isOn: $model.printJob.options.calibrationBar)
+                    Toggle("As many copies as possible", isOn: maximumCopiesBinding)
+                    Picker("Order on the page", selection: $model.printJob.options.fillStrategy) {
                         Text("One size at a time").tag(FillStrategy.byType)
-                        Text("Mix sizes on every page").tag(FillStrategy.interleave)
+                        Text("Mix sizes").tag(FillStrategy.interleave)
                     }
                 }
+                .accessibilityIdentifier("cuttingOptions")
+            } footer: {
+                Text("The safety margin lets a slightly off cut stay inside the photo. The check bar lets you confirm the print is at real size.")
             }
-            .navigationTitle("Print sheet")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
-            }
-            .task { model.refreshSheetThumbnails() }
-            .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
         }
+        .navigationTitle("Your sheet")
+        .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom) {
+            Button { path.append(.share) } label: {
+                Label("Continue", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .padding()
+            .background(.bar)
+            .disabled(layout.pages.isEmpty || model.activity != nil)
+            .accessibilityIdentifier("continueToShare")
+        }
+        .confirmationDialog("Add a size", isPresented: Binding(get: { addingSizeFor != nil }, set: { if !$0 { addingSizeFor = nil } }),
+                            titleVisibility: .visible, presenting: addingSizeFor) { photoID in
+            ForEach(PhotoFormat.presets) { format in
+                Button(formatName(format)) { model.addPrintItem(format: format, photoID: photoID) }
+            }
+        } message: { _ in
+            Text("Sizes for other documents; each one gets its own copies.")
+        }
+        .task { model.refreshSheetThumbnails() }
+        .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
     }
 
     private var paperSelection: Binding<String> {
@@ -174,8 +200,7 @@ struct PrintComposerView: View {
 enum PaperNames {
     static func name(for paper: PaperSize) -> String {
         switch paper.id {
-        case PaperSize.photo10x15.id: return String(localized: "10 × 15 cm (100 × 150 mm)")
-        case PaperSize.photo4x6.id: return String(localized: "4 × 6 in (101.6 × 152.4 mm)")
+        case PaperSize.photo4x6.id: return String(localized: "10 × 15 cm · 4 × 6 in")
         case PaperSize.photo13x18.id: return String(localized: "13 × 18 cm · 5 × 7 in")
         case PaperSize.photo9x13.id: return String(localized: "9 × 13 cm · 3.5 × 5 in")
         case PaperSize.a6.id: return String(localized: "A6 (105 × 148 mm)")
@@ -195,11 +220,13 @@ struct SheetPreview: View {
     let layout: PrintLayout
     /// Crops per print item; placements without one are drawn as grey boxes.
     var thumbnails: [UUID: CGImage] = [:]
+    /// First page only, no captions, for cards.
+    var compact = false
 
     var body: some View {
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 16) {
-                ForEach(Array(layout.pages.enumerated()), id: \.offset) { index, page in
+                ForEach(Array((compact ? Array(layout.pages.prefix(1)) : layout.pages).enumerated()), id: \.offset) { index, page in
                     VStack(spacing: 4) {
                         Canvas { context, size in
                             let scale = min(size.width / page.widthMM, size.height / page.heightMM)
@@ -245,13 +272,13 @@ struct SheetPreview: View {
                             }
                         }
                         .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
-                        .frame(height: 220)
-                        Text("Page \(index + 1) of \(layout.pages.count)").font(.caption)
+                        .frame(height: compact ? 130 : 220)
+                        if !compact { Text("Page \(index + 1) of \(layout.pages.count)").font(.caption) }
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text("Page \(index + 1) of \(layout.pages.count): \(page.placements.count) photos"))
                 }
-                if layout.pages.isEmpty {
+                if layout.pages.isEmpty, !compact {
                     ContentUnavailableView("Nothing to print", systemImage: "printer",
                                            description: Text("Add copies or choose a larger paper."))
                         .frame(height: 220)
@@ -259,7 +286,8 @@ struct SheetPreview: View {
             }
             .padding(.horizontal, 4)
         }
-        .scrollIndicators(.visible)
-        .accessibilityIdentifier("sheetPreview")
+        .scrollIndicators(compact ? .hidden : .visible)
+        .scrollDisabled(compact)
+        .accessibilityIdentifier(compact ? "sheetThumbnail" : "sheetPreview")
     }
 }

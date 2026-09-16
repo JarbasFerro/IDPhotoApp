@@ -15,10 +15,10 @@ struct PrintLayoutSolverTests {
 
     // Verified against the formula floor((W - 2m + g) / (cell + g)) with m = 4, g = 2, adaptive bleed.
     static let table: [Case] = [
-        Case(paper: .photo10x15, trim: (26, 32), minimum: 12, exact: false),
-        Case(paper: .photo10x15, trim: (35, 45), minimum: 6, exact: true),
-        Case(paper: .photo10x15, trim: (50.8, 50.8), minimum: 2, exact: false),
-        Case(paper: .photo10x15, trim: (50, 70), minimum: 2, exact: false),
+        Case(paper: .photo4x6, trim: (26, 32), minimum: 12, exact: false),
+        Case(paper: .photo4x6, trim: (35, 45), minimum: 6, exact: true),
+        Case(paper: .photo4x6, trim: (50.8, 50.8), minimum: 2, exact: false),
+        Case(paper: .photo4x6, trim: (50, 70), minimum: 2, exact: false),
         Case(paper: .photo4x6, trim: (26, 32), minimum: 12, exact: false),
         Case(paper: .photo4x6, trim: (35, 45), minimum: 6, exact: false),
         Case(paper: .photo13x18, trim: (26, 32), minimum: 20, exact: false),
@@ -62,24 +62,24 @@ struct PrintLayoutSolverTests {
     }
 
     @Test func adaptiveBleedKeepsCountAndFixedBleedCosts() {
-        let adaptive = PrintLayoutSolver.solve(job(.photo10x15, items: [(35, 45, 6)]))
+        let adaptive = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 6)]))
         #expect(adaptive.pages.count == 1)
         #expect(adaptive.pages[0].bleedMM == 0.5)
-        let fixed = PrintLayoutSolver.solve(job(.photo10x15, items: [(35, 45, 6)], options: {
+        let fixed = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 6)], options: {
             var options = PrintOptions(); options.bleed = .fixed(mm: 1); return options
         }()))
         // Two upright rows of two plus one rotated copy in the 44 mm strip below them.
         #expect(fixed.pages[0].placements.count == 5)
         #expect(fixed.pages.count == 2)
-        let full = PrintLayoutSolver.solve(job(.photo10x15, items: [(26, 32, 12)]))
+        let full = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 12)]))
         #expect(full.pages.count == 1 && full.pages[0].bleedMM == 1)
         #expect(full.pages[0].calibrationBar == nil) // no room left on a full 12-up sheet
-        let spare = PrintLayoutSolver.solve(job(.photo10x15, items: [(26, 32, 6)]))
+        let spare = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 6)]))
         #expect(spare.pages[0].calibrationBar != nil)
     }
 
     @Test func maximumCopiesModeUsesSharedCuts() {
-        let layout = PrintLayoutSolver.solve(job(.photo10x15, items: [(35, 45, 8)], options: .maximumCopies))
+        let layout = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 8)], options: .maximumCopies))
         #expect(layout.pages.count == 1)
         #expect(layout.pages[0].placements.count == 8)
         #expect(layout.pages[0].placements.allSatisfy { $0.rotated })
@@ -87,10 +87,10 @@ struct PrintLayoutSolverTests {
     }
 
     @Test func overflowAddsPagesAndRespectsCap() {
-        let layout = PrintLayoutSolver.solve(job(.photo10x15, items: [(35, 45, 30)]))
+        let layout = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 30)]))
         #expect(layout.pages.count == 5)
         #expect(layout.placedCount == 30 && layout.isComplete)
-        let capped = PrintLayoutSolver.solve(job(.photo10x15, items: [(35, 45, 30)], options: {
+        let capped = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 30)], options: {
             var options = PrintOptions(); options.maxPages = 2; return options
         }()))
         #expect(capped.pages.count == 2)
@@ -98,7 +98,7 @@ struct PrintLayoutSolverTests {
     }
 
     @Test func mixedSizesShareAPageWithPerItemCopies() {
-        let job = job(.photo10x15, items: [(35, 45, 4), (26, 32, 6)])
+        let job = job(.photo4x6, items: [(35, 45, 4), (26, 32, 6)])
         let layout = PrintLayoutSolver.solve(job)
         #expect(layout.isComplete)
         #expect(layout.pages.count <= 2)
@@ -134,13 +134,13 @@ struct PrintLayoutSolverTests {
         let layout = PrintLayoutSolver.solve(job(paper, items: [(35, 45, 20)]))
         #expect(layout.pages.count == 4)
         #expect(Set(layout.pages.map { "\($0.widthMM)x\($0.heightMM)" }).count == 1)
-        var landscape = job(.photo10x15, items: [(26, 32, 3)])
+        var landscape = job(.photo4x6, items: [(26, 32, 3)])
         landscape.options.orientation = .landscape
-        #expect(PrintLayoutSolver.solve(landscape).pages[0].widthMM == 150)
+        #expect(PrintLayoutSolver.solve(landscape).pages[0].widthMM == 152.4)
     }
 
     @Test func ticksNeverEnterANeighbourAndStayOnPage() {
-        let layout = PrintLayoutSolver.solve(job(.photo10x15, items: [(26, 32, 12)]))
+        let layout = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 12)]))
         let page = layout.pages[0]
         #expect(!page.cornerTicks.isEmpty)
         for tick in page.cornerTicks {

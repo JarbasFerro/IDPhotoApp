@@ -79,7 +79,7 @@ struct ToneTests {
         var edits = CropAdjustment()
         edits.background = .color(.white)
         edits.tone = ToneSettings(isEnabled: true, strength: 1)
-        let job = PrintJob(paper: .photo10x15, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 1)])
+        let job = PrintJob(paper: .photo4x6, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 1)])
         let export = try await pipeline.export(photo: photo, adjustment: edits, job: job)
         let source = try #require(CGImageSourceCreateWithURL(export.jpeg as CFURL, nil))
         let image = try #require(CGImageSourceCreateImageAtIndex(source, 0, nil))

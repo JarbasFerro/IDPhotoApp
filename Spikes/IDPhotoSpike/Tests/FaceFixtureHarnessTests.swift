@@ -61,7 +61,7 @@ struct FaceFixtureHarnessTests {
                                 solution.adjustment.rotationDegrees, solution.overall.rawValue, nonPass))
             try writeAnnotated(photo: photo, geometry: g, crop: crop, to: Self.reportFolder.appendingPathComponent("fixture-\(index)-annotated.jpg"))
             let export = try await pipeline.export(photo: photo, adjustment: solution.adjustment,
-                                                   job: PrintJob(paper: .photo10x15, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 1)]))
+                                                   job: PrintJob(paper: .photo4x6, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 1)]))
             try? FileManager.default.removeItem(at: Self.reportFolder.appendingPathComponent("fixture-\(index)-aligned.jpg"))
             try FileManager.default.copyItem(at: export.jpeg, to: Self.reportFolder.appendingPathComponent("fixture-\(index)-aligned.jpg"))
             await pipeline.discard(exportID: export.id)

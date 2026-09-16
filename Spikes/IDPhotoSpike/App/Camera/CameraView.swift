@@ -49,6 +49,7 @@ struct CameraView: View {
     @State private var flash = false
     @State private var countdown: Int?
     @AppStorage("autoCapture") private var autoCapture = true
+    @AppStorage(DeveloperMode.key) private var developerMode = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -203,16 +204,16 @@ struct CameraView: View {
                 Text("Camera paused. It resumes when the interruption ends.")
                     .font(.footnote).padding(8).background(.regularMaterial, in: Capsule())
             }
-            #if DEBUG
-            if let startup = camera.startupMilliseconds {
-                Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? ""))
+            if developerMode {
+                if let startup = camera.startupMilliseconds {
+                    Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? ""))
+                        .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
+                        .accessibilityHidden(true)
+                }
+                Text(debugLine)
                     .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
                     .accessibilityHidden(true)
             }
-            Text(debugLine)
-                .font(.caption2.monospacedDigit()).padding(6).background(.regularMaterial, in: Capsule())
-                .accessibilityHidden(true)
-            #endif
             Spacer()
             HStack {
                 Button("Cancel") { dismiss() }
@@ -273,8 +274,7 @@ struct CameraView: View {
         .foregroundStyle(.white)
     }
 
-    #if DEBUG
-    /// Raw numbers behind the hints, so a device screenshot can validate signs and thresholds.
+    /// Raw numbers behind the hints, so a device screenshot can validate signs and thresholds (developer mode).
     private var debugLine: String {
         var parts: [String] = []
         if let level = camera.deviceLevel {
@@ -292,7 +292,6 @@ struct CameraView: View {
         }
         return parts.joined(separator: " · ")
     }
-    #endif
 
     private func takePhoto() {
         guard camera.state == .running, !camera.isCapturing else { return }

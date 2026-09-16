@@ -135,7 +135,7 @@ struct PhotoPipelineTests {
         defer { try? FileManager.default.removeItem(at: root) }
         let pipeline = PhotoPipeline(root: root)
         let photo = try await pipeline.ingest(SyntheticFixture.staged())
-        let job = PrintJob(paper: .photo10x15, items: [
+        let job = PrintJob(paper: .photo4x6, items: [
             PrintItem(photoID: photo.id, trimWidthMM: 35, trimHeightMM: 45, copies: 4),
             PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 20)
         ])
@@ -166,7 +166,7 @@ struct PhotoPipelineTests {
         let first = try await pipeline.ingest(SyntheticFixture.staged())
         let magenta = Array(repeating: CGColor(red: 1, green: 0, blue: 1, alpha: 1), count: 4)
         let second = try await pipeline.ingest(SyntheticFixture.staged(palette: magenta))
-        let job = PrintJob(paper: .photo10x15, items: [
+        let job = PrintJob(paper: .photo4x6, items: [
             PrintItem(photoID: first.id, trimWidthMM: 26, trimHeightMM: 32, copies: 2),
             PrintItem(photoID: second.id, trimWidthMM: 26, trimHeightMM: 32, copies: 2)
         ])
@@ -194,7 +194,7 @@ struct PhotoPipelineTests {
     }
 
     private func defaultJob(_ photo: PreparedPhoto) -> PrintJob {
-        PrintJob(paper: .photo10x15, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 8)])
+        PrintJob(paper: .photo4x6, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 8)])
     }
 
     /// Rasterizes into an explicit RGBA layout. Returned coordinates are top-left.

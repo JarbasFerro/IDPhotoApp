@@ -31,7 +31,6 @@ struct PaperSize: Sendable, Hashable, Identifiable {
     let heightMM: Double
     let isCustom: Bool
 
-    static let photo10x15 = PaperSize(id: "photo-10x15", widthMM: 100, heightMM: 150, isCustom: false)
     static let photo4x6 = PaperSize(id: "photo-4x6", widthMM: 101.6, heightMM: 152.4, isCustom: false)
     static let photo13x18 = PaperSize(id: "photo-13x18", widthMM: 127, heightMM: 178, isCustom: false)
     static let photo9x13 = PaperSize(id: "photo-9x13", widthMM: 89, heightMM: 127, isCustom: false)
@@ -40,7 +39,8 @@ struct PaperSize: Sendable, Hashable, Identifiable {
     static let a4 = PaperSize(id: "a4", widthMM: 210, heightMM: 297, isCustom: false)
     static let usLetter = PaperSize(id: "us-letter", widthMM: 215.9, heightMM: 279.4, isCustom: false)
 
-    static let presets: [PaperSize] = [photo10x15, photo4x6, photo13x18, photo9x13, a6, a5, a4, usLetter]
+    /// 4 × 6 in is the photo-lab and home-printer standard; "10 × 15 cm" paper is the same sheet.
+    static let presets: [PaperSize] = [photo4x6, photo13x18, photo9x13, a6, a5, a4, usLetter]
 
     static let customRange: ClosedRange<Double> = 50...500
 

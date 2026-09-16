@@ -101,7 +101,7 @@ struct BackgroundTests {
 
         var edits = CropAdjustment()
         edits.background = .color(.white)
-        let job = PrintJob(paper: .photo10x15, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 1)])
+        let job = PrintJob(paper: .photo4x6, items: [PrintItem(photoID: photo.id, trimWidthMM: 26, trimHeightMM: 32, copies: 1)])
         let white = try await pipeline.export(photo: photo, adjustment: edits, job: job)
         let whiteSource = try #require(CGImageSourceCreateWithURL(white.jpeg as CFURL, nil))
         let whiteImage = try #require(CGImageSourceCreateImageAtIndex(whiteSource, 0, nil))

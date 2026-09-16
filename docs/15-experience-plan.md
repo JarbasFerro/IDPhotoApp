@@ -1,7 +1,7 @@
 # 15 — Experience plan: beautiful, easy, fun
 
 **Date:** 2026-09-16  
-**Status:** Proposed, awaiting the user's decisions in §8  
+**Status:** In progress. Decisions in §8 taken with the defaults on 2026-09-16; stage A shipped as version 0.9.0.  
 **Builds on:** [04-ux-ui.md](04-ux-ui.md) (principles and screen catalogue), [11-ios-excellence-strategy.md](11-ios-excellence-strategy.md) (signature experiences), the spike app at version 0.8.2.
 
 ## 1. Where we are
@@ -103,7 +103,7 @@ Each stage ships to the user's iPhone as a version and is judged there. Work sta
 
 | Stage | Version | Deliverable | Judged by |
 |---|---|---|---|
-| A. Structure and words | 0.9 | Four-step flow (Home, Photo Check, Your Sheet, Share) with the Adjust sheet; session card on Home; plain-language checks; Spanish and English; debug line moved behind the developer switch | Can a friend go launch-to-share unaided? Are both languages complete? |
+| A. Structure and words | 0.9 | Done in 0.9.0: four-step flow (Home, Photo Check, Your Sheet, Share) with the Adjust sheet; session card on Home; plain-language checks from one pure mapping with tests; Spanish and English complete (301 strings, Info.plist names); developer details behind a long press on the version line | Can a friend go launch-to-share unaided? Are both languages complete? |
 | B. Moments | 0.10 | Capture-to-frame landing, readiness ring around the shutter with countdown, sheet re-flow animation, hold-to-compare, success tick, haptics, Reduce Motion paths | Does each moment explain something? Nothing flickers or lags on the phone |
 | C. Look | 0.11 | App icon, accent colour, glass control cluster in Adjust, paper chips, people row, light and dark, Dynamic Type and VoiceOver audits, App Store-style screenshots from UI tests | Side-by-side screenshots against Apple's own apps; audits green |
 | D. Ease and reach | 0.12 | TipKit tips, App Intent, Spotlight for the document profile, print-flow polish, final copy pass, then the M2 production project with the spike code promoted | Launch-to-share under 60 s for a new user; M1 exit checklist |
@@ -119,9 +119,9 @@ Estimated effort at the current pace: stage A two sessions, B one to two, C two,
 - The readiness ring is a `Canvas` fed by `CaptureReadiness`; no new signals.
 - UI tests gain one flow per step and keep the accessibility audits; screenshots from these tests become the App Store set.
 
-## 8. Decisions needed from the user
+## 8. Decisions
 
-Defaults in bold are what I will use if there is no answer.
+Taken on 2026-09-16 with the defaults below (user: "Go ahead"). One addition from the user: the invented 10 × 15 cm paper preset is removed; 4 × 6 in (the same physical sheet) is the default and is labelled "10 × 15 cm · 4 × 6 in".
 
 1. **App name shown to people**: "Foto carnet" (current) vs "ID Photo" for international. **Default: Foto carnet in Spanish, ID Photo in English, same icon.**
 2. **Accent colour**: a calm blue-green, a warm orange, or system blue. **Default: blue-green.**

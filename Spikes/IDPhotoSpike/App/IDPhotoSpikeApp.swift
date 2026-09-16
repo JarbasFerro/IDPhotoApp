@@ -14,7 +14,7 @@ struct IDPhotoSpikeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(model: model)
+            RootView(model: model)
                 .task {
                     guard !model.isInitialized else { return }
                     do {

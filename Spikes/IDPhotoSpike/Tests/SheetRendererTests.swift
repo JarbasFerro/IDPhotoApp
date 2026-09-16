@@ -15,7 +15,7 @@ struct SheetRendererTests {
         return try #require(context.makeImage())
     }
 
-    @Test(arguments: [PaperSize.photo10x15, .photo4x6, .a4])
+    @Test(arguments: [PaperSize.photo4x6, .photo13x18, .a4])
     func pdfPageBoxesAndJPEGPixelsMatchPaper(paper: PaperSize) throws {
         let job = PrintJob(paper: paper, items: [
             PrintItem(photoID: UUID(), trimWidthMM: 26, trimHeightMM: 32, copies: 30),
@@ -44,12 +44,12 @@ struct SheetRendererTests {
         #expect(props[kCGImagePropertyPixelWidth] as? Int == expected.width)
         #expect(props[kCGImagePropertyDPIWidth] as? Double == 300)
         // Photo paper at 300 ppi: 10 x 15 cm -> 1181 x 1772, 4 x 6 in -> 1200 x 1800 (portrait pages).
-        if paper == .photo10x15 { #expect(expected == OutputPixels(width: 1_181, height: 1_772) || expected == OutputPixels(width: 1_772, height: 1_181)) }
+        if paper == .photo4x6 { #expect(expected == OutputPixels(width: 1_200, height: 1_800) || expected == OutputPixels(width: 1_800, height: 1_200)) }
         if paper == .photo4x6 { #expect(expected == OutputPixels(width: 1_200, height: 1_800) || expected == OutputPixels(width: 1_800, height: 1_200)) }
     }
 
     @Test func rasterIsPlacedInsideItsBleedBoxAndTicksAreBlack() throws {
-        let job = PrintJob(paper: .photo10x15, items: [PrintItem(photoID: UUID(), trimWidthMM: 35, trimHeightMM: 45, copies: 1)])
+        let job = PrintJob(paper: .photo4x6, items: [PrintItem(photoID: UUID(), trimWidthMM: 35, trimHeightMM: 45, copies: 1)])
         let layout = PrintLayoutSolver.solve(job)
         let page = layout.pages[0]
         let placement = page.placements[0]

@@ -27,7 +27,11 @@ final class PhotoWorkflow {
     private(set) var entries: [PhotoEntry] = []
     /// The photo the editor controls.
     var selectedID: UUID?
-    var printJob = PrintJob(paper: .photo10x15, items: [])
+    /// Changes whenever a photo finishes importing, so the flow can move to its Photo Check.
+    private(set) var lastInstalled: InstallEvent?
+
+    struct InstallEvent: Hashable { let id: UUID; let sequence: Int }
+    var printJob = PrintJob(paper: .photo4x6, items: [])
     /// Sheet-preview crops per print item, rendered on demand.
     private(set) var sheetThumbnails: [UUID: CGImage] = [:]
     /// When true the editor shows the untouched preview (before/after comparison).
@@ -136,6 +140,7 @@ final class PhotoWorkflow {
         }
         selectedID = photo.id
         showsOriginal = false
+        lastInstalled = InstallEvent(id: photo.id, sequence: (lastInstalled?.sequence ?? 0) + 1)
         analyze(photo)
     }
 
