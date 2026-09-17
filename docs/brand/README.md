@@ -82,6 +82,7 @@ Brand decisions may refine the expression of these principles, but may not silen
 
 ### Draft standards
 
+- [`07-visual-identity.md`](07-visual-identity.md) — symbol, frame geometry, character slot, wordmark, colour roles, motif and misuse rules (draft; consolidates accepted decisions).
 - [`11-design-tokens.md`](11-design-tokens.md) — draft executable tokens: spacing, radii, strokes, type roles, sizes and motion as SwiftUI constants (`App/Brand/DesignTokens.swift`), rules for adding one, and what is deliberately not tokenised. Colours stay in `Brand` and `StatusStyle`.
 - [`12-voice-and-writing.md`](12-voice-and-writing.md) — draft product voice, vocabulary, instruction, error and compliance language, localization notes.
 - [`15-brand-qa-checklist.md`](15-brand-qa-checklist.md) — draft review checklist for screens, copy, assets, features and implementation PRs.
@@ -113,7 +114,6 @@ Numbering note (2026-09-17): `06` is taken by the identity handoff, so the plann
 
 ### Visual system
 
-- `07-visual-identity.md` — final symbol, wordmark, app icon, color system, composition and misuse rules.
 - `08-product-design-language.md` — hierarchy, spacing, surfaces, photo treatment, controls, states, component behavior.
 - `09-photography-and-image-language.md` — marketing photography, in-product imagery, manipulation boundaries, representation.
 - `10-iconography-and-symbols.md` — SF Symbols policy and custom-symbol exceptions.
