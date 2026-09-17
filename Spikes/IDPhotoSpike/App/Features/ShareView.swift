@@ -76,7 +76,7 @@ struct ShareView: View {
             }
             if PrintController.isAvailable {
                 Button {
-                    PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Foto carnet sheet"))
+                    PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Calipic sheet"))
                 } label: {
                     Label("Print", systemImage: "printer").frame(maxWidth: .infinity)
                 }

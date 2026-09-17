@@ -302,7 +302,7 @@
 				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = U97K67BK4R;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet";
+				INFOPLIST_KEY_CFBundleDisplayName = Calipic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera is used only to take your ID photo. Photos stay on this iPhone.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -324,7 +324,7 @@
 				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = U97K67BK4R;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Foto carnet";
+				INFOPLIST_KEY_CFBundleDisplayName = Calipic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera is used only to take your ID photo. Photos stay on this iPhone.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

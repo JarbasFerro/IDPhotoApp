@@ -61,7 +61,7 @@ struct HomeView: View {
             }
             .padding()
         }
-        .navigationTitle(Text("Foto carnet"))
+        .navigationTitle(Text(verbatim: "Calipic"))
         .sheet(isPresented: $showRequirements) { RequirementsView() }
     }
 
