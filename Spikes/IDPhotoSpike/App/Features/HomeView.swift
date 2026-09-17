@@ -6,6 +6,9 @@ struct HomeView: View {
     @Binding var path: [Route]
     let acquire: Acquire
     @State private var showRequirements = false
+    @State private var showAppIcons = false
+    @State private var appIcon = AppIconController()
+    @ScaledMetric(relativeTo: .footnote) private var appIconRowSide: CGFloat = 29
     @AppStorage(DeveloperMode.key) private var developerMode = false
 
     var body: some View {
@@ -57,12 +60,16 @@ struct HomeView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
-                versionLine
+                VStack(alignment: .leading, spacing: 0) {
+                    if appIcon.isSupported { appIconRow }
+                    versionLine
+                }
             }
             .padding()
         }
         .navigationTitle(Text(verbatim: "Calipic"))
         .sheet(isPresented: $showRequirements) { RequirementsView() }
+        .sheet(isPresented: $showAppIcons) { AppIconPickerView(controller: appIcon) }
     }
 
     /// People already in the session: faces, copies, and the way back into the sheet.
@@ -122,6 +129,30 @@ struct HomeView: View {
         .accessibilityAddTraits(.isButton)
         .accessibilityHint("Shows the photo requirements.")
         .accessibilityIdentifier("documentCard")
+    }
+
+    /// Quiet entry to choose-your-icon (BD-038). It lives here, outside the capture → check → print path.
+    private var appIconRow: some View {
+        Button { showAppIcons = true } label: {
+            HStack(spacing: 10) {
+                Image(appIcon.current.previewAssetName)
+                    .resizable()
+                    .frame(width: appIconRowSide, height: appIconRowSide)
+                    .accessibilityHidden(true)
+                Text("App Icon")
+                Spacer()
+                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+            }
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityValue(Text(appIcon.current.label))
+        .accessibilityIdentifier("appIconRow")
     }
 
     private var versionLine: some View {

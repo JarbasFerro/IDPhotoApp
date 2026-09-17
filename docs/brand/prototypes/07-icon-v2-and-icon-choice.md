@@ -81,7 +81,7 @@ The set now has **33 characters** — 21 people and 12 fun. Everyone sits on the
 
 Assessment: all 33 are identifiable at 180 px. Closest pairs to watch: short / bald, afro / bob, cat / fox. **Locs** is the least confident drawing (strands hanging beside the face, separated by gaps) and would benefit most from a designer's hand; representation there deserves better than my geometry. Below 60 px everything converges to "a character in a C", which is fine — the choice is for the Home Screen.
 
-**Implementation notes (not built yet):**
+**Implementation notes (written before the build; see "Implemented" below):**
 
 - iOS alternate icons: `UIApplication.shared.setAlternateIconName(_:)`; each alternate is an app-icon set in the asset catalog, listed via `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` (+ `ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES`). iOS shows a system alert when the icon changes; that is expected and cannot be suppressed.
 - Placement: a quiet "App Icon" row in the app's settings/about area with a grid of the icons — never in the capture → check → print path (Experience Constitution: nothing between the person and the finished photo).
@@ -89,6 +89,17 @@ Assessment: all 33 are identifiable at 180 px. Closest pairs to watch: short / b
 - Keep every icon structurally identical; colour stays teal for all — colour choice is not offered, so the brand colour keeps its recognition job. With 33 icons, watch app size: render alternates without the grain layer or as layered Icon Composer files if the PNGs get heavy.
 - Guardrails from BD-023 still apply to every variant: no Face ID, surveillance, Contacts-avatar or character-illustration look. No skin, no facial features, no accessories that imply religion, age or profession.
 - Every alternate needs the same dark / tinted / clear appearances as the default.
+
+**Implemented (2026-09-17):** choose-your-icon ships in the app.
+
+- **Where:** a quiet "App Icon" row above the version line on Home opens a sheet titled "App Icon" with two sections, "People" and "Just for fun", and a grid of the icons. The current icon carries a checkmark badge and the VoiceOver "selected" trait; every icon has a spoken label in en, es and pt-BR. The row is hidden when the system does not support alternate icons, and nothing appears in the capture → check → print path. The selection is read from the system (`UIApplication.alternateIconName`); the app stores nothing. Code: `App/Brand/AppIconChoice.swift`, `App/Features/AppIconPickerView.swift`.
+- **Assets are generated:** `scripts/brand/generate-brand-assets.py` imports `VARIANTS` from `build-icon-v2.py` and writes the primary `AppIcon` (swept), one alternate `AppIcon-<name>` per other character (single 1024 px image, no alpha), a 240 px pre-masked `IconPreview-<name>` for the picker, the Swift list `App/Brand/AppIconCatalog.swift`, and the value of `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` in the project (Debug and Release). The old placeholder PNG is gone.
+- **Size:** with the grain layer the icons weigh about 890 KB each (≈ 29 MB for 33). All app icons are therefore rendered **without grain and without dithering**, consistently: **3.42 MB for the 33 × 1024 PNGs** plus 0.68 MB of previews in the repository; the compiled `Assets.car` of the app is 6.1 MB. Grain returns when the icons become layered Icon Composer files (open point 4).
+- **Adding or removing a character:** one `VARIANTS` entry → run `scripts/brand/generate-brand-assets.py` → add (or delete) the label `AppIcon.<name>` in `Localizable.xcstrings` with en, es and pt-BR. `generate-brand-assets.py --check`, `scripts/brand/test_generate_brand_assets.py` and `AppIconChoiceTests` fail if the build settings, asset catalog, Swift list, labels or the built Info.plist disagree with `VARIANTS`.
+- **Not done yet:** dark / tinted / clear appearances (iOS derives them from the single image for now) and the small-size master below 60 px.
+- **Verified** on the iPhone 17 simulator (iOS 26.5): the built Info.plist lists all 32 alternates; choosing "Panda" changed the Home Screen icon after the system alert, and choosing the default put it back.
+
+![App Icon sheet](icon-v2/app-icon-picker.png)
 
 ---
 
@@ -103,7 +114,7 @@ Assessment: all 33 are identifiable at 180 px. Closest pairs to watch: short / b
 
 ## 6. In the app (2026-09-17)
 
-Teal is now the app's real accent (`App/Brand/BrandRoles.swift`: `Brand.accent`, `Brand.accentFill`), with the separate fill role for filled buttons, neutral destructive toolbar items, and status colours untouched. The Debug-only `-brandCandidate` hook remains for comparisons. The Debug placeholder app icon is the v2 finished teal study.
+Teal is now the app's real accent (`App/Brand/BrandRoles.swift`: `Brand.accent`, `Brand.accentFill`), with the separate fill role for filled buttons, neutral destructive toolbar items, and status colours untouched. The Debug-only `-brandCandidate` hook remains for comparisons. The app icon is the v2 finished teal set of §4 (generated, without grain).
 
 | Home, Dark Mode | Home Screen (simulator, iOS 26.5) |
 |---|---|
