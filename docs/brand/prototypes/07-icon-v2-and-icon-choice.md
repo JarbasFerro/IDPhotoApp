@@ -158,7 +158,9 @@ Greyscale only — white `#FFFFFF` → light grey `#B9B9B9`, top to bottom — o
 ### Verified on the iPhone 17 simulator (iOS 26.5)
 
 - `assetutil --info Assets.car`: every icon has three `Icon Image` renditions at 1024 px — appearance none (opaque), `UIAppearanceDark` and `ISAppearanceTintable` (both with alpha). No `actool` warnings.
-- `xcrun simctl ui <id> appearance dark` with the Home Screen style **Dark → Auto** shows the dark variant, and the default one again in light appearance. Note that the style **Default** keeps light icons even in Dark Mode; that is the system's behaviour, not the asset's.
+- `xcrun simctl ui <id> appearance dark` with the Home Screen style **Dark → Auto** shows the dark variant, and the default one again in light appearance. Note that the style **Default** keeps light icons even in Dark Mode; that is the system's behaviour, not the asset's. The third panel is the same Home Screen with the 0.11.1 build, where iOS had only the teal square to work with:
+
+  ![Light, dark with this change, dark before](icon-v2/springboard-light-dark.png)
 - The Home Screen styles cannot be set with `simctl`. They were driven once through SpringBoard's own *Edit → Customize* panel with a throw-away XCUITest (not committed: it automates system UI that changes between iOS versions). Result, with the **Panda alternate** selected so that an alternate icon and its cut-outs are covered too:
 
 ![Dark, Tinted and Clear Home Screen styles](icon-v2/springboard-styles-panda.png)
