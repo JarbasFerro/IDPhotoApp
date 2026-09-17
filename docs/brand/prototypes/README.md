@@ -13,7 +13,7 @@ This folder holds **evidence**, not decisions. Nothing here approves a color or 
 Two facts frame everything in this folder:
 
 - **The icon is a draft.** `../assets/calipic-icon-draft-v0.svg` is a stand-in. The symbol territory is provisionally frozen (BD-036), but the drawing needs substantial form refinement, and the final icon is expected to gain finishing touches — shadows, depth, texture — rather than stay a flat glyph. All current renders use v0 flat.
-- **The palette is a test palette.** The hex values come from BD-037 and are test values only. BD-033 is unchanged: no brand color is approved.
+- **The colour is teal (BD-033, 2026-09-17).** Round 1 (01–05) was run before that decision with the BD-037 test palette; exact teal values remain working values.
 
 ---
 
@@ -29,6 +29,7 @@ All five documents of round 1 are on `main`. They will be regenerated when the r
 | 04 | [`04-product-context.md`](04-product-context.md) | Step 4 | How little explicit branding do Home, Guided Camera, Photo Check, Editor and Print Sheet / Completion need to feel like Calipic? | Delivered 2026-09-17 (draft v0 stand-in) |
 | 05 | [`05-color-recommendation.md`](05-color-recommendation.md) | Synthesis | What do 01–04 recommend to the founder, and what remains uncertain? | Delivered 2026-09-17 — awaiting founder decision |
 | 06 | [`06-icon-refinement-v1.md`](06-icon-refinement-v1.md) | Refinement | Does a refined form inside the frozen territory fix the small-size failures, and how should finishing (depth, shadow, grain) look? | Delivered 2026-09-17 — candidate, awaiting founder review |
+| 07 | [`07-icon-v2-and-icon-choice.md`](07-icon-v2-and-icon-choice.md) | Refinement | Founder direction applied: simpler bust, 72 stroke, wider C opening, teal; plus the choose-your-icon set | Delivered 2026-09-17 — candidate, awaiting founder review |
 
 `05-color-recommendation.md` is a recommendation. It does not change BD-033 by itself.
 
