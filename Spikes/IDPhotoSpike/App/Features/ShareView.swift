@@ -10,15 +10,15 @@ struct ShareView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 if let result = model.exported {
-                    VStack(spacing: 10) {
+                    VStack(spacing: Design.Spacing.row) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 56))
+                            .font(.system(size: Design.Size.completionSeal))
                             .foregroundStyle(StatusStyle.pass)
                             .symbolEffect(.bounce, options: .nonRepeating, isActive: celebrated && !reduceMotion)
-                        Text("Your files are ready.").font(.title2.weight(.semibold))
-                        Text("Print the sheet or share the photos.").font(.subheadline).foregroundStyle(.secondary)
+                        Text("Your files are ready.").font(Design.Typography.screenTitle)
+                        Text("Print the sheet or share the photos.").font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 8)
@@ -36,7 +36,7 @@ struct ShareView: View {
                     .controlSize(.large)
                     .accessibilityIdentifier("shareDone")
                 } else if model.activity == .exporting {
-                    HStack(spacing: 12) {
+                    HStack(spacing: Design.Spacing.control) {
                         ProgressView()
                         Text("Preparing your files…")
                     }
@@ -62,16 +62,16 @@ struct ShareView: View {
     }
 
     private func printCard(_ result: PhotoExport) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 14) {
+        VStack(alignment: .leading, spacing: Design.Spacing.cardContent) {
+            HStack(alignment: .top, spacing: Design.Spacing.cardContent) {
                 SheetPreview(layout: result.layout, thumbnails: model.sheetThumbnails, compact: true)
                     .frame(width: 96)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Print sheet").font(.headline)
+                VStack(alignment: .leading, spacing: Design.Spacing.tight) {
+                    Text("Print sheet").font(Design.Typography.cardTitle)
                     Text("\(PaperNames.name(for: model.printJob.paper)) · ^[\(result.layout.placedCount) copy](inflect: true) · ^[\(result.layout.pages.count) page](inflect: true)")
-                        .font(.subheadline).foregroundStyle(.secondary)
+                        .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                     Text("Print at Actual Size (100 %), not Fit to Page. Then measure the 50 mm bar before cutting.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .font(Design.Typography.note).foregroundStyle(.secondary)
                 }
             }
             if PrintController.isAvailable {
@@ -83,7 +83,7 @@ struct ShareView: View {
                 .brandProminentButtonStyle()
                 .accessibilityIdentifier("print")
             }
-            HStack(spacing: 12) {
+            HStack(spacing: Design.Spacing.control) {
                 ShareLink(item: result.pdf) { Label("Share PDF", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("sharePDF")
@@ -93,42 +93,42 @@ struct ShareView: View {
             }
         }
         .padding()
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
     }
 
     /// One thumbnail per person; tap a thumbnail to share that JPEG. The badge in the corner says so.
     private func digitalCard(_ result: PhotoExport) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Design.Spacing.control) {
             HStack(alignment: .firstTextBaseline) {
-                Text(result.jpegs.count == 1 ? "Digital photo" : "Digital photos").font(.headline)
+                Text(result.jpegs.count == 1 ? "Digital photo" : "Digital photos").font(Design.Typography.cardTitle)
                 Spacer()
                 if result.jpegs.count > 1 {
                     ShareLink(items: result.jpegs) { Label("Share all", systemImage: "square.and.arrow.up.on.square") }
-                        .font(.subheadline)
+                        .font(Design.Typography.cardDetail)
                         .accessibilityIdentifier("shareAllJPEGs")
                 }
             }
             Text("JPEG, 520 × 640 pixels, for online forms. Tap a photo to share it.")
-                .font(.footnote).foregroundStyle(.secondary)
+                .font(Design.Typography.note).foregroundStyle(.secondary)
             ScrollView(.horizontal) {
-                HStack(alignment: .top, spacing: 14) {
+                HStack(alignment: .top, spacing: Design.Spacing.cardContent) {
                     ForEach(Array(result.jpegs.enumerated()), id: \.offset) { index, url in
                         ShareLink(item: url) {
-                            VStack(spacing: 6) {
+                            VStack(spacing: Design.Spacing.caption) {
                                 ZStack(alignment: .bottomTrailing) {
                                     if let entry = model.entries.dropFirst(index).first {
                                         PortraitView(entry: entry).frame(width: 86)
                                     } else {
-                                        RoundedRectangle(cornerRadius: 6).fill(.fill).frame(width: 86, height: 106)
+                                        RoundedRectangle(cornerRadius: Design.Radius.photo).fill(.fill).frame(width: 86, height: 106)
                                     }
                                     Image(systemName: "square.and.arrow.up.circle.fill")
-                                        .font(.title2)
+                                        .font(Design.Typography.titleGlyph)
                                         .symbolRenderingMode(.palette)
                                         .foregroundStyle(.white, Color.brandAccentFill)
                                         .offset(x: 8, y: 6)
                                 }
                                 if result.jpegs.count > 1 {
-                                    Text("Photo \(index + 1)").font(.caption).foregroundStyle(.primary)
+                                    Text("Photo \(index + 1)").font(Design.Typography.caption).foregroundStyle(.primary)
                                 }
                             }
                             .padding(.top, 4).padding(.trailing, 8)
@@ -143,6 +143,6 @@ struct ShareView: View {
             .scrollIndicators(.hidden)
         }
         .padding()
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
     }
 }

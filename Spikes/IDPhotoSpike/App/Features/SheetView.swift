@@ -19,7 +19,7 @@ struct SheetView: View {
                     .frame(maxWidth: .infinity)
                     .listRowInsets(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
                 Text(summary(layout))
-                    .font(.subheadline)
+                    .font(Design.Typography.cardDetail)
                     .accessibilityIdentifier("layoutSummary")
                 if !layout.isComplete {
                     StatusLabel(text: "\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.", state: .warn)
@@ -45,12 +45,12 @@ struct SheetView: View {
                     }
                     .accessibilityIdentifier("addSize-\(index + 1)")
                 } header: {
-                    HStack(spacing: 10) {
+                    HStack(spacing: Design.Spacing.row) {
                         PortraitView(entry: entry).frame(width: 28)
                         Text(model.entries.count > 1 ? LocalizedStringKey("Photo \(index + 1)") : LocalizedStringKey("Your photo"))
                         Spacer()
                         Button { path.append(.check(entry.id)) } label: {
-                            Text("Check").font(.subheadline).textCase(nil).frame(minWidth: 44, minHeight: 44)
+                            Text("Check").font(.subheadline).textCase(nil).frame(minWidth: Design.Size.minimumTarget, minHeight: Design.Size.minimumTarget)
                         }
                         .accessibilityIdentifier("person-\(index + 1)")
                     }
@@ -92,10 +92,10 @@ struct SheetView: View {
                     }
                     Button("Apply custom size") { applyCustom() }
                     if customError {
-                        Text("Enter sizes between 50 and 500 mm.").font(.footnote).foregroundStyle(.secondary)
+                        Text("Enter sizes between 50 and 500 mm.").font(Design.Typography.note).foregroundStyle(.secondary)
                     }
                     Text("AirPrint uses the nearest paper your printer offers; share the PDF or JPEG for other sizes.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .font(Design.Typography.note).foregroundStyle(.secondary)
                 }
             }
 
@@ -229,14 +229,14 @@ struct SheetPreview: View {
     var body: some View {
         let pages = compact ? Array(layout.pages.prefix(1)) : layout.pages
         ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: 16) {
+            HStack(alignment: .top, spacing: Design.Spacing.group) {
                 ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                    VStack(spacing: 4) {
+                    VStack(spacing: Design.Spacing.tight) {
                         SheetPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion)
                             .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
                             .frame(height: compact ? 130 : 220)
                             .shadow(color: .black.opacity(compact ? 0 : 0.10), radius: 6, y: 3)
-                        if !compact { Text("Page \(index + 1) of \(layout.pages.count)").font(.caption) }
+                        if !compact { Text("Page \(index + 1) of \(layout.pages.count)").font(Design.Typography.caption) }
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text("Page \(index + 1) of \(layout.pages.count): \(page.placements.count) photos"))
@@ -284,19 +284,19 @@ struct SheetPageView: View {
                         ticks.move(to: CGPoint(x: tick.fromX * scale, y: tick.fromY * scale))
                         ticks.addLine(to: CGPoint(x: tick.toX * scale, y: tick.toY * scale))
                     }
-                    context.stroke(ticks, with: .color(.primary), lineWidth: 1)
+                    context.stroke(ticks, with: .color(.primary), lineWidth: Design.Stroke.hairline)
                     if let bar = page.calibrationBar {
                         var path = Path()
                         path.move(to: CGPoint(x: bar.x * scale, y: bar.y * scale))
                         path.addLine(to: CGPoint(x: (bar.x + bar.lengthMM) * scale, y: bar.y * scale))
-                        context.stroke(path, with: .color(.primary), lineWidth: 1)
+                        context.stroke(path, with: .color(.primary), lineWidth: Design.Stroke.hairline)
                     }
                 }
                 .allowsHitTesting(false)
             }
-            .animation(animated ? .spring(duration: 0.55, bounce: 0.12) : nil, value: page.placements)
+            .animation(Design.Motion.rearrange.resolved(animated: animated), value: page.placements)
         }
-        .overlay(Rectangle().strokeBorder(.secondary, lineWidth: 1))
+        .overlay(Rectangle().strokeBorder(.secondary, lineWidth: Design.Stroke.hairline))
         .clipped()
     }
 

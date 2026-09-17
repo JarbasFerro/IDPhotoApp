@@ -137,19 +137,9 @@ struct CameraView: View {
         }
     }
 
+    /// The head oval inside the Calipic frame; green when every check is ready.
     private var headGuide: some View {
-        GeometryReader { geometry in
-            // Sized for a comfortable arm's-length framing; the guide is a composition aid, not the final crop.
-            let height = geometry.size.height * 0.32
-            let width = height * 0.78
-            Ellipse()
-                .strokeBorder(camera.hint == .ready ? StatusStyle.pass : Color.white.opacity(0.7), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
-                .frame(width: width, height: height)
-                .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
-                .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: camera.hint == .ready)
-        }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
+        CameraFramingGuide(ready: camera.hint == .ready)
     }
 
     /// The detected eye line, rotated by the head's roll relative to the camera; green when level in the frame.
@@ -162,7 +152,7 @@ struct CameraView: View {
                     .fill(ok ? StatusStyle.pass : Color.white.opacity(0.8))
                     .frame(width: ok ? 140 : 110, height: 2)
                     .rotationEffect(.degrees(roll))
-                    .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height * CameraFramingGuide.Layout.eyeLineFraction)
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: ok)
             }
             .allowsHitTesting(false)

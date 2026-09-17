@@ -26,11 +26,11 @@ struct PhotoCheckView: View {
                 if dynamicTypeSize.isAccessibilitySize {
                     // Large text: everything scrolls, actions included, so nothing can be pushed off screen.
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 20) { portrait(entry); summaryBlock(entry); actions }.padding()
+                        VStack(alignment: .leading, spacing: Design.Spacing.block) { portrait(entry); summaryBlock(entry); actions }.padding()
                     }
                 } else {
                     // One screen, no scrolling: the portrait takes whatever height the summary leaves.
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: Design.Spacing.group) {
                         portrait(entry).frame(maxHeight: .infinity)
                         summaryBlock(entry).fixedSize(horizontal: false, vertical: true)
                     }
@@ -69,10 +69,10 @@ struct PhotoCheckView: View {
         .task(id: photoID) {
             // Landing: show the uncropped photo first, wait for the push to settle and the check to finish, then frame it.
             landed = false
-            try? await Task.sleep(for: .milliseconds(reduceMotion ? 50 : 650))
+            try? await Task.sleep(for: Design.Motion.landingDelay(reduceMotion: reduceMotion))
             while (entry?.isAnalyzing ?? false), !Task.isCancelled { try? await Task.sleep(for: .milliseconds(50)) }
             guard !Task.isCancelled else { return }
-            withAnimation(reduceMotion ? nil : .spring(duration: 0.8, bounce: 0.12)) { landed = true }
+            withAnimation(Design.Motion.landing.resolved(reduceMotion: reduceMotion)) { landed = true }
         }
     }
 
@@ -82,22 +82,22 @@ struct PhotoCheckView: View {
     private func portrait(_ entry: PhotoEntry) -> some View {
         let checking = entry.isAnalyzing || !landed
         let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 340 : 300)
-        return VStack(spacing: 6) {
+        return VStack(spacing: Design.Spacing.caption) {
             PortraitView(entry: entry, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
                          animated: !reduceMotion)
                 .frame(maxWidth: width)
                 .frame(maxHeight: .infinity)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
-                .animation(reduceMotion ? nil : .spring(duration: 0.8, bounce: 0.12), value: checking)
+                .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
                 .sensoryFeedback(.impact(weight: .light), trigger: landed) { old, new in !old && new }
                 .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
-                    withAnimation(reduceMotion ? nil : .spring(duration: 0.5, bounce: 0.1)) { comparing = pressing }
+                    withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { comparing = pressing }
                 }
                 .accessibilityHint("Press and hold to compare with the original.")
                 .accessibilityAction(named: Text("Compare with original")) { comparing.toggle() }
                 .accessibilityIdentifier("portrait")
             Text(comparing ? "Original" : entry.isAnalyzing ? "Finding your face…" : !landed ? "Framing…" : "Hold to compare with the original")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(Design.Typography.caption).foregroundStyle(.secondary)
                 .animation(nil, value: checking)
                 // Leaf element that marks the screen for UI tests; identifiers on containers hide their children.
                 .accessibilityIdentifier("photoCheck")
@@ -108,29 +108,29 @@ struct PhotoCheckView: View {
     private func summaryBlock(_ entry: PhotoEntry) -> some View {
         let whiteApplied: Bool = { if case .color = entry.adjustment.background { return true } else { return false } }()
         let summary = CheckPresentation.summary(for: entry, whiteApplied: whiteApplied, sourceIsSmall: model.sourceIsSmall)
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
+        return VStack(alignment: .leading, spacing: Design.Spacing.row) {
+            HStack(alignment: .firstTextBaseline, spacing: Design.Spacing.row) {
                 if summary.headline == .checking {
                     ProgressView()
                 } else {
                     Image(systemName: CheckPresentation.symbol(for: summary.headline))
-                        .font(.title2)
+                        .font(Design.Typography.titleGlyph)
                         .foregroundStyle(StatusStyle.color(for: summary.headline))
                 }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(CheckPresentation.title(for: summary.headline)).font(.title3.weight(.semibold))
-                    Text(CheckPresentation.subtitle(for: summary.headline)).font(.footnote).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                    Text(CheckPresentation.title(for: summary.headline)).font(Design.Typography.statusTitle)
+                    Text(CheckPresentation.subtitle(for: summary.headline)).font(Design.Typography.note).foregroundStyle(.secondary)
                 }
             }
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("checkHeadline")
             ForEach(summary.rows) { row in
-                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: Design.Spacing.row) {
                     Image(systemName: StatusStyle.symbol(for: row.state))
                         .foregroundStyle(StatusStyle.color(for: row.state))
                         .frame(width: 20)
-                    Text(row.title).font(.subheadline.weight(.semibold))
-                    Text(row.detail).font(.footnote).foregroundStyle(.secondary)
+                    Text(row.title).font(Design.Typography.rowTitle)
+                    Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
                         .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
                 }
                 .accessibilityElement(children: .combine)
@@ -140,7 +140,7 @@ struct PhotoCheckView: View {
     }
 
     private var actions: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Design.Spacing.control) {
             Button { path.append(.sheet) } label: {
                 Label("Add to sheet", systemImage: "printer").frame(maxWidth: .infinity)
             }
@@ -148,7 +148,7 @@ struct PhotoCheckView: View {
             .controlSize(.large)
             .disabled(model.activity != nil)
             .accessibilityIdentifier("addToSheet")
-            let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout(spacing: 12))
+            let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
             layout {
                 Button { showAdjust = true } label: {
                     Label("Adjust", systemImage: "slider.horizontal.3").frame(maxWidth: .infinity)
@@ -196,14 +196,14 @@ struct PortraitView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
             .clipped()
-            .animation(animated ? .easeInOut(duration: 0.45) : nil, value: hasPreview)
-            .animation(animated ? .spring(duration: 0.7, bounce: 0.1) : nil, value: adjustment)
+            .animation(Design.Motion.backgroundFade.resolved(animated: animated), value: hasPreview)
+            .animation(Design.Motion.reframe.resolved(animated: animated), value: adjustment)
         }
         .aspectRatio(PhotoFormat.spainPrototype.aspectRatio, contentMode: .fit)
         .environment(\.layoutDirection, .leftToRight)
         .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 6))
-        .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.primary.opacity(0.15), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))
+        .overlay(RoundedRectangle(cornerRadius: Design.Radius.photo).strokeBorder(.primary.opacity(0.15), lineWidth: Design.Stroke.hairline))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(label ?? ""))
         .accessibilityHidden(label == nil)
