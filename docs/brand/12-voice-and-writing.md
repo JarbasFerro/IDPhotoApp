@@ -294,7 +294,7 @@ Source: `Spikes/IDPhotoSpike/App/Resources/Localizable.xcstrings` as of 2026-09-
 - The catalog is already largely on voice: direct imperatives, no AI vocabulary, no humor, no guarantee language, visible manual checks. The problems are edges — generic error fallbacks, leftover prototype wording, and one prediction of rejection.
 - "We" is used once ("Everything we can measure…") and works. Extending it to the handful of "could not be…" failures where Calipic is the actor would make the voice more consistent. It should not replace neutral descriptions of the photo ("The face is dark").
 - Capture-ring help text explains a color key (grey / orange / green). The words are fine; [`15-brand-qa-checklist.md`](15-brand-qa-checklist.md) covers the requirement that the same states are never color-only on screen or in VoiceOver.
-- `pt-BR` is entirely missing and should be written natively from this document, not converted from `es`.
+- `pt-BR` was missing when this audit was written; it was added later on 2026-09-17 ("foto para documento" as the consistent term), written from this document rather than converted from `es`. A native-speaker review is still advisable. The "unlikely to be accepted" string audited above was reworded in the same change.
 
 ---
 

@@ -58,50 +58,158 @@ def frame_paths(s):
     return [top_left, bot_left, top_right, bot_right]
 
 
-def hair_paths(name, x):
-    """Hair is drawn over a shared head, so every person keeps the same face, ears, neck, shoulders and size."""
-    if name == "swept":
-        return [f'<path d="M {x - 150} 372 C {x - 104} 296 {x - 44} 258 {x + 24} 258 '
-                f'C {x + 104} 258 {x + 150} 330 {x + 138} 420 C {x + 134} 448 {x + 126} 462 {x + 116} 470 '
-                f'L {x - 116} 470 C {x - 116} 440 {x - 118} 410 {x - 124} 396 '
-                f'C {x - 128} 384 {x - 138} 376 {x - 150} 372 Z"/>']
-    short = (f'<path d="M {x - 128} 450 C {x - 140} 340 {x - 80} 270 {x} 270 '
-             f'C {x + 80} 270 {x + 140} 340 {x + 128} 450 L {x + 116} 470 L {x - 116} 470 Z"/>')
-    if name == "short":
-        return [short]
-    if name == "bun":
-        return [short, f'<ellipse cx="{x}" cy="270" rx="54" ry="40"/>']
-    if name == "bob":
-        return [f'<path d="M {x - 150} 560 C {x - 176} 400 {x - 110} 262 {x} 262 '
-                f'C {x + 110} 262 {x + 176} 400 {x + 150} 560 C {x + 150} 590 {x + 130} 604 {x + 108} 600 '
-                f'L {x - 108} 600 C {x - 130} 604 {x - 150} 590 {x - 150} 560 Z"/>']
-    if name == "long":
-        return [f'<path d="M {x - 142} 664 V 404 C {x - 142} 312 {x - 86} 262 {x} 262 '
-                f'C {x + 86} 262 {x + 142} 312 {x + 142} 404 V 664 Z"/>']
-    if name == "curly":
-        out = []
-        for deg in range(190, 351, 20):  # soft scallops around the crown
-            a = math.radians(deg)
-            out.append(f'<circle cx="{x + 112 * math.cos(a):.1f}" cy="{408 + 112 * math.sin(a):.1f}" r="44"/>')
-        return out
-    raise ValueError(name)
+def _p(d):
+    return f'<path d="{d}"/>'
 
 
-BUSTS = ["swept", "short", "curly", "bob", "long", "bun"]
+def _both(fn):
+    """Draw a shape on the left (sign -1) and its mirror on the right (sign +1)."""
+    return [fn(-1), fn(1)]
+
+
+def _cap(x, top=270):
+    return _p(f"M {x - 128} 450 C {x - 140} 340 {x - 80} {top} {x} {top} "
+              f"C {x + 80} {top} {x + 140} 340 {x + 128} 450 L {x + 116} 470 L {x - 116} 470 Z")
+
+
+def _swept(x):
+    return [_p(f"M {x - 150} 372 C {x - 104} 296 {x - 44} 258 {x + 24} 258 "
+               f"C {x + 104} 258 {x + 150} 330 {x + 138} 420 C {x + 134} 448 {x + 126} 462 {x + 116} 470 "
+               f"L {x - 116} 470 C {x - 116} 440 {x - 118} 410 {x - 124} 396 "
+               f"C {x - 128} 384 {x - 138} 376 {x - 150} 372 Z")]
+
+
+def _spiky(x):
+    pts = [(-128, 440), (-122, 330), (-98, 262), (-72, 308), (-44, 240), (-16, 294), (16, 236), (44, 294),
+           (76, 246), (98, 312), (124, 276), (128, 440)]
+    return [_p("M " + " L ".join(f"{x + dx} {y}" for dx, y in pts) + " Z")]
+
+
+def _curly(x):
+    out = []
+    for deg in range(190, 351, 20):
+        a = math.radians(deg)
+        out.append(f'<circle cx="{x + 112 * math.cos(a):.1f}" cy="{408 + 112 * math.sin(a):.1f}" r="44"/>')
+    return out
+
+
+def _braids(x):
+    out = [_cap(x)]
+    for sgn in (-1, 1):
+        for i, y in enumerate(range(470, 691, 44)):
+            out.append(f'<circle cx="{x + sgn * (146 + i * 2)}" cy="{y}" r="{30 - i * 2}"/>')
+    return out
+
+
+def _unicorn(x):
+    out = [f'<ellipse cx="{x}" cy="480" rx="96" ry="150"/>',
+           _p(f"M {x - 28} 356 L {x} 234 L {x + 28} 356 Z"),
+           _p(f"M {x + 56} 352 C {x + 150} 346 {x + 176} 428 {x + 144} 482 C {x + 184} 524 {x + 172} 596 {x + 118} 626 "
+              f"C {x + 132} 566 {x + 110} 524 {x + 92} 484 Z")]
+    out += _both(lambda s: _p(f"M {x + s * 50} 380 L {x + s * 128} 296 L {x + s * 100} 420 Z"))
+    return out
+
+
+def _alien(x):
+    out = [_p(f"M {x} 656 C {x - 60} 630 {x - 184} 500 {x - 176} 400 C {x - 168} 316 {x - 90} 276 {x} 276 "
+              f"C {x + 90} 276 {x + 168} 316 {x + 176} 400 C {x + 184} 500 {x + 60} 630 {x} 656 Z")]
+    for s in (-1, 1):
+        out.append(_p(f"M {x + s * 52} 300 L {x + s * 100} 244 L {x + s * 112} 254 L {x + s * 70} 312 Z"))
+        out.append(f'<circle cx="{x + s * 110}" cy="244" r="20"/>')
+    return out
+
+
+# name -> (group, draws the shared human head?, narrow child shoulders?, extra shapes)
+VARIANTS = {
+    "swept":     ("people", True, False, _swept),
+    "short":     ("people", True, False, lambda x: [_cap(x)]),
+    "bald":      ("people", True, False, lambda x: []),
+    "spiky":     ("people", True, False, _spiky),
+    "mohawk":    ("people", True, False, lambda x: [_p(
+        f"M {x - 54} 352 C {x - 62} 276 {x - 34} 234 {x} 234 C {x + 34} 234 {x + 62} 276 {x + 54} 352 Z")]),
+    "curly":     ("people", True, False, _curly),
+    "afro":      ("people", True, False, lambda x: [f'<circle cx="{x}" cy="404" r="166"/>']),
+    "bob":       ("people", True, False, lambda x: [_p(
+        f"M {x - 150} 560 C {x - 176} 400 {x - 110} 262 {x} 262 C {x + 110} 262 {x + 176} 400 {x + 150} 560 "
+        f"C {x + 150} 590 {x + 130} 604 {x + 108} 600 L {x - 108} 600 C {x - 130} 604 {x - 150} 590 {x - 150} 560 Z")]),
+    "long":      ("people", True, False, lambda x: [_p(
+        f"M {x - 156} 676 C {x - 138} 600 {x - 142} 480 {x - 142} 404 C {x - 142} 312 {x - 86} 262 {x} 262 "
+        f"C {x + 86} 262 {x + 142} 312 {x + 142} 404 C {x + 142} 480 {x + 138} 600 {x + 156} 676 Z")]),
+    "bun":       ("people", True, False, lambda x: [_cap(x), f'<ellipse cx="{x}" cy="270" rx="54" ry="40"/>']),
+    "spacebuns": ("people", True, False, lambda x: [_cap(x)] + _both(
+        lambda s: f'<circle cx="{x + s * 96}" cy="294" r="46"/>')),
+    "ponytail":  ("people", True, False, lambda x: [_cap(x), _p(
+        f"M {x + 92} 300 C {x + 170} 288 {x + 216} 360 {x + 206} 452 C {x + 200} 522 {x + 182} 582 {x + 160} 618 "
+        f"C {x + 166} 540 {x + 160} 470 {x + 126} 420 Z")]),
+    "pigtails":  ("people", True, False, lambda x: [_cap(x)] + _both(lambda s: _p(
+        f"M {x + s * 122} 410 C {x + s * 180} 424 {x + s * 194} 520 {x + s * 178} 612 "
+        f"C {x + s * 172} 642 {x + s * 150} 650 {x + s * 142} 630 C {x + s * 152} 560 {x + s * 142} 500 {x + s * 116} 470 Z"))),
+    "braids":    ("people", True, False, _braids),
+    "covered":   ("people", True, False, lambda x: [_p(
+        f"M {x} 250 C {x + 120} 250 {x + 160} 340 {x + 156} 450 C {x + 154} 530 {x + 132} 580 {x + 122} 612 "
+        f"C {x + 150} 640 {x + 196} 668 {x + 224} 708 L {x - 224} 708 C {x - 196} 668 {x - 150} 640 {x - 122} 612 "
+        f"C {x - 132} 580 {x - 154} 530 {x - 156} 450 C {x - 160} 340 {x - 120} 250 {x} 250 Z")]),
+    "cap":       ("people", True, False, lambda x: [
+        _p(f"M {x - 126} 410 C {x - 130} 310 {x - 70} 262 {x} 262 C {x + 70} 262 {x + 130} 310 {x + 126} 410 Z"),
+        f'<rect x="{x + 30}" y="376" width="196" height="34" rx="17"/>']),
+    "beanie":    ("people", True, False, lambda x: [
+        _p(f"M {x - 132} 424 C {x - 138} 320 {x - 78} 276 {x} 276 C {x + 78} 276 {x + 138} 320 {x + 132} 424 Z"),
+        f'<circle cx="{x}" cy="264" r="28"/>']),
+    "hat":       ("people", True, False, lambda x: [
+        f'<ellipse cx="{x}" cy="376" rx="212" ry="30"/>',
+        _p(f"M {x - 102} 376 C {x - 106} 292 {x - 70} 250 {x} 250 C {x + 70} 250 {x + 106} 292 {x + 102} 376 Z")]),
+    "beard":     ("people", True, False, lambda x: [_cap(x), _p(
+        f"M {x - 112} 520 C {x - 112} 624 {x - 60} 694 {x} 694 C {x + 60} 694 {x + 112} 624 {x + 112} 520 Z")]),
+    "child":     ("people", True, True, lambda x: [_cap(x, 282), _p(
+        f"M {x - 8} 290 C {x - 4} 262 {x + 14} 246 {x + 36} 244 C {x + 24} 258 {x + 22} 274 {x + 26} 292 Z")]),
+    "baby":      ("people", True, True, lambda x: [_p(
+        f"M {x - 6} 302 C {x - 16} 268 {x + 8} 246 {x + 30} 258 C {x + 46} 268 {x + 38} 292 {x + 22} 288 "
+        f"C {x + 28} 278 {x + 18} 270 {x + 10} 278 C {x + 4} 286 {x + 8} 296 {x + 14} 302 Z")]),
+    "cat":       ("fun", False, False, lambda x: [f'<ellipse cx="{x}" cy="474" rx="152" ry="130"/>'] + _both(
+        lambda s: _p(f"M {x + s * 146} 430 L {x + s * 132} 262 L {x + s * 38} 356 Z"))),
+    "dog":       ("fun", False, False, lambda x: [f'<ellipse cx="{x}" cy="474" rx="112" ry="140"/>'] + _both(
+        lambda s: _p(f"M {x + s * 50} 328 C {x + s * 150} 296 {x + s * 218} 380 {x + s * 202} 504 "
+                     f"C {x + s * 194} 566 {x + s * 150} 574 {x + s * 130} 522 C {x + s * 122} 470 {x + s * 112} 420 {x + s * 50} 404 Z"))),
+    "bunny":     ("fun", False, False, lambda x: [f'<ellipse cx="{x}" cy="494" rx="126" ry="118"/>'] + _both(
+        lambda s: f'<ellipse cx="{x + s * 58}" cy="336" rx="34" ry="94" '
+                  f'transform="rotate({s * 12} {x + s * 58} 430)"/>')),
+    "bear":      ("fun", False, False, lambda x: [f'<circle cx="{x}" cy="476" r="140"/>'] + _both(
+        lambda s: f'<circle cx="{x + s * 108}" cy="352" r="52"/>')),
+    "unicorn":   ("fun", False, False, _unicorn),
+    "robot":     ("fun", False, False, lambda x: [
+        f'<rect x="{x - 132}" y="322" width="264" height="284" rx="40"/>',
+        f'<rect x="{x - 8}" y="262" width="16" height="64"/>', f'<circle cx="{x}" cy="258" r="24"/>'] + _both(
+        lambda s: f'<rect x="{x + s * 146 - 16}" y="426" width="32" height="76" rx="10"/>')),
+    "alien":     ("fun", False, True, _alien),
+    "crown":     ("fun", True, False, lambda x: [_cap(x), _p(
+        f"M {x - 102} 336 L {x - 116} 244 L {x - 56} 296 L {x} 236 L {x + 56} 296 L {x + 116} 244 L {x + 102} 336 Z")]),
+    "party":     ("fun", True, False, lambda x: [_cap(x), _p(f"M {x + 20} 300 L {x + 168} 240 L {x + 128} 396 Z"),
+                                                 f'<circle cx="{x + 172}" cy="238" r="20"/>']),
+    "viking":    ("fun", True, False, lambda x: [_p(
+        f"M {x - 130} 412 C {x - 134} 318 {x - 72} 272 {x} 272 C {x + 72} 272 {x + 134} 318 {x + 130} 412 Z")] + _both(
+        lambda s: _p(f"M {x + s * 118} 366 C {x + s * 190} 356 {x + s * 216} 294 {x + s * 198} 238 "
+                     f"C {x + s * 180} 292 {x + s * 152} 312 {x + s * 110} 318 Z"))),
+}
+BUSTS = list(VARIANTS)
 
 
 def bust_paths(s):
-    """Simple, neutral front-facing bust: shared head with ears, neck, broad shoulders, flat print-like base."""
+    """The person in the frame. Everyone shares the same neck, shoulders and flat print-like base; people also
+    share one head with ears, so only the hair or headwear changes. The frame itself never changes."""
     x = C + s.shift_x
-    head = (f'<path d="M {x + 116} 470 C {x + 136} 466 {x + 142} 490 {x + 134} 516 '
-            f'C {x + 130} 534 {x + 122} 542 {x + 110} 542 '
-            f'C {x + 100} 592 {x + 60} 628 {x} 628 C {x - 60} 628 {x - 100} 592 {x - 110} 542 '
-            f'C {x - 122} 542 {x - 130} 534 {x - 134} 516 C {x - 142} 490 {x - 136} 466 {x - 116} 470 '
-            f'C {x - 120} 370 {x - 70} 296 {x} 296 C {x + 70} 296 {x + 120} 370 {x + 116} 470 Z"/>')
-    body = (f'<path d="M {x - 54} 596 C {x - 54} 640 {x - 66} 664 {x - 104} 676 '
-            f'C {x - 172} 694 {x - 218} 716 {x - 232} 760 H {x + 232} '
-            f'C {x + 218} 716 {x + 172} 694 {x + 104} 676 C {x + 66} 664 {x + 54} 640 {x + 54} 596 Z"/>')
-    return [head, body] + hair_paths(s.bust, x)
+    _, human_head, narrow, extras = VARIANTS[s.bust]
+    parts = []
+    if human_head:
+        parts.append(_p(f"M {x + 116} 470 C {x + 136} 466 {x + 142} 490 {x + 134} 516 "
+                        f"C {x + 130} 534 {x + 122} 542 {x + 110} 542 "
+                        f"C {x + 100} 592 {x + 60} 628 {x} 628 C {x - 60} 628 {x - 100} 592 {x - 110} 542 "
+                        f"C {x - 122} 542 {x - 130} 534 {x - 134} 516 C {x - 142} 490 {x - 136} 466 {x - 116} 470 "
+                        f"C {x - 120} 370 {x - 70} 296 {x} 296 C {x + 70} 296 {x + 120} 370 {x + 116} 470 Z"))
+    w, n = (176, 44) if narrow else (232, 54)  # shoulder half-width, neck half-width
+    parts.append(_p(f"M {x - n} 596 C {x - n} 640 {x - n - 12} 664 {x - n - 46} 676 "
+                    f"C {x - w + 56} 694 {x - w + 14} 716 {x - w} 760 H {x + w} "
+                    f"C {x + w - 14} 716 {x + w - 56} 694 {x + n + 46} 676 C {x + n + 12} 664 {x + n} 640 {x + n} 596 Z"))
+    return parts + extras(x)
 
 
 def flat_svg(s, title):
@@ -216,6 +324,40 @@ def sheet(path, rows, sizes, title, note):
     os.remove(path)
 
 
+def grid(path, cells, cols=7):
+    """Choose-your-icon overview: every variant at Home Screen size (180 px) with its 60 px render beside it."""
+    pad, cw, ch = 48, 270, 250
+    groups = []
+    for name, group, files in cells:
+        if not groups or groups[-1][0] != group:
+            groups.append((group, []))
+        groups[-1][1].append((name, files))
+    height = 110 + sum(60 + ch * -(-len(items) // cols) for _, items in groups) + 20
+    width = pad * 2 + cw * cols
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+           f'width="{width}" height="{height}" viewBox="0 0 {width} {height}" font-family="Helvetica, Arial, sans-serif">',
+           f'<rect width="{width}" height="{height}" fill="#F2F2F7"/>',
+           f'<text x="{pad}" y="62" font-size="34" font-weight="700" fill="#111">Calipic - choose-your-icon set</text>']
+    y, n = 110, 0
+    for group, items in groups:
+        out.append(f'<text x="{pad}" y="{y + 30}" font-size="24" font-weight="700" fill="#111">{group}</text>')
+        y += 60
+        for i, (name, files) in enumerate(items):
+            x, cy = pad + cw * (i % cols), y + ch * (i // cols)
+            for px, dx, dy in ((180, 0, 0), (60, 196, 120)):
+                n += 1
+                rx = 0.2237 * px
+                out.append(f'<clipPath id="g{n}"><rect x="{x + dx}" y="{cy + dy}" width="{px}" height="{px}" rx="{rx:.2f}"/></clipPath>')
+                out.append(f'<image xlink:href="{files[px]}" x="{x + dx}" y="{cy + dy}" width="{px}" height="{px}" clip-path="url(#g{n})"/>')
+            out.append(f'<text x="{x}" y="{cy + 208}" font-size="18" fill="#444">{name}</text>')
+        y += ch * -(-len(items) // cols)
+    out.append("</svg>")
+    with open(path, "w") as fh:
+        fh.write("\n".join(out))
+    inkscape(path, path[:-4] + ".png", width)
+    os.remove(path)
+
+
 def main():
     if not shutil.which("inkscape"):
         sys.exit("inkscape is required")
@@ -260,7 +402,7 @@ def main():
     # Alternate app icons: same frame, a different person. Finished teal, shown at Home Screen and Settings sizes.
     vdir = os.path.join(OUT, "variants")
     os.makedirs(vdir, exist_ok=True)
-    rows, vsizes = [], [256, 180, 60, 29]
+    cells = []
     teal = FINISHES["teal"]
     for bust in BUSTS:
         full = Spec(FULL.stroke, FULL.net_gap, FULL.right_sweep, shift_x=FULL.shift_x, bust=bust)
@@ -273,13 +415,11 @@ def main():
             with open(paths[tag], "w") as fh:
                 fh.write(finished_svg(spec, f"{bust}{tag}", teal))
         files = {}
-        for px in vsizes:
+        for px in (180, 60):
             files[px] = f"variants/v2-finished-{bust}-{px}.png"
-            inkscape(paths[""] if px >= 60 else paths["-small"], os.path.join(OUT, files[px]), px)
-        rows.append((bust, files))
-    sheet(os.path.join(OUT, "sheet-variants.svg"), rows, vsizes,
-          "Calipic icon v2 - choose-your-icon set",
-          "Finished teal. 256 / 180 / 60 / 29 px at true pixels; small master below 60 px.")
+            inkscape(paths[""], os.path.join(OUT, files[px]), px)
+        cells.append((bust, VARIANTS[bust][0], files))
+    grid(os.path.join(OUT, "sheet-variants.svg"), cells)
     print("built", master, small, OUT)
 
 

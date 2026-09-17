@@ -66,16 +66,21 @@ Unchanged from v1: lit single-hue teal field (`#15899A` → `#0A5863`, around th
 
 ![Choose-your-icon set](icon-v2/sheet-variants.png)
 
-First set, all sharing one head, ears, neck, shoulders and size — only the hair changes (`hair_paths()` in the script): **swept** (default), **short**, **curly**, **bob**, **long**, **bun**.
+**Founder decision (2026-09-17):** frame approved, "swept" stays the default, and the set should be as diverse as possible and end with a playful group.
 
-Honest assessment of this first pass: swept, short, curly, bob and bun read well down to 60 px; **long** is the weakest (a solid silhouette of straight long hair tends toward a plain block) and needs a designer's hand. Below 60 px all variants converge to "a person in a C" — which is fine: the choice is for the Home Screen, where the icon is 60 pt (120–180 px).
+The set now has **31 characters** — 21 people and 10 fun ones. Everyone sits on the same shoulders and base line inside the same frame; people also share one head with ears, so only hair or headwear changes. Each is one entry in the `VARIANTS` table of the script.
+
+- **People:** swept (default), short, bald, spiky, mohawk, curly, afro, bob, long, bun, spacebuns, ponytail, pigtails, braids, covered, cap, beanie, hat, beard, child, baby.
+- **Fun:** cat, dog, bunny, bear, unicorn, robot, alien, crown, party, viking.
+
+Honest assessment of this pass: most read clearly at Home Screen size (the 180 px column) and stay distinguishable at 60 px. Weakest drawings, worth a designer's hand: **long** and **covered** (solid silhouettes of hair or fabric tend toward a plain block), **unicorn** (a front-facing unicorn is mostly a horn and a mane), **dog** (floppy ears sit close to pigtails) and **mohawk / crown** (only ~36 units of headroom under the frame limits how tall anything on top of the head can be). Below 60 px everything converges to "a character in a C", which is fine — the choice is for the Home Screen.
 
 **Implementation notes (not built yet):**
 
 - iOS alternate icons: `UIApplication.shared.setAlternateIconName(_:)`; each alternate is an app-icon set in the asset catalog, listed via `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` (+ `ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES`). iOS shows a system alert when the icon changes; that is expected and cannot be suppressed.
 - Placement: a quiet "App Icon" row in the app's settings/about area with a grid of the icons — never in the capture → check → print path (Experience Constitution: nothing between the person and the finished photo).
 - The App Store listing, marketing and the wordmark lock-up always use the **default** icon.
-- Keep the set small (6–8) and structurally identical; colour stays teal for all — colour choice is not offered, so the brand colour keeps its recognition job.
+- Keep every icon structurally identical; colour stays teal for all — colour choice is not offered, so the brand colour keeps its recognition job. With ~31 icons, watch app size: render alternates without the grain layer or as layered Icon Composer files if the PNGs get heavy.
 - Guardrails from BD-023 still apply to every variant: no Face ID, surveillance, Contacts-avatar or character-illustration look. No skin, no facial features, no accessories that imply religion, age or profession.
 - Every alternate needs the same dark / tinted / clear appearances as the default.
 
@@ -83,10 +88,10 @@ Honest assessment of this first pass: swept, short, curly, bob and bun read well
 
 ## 5. Open points
 
-1. Approve the v2 **frame** (stroke 72, 52° right corners, 30-unit gaps)? This is the part that becomes the fixed brand element.
-2. Approve the **default bust** (swept) — or choose another default from the set.
-3. The variant set itself: which to keep, which to add (e.g. a child, a headscarf-neutral rounded outline, a ponytail), and a redraw of "long".
-4. Exact teal values (light `#0E6F7C`, dark `#4FC3D1`, fill roles from PR #10) remain working values until tested on device.
+1. ~~Frame~~ — **approved 2026-09-17.** ~~Default bust~~ — **swept, confirmed.**
+2. Designer pass on the weakest characters listed in §4, and any additions (suggestions: glasses as a cut-out, headphones, turban-style wrap, hijab with a distinct face opening, locs, a second child, fox, panda, dinosaur).
+3. Exact teal values (light `#0E6F7C`, dark `#4FC3D1`, fill roles) remain working values until tested on device.
+4. Layered Icon Composer assets with dark / tinted / clear appearances for the default and every alternate.
 
 ---
 

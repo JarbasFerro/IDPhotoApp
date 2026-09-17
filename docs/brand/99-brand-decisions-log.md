@@ -208,6 +208,8 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 
 **Update 2026-09-17 (founder direction → v2):** after reviewing v1 the founder chose a **simpler, neutral bust** (no bun, no strand), the **thicker 72-unit stroke**, and a **wider right-hand opening** so the C reads without explanation. Candidate: `docs/brand/assets/calipic-icon-v2-master.svg` / `calipic-icon-v2-small.svg` from `scripts/brand/build-icon-v2.py`; write-up `docs/brand/prototypes/07-icon-v2-and-icon-choice.md`. The "bun + loose strand" description above is superseded as the working direction. Status stays Working until the founder approves the frame and default bust.
 
+**Founder approval 2026-09-17 (frame + default bust):** the **v2 frame is approved** as the fixed brand element — 72-unit stroke, identical 130 radii, equal 30-unit gaps top/bottom/left, right corners drawn for 52° so the opening reads as a C, 14-unit optical shift, exact mirror symmetry (small master: 82 stroke, 44 gaps). The **default bust is "swept"**. Source of truth: `Spec` values in `scripts/brand/build-icon-v2.py` and `docs/brand/assets/calipic-icon-v2-master.svg` / `-small.svg`. Still open before full lock: a designer's optical pass on the curves, the finish, and the layered Icon Composer asset with dark/tinted/clear appearances. Status: **Accepted (frame geometry and default bust); finish Working.**
+
 ## BD-037 — Provisional color test palette (test values only)
 
 **Status:** Working  
@@ -249,11 +251,12 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 
 ## BD-038 — User-selectable app icon
 
-**Status:** Working  
+**Status:** Accepted (direction) — set and drawings Working  
 **Date:** 2026-09-17  
-**Direction (founder idea):** Let people choose their app icon from a small set in which the **C-frame, colour and finish are constant** and only the person inside changes (first set: swept, short, curly, bob, long, bun). The frame-C is therefore the fixed brand element; the default icon is used for the App Store, marketing and lock-ups.  
-**Constraints:** 6–8 structurally identical variants; no colour choice; BD-023 guardrails apply to every variant; selection lives in settings/about, never in the capture → check → print path; every variant ships the same dark/tinted/clear appearances.  
-**Details:** `docs/brand/prototypes/07-icon-v2-and-icon-choice.md` §4. Not implemented yet.
+**Decision (founder):** People can choose their app icon. The **C-frame, teal and finish are constant**; only the character inside changes. The founder asked for **as many diverse icons as possible, ending with a playful group** (unicorn and friends). This supersedes the earlier "6–8 variants" suggestion.  
+**First set (31):** people — swept (default), short, bald, spiky, mohawk, curly, afro, bob, long, bun, spacebuns, ponytail, pigtails, braids, covered, cap, beanie, hat, beard, child, baby; fun — cat, dog, bunny, bear, unicorn, robot, alien, crown, party, viking. Generated from `VARIANTS` in `scripts/brand/build-icon-v2.py`; adding one is a single table entry.  
+**Constraints:** every character sits on the same shoulders, size and base line inside the same frame; no colour choice; no facial features or skin; BD-023 guardrails (no Face ID / surveillance / Contacts look) apply; the picker lives in settings/about, never in the capture → check → print path; App Store, marketing and lock-ups always use the default icon; every variant must ship the same dark/tinted/clear appearances as the default.  
+**Details:** `docs/brand/prototypes/07-icon-v2-and-icon-choice.md` §4.
 
 ---
 

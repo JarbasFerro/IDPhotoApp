@@ -149,7 +149,7 @@ See [`12-voice-and-writing.md`](12-voice-and-writing.md) for patterns and vocabu
 
 ## 10. Localization (BD-031)
 
-- [ ] Every new user-facing string exists in the string catalog with **en, es and pt-BR**. Missing pt-BR is tracked, not ignored. (As of 2026-09-17 the catalog has no pt-BR at all — see 12 §9.3.)
+- [ ] Every new user-facing string exists in the string catalog with **en, es and pt-BR**. Missing pt-BR is tracked, not ignored. (pt-BR was added on 2026-09-17; a native-speaker review is still advisable before release.)
 - [ ] "Calipic" is not translated. Feature names are translated as ordinary descriptive words.
 - [ ] No concatenated sentence fragments; placeholders are positional; plurals use grammar agreement or plural variants, never "(s)".
 - [ ] Decimal separators, units and paper sizes follow the locale.
