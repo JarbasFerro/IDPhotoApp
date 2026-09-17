@@ -50,7 +50,7 @@ struct BrandCandidateTests {
         return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
     }
 
-    /// The test host is launched without `-brandCandidate`, which must leave the app untinted.
+    /// The test host is launched without `-brandCandidate`, so the app wears the brand teal and no test system.
     @Test func nothingIsSelectedByDefault() {
         #expect(BrandCandidate.current == nil)
     }

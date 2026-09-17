@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Provisional brand accent candidates for controlled product-context testing (docs/brand/prototypes). These are
-/// test values, not decisions: nothing is selected unless the app is launched with `-brandCandidate A|B|C|D`, and
-/// without it the app keeps the system default tint. Status colours never derive from the candidate.
+/// Colour test systems from the controlled product-context tests (docs/brand/prototypes). Teal (B) was chosen
+/// (BD-033) and is what the app wears by default, see `Brand`; launching a Debug build with
+/// `-brandCandidate A|B|C|D` swaps in a test system for comparisons. Status colours never derive from these.
 enum BrandCandidate: String, CaseIterable, Sendable {
     /// Deep blue.
     case a = "A"

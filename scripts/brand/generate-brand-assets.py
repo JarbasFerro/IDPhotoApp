@@ -6,9 +6,9 @@
 - BrandAccentFillA…D colorsets: the accent FILL role, for filled buttons under a white label. Each fill is derived
   from the accent of the same appearance (same hue and saturation, lightness lowered only as far as needed) and the
   script fails if any fill gives a white label less than 4.5:1.
-- AppIcon: a labelled placeholder rendered from docs/brand/assets/calipic-icon-draft-v0.svg. The draft geometry is
-  used untouched; only the rounded preview tile is swapped for a full-bleed opaque white square, as iOS requires
-  (the system applies its own mask). Neutral white field, mark #111111: a draft placeholder, not a colour pick.
+- AppIcon: a placeholder rendered from the v2 finished teal study (docs/brand/prototypes/icon-v2, built by
+  scripts/brand/build-icon-v2.py), which is already a full-bleed opaque square as iOS requires. The symbol form is
+  still a candidate (BD-036), so this stays a Debug-only placeholder.
 
 None of these values are brand decisions. Requires inkscape and sips on PATH.
 """
@@ -20,7 +20,7 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "Spikes/IDPhotoSpike/App/Resources/Assets.xcassets"
-DRAFT_SVG = ROOT / "docs/brand/assets/calipic-icon-draft-v0.svg"
+ICON_SVG = ROOT / "docs/brand/prototypes/icon-v2/v2-finished-teal.svg"
 INFO = {"author": "xcode", "version": 1}
 
 # id: (light, dark, increase-contrast light, increase-contrast dark)
@@ -39,8 +39,6 @@ FILL_CONTRAST_INCREASED = 7.0
 # In the order of a PALETTE row.
 FILL_MINIMUMS = (FILL_CONTRAST, FILL_CONTRAST, FILL_CONTRAST_INCREASED, FILL_CONTRAST_INCREASED)
 
-PREVIEW_TILE = '<rect x="28" y="28" width="968" height="968" rx="216" fill="#FFFFFF" stroke="#D9D9D9" stroke-width="4"/>'
-FULL_BLEED = '<rect x="0" y="0" width="1024" height="1024" fill="#FFFFFF"/>'
 
 
 def write_json(path, payload):
@@ -135,22 +133,21 @@ def main():
         write_colorset(f"BrandAccentFill{identifier}", fill_palette[identifier])
         print(f"{identifier} fill  " + "  ".join(f"#{fill} {contrast(fill, ON_FILL):.2f}:1" for fill in fill_palette[identifier]))
 
-    icon_name = "AppIcon-draft-v0-placeholder.png"
+    icon_name = "AppIcon-v2-teal-placeholder.png"
     write_json(CATALOG / "AppIcon.appiconset/Contents.json", {
         "images": [{"filename": icon_name, "idiom": "universal", "platform": "ios", "size": "1024x1024"}],
         "info": INFO,
     })
-    svg = DRAFT_SVG.read_text()
-    if PREVIEW_TILE not in svg:
-        raise SystemExit("The draft SVG's preview tile changed; update PREVIEW_TILE before regenerating the placeholder.")
+    for stale in (CATALOG / "AppIcon.appiconset").glob("*.png"):
+        stale.unlink()
     with tempfile.TemporaryDirectory() as scratch:
         scratch = pathlib.Path(scratch)
-        (scratch / "icon.svg").write_text(svg.replace(PREVIEW_TILE, FULL_BLEED))
+        (scratch / "icon.svg").write_text(ICON_SVG.read_text())
         subprocess.run(["inkscape", str(scratch / "icon.svg"), "-w", "1024", "-h", "1024",
                         "--export-background=#FFFFFF", "--export-background-opacity=1",
                         "-o", str(scratch / "icon.png")], check=True)
-        # App icons must not carry an alpha channel; a JPEG round trip through sips drops it losslessly enough
-        # for a two-tone placeholder.
+        # App icons must not carry an alpha channel; a JPEG round trip through sips drops it, which is good
+        # enough for a placeholder.
         subprocess.run(["sips", "-s", "format", "jpeg", "-s", "formatOptions", "100",
                         str(scratch / "icon.png"), "--out", str(scratch / "icon.jpg")], check=True, capture_output=True)
         subprocess.run(["sips", "-s", "format", "png", str(scratch / "icon.jpg"),

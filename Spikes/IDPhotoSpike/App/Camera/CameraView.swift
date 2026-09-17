@@ -513,7 +513,7 @@ struct CameraIntroView: View {
         VStack(spacing: 22) {
             Image(systemName: "timer")
                 .font(.system(size: 64, weight: .light))
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(Color.brandAccent)
                 .padding(.top, 12)
                 .accessibilityHidden(true)
             Text("When the ring closes, a 3-second countdown runs and the photo is taken for you. Look at the lens during the countdown.")

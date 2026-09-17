@@ -87,3 +87,15 @@ Honest assessment of this first pass: swept, short, curly, bob and bun read well
 2. Approve the **default bust** (swept) — or choose another default from the set.
 3. The variant set itself: which to keep, which to add (e.g. a child, a headscarf-neutral rounded outline, a ponytail), and a redraw of "long".
 4. Exact teal values (light `#0E6F7C`, dark `#4FC3D1`, fill roles from PR #10) remain working values until tested on device.
+
+---
+
+## 6. In the app (2026-09-17)
+
+Teal is now the app's real accent (`App/Brand/BrandRoles.swift`: `Brand.accent`, `Brand.accentFill`), with the separate fill role for filled buttons, neutral destructive toolbar items, and status colours untouched. The Debug-only `-brandCandidate` hook remains for comparisons. The Debug placeholder app icon is the v2 finished teal study.
+
+| Home, Dark Mode | Home Screen (simulator, iOS 26.5) |
+|---|---|
+| ![Home in Dark Mode](icon-v2/app-home-dark-teal.png) | ![Home Screen](icon-v2/springboard-teal.png) |
+
+Note how the icon separates from Contacts on the same row: the C-frame and teal do the work, not the bust.
