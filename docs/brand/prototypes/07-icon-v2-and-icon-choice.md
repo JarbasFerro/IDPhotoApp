@@ -68,19 +68,25 @@ Unchanged from v1: lit single-hue teal field (`#15899A` → `#0A5863`, around th
 
 **Founder decision (2026-09-17):** frame approved, "swept" stays the default, and the set should be as diverse as possible and end with a playful group.
 
-The set now has **31 characters** — 21 people and 10 fun ones. Everyone sits on the same shoulders and base line inside the same frame; people also share one head with ears, so only hair or headwear changes. Each is one entry in the `VARIANTS` table of the script.
+**Second pass (founder, 2026-09-17):** remove anything that does not read clearly at Home Screen size, and try the suggested additions.
 
-- **People:** swept (default), short, bald, spiky, mohawk, curly, afro, bob, long, bun, spacebuns, ponytail, pigtails, braids, covered, cap, beanie, hat, beard, child, baby.
-- **Fun:** cat, dog, bunny, bear, unicorn, robot, alien, crown, party, viking.
+- **Removed:** long and covered (solid hair/fabric became a plain block), unicorn (front view was only a horn and a mane), dog (floppy ears read as pigtails), mohawk and crown (too little headroom under the frame), beard, child and baby (indistinguishable from short / bald at 180 px).
+- **Added:** locs, turban, hijab, glasses, headphones, graduate; fox, panda, frog, dinosaur, astronaut.
+- **New technique — cut-outs.** A character may carry negative-space details (5th element of a `VARIANTS` entry): glasses, the turban fold, the hijab's face opening, panda eye patches, frog pupils, the dinosaur's eye and mouth, the astronaut's visor. Flat masters paint them in the field colour; finished icons mask them so the lit teal shows through. This is what makes characters readable that a plain silhouette cannot express.
 
-Honest assessment of this pass: most read clearly at Home Screen size (the 180 px column) and stay distinguishable at 60 px. Weakest drawings, worth a designer's hand: **long** and **covered** (solid silhouettes of hair or fabric tend toward a plain block), **unicorn** (a front-facing unicorn is mostly a horn and a mane), **dog** (floppy ears sit close to pigtails) and **mohawk / crown** (only ~36 units of headroom under the frame limits how tall anything on top of the head can be). Below 60 px everything converges to "a character in a C", which is fine — the choice is for the Home Screen.
+The set now has **33 characters** — 21 people and 12 fun. Everyone sits on the same shoulders and base line inside the same frame; people share one head with ears, so only hair, headwear or accessories change.
+
+- **People:** swept (default), short, bald, spiky, curly, afro, bob, bun, spacebuns, ponytail, pigtails, braids, cap, beanie, hat, locs, turban, hijab, glasses, headphones, graduate.
+- **Fun:** cat, bunny, bear, fox, panda, frog, dinosaur, astronaut, robot, alien, party, viking.
+
+Assessment: all 33 are identifiable at 180 px. Closest pairs to watch: short / bald, afro / bob, cat / fox. **Locs** is the least confident drawing (strands hanging beside the face, separated by gaps) and would benefit most from a designer's hand; representation there deserves better than my geometry. Below 60 px everything converges to "a character in a C", which is fine — the choice is for the Home Screen.
 
 **Implementation notes (not built yet):**
 
 - iOS alternate icons: `UIApplication.shared.setAlternateIconName(_:)`; each alternate is an app-icon set in the asset catalog, listed via `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` (+ `ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES`). iOS shows a system alert when the icon changes; that is expected and cannot be suppressed.
 - Placement: a quiet "App Icon" row in the app's settings/about area with a grid of the icons — never in the capture → check → print path (Experience Constitution: nothing between the person and the finished photo).
 - The App Store listing, marketing and the wordmark lock-up always use the **default** icon.
-- Keep every icon structurally identical; colour stays teal for all — colour choice is not offered, so the brand colour keeps its recognition job. With ~31 icons, watch app size: render alternates without the grain layer or as layered Icon Composer files if the PNGs get heavy.
+- Keep every icon structurally identical; colour stays teal for all — colour choice is not offered, so the brand colour keeps its recognition job. With 33 icons, watch app size: render alternates without the grain layer or as layered Icon Composer files if the PNGs get heavy.
 - Guardrails from BD-023 still apply to every variant: no Face ID, surveillance, Contacts-avatar or character-illustration look. No skin, no facial features, no accessories that imply religion, age or profession.
 - Every alternate needs the same dark / tinted / clear appearances as the default.
 
@@ -89,7 +95,7 @@ Honest assessment of this pass: most read clearly at Home Screen size (the 180 p
 ## 5. Open points
 
 1. ~~Frame~~ — **approved 2026-09-17.** ~~Default bust~~ — **swept, confirmed.**
-2. Designer pass on the weakest characters listed in §4, and any additions (suggestions: glasses as a cut-out, headphones, turban-style wrap, hijab with a distinct face opening, locs, a second child, fox, panda, dinosaur).
+2. Designer pass, starting with locs; a readable child and beard (both need more than a silhouette — perhaps cut-outs); further additions.
 3. Exact teal values (light `#0E6F7C`, dark `#4FC3D1`, fill roles) remain working values until tested on device.
 4. Layered Icon Composer assets with dark / tinted / clear appearances for the default and every alternate.
 
