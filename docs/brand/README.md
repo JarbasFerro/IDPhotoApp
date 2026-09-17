@@ -72,7 +72,18 @@ Brand decisions may refine the expression of these principles, but may not silen
 
 - [`03-color-strategy-research.md`](03-color-strategy-research.md) — evidence-led evaluation of color perception, accessibility, semantics, and first color candidates.
 - [`04-market-prioritization.md`](04-market-prioritization.md) — launch-market evidence and current U.S.-first commercial lens.
-- [`05-creative-territories.md`](05-creative-territories.md) — four controlled identity territories and prototype matrix.
+- [`05-creative-territories.md`](05-creative-territories.md) — four controlled identity territories and the original prototype matrix (its symbol-variant round is superseded by BD-036).
+- [`06-identity-exploration-handoff.md`](06-identity-exploration-handoff.md) — resume point for the identity work: provisional icon direction, frame geometry rules, and the ordered next steps.
+
+### Prototype evidence
+
+- [`prototypes/`](prototypes/README.md) — controlled color, icon-size, accessibility and product-context test evidence. In progress; every render must be reproducible from a script under `scripts/brand/` (planned path, delivered with the prototype PRs).
+- `assets/calipic-icon-draft-v0.svg` / `.png` — **draft only** (see "Symbol status" below).
+
+### Draft standards
+
+- [`12-voice-and-writing.md`](12-voice-and-writing.md) — draft product voice, vocabulary, instruction, error and compliance language, localization notes.
+- [`15-brand-qa-checklist.md`](15-brand-qa-checklist.md) — draft review checklist for screens, copy, assets, features and implementation PRs.
 
 ## Current creative hypothesis
 
@@ -87,28 +98,36 @@ The four creative territories are:
 3. **Photo to Print** — completion and marketing proposition.
 4. **Optical Order** — geometric ownability and calibration meaning.
 
+### Symbol status (2026-09-17)
+
+The symbol **territory** is provisionally frozen by BD-036: a portrait/bust silhouette inside a rounded crop frame whose wider right-side opening reads as a capital `C`. There is no further broad symbol exploration round.
+
+The **drawing** is not frozen. `assets/calipic-icon-draft-v0.*` is only a draft stand-in. The founder expects substantial form refinement, and expects the final icon to receive finishing touches — shadows, depth, texture — rather than remain a flat glyph. Color and context tests currently run on the flat v0 and must be re-run on the refined icon before anything is locked.
+
 No final symbol or color is approved yet.
 
 ## Planned documentation
 
+Numbering note (2026-09-17): `06` is taken by the identity handoff, so the planned visual-system documents now start at `07`. `12` and `15` keep their numbers because drafts exist under those names; the documents around them were renumbered so that nothing collides. File names without a link do not exist yet.
+
 ### Visual system
 
-- `06-visual-identity.md` — final symbol, wordmark, app icon, color system, composition and misuse rules.
-- `07-product-design-language.md` — hierarchy, spacing, surfaces, photo treatment, controls, states, component behavior.
-- `08-photography-and-image-language.md` — marketing photography, in-product imagery, manipulation boundaries, representation.
-- `09-iconography-and-symbols.md` — SF Symbols policy and custom-symbol exceptions.
+- `07-visual-identity.md` — final symbol, wordmark, app icon, color system, composition and misuse rules.
+- `08-product-design-language.md` — hierarchy, spacing, surfaces, photo treatment, controls, states, component behavior.
+- `09-photography-and-image-language.md` — marketing photography, in-product imagery, manipulation boundaries, representation.
+- `10-iconography-and-symbols.md` — SF Symbols policy and custom-symbol exceptions.
 
 ### Executable design system
 
-- `10-design-tokens.md` — semantic colors, spacing, radii, typography roles, materials, motion values, icon sizing and SwiftUI mapping.
-- `11-motion-and-haptics.md` — motion grammar, transitions, haptics and Reduce Motion behavior.
-- `12-voice-and-writing.md` — product voice, vocabulary, instructions, errors, confidence language and localization.
-- `13-accessibility-standard.md` — brand expression under Dynamic Type, VoiceOver, Voice Control, Reduce Motion, Reduce Transparency, Increased Contrast and Differentiate Without Color.
+- `11-design-tokens.md` — semantic colors, spacing, radii, typography roles, materials, motion values, icon sizing and SwiftUI mapping.
+- [`12-voice-and-writing.md`](12-voice-and-writing.md) — product voice, vocabulary, instructions, errors, confidence language and localization. **Draft exists.**
+- `13-motion-and-haptics.md` — motion grammar, transitions, haptics and Reduce Motion behavior.
+- `14-accessibility-standard.md` — brand expression under Dynamic Type, VoiceOver, Voice Control, Reduce Motion, Reduce Transparency, Increased Contrast and Differentiate Without Color.
 
 ### Brand extension and governance
 
-- `14-app-store-and-marketing.md` — App Store screenshots, preview video, website, press assets and launch imagery.
-- `15-brand-qa-checklist.md` — review checklist for screens, copy, assets, features and implementation PRs.
+- [`15-brand-qa-checklist.md`](15-brand-qa-checklist.md) — review checklist for screens, copy, assets, features and implementation PRs. **Draft exists.**
+- `16-app-store-and-marketing.md` — App Store screenshots, preview video, website, press assets and launch imagery.
 
 ## Source-of-truth hierarchy
 
@@ -126,14 +145,19 @@ A campaign, mockup, or visual experiment must never redefine the product's core 
 
 ## Next milestone
 
-Produce controlled visual prototypes rather than isolated moodboards.
+Produce controlled test evidence — not moodboards, and not another broad symbol round (BD-036). The order of work is defined in [`06-identity-exploration-handoff.md`](06-identity-exploration-handoff.md) §7.
 
-The first prototype round should compare:
+With the v0 icon geometry held fixed, the current round compares:
 
-- four symbol constructions based on portrait + frame geometry;
-- four color systems (deep distinctive blue, restrained violet, graphite + cool accent, dark cyan/teal);
-- the same key surfaces in Light and Dark Mode;
-- App Store/Home Screen small-size recognition;
-- camera, Photo Check, editor, print-sheet and credit-purchase contexts.
+- four color systems: deep distinctive blue; dark cyan / blue-teal; graphite + restrained cool accent; and one evidence-backed differentiated alternative. The test batch uses a warm deep amber-ochre challenger, drawn from the conditional yellow/orange challenger line in `03-color-strategy-research.md` §8; its closeness to the `warn` status family is a known risk recorded in BD-037. Purple/violet is not in the batch, per the handoff's instruction to avoid contemporary purple/gradient AI branding;
+- realistic icon sizes and contexts: App Store result, Home Screen, Spotlight/Search, Settings-style small icon, large marketing presentation;
+- Light Mode, Dark Mode, Increased Contrast, grayscale and common color-vision deficiencies;
+- Home, Guided Camera, Photo Check, Editor and Print Sheet / Completion contexts (handoff Step 4). The credit-purchase screen required by `03-color-strategy-research.md` §9 is not in the handoff's list and is still owed before color lock.
+
+The hex values used are recorded in BD-037 as **test values only**. BD-033 is unchanged: no brand color is approved.
+
+Evidence lands in [`prototypes/`](prototypes/README.md). Its synthesis document is a recommendation to the founder, not a decision.
+
+In parallel, the icon drawing needs form refinement and finishing (see "Symbol status" above). Any finding made on the flat v0 must be re-run on the refined icon before color or symbol is locked.
 
 Color and symbol should be chosen together after testing, not independently.

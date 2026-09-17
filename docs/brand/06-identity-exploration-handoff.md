@@ -30,6 +30,8 @@ The current synthesis is:
 
 The current symbol is **provisional, not final**. It is good enough to carry into color and product-context testing. Do not spend the next iteration endlessly polishing the logo in isolation.
 
+> **Update — 2026-09-17 (founder note).** The v0 icon is only a draft. The territory is provisionally frozen (BD-036), but the drawing still needs a lot of form refinement, and the final icon is expected to get finishing touches — shadows, depth, texture — rather than stay a flat glyph. The steps in §7 still run first on v0 with geometry held fixed; their findings are provisional and must be re-run on the refined icon before lock. See the BD-036 amendment.
+
 ### Current icon assets
 
 - `docs/brand/assets/calipic-icon-draft-v0.png` — raster snapshot of the latest visual draft from the exploration session.

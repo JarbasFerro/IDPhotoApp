@@ -198,7 +198,25 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 **Decision:** Carry forward the current icon direction without another broad symbol exploration: an elegant portrait/bust silhouette with a bun and one curved loose hair strand, enclosed by a rounded crop-frame system whose small gaps occur around the frame while the right-side opening is substantially wider, making the frame read as a capital `C`.  
 **Geometry constraints:** uniform stroke width; identical rounded endpoints; exact top/bottom mirror symmetry; equal small top-center and bottom-center gaps; small left-center interruption; clearly larger right-side opening.  
 **Assets:** `docs/brand/assets/calipic-icon-draft-v0.svg` plus the identity handoff in `docs/brand/06-identity-exploration-handoff.md`.  
-**Next action:** freeze symbol geometry provisionally and proceed to controlled color + real iOS context testing. Final vector geometry remains deferred.
+**Next action:** freeze symbol geometry provisionally and proceed to controlled color + real iOS context testing. Final vector geometry remains deferred.  
+**Amendment — 2026-09-17 (founder note):** `calipic-icon-draft-v0.*` is **only a draft stand-in**. What is provisionally frozen is the symbol *territory* (portrait in a crop frame that reads as `C`), not the drawing. The form needs substantial refinement, and the final icon is expected to receive finishing touches — shadows, depth, texture — rather than remain a flat glyph. Consequences: (1) no asset, screen or marketing piece may treat v0 as the Calipic icon; (2) the current color/context tests use v0 flat because it is the only fixed geometry available, and their findings are provisional; (3) those tests must be re-run on the refined, finished icon before symbol or color is locked, which is why every render is required to be scripted (planned path `scripts/brand/`, see `docs/brand/prototypes/README.md`). **Reading the "Next action" above:** "freeze symbol geometry provisionally" means the tests hold v0 geometry fixed so that only color and context vary; it does not mean the drawing is finished. Form refinement and finishing proceed as a separate track inside the same territory, and are not a new broad symbol exploration. Status stays Working.
+
+## BD-037 — Provisional color test palette (test values only)
+
+**Status:** Working  
+**Date:** 2026-09-17  
+**Decision:** For the controlled color/context tests only, the following values are used. They exist so that every prototype document and script renders the same thing. **This is not a color decision.** BD-033 is unchanged: no brand color is approved.
+
+| Test system | Light | Dark |
+|---|---|---|
+| A — deep blue | `#1F3FA8` | `#7C98F5` |
+| B — dark cyan / blue-teal | `#0E6F7C` | `#4FC3D1` |
+| C — graphite ink + cool accent | ink `#1C1F24`; accent `#5B7C99` | accent `#9DB7CF` |
+| D — warm challenger (deep amber-ochre) | `#B26A00` | `#F0B55A` |
+
+**Not yet defined:** a Dark Mode ink for system C, and Increase Contrast Light/Dark values for all four systems. The first prototype that needs them adds them to this table; they are not to be defined locally in a script or document.  
+**Known risk — system D:** amber-ochre sits in the same hue family as the `warn` status color, which `03-color-strategy-research.md` §6 rates as a high identity-conflict risk, and `#B26A00` on white measures about 4.2:1 (below 4.5:1 for body text; `#5B7C99` is about 4.4:1). 03 §8 allows yellow/orange only as a challenger *if the first set lacks warmth or shelf recognition*; that condition has not been evaluated — D is included up front so the batch has one clearly differentiated alternative. D is in the batch to be tested against the status-independence rule, not because it is assumed to pass it.  
+**Notes:** System D is the "one evidence-backed differentiated alternative" from the handoff, drawn from the conditional yellow/orange challenger line in 03 §8; purple/violet is not in the batch. The letters are test labels and do not match the candidate letters in 03 §8 (see the dated update there). Values may change between test rounds without a new BD entry, provided this table is kept current. Status colors (`pass`, `warn`, `fail`, `manual_check`) must remain independent of whichever system is chosen; a system that cannot meet this is rejected. Any winner still needs Increase Contrast variants, P3/sRGB evaluation and device testing (03 §5), and a re-run on the refined icon (BD-036 amendment), before BD-033 can change.
 
 ---
 

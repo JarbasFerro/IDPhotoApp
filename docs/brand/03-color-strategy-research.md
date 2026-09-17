@@ -346,6 +346,8 @@ A controlled blue-green family clearly separated from system blue.
 
 Yellow/orange should be explored only as challenger icon concepts if the first set lacks warmth or shelf recognition.
 
+> **Update — 2026-09-17.** The research in this section is kept as written. The test batch that followed differs in one place: `06-identity-exploration-handoff.md` (Step 1) lists deep blue, dark cyan / blue-teal, graphite + restrained cool accent, and one evidence-backed differentiated alternative, and asks the round to avoid contemporary purple/gradient AI branding. Candidate B (restrained violet) is therefore **not** in the first test batch. Its slot is taken by the warm challenger described in the line directly above this note — a deep amber-ochre. Violet is not rejected as research; it is simply untested, and its AI-category risk (§4.7) is the reason. Test labels differ from the candidate letters above: test system A = Candidate A (deep blue); test system B = Candidate D (dark cyan); test system C = Candidate C (graphite + cool accent); test system D = the warm challenger. Always write "test system B" or "Candidate B", never a bare letter. That challenger line is conditional ("if the first set lacks warmth or shelf recognition"); that condition was not evaluated first, and the challenger's closeness to the warn family (§6) is recorded as a known risk in BD-037. Test values are recorded in BD-037 as test values only; BD-033 is unchanged. Evidence: [`prototypes/`](prototypes/README.md).
+
 ---
 
 ## 9. Test protocol before color lock
