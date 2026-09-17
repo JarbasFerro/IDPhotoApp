@@ -114,7 +114,7 @@ struct PhotoCheckView: View {
                 } else {
                     Image(systemName: CheckPresentation.symbol(for: summary.headline))
                         .font(.title2)
-                        .foregroundStyle(headlineTint(summary.headline))
+                        .foregroundStyle(StatusStyle.color(for: summary.headline))
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(CheckPresentation.title(for: summary.headline)).font(.title3.weight(.semibold))
@@ -125,8 +125,8 @@ struct PhotoCheckView: View {
             .accessibilityIdentifier("checkHeadline")
             ForEach(summary.rows) { row in
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Image(systemName: AlignmentPresentation.symbol(for: row.state))
-                        .foregroundStyle(rowTint(row.state))
+                    Image(systemName: StatusStyle.symbol(for: row.state))
+                        .foregroundStyle(StatusStyle.color(for: row.state))
                         .frame(width: 20)
                     Text(row.title).font(.subheadline.weight(.semibold))
                     Text(row.detail).font(.footnote).foregroundStyle(.secondary)
@@ -165,24 +165,6 @@ struct PhotoCheckView: View {
                 .controlSize(.large)
                 .accessibilityIdentifier("retake")
             }
-        }
-    }
-
-    private func headlineTint(_ headline: PhotoCheckSummary.Headline) -> Color {
-        switch headline {
-        case .checking: .secondary
-        case .good: .green
-        case .review: .orange
-        case .retake: .red
-        }
-    }
-
-    private func rowTint(_ state: CheckState) -> Color {
-        switch state {
-        case .pass: .green
-        case .warn: .orange
-        case .fail: .red
-        case .manualCheck: .secondary
         }
     }
 }
