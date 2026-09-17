@@ -60,3 +60,6 @@ Local.xcconfig
 
 # Package.resolved should be committed for an application target to pin dependency versions.
 # Keep source-controlled shared schemes/settings intentionally; do not blanket-ignore *.xcscheme
+
+# Claude Code agent worktrees
+.claude/worktrees/
