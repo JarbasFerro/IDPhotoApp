@@ -1,36 +1,36 @@
 # Calipic — Experience constitution
 
-**Status:** Working draft  
+**Status:** Strategic direction approved; amend deliberately as the visual system matures.  
 **Purpose:** Define the small set of durable product/brand rules that should survive redesigns, new iOS versions, new markets, and new features.
 
 This document is intentionally short compared with the full brand and UX specifications. When a future design looks attractive but conflicts with this constitution, the design should change unless the constitution itself is deliberately amended.
 
-## Constitutional rule 1 — Precision must be real
+## Constitutional rule 1 — Simplicity must be experienced
+
+Calipic's primary advantage is not the number of capabilities behind the interface. It is how little the user needs to understand to finish the task.
+
+- one obvious next action;
+- strong defaults;
+- hide technical choices unless they are genuinely necessary;
+- guide rather than expose tools;
+- keep feature names descriptive;
+- optimize the shortest safe path from portrait to result.
+
+**Never:** make the user learn image-processing, print, or compliance terminology in order to complete a normal photo.
+
+---
+
+## Constitutional rule 2 — Precision must be real
 
 Calipic may look precise only where the product is actually precise.
 
 - exact dimensions come from deterministic geometry;
 - sourced requirements remain traceable;
 - uncertainty is preserved rather than cosmetically hidden;
-- status language must reflect actual confidence;
-- print size, crop, and export dimensions are treated as product correctness, not visual polish.
+- status language reflects actual confidence;
+- print size, crop, and export dimensions are product correctness, not visual polish.
 
 **Never:** use pseudo-measurements, decorative precision, or confident language to cover uncertain logic.
-
----
-
-## Constitutional rule 2 — Calm the task, not the truth
-
-Calipic should reduce cognitive load without oversimplifying important uncertainty.
-
-- one obvious next action;
-- limited simultaneous guidance;
-- progressive disclosure;
-- no warning storms;
-- no urgency-driven monetization;
-- no fake reassurance.
-
-**Never:** hide a manual check or unresolved requirement merely to make a screen appear cleaner.
 
 ---
 
@@ -62,7 +62,21 @@ Order of preference:
 
 ---
 
-## Constitutional rule 5 — Intelligence should disappear into usefulness
+## Constitutional rule 5 — Beauty comes from restraint
+
+Calipic is quietly premium. Beauty should come from proportion, typography, photography, spacing, materials, and detail rather than visual volume.
+
+- keep the interface outside the portrait extremely minimal;
+- use color selectively;
+- allow negative space;
+- make Light and Dark Mode equally intentional;
+- prefer a few ownable details over a broad decorative language.
+
+**Never:** use color, cards, gradients, animation, branded chrome, or visual effects merely to make the app look designed.
+
+---
+
+## Constitutional rule 6 — Intelligence should disappear into usefulness
 
 Users should experience the benefit of computer vision and image intelligence without needing to understand the stack.
 
@@ -75,7 +89,7 @@ Users should experience the benefit of computer vision and image intelligence wi
 
 ---
 
-## Constitutional rule 6 — Trust is behavior
+## Constitutional rule 7 — Trust is behavior
 
 Calipic earns trust through what it does, not through decorative security or verification claims.
 
@@ -95,7 +109,7 @@ Trust behaviors include:
 
 ---
 
-## Constitutional rule 7 — Every warning must create agency
+## Constitutional rule 8 — Every warning must create agency
 
 A warning that only announces failure is incomplete.
 
@@ -111,7 +125,7 @@ The preferred outcome is a small, actionable instruction rather than technical d
 
 ---
 
-## Constitutional rule 8 — Accessibility is equivalent functionality
+## Constitutional rule 9 — Accessibility is equivalent functionality
 
 The product is not complete if the fast path only works through vision, color, precision gestures, or motion.
 
@@ -125,20 +139,6 @@ The product is not complete if the fast path only works through vision, color, p
 
 ---
 
-## Constitutional rule 9 — Brand restraint is a feature
-
-Calipic should have a recognizable identity without filling every surface with it.
-
-- a restrained accent system is preferable to themed chrome;
-- system typography remains the default in-product choice unless a future exception has a strong reason;
-- SF Symbols remain the default for standard actions;
-- custom visual devices should be few enough to become recognizable;
-- motion and haptics communicate cause and state rather than decoration.
-
-**Never:** confuse visual density or novelty with premium quality.
-
----
-
 ## Constitutional rule 10 — Finish the real-world job
 
 Calipic is not an image editor whose responsibility ends at preview.
@@ -147,27 +147,51 @@ The experience must remain connected to the user's real outcome:
 
 - correct digital output;
 - reliable print geometry;
+- convenient physical copies;
 - understandable remaining checks;
 - native save/share/print paths;
 - a clear completion state.
+
+Printing is a first-class product outcome, not a secondary export utility.
 
 **Never:** optimize a beautiful editing experience while treating export, printing, or rule correctness as secondary.
 
 ---
 
-## Proposed experience test
+## Constitutional rule 11 — Satisfaction is the completion signal
+
+The intended emotional result is satisfaction: the sense that an annoying real-world task was handled simply and well.
+
+Calipic should not require celebration to communicate success.
+
+- completion can be quiet;
+- the finished photo/print is the reward;
+- motion and haptics can confirm state but should not become spectacle;
+- commercial prompts must not interrupt the moment immediately after success.
+
+**Never:** replace the satisfaction of finishing with confetti, gamification, forced review prompts, or an aggressive upsell.
+
+---
+
+## Experience test
 
 Before approving a significant Calipic design, ask:
 
-> Does this make the user more confident because the task became clearer and more correct, or does it merely make Calipic look more impressive?
+> **Does this make the task easier, clearer, more beautiful, or more complete for the user — or does it mainly make Calipic look more impressive?**
 
-If the answer is primarily the latter, the design needs stronger justification.
+If the answer is primarily the latter, remove or justify the design.
+
+Then ask:
+
+> **Would a first-time iPhone user understand what to do without learning Calipic's interface?**
+
+If not, native familiarity or simplification has likely been sacrificed.
 
 ## Amendment policy
 
-These rules are working hypotheses until brand discovery is completed. After foundation approval, changing a constitutional rule should require:
+Changing a constitutional rule requires:
 
 1. a documented reason;
 2. identification of affected product/design standards;
-3. explicit update to the brand decisions log;
-4. review of whether existing UI or marketing now conflicts with the new rule.
+3. explicit update to `99-brand-decisions-log.md`;
+4. review of whether existing UI or marketing conflicts with the new rule.
