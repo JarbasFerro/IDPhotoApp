@@ -1,0 +1,476 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2068" height="2652" viewBox="0 0 2068 2652" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect width="2068" height="2652" fill="#F2F2F7"/>
+<rect x="1452" y="118" width="576" height="2464" fill="#000000"/>
+<text x="40" y="64" font-size="31" font-weight="600" fill="#1C1C1E">Calipic icon colour matrix - draft v0 stand-in</text>
+<text x="588" y="106" font-size="24" text-anchor="middle" fill="#3A3A3C">1 - accent mark on white field</text>
+<text x="1164" y="106" font-size="24" text-anchor="middle" fill="#3A3A3C">2 - white mark on accent field (C: ink mark)</text>
+<text x="1740" y="106" font-size="24" text-anchor="middle" fill="#3A3A3C">3 - dark-mode field</text>
+<text x="40" y="406" font-size="24" font-weight="600" fill="#1C1C1E">A</text>
+<text x="40" y="436" font-size="20" fill="#3A3A3C">Deep blue</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="332" y="150" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#FFFFFF" stroke="#D9D9D9" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#1F3FA8" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#1F3FA8">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="588" y="694" font-size="19" text-anchor="middle" fill="#3A3A3C">A1  mark #1F3FA8 / field #FFFFFF</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="908" y="150" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#1F3FA8" stroke="#1F3FA8" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#FFFFFF" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#FFFFFF">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#1F3FA8" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1164" y="694" font-size="19" text-anchor="middle" fill="#3A3A3C">A2  mark #FFFFFF / field #1F3FA8</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="1484" y="150" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#111214" stroke="#2C2E33" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#7C98F5" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#7C98F5">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#111214" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1740" y="694" font-size="19" text-anchor="middle" fill="#AEAEB2">A3  mark #7C98F5 / field #111214</text>
+<text x="40" y="1014" font-size="24" font-weight="600" fill="#1C1C1E">B</text>
+<text x="40" y="1044" font-size="20" fill="#3A3A3C">Dark cyan /</text>
+<text x="40" y="1074" font-size="20" fill="#3A3A3C">blue-teal</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="332" y="758" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#FFFFFF" stroke="#D9D9D9" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#0E6F7C" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#0E6F7C">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="588" y="1302" font-size="19" text-anchor="middle" fill="#3A3A3C">B1  mark #0E6F7C / field #FFFFFF</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="908" y="758" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#0E6F7C" stroke="#0E6F7C" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#FFFFFF" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#FFFFFF">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#0E6F7C" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1164" y="1302" font-size="19" text-anchor="middle" fill="#3A3A3C">B2  mark #FFFFFF / field #0E6F7C</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="1484" y="758" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#111214" stroke="#2C2E33" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#4FC3D1" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#4FC3D1">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#111214" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1740" y="1302" font-size="19" text-anchor="middle" fill="#AEAEB2">B3  mark #4FC3D1 / field #111214</text>
+<text x="40" y="1622" font-size="24" font-weight="600" fill="#1C1C1E">C</text>
+<text x="40" y="1652" font-size="20" fill="#3A3A3C">Graphite +</text>
+<text x="40" y="1682" font-size="20" fill="#3A3A3C">cool accent</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="332" y="1366" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#FFFFFF" stroke="#D9D9D9" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#1C1F24" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#1C1F24">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="588" y="1910" font-size="19" text-anchor="middle" fill="#3A3A3C">C1  mark #1C1F24 / field #FFFFFF</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="908" y="1366" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#5B7C99" stroke="#5B7C99" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#1C1F24" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#1C1F24">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#5B7C99" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1164" y="1910" font-size="19" text-anchor="middle" fill="#3A3A3C">C2  mark #1C1F24 / field #5B7C99</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="1484" y="1366" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#111214" stroke="#2C2E33" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#F2F3F5" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#F2F3F5">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#111214" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1740" y="1910" font-size="19" text-anchor="middle" fill="#AEAEB2">C3  mark #F2F3F5 / field #111214</text>
+<text x="40" y="2230" font-size="24" font-weight="600" fill="#1C1C1E">D</text>
+<text x="40" y="2260" font-size="20" fill="#3A3A3C">Warm challenger</text>
+<text x="40" y="2290" font-size="20" fill="#3A3A3C">(amber-ochre)</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="332" y="1974" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#FFFFFF" stroke="#D9D9D9" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#B26A00" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#B26A00">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="588" y="2518" font-size="19" text-anchor="middle" fill="#3A3A3C">D1  mark #B26A00 / field #FFFFFF</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="908" y="1974" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#B26A00" stroke="#B26A00" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#FFFFFF" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#FFFFFF">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#B26A00" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1164" y="2518" font-size="19" text-anchor="middle" fill="#3A3A3C">D2  mark #FFFFFF / field #B26A00</text>
+<svg xmlns="http://www.w3.org/2000/svg" x="1484" y="1974" width="512" height="512" viewBox="0 0 1024 1024">
+  
+  
+
+  
+  <rect x="28" y="28" width="968" height="968" rx="216" fill="#111214" stroke="#2C2E33" stroke-width="4"/>
+
+  
+  <g fill="none" stroke="#F0B55A" stroke-width="72" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M 474 172 H 322 C 236 172 180 228 180 314 V 466"/>
+    
+    <path d="M 180 558 V 710 C 180 796 236 852 322 852 H 474"/>
+    
+    <path d="M 550 172 H 706 C 786 172 842 224 842 298"/>
+    
+    <path d="M 842 726 C 842 800 786 852 706 852 H 550"/>
+  </g>
+
+  
+  <g fill="#F0B55A">
+    
+    <ellipse cx="520" cy="314" rx="58" ry="48"/>
+    
+    <ellipse cx="520" cy="472" rx="132" ry="154"/>
+    
+    <path d="M 466 585 C 468 632 455 664 422 682 H 618 C 585 664 572 632 574 585 Z"/>
+    
+    <path d="M 422 673 C 360 688 315 722 292 780 H 748 C 725 722 680 688 618 673 C 594 667 578 654 570 636 H 470 C 462 654 446 667 422 673 Z"/>
+    
+    <path d="M 408 436 C 382 476 382 540 408 580 C 424 604 438 616 449 620 C 430 588 426 552 432 520 C 438 486 448 458 462 436 Z"/>
+  </g>
+
+  
+  <path d="M 582 350 C 578 404 546 435 500 462 C 451 490 425 522 432 565 C 436 590 426 616 404 635"
+        fill="none" stroke="#111214" stroke-width="12" stroke-linecap="round"/>
+</svg>
+<text x="1740" y="2518" font-size="19" text-anchor="middle" fill="#AEAEB2">D3  mark #F0B55A / field #111214</text>
+<text x="40" y="2613" font-size="19" fill="#636366">Draft v0 stand-in: flat colour test only. Geometry unchanged and not final; depth/texture finishing will come later. Provisional test values, not decisions.</text>
+</svg>
