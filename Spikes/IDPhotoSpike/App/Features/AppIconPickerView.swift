@@ -6,20 +6,20 @@ struct AppIconPickerView: View {
     let controller: AppIconController
     @Environment(\.dismiss) private var dismiss
     /// The previews grow with Dynamic Type; the adaptive grid then simply fits fewer columns.
-    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 76
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = Design.Size.pickerIcon
 
     var body: some View {
         @Bindable var controller = controller
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: Design.Spacing.section) {
                     ForEach(AppIconChoice.Group.allCases, id: \.self) { group in
-                        VStack(alignment: .leading, spacing: 14) {
+                        VStack(alignment: .leading, spacing: Design.Spacing.cardContent) {
                             Text(group.title)
-                                .font(.headline)
+                                .font(Design.Typography.cardTitle)
                                 .accessibilityAddTraits(.isHeader)
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: side, maximum: side + 8), spacing: 16, alignment: .top)],
-                                      alignment: .leading, spacing: 16) {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: side, maximum: side + 8), spacing: Design.Spacing.group, alignment: .top)],
+                                      alignment: .leading, spacing: Design.Spacing.group) {
                                 ForEach(AppIconChoice.choices(in: group)) { choice in
                                     cell(choice)
                                 }
@@ -27,7 +27,7 @@ struct AppIconPickerView: View {
                         }
                     }
                     Text("Changes the Calipic icon on your Home Screen.")
-                        .font(.footnote)
+                        .font(Design.Typography.note)
                         .foregroundStyle(.secondary)
                 }
                 .padding()
@@ -53,7 +53,7 @@ struct AppIconPickerView: View {
         return Button {
             Task { await controller.select(choice) }
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: Design.Spacing.caption) {
                 Image(choice.previewAssetName)
                     .resizable()
                     .interpolation(.high)
@@ -61,7 +61,7 @@ struct AppIconPickerView: View {
                     .overlay(alignment: .bottomTrailing) { selectionBadge(isSelected) }
                 // Two lines keep longer names ("Fones de ouvido") whole; cells are top-aligned in the grid.
                 Text(choice.label)
-                    .font(.caption)
+                    .font(Design.Typography.caption)
                     .foregroundStyle(isSelected ? .primary : .secondary)
                     .fontWeight(isSelected ? .semibold : .regular)
                     .multilineTextAlignment(.center)
@@ -87,7 +87,7 @@ struct AppIconPickerView: View {
                 .foregroundStyle(.white)
                 .padding(6)
                 .background(Color.brandAccentFill, in: Circle())
-                .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 2))
+                .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: Design.Stroke.separation))
                 .offset(x: 6, y: 6)
                 .accessibilityHidden(true)
         }

@@ -83,6 +83,7 @@ Brand decisions may refine the expression of these principles, but may not silen
 ### Draft standards
 
 - [`07-visual-identity.md`](07-visual-identity.md) — symbol, frame geometry, character slot, wordmark, colour roles, motif and misuse rules (draft; consolidates accepted decisions).
+- [`11-design-tokens.md`](11-design-tokens.md) — draft executable tokens: spacing, radii, strokes, type roles, sizes and motion as SwiftUI constants (`App/Brand/DesignTokens.swift`), rules for adding one, and what is deliberately not tokenised. Colours stay in `Brand` and `StatusStyle`.
 - [`12-voice-and-writing.md`](12-voice-and-writing.md) — draft product voice, vocabulary, instruction, error and compliance language, localization notes.
 - [`15-brand-qa-checklist.md`](15-brand-qa-checklist.md) — draft review checklist for screens, copy, assets, features and implementation PRs.
 
@@ -119,7 +120,7 @@ Numbering note (2026-09-17): `06` is taken by the identity handoff, so the plann
 
 ### Executable design system
 
-- `11-design-tokens.md` — semantic colors, spacing, radii, typography roles, materials, motion values, icon sizing and SwiftUI mapping.
+- [`11-design-tokens.md`](11-design-tokens.md) — semantic colors, spacing, radii, typography roles, materials, motion values, icon sizing and SwiftUI mapping. **Draft exists.**
 - [`12-voice-and-writing.md`](12-voice-and-writing.md) — product voice, vocabulary, instructions, errors, confidence language and localization. **Draft exists.**
 - `13-motion-and-haptics.md` — motion grammar, transitions, haptics and Reduce Motion behavior.
 - `14-accessibility-standard.md` — brand expression under Dynamic Type, VoiceOver, Voice Control, Reduce Motion, Reduce Transparency, Increased Contrast and Differentiate Without Color.

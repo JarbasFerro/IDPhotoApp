@@ -8,21 +8,21 @@ struct HomeView: View {
     @State private var showRequirements = false
     @State private var showAppIcons = false
     @State private var appIcon = AppIconController()
-    @ScaledMetric(relativeTo: .footnote) private var appIconRowSide: CGFloat = 29
+    @ScaledMetric(relativeTo: .footnote) private var appIconRowSide: CGFloat = Design.Size.settingsIcon
     @AppStorage(DeveloperMode.key) private var developerMode = false
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: Design.Spacing.section) {
+                VStack(alignment: .leading, spacing: Design.Spacing.text) {
                     Text("A correct ID photo in a minute.")
-                        .font(.title2.weight(.semibold))
+                        .font(Design.Typography.screenTitle)
                     Text("Take it or choose one. The app frames it, whitens the background and prepares the print sheet. Everything stays on your iPhone.")
                         .foregroundStyle(.secondary)
                 }
                 .accessibilityElement(children: .combine)
 
-                VStack(spacing: 12) {
+                VStack(spacing: Design.Spacing.control) {
                     Button { acquire(.camera, model.entries.isEmpty ? .replace : .add) } label: {
                         Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
                     }
@@ -53,11 +53,11 @@ struct HomeView: View {
 
                 documentCard
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: Design.Spacing.caption) {
                     Label("Your photos stay on your iPhone.", systemImage: "lock")
                     Text("The app formats the photo. Acceptance is decided by the office that receives it.")
                 }
-                .font(.footnote)
+                .font(Design.Typography.note)
                 .foregroundStyle(.secondary)
 
                 VStack(alignment: .leading, spacing: 0) {
@@ -75,27 +75,27 @@ struct HomeView: View {
     /// People already in the session: faces, copies, and the way back into the sheet.
     private var sessionCard: some View {
         Button { path.append(.sheet) } label: {
-            HStack(spacing: 14) {
+            HStack(spacing: Design.Spacing.cardContent) {
                 HStack(spacing: -10) {
                     ForEach(Array(model.entries.prefix(4).enumerated()), id: \.element.id) { index, entry in
                         Image(decorative: entry.photo.preview, scale: 1)
                             .resizable().scaledToFill()
-                            .frame(width: 44, height: 44)
+                            .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
                             .clipShape(Circle())
-                            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 2))
+                            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: Design.Stroke.separation))
                             .accessibilityIdentifier("face-\(index + 1)")
                     }
                 }
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Your sheet").font(.headline)
+                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                    Text("Your sheet").font(Design.Typography.cardTitle)
                     Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.name(for: model.printJob.paper))")
-                        .font(.subheadline).foregroundStyle(.secondary)
+                        .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(.tertiary)
             }
             .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -108,20 +108,20 @@ struct HomeView: View {
 
     private var documentCard: some View {
         Button { showRequirements = true } label: {
-            HStack(spacing: 14) {
+            HStack(spacing: Design.Spacing.cardContent) {
                 Image(systemName: "person.text.rectangle")
-                    .font(.title2)
-                    .frame(width: 44, height: 44)
-                    .background(.fill.secondary, in: RoundedRectangle(cornerRadius: 10))
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Spain · DNI and passport").font(.headline)
-                    Text("26 × 32 mm · white background").font(.subheadline).foregroundStyle(.secondary)
+                    .font(Design.Typography.titleGlyph)
+                    .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
+                    .background(.fill.secondary, in: RoundedRectangle(cornerRadius: Design.Radius.tile))
+                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                    Text("Spain · DNI and passport").font(Design.Typography.cardTitle)
+                    Text("26 × 32 mm · white background").font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(.tertiary)
             }
             .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 16))
+            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -134,7 +134,7 @@ struct HomeView: View {
     /// Quiet entry to choose-your-icon (BD-038). It lives here, outside the capture → check → print path.
     private var appIconRow: some View {
         Button { showAppIcons = true } label: {
-            HStack(spacing: 10) {
+            HStack(spacing: Design.Spacing.row) {
                 Image(appIcon.current.previewAssetName)
                     .resizable()
                     .frame(width: appIconRowSide, height: appIconRowSide)
@@ -143,9 +143,9 @@ struct HomeView: View {
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(.tertiary)
             }
-            .font(.footnote)
+            .font(Design.Typography.note)
             .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -156,11 +156,11 @@ struct HomeView: View {
     }
 
     private var versionLine: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Design.Spacing.tight) {
             Text(developerMode ? "\(AppVersion.display) · developer details on" : AppVersion.display)
-                .font(.footnote.monospacedDigit())
+                .font(Design.Typography.noteDigits)
                 .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget, alignment: .leading)
                 .contentShape(Rectangle())
                 .accessibilityLabel(Text("Version \(AppVersion.display)"))
                 .accessibilityIdentifier("appVersion")
@@ -168,7 +168,7 @@ struct HomeView: View {
                 .sensoryFeedback(.impact(weight: .light), trigger: developerMode)
             if developerMode, let metrics = model.lastCameraMetrics {
                 Text("Camera: start \(metrics.startupMilliseconds ?? 0) ms · capture \(metrics.captureMilliseconds ?? 0) ms")
-                    .font(.footnote.monospacedDigit()).foregroundStyle(.tertiary)
+                    .font(Design.Typography.noteDigits).foregroundStyle(.tertiary)
                     .accessibilityIdentifier("cameraMetrics")
             }
         }
