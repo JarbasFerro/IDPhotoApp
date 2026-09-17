@@ -30,7 +30,7 @@ All five documents of round 1 are on `main`. They will be regenerated when the r
 | 05 | [`05-color-recommendation.md`](05-color-recommendation.md) | Synthesis | What do 01–04 recommend to the founder, and what remains uncertain? | Delivered 2026-09-17 — awaiting founder decision |
 | 06 | [`06-icon-refinement-v1.md`](06-icon-refinement-v1.md) | Refinement | Does a refined form inside the frozen territory fix the small-size failures, and how should finishing (depth, shadow, grain) look? | Delivered 2026-09-17 — candidate, awaiting founder review |
 | 07 | [`07-icon-v2-and-icon-choice.md`](07-icon-v2-and-icon-choice.md) | Refinement | Founder direction applied: simpler bust, 72 stroke, wider C opening, teal; plus the choose-your-icon set | Delivered 2026-09-17 — candidate, awaiting founder review |
-| 09 | [`09-wordmark.md`](09-wordmark.md) | Step 5 | A drawn wordmark built from the frame's stroke, and four lock-ups | Delivered 2026-09-17 — candidate, awaiting founder review |
+| 09 | [`09-wordmark.md`](09-wordmark.md) | Step 5 | A drawn wordmark built from the frame's stroke, and four lock-ups | Accepted 2026-09-17 (integrated lock-up, stroke 36) |
 
 `05-color-recommendation.md` is a recommendation. It does not change BD-033 by itself.
 

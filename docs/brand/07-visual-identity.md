@@ -46,9 +46,9 @@ App icon only: a lit single-hue teal field (`#15899A` → `#0A5863`), a soft top
 
 ---
 
-## 3. Wordmark and lock-ups *(working, BD-039)*
+## 3. Wordmark and lock-ups (Accepted, BD-039)
 
-Drawn from the same stroke, caps and 52° opening as the frame; the capital C is the frame. Files: `assets/calipic-wordmark.svg`, `calipic-lockup-integrated.svg` (recommended primary: the symbol is the C), `calipic-lockup-horizontal.svg`, `calipic-lockup-stacked.svg`. Construction, clear space (½ cap height) and the descriptor rule are in `prototypes/09-wordmark.md`. The wordmark never appears inside the app icon, and in-product UI uses system typography, not the wordmark's letterforms.
+Drawn from the same stroke, caps and 52° opening as the frame; the capital C is the frame. Files: `assets/calipic-wordmark.svg`, `calipic-lockup-integrated.svg` (**primary**: the symbol is the C; 36-unit stroke), `calipic-lockup-horizontal.svg`, `calipic-lockup-stacked.svg`. Construction, clear space (½ cap height) and the descriptor rule are in `prototypes/09-wordmark.md`. The wordmark never appears inside the app icon, and in-product UI uses system typography, not the wordmark's letterforms.
 
 ---
 
@@ -96,5 +96,5 @@ Do not: close the right side of the frame; equalise the right opening with the s
 
 1. Finish lock, dark / tinted / clear appearances, Icon Composer layered asset.
 2. Teal values verified on device in bright and dim light and against real portraits.
-3. Wordmark: founder choice of primary lock-up and weight; designer's optical pass.
+3. Wordmark: designer's optical pass.
 4. App Store presentation (screenshots, preview) — `16-app-store-and-marketing.md`, planned.

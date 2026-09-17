@@ -1,6 +1,6 @@
 # Calipic — Wordmark and lock-ups (candidate)
 
-**Status:** Candidate for founder review (BD-039 Working)  
+**Status:** Accepted by the founder 2026-09-17 (BD-039): integrated lock-up primary, 36-unit stroke  
 **Date:** 2026-09-17  
 **Handoff step:** 5 — only after symbol and colour are stable (frame accepted, teal accepted)  
 **Command:** `scripts/brand/build-wordmark.py` (stdlib + inkscape; imports the symbol geometry from `build-icon-v2.py`)
@@ -55,9 +55,8 @@ Ink `#111111` on light, teal `#0E6F7C` on light, white on teal, light teal `#4FC
 
 ---
 
-## 5. Open points for the founder
+## 5. Decisions and what remains
 
-1. Primary lock-up: **B (integrated)** as recommended, or A?
-2. Weight: 36 reads quietly premium; 40–44 is sturdier at small sizes (one number, `W`).
-3. The capital C as a rounded square is the ownable choice; a circular C is the conservative alternative.
-4. A designer's optical pass (overshoot of round letters, spacing of "l i") is still worthwhile before lock.
+1. Primary lock-up: **B, integrated** — accepted.
+2. Stroke weight: **36** — accepted.
+3. Still open: a designer's optical pass (overshoot of round letters, spacing of "l i"). The rounded-square capital C stands.
