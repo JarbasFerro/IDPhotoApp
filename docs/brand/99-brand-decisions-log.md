@@ -192,6 +192,14 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 **Status:** Accepted as inspiration, not imitation  
 **Decision:** Apple and Teenage Engineering are useful references for restraint, detail, ownability, and functional beauty. Calipic must not visually copy either brand.
 
+## BD-036 — Provisional icon construction
+
+**Status:** Working  
+**Decision:** Carry forward the current icon direction without another broad symbol exploration: an elegant portrait/bust silhouette with a bun and one curved loose hair strand, enclosed by a rounded crop-frame system whose small gaps occur around the frame while the right-side opening is substantially wider, making the frame read as a capital `C`.  
+**Geometry constraints:** uniform stroke width; identical rounded endpoints; exact top/bottom mirror symmetry; equal small top-center and bottom-center gaps; small left-center interruption; clearly larger right-side opening.  
+**Assets:** `docs/brand/assets/calipic-icon-draft-v0.svg` plus the identity handoff in `docs/brand/06-identity-exploration-handoff.md`.  
+**Next action:** freeze symbol geometry provisionally and proceed to controlled color + real iOS context testing. Final vector geometry remains deferred.
+
 ---
 
 ## Change discipline
