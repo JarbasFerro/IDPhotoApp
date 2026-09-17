@@ -1,0 +1,403 @@
+# Calipic — Accessibility & perception colour evidence
+
+**Status:** Evidence / observations — no colour is approved (BD-033 remains the founder's decision)  
+**Date:** 2026-09-17  
+**Icon used:** `docs/brand/assets/calipic-icon-draft-v0.svg` — **draft v0 stand-in only**  
+**Purpose:** Answer handoff Step 3 (`06-identity-exploration-handoff.md` §7) and the accessibility items of the colour test protocol (`03-color-strategy-research.md` §5, §6, §9): how do the four provisional colour systems behave in grayscale, under common colour-vision deficiencies, with Increase Contrast, and next to the iOS status colours?
+
+---
+
+## 1. Scope and ground rules
+
+- The icon is a **flat draft stand-in**. Its form will be refined substantially and the final icon will receive finishing (shadows, depth, texture). Nothing here is a drawing review. Geometry was not altered: the script substitutes only three colour tokens — `#111111` (mark), `#FFFFFF` (field and the hair-strand cutout, always kept equal to the field) and `#D9D9D9` (field stroke).
+- Palette values are the **shared provisional test values** of this evidence round, not decisions.
+- No violet/purple, no gradients. Status colours (`pass`, `warn`, `fail`, `manual_check`) are treated as independent of the brand accent; this document tests exactly that independence.
+- Findings are observations plus a recommendation. Section 7 lists which conclusions may change once the icon gains depth/texture.
+
+### Palette under test
+
+| Id | System | Accent light | Accent dark | Increase-Contrast light | Increase-Contrast dark |
+|---|---|---|---|---|---|
+| A | Deep blue | `#1F3FA8` | `#7C98F5` | `#142C7A` | `#A9BCFF` |
+| B | Dark cyan / blue-teal | `#0E6F7C` | `#4FC3D1` | `#084C55` | `#8ADFE9` |
+| C | Graphite + cool accent | ink `#1C1F24`, accent `#5B7C99` | ink `#F2F3F5`, accent `#9DB7CF` | `#3D5A73` | `#C3D6E6` |
+| D | Warm challenger (deep amber-ochre, icon-only challenger) | `#B26A00` | `#F0B55A` | `#7A4800` | `#FFD08A` |
+
+Icon treatments: (1) accent mark on white field, (2) white mark on accent field, (3) dark field `#111214` with accent-dark mark; each also in an Increase-Contrast variant (1-IC, 2-IC, 3-IC). For C the mark is drawn in ink and the accent appears only as the field of treatment 2 (interpretation used here: white mark on the `#5B7C99` field).
+
+Reference system colours: light `#34C759` `#FF9500` `#FF3B30` `#007AFF`, dark `#30D158` `#FF9F0A` `#FF453A` `#0A84FF`, plus `systemGray` `#8E8E93` as the stand-in for the neutral `manual_check` treatment. The Increase-Contrast rows use the "accessible" variants from Apple's HIG colour table (light `#248A3D` `#C93400` `#D70015` `#0040DD` `#6C6C70`; dark `#30DB5B` `#FFB340` `#FF6961` `#409CFF` `#AEAEB2`) — confirm on device before relying on them.
+
+---
+
+## 2. How to reproduce
+
+```sh
+scripts/brand/render-a11y.sh                       # draft v0 stand-in (default)
+scripts/brand/render-a11y.sh path/to/refined.svg   # re-run on a refined icon
+```
+
+The icon path is a parameter so the whole study can be re-run when the icon is refined; the refined SVG must keep the three colour tokens above (the script stops with an explanation if they are missing). Optional environment: `OUT_DIR`, `ICON_LABEL`, `KEEP_SVG=1`, `INKSCAPE`. Requirements: `inkscape`, `sips`, `python3` (stdlib only; helper `scripts/brand/a11y_tools.py`). The script regenerates its own outputs on every run, so it is idempotent (verified: two consecutive runs give byte-identical files).
+
+Each run also self-verifies:
+
+1. colour-math self-test (`#FFFFFF` vs `#000000` = 21.00:1; `#007AFF` on white = 4.02:1; three CIEDE2000 reference pairs from Sharma et al.; matrix rows sum to 1);
+2. every PNG exists, is non-empty and has the expected pixel size (`sips`);
+3. a probe strip of all 41 palette/system colours is rendered through each filter, decoded with a stdlib PNG reader and compared with the independently computed simulation — this proves the filters really applied and that the renderer honoured linear RGB;
+4. every delivered grayscale PNG (sheet + 4 strips) is checked at full resolution and must contain zero chroma.
+
+All rendering and checks happen in a temporary directory; the committed outputs are only replaced after every check passes.
+
+### Outputs (`docs/brand/prototypes/a11y/`)
+
+| File | Content |
+|---|---|
+| `sheet-normal.png` | Reference sheet, no filter: 4 candidates x 6 treatments + swatch rows |
+| `sheet-grayscale.png` | Same sheet as relative luminance |
+| `sheet-protanopia.png`, `sheet-deuteranopia.png`, `sheet-tritanopia.png` | Same sheet under each simulation |
+| `candidates/candidate-<A-D>-<sim>.png` | Per-candidate strip (3 treatments + 3 Increase-Contrast variants) for each of the 5 conditions — 20 files |
+| `tables.md` | Generated tables (also injected into §4 below) |
+
+Sheets are 2108 x 1726 px, strips 1660 x 374 px. Every sheet carries four swatch panels (Light, Dark, Increase Contrast Light, Increase Contrast Dark) showing each accent beside the system green / orange / red / gray / blue of the same appearance.
+
+---
+
+## 3. Method
+
+### 3.1 Simulation
+
+- **CVD:** Machado, Oliveira & Fernandes (2009), *A Physiologically-based Model for Simulation of Color Vision Deficiency*, IEEE TVCG 15(6), **severity 1.0** matrices (full dichromacy: protanopia, deuteranopia, tritanopia). Severity 1.0 is the worst case; the far more common anomalous trichromacies (protanomaly / deuteranomaly) are milder.
+- **Grayscale:** relative luminance `Y = 0.2126 R + 0.7152 G + 0.0722 B`.
+- **Implementation:** one SVG `<filter>` with a single `<feColorMatrix type="matrix">` applied to the whole page (background, icons, swatches and labels).
+- **Linear-RGB caveat:** the Machado matrices and the luminance weights are defined for *linear-light* RGB. Applying them to gamma-encoded sRGB values gives visibly wrong results (in our probe the summed channel error of a gamma-space application is about 6x larger). The filter therefore sets `color-interpolation-filters="linearRGB"` **deliberately and explicitly** (it is the SVG default, but some renderers and hand-written CSS filters silently use sRGB). Do not copy these matrices into a CSS/`sRGB` context without linearising first.
+- **Renderer precision:** Inkscape 1.4 honours linearRGB but keeps 8-bit linear intermediates, so near-black tones are quantised: measured maximum deviation from the exact computation is dE00 4.1 (`#1C1F24` under deuteranopia; up to 8/255 per channel, 16/255 on one near-zero channel) and <= 2 elsewhere. The dark field `#111214` renders as about `#0C0C0C` in filtered sheets. This is not visible at sheet scale and does not affect the tables, which use exact floating-point maths.
+
+### 3.2 Numbers
+
+- **Contrast:** WCAG 2.x relative-luminance contrast ratio. Thresholds flagged: 4.5:1 (AA normal text) and 3:1 (large text, non-text UI components, graphical objects).
+- **Colour difference:** CIEDE2000 (Sharma, Wu & Dalal 2005 formulation) in CIELAB D65, computed between the accent and each system colour of the same appearance after both pass through the same simulation. The heuristic flags (`< 10` likely confusable, `< 20` close) are **not a standard**; they are a screening aid. CIEDE2000 was designed for small differences and compresses large chroma differences, particularly in blues, so the Min column also quotes plain CIE76 for the same pair.
+- **Adjustment proposals:** computed, not hand-picked — CIELAB L* is lowered in 0.25 steps with a*, b* held until the target ratio is met.
+
+---
+
+## 4. Generated tables
+
+<!-- BEGIN GENERATED TABLES -->
+<!-- Generated by scripts/brand/render-a11y.sh (a11y_tools.py tables). Do not edit by hand. -->
+
+#### T1 - WCAG 2.x contrast ratios
+
+`*<4.5*` = below AA for normal text (still >= 3:1: large text / non-text UI only). `**FAIL <3**` = below the 3:1 minimum for non-text UI components and large text.
+
+| Cand. | Appearance | Value | vs bg 1 | vs bg 2 | White `#FFFFFF` label on accent | Black `#000000` label on accent |
+|---|---|---|---|---|---|---|
+| A accent | Light | `#1F3FA8` | 8.99 (`#FFFFFF`) | 8.06 (`#F2F2F7`) | 8.99 | 2.33 **FAIL <3** |
+| A accent | Dark | `#7C98F5` | 7.67 (`#000000`) | 6.21 (`#1C1C1E`) | 2.74 **FAIL <3** | 7.67 |
+| A accent | Increase Contrast - Light | `#142C7A` | 12.57 (`#FFFFFF`) | 11.26 (`#F2F2F7`) | 12.57 | 1.67 **FAIL <3** |
+| A accent | Increase Contrast - Dark | `#A9BCFF` | 11.32 (`#000000`) | 9.18 (`#1C1C1E`) | 1.85 **FAIL <3** | 11.32 |
+| B accent | Light | `#0E6F7C` | 5.86 (`#FFFFFF`) | 5.25 (`#F2F2F7`) | 5.86 | 3.58 *<4.5* |
+| B accent | Dark | `#4FC3D1` | 10.06 (`#000000`) | 8.15 (`#1C1C1E`) | 2.09 **FAIL <3** | 10.06 |
+| B accent | Increase Contrast - Light | `#084C55` | 9.65 (`#FFFFFF`) | 8.65 (`#F2F2F7`) | 9.65 | 2.18 **FAIL <3** |
+| B accent | Increase Contrast - Dark | `#8ADFE9` | 13.81 (`#000000`) | 11.19 (`#1C1C1E`) | 1.52 **FAIL <3** | 13.81 |
+| C accent | Light | `#5B7C99` | 4.39 *<4.5* (`#FFFFFF`) | 3.93 *<4.5* (`#F2F2F7`) | 4.39 *<4.5* | 4.79 |
+| C accent | Dark | `#9DB7CF` | 10.11 (`#000000`) | 8.19 (`#1C1C1E`) | 2.08 **FAIL <3** | 10.11 |
+| C accent | Increase Contrast - Light | `#3D5A73` | 7.22 (`#FFFFFF`) | 6.47 (`#F2F2F7`) | 7.22 | 2.91 **FAIL <3** |
+| C accent | Increase Contrast - Dark | `#C3D6E6` | 14.08 (`#000000`) | 11.41 (`#1C1C1E`) | 1.49 **FAIL <3** | 14.08 |
+| C ink | Light | `#1C1F24` | 16.52 (`#FFFFFF`) | 14.81 (`#F2F2F7`) | 16.52 | 1.27 **FAIL <3** |
+| C ink | Dark | `#F2F3F5` | 18.91 (`#000000`) | 15.32 (`#1C1C1E`) | 1.11 **FAIL <3** | 18.91 |
+| D accent | Light | `#B26A00` | 4.24 *<4.5* (`#FFFFFF`) | 3.80 *<4.5* (`#F2F2F7`) | 4.24 *<4.5* | 4.95 |
+| D accent | Dark | `#F0B55A` | 11.46 (`#000000`) | 9.29 (`#1C1C1E`) | 1.83 **FAIL <3** | 11.46 |
+| D accent | Increase Contrast - Light | `#7A4800` | 7.62 (`#FFFFFF`) | 6.83 (`#F2F2F7`) | 7.62 | 2.75 **FAIL <3** |
+| D accent | Increase Contrast - Dark | `#FFD08A` | 14.64 (`#000000`) | 11.86 (`#1C1C1E`) | 1.43 **FAIL <3** | 14.64 |
+
+Reference rows (iOS system colours, same maths):
+
+| System colour | Appearance | Value | vs bg 1 | vs bg 2 | White label on it |
+|---|---|---|---|---|---|
+| green (pass) | Light | `#34C759` | 2.22 **FAIL <3** | 1.99 **FAIL <3** | 2.22 **FAIL <3** |
+| orange (warn) | Light | `#FF9500` | 2.20 **FAIL <3** | 1.97 **FAIL <3** | 2.20 **FAIL <3** |
+| red (fail) | Light | `#FF3B30` | 3.55 *<4.5* | 3.18 *<4.5* | 3.55 *<4.5* |
+| gray (manual_check) | Light | `#8E8E93` | 3.26 *<4.5* | 2.92 **FAIL <3** | 3.26 *<4.5* |
+| blue (system tint/info) | Light | `#007AFF` | 4.02 *<4.5* | 3.60 *<4.5* | 4.02 *<4.5* |
+| green (pass) | Dark | `#30D158` | 10.39 | 8.42 | 2.02 **FAIL <3** |
+| orange (warn) | Dark | `#FF9F0A` | 10.22 | 8.28 | 2.06 **FAIL <3** |
+| red (fail) | Dark | `#FF453A` | 6.16 | 4.99 | 3.41 *<4.5* |
+| gray (manual_check) | Dark | `#8E8E93` | 6.44 | 5.22 | 3.26 *<4.5* |
+| blue (system tint/info) | Dark | `#0A84FF` | 5.76 | 4.66 | 3.65 *<4.5* |
+
+#### T2 - Icon-treatment contrast (mark vs field)
+
+| Cand. | Treatment | Mark | Field | Contrast |
+|---|---|---|---|---|
+| A | 1 accent on white | `#1F3FA8` | `#FFFFFF` | 8.99 |
+| A | 2 white on accent field | `#FFFFFF` | `#1F3FA8` | 8.99 |
+| A | 3 dark field, accent-dark mark | `#7C98F5` | `#111214` | 6.84 |
+| A | 1-IC IC-accent on white | `#142C7A` | `#FFFFFF` | 12.57 |
+| A | 2-IC white on IC-accent field | `#FFFFFF` | `#142C7A` | 12.57 |
+| A | 3-IC dark field, IC-dark mark | `#A9BCFF` | `#111214` | 10.11 |
+| B | 1 accent on white | `#0E6F7C` | `#FFFFFF` | 5.86 |
+| B | 2 white on accent field | `#FFFFFF` | `#0E6F7C` | 5.86 |
+| B | 3 dark field, accent-dark mark | `#4FC3D1` | `#111214` | 8.98 |
+| B | 1-IC IC-accent on white | `#084C55` | `#FFFFFF` | 9.65 |
+| B | 2-IC white on IC-accent field | `#FFFFFF` | `#084C55` | 9.65 |
+| B | 3-IC dark field, IC-dark mark | `#8ADFE9` | `#111214` | 12.33 |
+| C | 1 ink on white | `#1C1F24` | `#FFFFFF` | 16.52 |
+| C | 2 white on accent field | `#FFFFFF` | `#5B7C99` | 4.39 *<4.5* |
+| C | 3 dark field, ink-dark mark | `#F2F3F5` | `#111214` | 16.88 |
+| C | 1-IC ink on white | `#1C1F24` | `#FFFFFF` | 16.52 |
+| C | 2-IC white on IC-accent field | `#FFFFFF` | `#3D5A73` | 7.22 |
+| C | 3-IC dark field, ink-dark mark | `#F2F3F5` | `#111214` | 16.88 |
+| D | 1 accent on white | `#B26A00` | `#FFFFFF` | 4.24 *<4.5* |
+| D | 2 white on accent field | `#FFFFFF` | `#B26A00` | 4.24 *<4.5* |
+| D | 3 dark field, accent-dark mark | `#F0B55A` | `#111214` | 10.23 |
+| D | 1-IC IC-accent on white | `#7A4800` | `#FFFFFF` | 7.62 |
+| D | 2-IC white on IC-accent field | `#FFFFFF` | `#7A4800` | 7.62 |
+| D | 3-IC dark field, IC-dark mark | `#FFD08A` | `#111214` | 13.07 |
+
+#### T3 - Minimal value adjustments for accents below 4.5:1 on their system backgrounds
+
+Computed, not hand-picked: CIELAB L* is moved away from the background (lowered for light appearances, raised for dark ones) in 0.25 steps with a*, b* held (hue and chroma approximately preserved; out-of-gamut results are clipped) until the target is met against BOTH system backgrounds. These are proposals for the next test round, not decisions.
+
+| Cand. | Appearance | Current | Worst bg contrast | Proposed for >= 4.5:1 | Contrast after (bg1 / bg2) | dE00 current -> proposed |
+|---|---|---|---|---|---|---|
+| C | Light | `#5B7C99` | 3.93 | `#51728E` | 5.06 / 4.54 | 4.0 |
+| D | Light | `#B26A00` | 3.80 | `#A45E00` | 5.02 / 4.50 | 5.0 |
+
+White-label-on-accent (filled button) adjustments, light appearance only - same method, target 4.5:1 for a `#FFFFFF` label:
+
+| Cand. | Current | White-label contrast | Proposed | White-label contrast after |
+|---|---|---|---|---|
+| A | `#1F3FA8` | 8.99 | (passes) | - |
+| B | `#0E6F7C` | 5.86 | (passes) | - |
+| C | `#5B7C99` | 4.39 | `#597A97` | 4.51 |
+| D | `#B26A00` | 4.24 | `#AC6500` | 4.55 |
+
+#### T4 - CIEDE2000 colour difference: accent vs iOS status/system colours
+
+dE00 between each accent and the system colour of the SAME appearance, under normal vision and each simulation. Heuristic flags (not a standard): `**x !!**` = dE00 < 10 (likely confusable as flat swatches), `*x !*` = dE00 < 20 (close; needs shape/label redundancy). The Grayscale column is informational only and is neither flagged nor included in Min: with chroma removed, dE00 reduces to a lightness difference, and the iOS status colours collide with EACH OTHER there too (see T4-ref), which is why colour may never be the only status signal. CIEDE2000 was designed for SMALL differences and compresses large chroma differences, especially in the blue region, so the Min column also quotes the plain CIE76 Lab distance of the same pair: a low dE00 with a high dE76 (e.g. a greyed blue vs saturated system blue) is a same-hue-family warning, not a claim that the two swatches look alike.
+
+**Light**
+
+| Cand. | Accent | vs | Normal | Grayscale | Protanopia | Deuteranopia | Tritanopia | Min (excl. grayscale) |
+|---|---|---|---|---|---|---|---|---|
+| A | `#1F3FA8` | green `#34C759` (pass) | 67.6 | 39.9 | 67.7 | 66.3 | 39.9 | 39.9 (dE76 50) |
+| A | `#1F3FA8` | orange `#FF9500` (warn) | 68.3 | 40.2 | 67.6 | 77.2 | 60.5 | 60.5 (dE76 83) |
+| A | `#1F3FA8` | red `#FF3B30` (fail) | 50.3 | 23.9 | 52.5 | 67.7 | 60.9 | 50.3 (dE76 123) |
+| A | `#1F3FA8` | gray `#8E8E93` (manual_check) | 36.1 | 26.5 | 31.8 | 35.0 | 29.0 | 29.0 (dE76 33) |
+| A | `#1F3FA8` | blue `#007AFF` (system tint/info) | 22.1 | 20.1 | 22.6 | *19.3 !* | 23.8 | *19.3 !* (dE76 26) |
+| B | `#0E6F7C` | green `#34C759` (pass) | 42.0 | 26.0 | 44.0 | 44.9 | 25.7 | 25.7 (dE76 33) |
+| B | `#0E6F7C` | orange `#FF9500` (warn) | 52.0 | 26.3 | 43.4 | 53.5 | 56.5 | 43.4 (dE76 83) |
+| B | `#0E6F7C` | red `#FF3B30` (fail) | 52.0 | 13.9 | 31.7 | 46.1 | 59.2 | 31.7 (dE76 49) |
+| B | `#0E6F7C` | gray `#8E8E93` (manual_check) | 26.6 | 16.2 | *15.9 !* | 20.8 | 25.3 | *15.9 !* (dE76 17) |
+| B | `#0E6F7C` | blue `#007AFF` (system tint/info) | 26.1 | 10.3 | 23.7 | *19.5 !* | *17.0 !* | *17.0 !* (dE76 20) |
+| C | `#5B7C99` | green `#34C759` (pass) | 44.7 | 18.0 | 44.0 | 41.5 | 21.5 | 21.5 (dE76 34) |
+| C | `#5B7C99` | orange `#FF9500` (warn) | 46.3 | 18.3 | 44.6 | 50.4 | 48.3 | 44.6 (dE76 88) |
+| C | `#5B7C99` | red `#FF3B30` (fail) | 44.4 | 6.1 | 36.3 | 44.2 | 51.6 | 36.3 (dE76 55) |
+| C | `#5B7C99` | gray `#8E8E93` (manual_check) | *15.2 !* | 8.2 | *12.7 !* | *14.7 !* | *18.6 !* | *12.7 !* (dE76 17) |
+| C | `#5B7C99` | blue `#007AFF` (system tint/info) | **9.9 !!** | 2.7 | *17.0 !* | *14.5 !* | *10.6 !* | **9.9 !!** (dE76 60) |
+| D | `#B26A00` | green `#34C759` (pass) | 48.4 | 16.8 | 22.7 | *14.3 !* | 61.5 | *14.3 !* (dE76 25) |
+| D | `#B26A00` | orange `#FF9500` (warn) | *17.7 !* | 17.1 | *17.3 !* | *17.5 !* | *14.6 !* | *14.6 !* (dE76 18) |
+| D | `#B26A00` | red `#FF3B30` (fail) | 25.6 | 4.9 | **5.7 !!** | **7.4 !!** | *11.3 !* | **5.7 !!** (dE76 17) |
+| D | `#B26A00` | gray `#8E8E93` (manual_check) | 29.5 | 7.0 | 30.1 | 29.2 | 25.6 | 25.6 (dE76 49) |
+| D | `#B26A00` | blue `#007AFF` (system tint/info) | 54.7 | 1.5 | 58.8 | 63.4 | 60.1 | 54.7 (dE76 133) |
+
+**Dark**
+
+| Cand. | Accent | vs | Normal | Grayscale | Protanopia | Deuteranopia | Tritanopia | Min (excl. grayscale) |
+|---|---|---|---|---|---|---|---|---|
+| A | `#7C98F5` | green `#30D158` (pass) | 54.0 | 7.6 | 55.4 | 52.2 | *16.3 !* | *16.3 !* (dE76 29) |
+| A | `#7C98F5` | orange `#FF9F0A` (warn) | 53.8 | 7.3 | 57.2 | 60.5 | 58.2 | 53.8 (dE76 127) |
+| A | `#7C98F5` | red `#FF453A` (fail) | 44.6 | 5.6 | 50.4 | 55.2 | 69.2 | 44.6 (dE76 112) |
+| A | `#7C98F5` | gray `#8E8E93` (manual_check) | 22.9 | 4.6 | 21.6 | 22.4 | 20.4 | 20.4 (dE76 29) |
+| A | `#7C98F5` | blue `#0A84FF` (system tint/info) | *10.5 !* | 7.4 | **7.1 !!** | **9.1 !!** | **4.3 !!** | **4.3 !!** (dE76 7) |
+| B | `#4FC3D1` | green `#30D158` (pass) | 33.4 | 0.8 | 37.2 | 38.8 | **6.0 !!** | **6.0 !!** (dE76 10) |
+| B | `#4FC3D1` | orange `#FF9F0A` (warn) | 46.6 | 0.5 | 39.7 | 45.8 | 57.5 | 39.7 (dE76 84) |
+| B | `#4FC3D1` | red `#FF453A` (fail) | 55.6 | 12.3 | 39.4 | 42.2 | 69.3 | 39.4 (dE76 54) |
+| B | `#4FC3D1` | gray `#8E8E93` (manual_check) | 26.8 | 11.3 | *15.4 !* | *15.0 !* | 26.4 | *15.0 !* (dE76 21) |
+| B | `#4FC3D1` | blue `#0A84FF` (system tint/info) | 29.7 | 14.1 | 22.4 | 20.8 | *14.1 !* | *14.1 !* (dE76 21) |
+| C | `#9DB7CF` | green `#30D158` (pass) | 39.6 | 0.5 | 38.5 | 36.3 | *14.8 !* | *14.8 !* (dE76 33) |
+| C | `#9DB7CF` | orange `#FF9F0A` (warn) | 40.3 | 0.3 | 40.8 | 43.1 | 41.5 | 40.3 (dE76 97) |
+| C | `#9DB7CF` | red `#FF453A` (fail) | 43.3 | 12.6 | 39.6 | 40.0 | 50.9 | 39.6 (dE76 55) |
+| C | `#9DB7CF` | gray `#8E8E93` (manual_check) | *15.6 !* | 11.6 | *14.8 !* | *14.5 !* | *18.3 !* | *14.5 !* (dE76 19) |
+| C | `#9DB7CF` | blue `#0A84FF` (system tint/info) | *18.5 !* | 14.4 | 21.0 | 23.2 | *13.9 !* | *13.9 !* (dE76 23) |
+| D | `#F0B55A` | green `#30D158` (pass) | 38.6 | 2.4 | **2.4 !!** | **6.4 !!** | 54.9 | **2.4 !!** (dE76 6) |
+| D | `#F0B55A` | orange `#FF9F0A` (warn) | **8.7 !!** | 2.7 | **6.5 !!** | **6.0 !!** | **6.7 !!** | **6.0 !!** (dE76 22) |
+| D | `#F0B55A` | red `#FF453A` (fail) | 34.2 | 15.5 | 24.2 | *12.2 !* | 23.3 | *12.2 !* (dE76 16) |
+| D | `#F0B55A` | gray `#8E8E93` (manual_check) | 31.0 | 14.5 | 30.3 | 32.1 | 26.7 | 26.7 (dE76 41) |
+| D | `#F0B55A` | blue `#0A84FF` (system tint/info) | 57.2 | 17.3 | 58.6 | 64.2 | 58.6 | 57.2 (dE76 125) |
+
+**Increase Contrast - Light**
+
+| Cand. | Accent | vs | Normal | Grayscale | Protanopia | Deuteranopia | Tritanopia | Min (excl. grayscale) |
+|---|---|---|---|---|---|---|---|---|
+| A | `#142C7A` | green `#248A3D` (pass) | 54.4 | 24.3 | 55.0 | 52.1 | 27.1 | 27.1 (dE76 36) |
+| A | `#142C7A` | orange `#C93400` (warn) | 48.4 | 19.7 | 51.6 | 61.2 | 55.3 | 48.4 (dE76 113) |
+| A | `#142C7A` | red `#D70015` (fail) | 46.4 | 18.9 | 48.5 | 61.4 | 56.9 | 46.4 (dE76 113) |
+| A | `#142C7A` | gray `#6C6C70` (manual_check) | 29.6 | 19.7 | 26.7 | 28.5 | 22.7 | 22.7 (dE76 28) |
+| A | `#142C7A` | blue `#0040DD` (system tint/info) | *14.1 !* | 11.0 | *16.8 !* | *14.7 !* | *15.6 !* | *14.1 !* (dE76 46) |
+| B | `#084C55` | green `#248A3D` (pass) | 33.6 | 18.6 | 35.5 | 35.3 | *19.2 !* | *19.2 !* (dE76 25) |
+| B | `#084C55` | orange `#C93400` (warn) | 46.6 | 13.9 | 31.3 | 42.4 | 54.0 | 31.3 (dE76 53) |
+| B | `#084C55` | red `#D70015` (fail) | 48.5 | 13.1 | 28.8 | 42.7 | 54.4 | 28.8 (dE76 45) |
+| B | `#084C55` | gray `#6C6C70` (manual_check) | 22.4 | 13.9 | *13.5 !* | *17.2 !* | 22.0 | *13.5 !* (dE76 16) |
+| B | `#084C55` | blue `#0040DD` (system tint/info) | 24.5 | 5.1 | 22.7 | 20.1 | *15.9 !* | *15.9 !* (dE76 22) |
+| C | `#3D5A73` | green `#248A3D` (pass) | 38.7 | 12.5 | 38.1 | 35.7 | *15.4 !* | *15.4 !* (dE76 22) |
+| C | `#3D5A73` | orange `#C93400` (warn) | 42.3 | 7.7 | 36.8 | 43.4 | 49.9 | 36.8 (dE76 61) |
+| C | `#3D5A73` | red `#D70015` (fail) | 43.3 | 7.0 | 34.7 | 43.6 | 50.2 | 34.7 (dE76 53) |
+| C | `#3D5A73` | gray `#6C6C70` (manual_check) | *14.2 !* | 7.7 | *11.9 !* | *14.1 !* | *17.7 !* | *11.9 !* (dE76 16) |
+| C | `#3D5A73` | blue `#0040DD` (system tint/info) | *11.6 !* | 1.1 | *16.5 !* | *15.2 !* | *11.2 !* | *11.2 !* (dE76 17) |
+| D | `#7A4800` | green `#248A3D` (pass) | 40.6 | 13.5 | *18.3 !* | *12.4 !* | 51.1 | *12.4 !* (dE76 19) |
+| D | `#7A4800` | orange `#C93400` (warn) | 20.5 | 8.8 | **3.7 !!** | *12.5 !* | *16.8 !* | **3.7 !!** (dE76 6) |
+| D | `#7A4800` | red `#D70015` (fail) | 26.0 | 8.0 | **2.0 !!** | *12.9 !* | 21.4 | **2.0 !!** (dE76 5) |
+| D | `#7A4800` | gray `#6C6C70` (manual_check) | 26.9 | 8.8 | 26.9 | 26.3 | 26.0 | 26.0 (dE76 38) |
+| D | `#7A4800` | blue `#0040DD` (system tint/info) | 53.7 | 0.0 | 58.5 | 61.6 | 46.8 | 46.8 (dE76 61) |
+
+**Increase Contrast - Dark**
+
+| Cand. | Accent | vs | Normal | Grayscale | Protanopia | Deuteranopia | Tritanopia | Min (excl. grayscale) |
+|---|---|---|---|---|---|---|---|---|
+| A | `#A9BCFF` | green `#30DB5B` (pass) | 49.7 | 0.3 | 49.7 | 47.3 | *16.5 !* | *16.5 !* (dE76 34) |
+| A | `#A9BCFF` | orange `#FFB340` (warn) | 48.2 | 1.0 | 50.8 | 52.2 | 45.5 | 45.5 (dE76 58) |
+| A | `#A9BCFF` | red `#FF6961` (fail) | 40.3 | 10.3 | 41.3 | 46.0 | 54.4 | 40.3 (dE76 85) |
+| A | `#A9BCFF` | gray `#AEAEB2` (manual_check) | *19.2 !* | 4.3 | *18.3 !* | *18.7 !* | *16.1 !* | *16.1 !* (dE76 20) |
+| A | `#A9BCFF` | blue `#409CFF` (system tint/info) | *15.5 !* | 10.3 | *10.4 !* | *13.8 !* | *11.7 !* | *10.4 !* (dE76 22) |
+| B | `#8ADFE9` | green `#30DB5B` (pass) | 32.7 | 4.5 | 36.1 | 37.2 | **8.5 !!** | **8.5 !!** (dE76 16) |
+| B | `#8ADFE9` | orange `#FFB340` (warn) | 42.0 | 3.7 | 37.7 | 41.3 | 51.5 | 37.7 (dE76 78) |
+| B | `#8ADFE9` | red `#FF6961` (fail) | 51.7 | 15.0 | 33.9 | 36.9 | 65.8 | 33.9 (dE76 44) |
+| B | `#8ADFE9` | gray `#AEAEB2` (manual_check) | 23.4 | 9.1 | *12.3 !* | *12.5 !* | 24.4 | *12.3 !* (dE76 17) |
+| B | `#8ADFE9` | blue `#409CFF` (system tint/info) | 27.2 | 15.0 | 22.7 | 22.7 | *14.0 !* | *14.0 !* (dE76 20) |
+| C | `#C3D6E6` | green `#30DB5B` (pass) | 37.2 | 4.9 | 35.5 | 33.8 | *18.2 !* | *18.2 !* (dE76 39) |
+| C | `#C3D6E6` | orange `#FFB340` (warn) | 37.9 | 4.2 | 37.1 | 37.6 | 37.2 | 37.1 (dE76 77) |
+| C | `#C3D6E6` | red `#FF6961` (fail) | 39.6 | 15.5 | 33.2 | 33.9 | 41.2 | 33.2 (dE76 43) |
+| C | `#C3D6E6` | gray `#AEAEB2` (manual_check) | *12.5 !* | 9.5 | *11.6 !* | *11.4 !* | *14.4 !* | *11.4 !* (dE76 16) |
+| C | `#C3D6E6` | blue `#409CFF` (system tint/info) | 21.3 | 15.5 | 22.1 | 25.1 | *18.7 !* | *18.7 !* (dE76 32) |
+| D | `#FFD08A` | green `#30DB5B` (pass) | 36.2 | 5.9 | **7.0 !!** | **8.5 !!** | 48.2 | **7.0 !!** (dE76 22) |
+| D | `#FFD08A` | orange `#FFB340` (warn) | **9.7 !!** | 5.1 | *10.3 !* | **8.5 !!** | **9.1 !!** | **8.5 !!** (dE76 26) |
+| D | `#FFD08A` | red `#FF6961` (fail) | 33.6 | 16.4 | 22.8 | *14.0 !* | 24.7 | *14.0 !* (dE76 20) |
+| D | `#FFD08A` | gray `#AEAEB2` (manual_check) | 26.0 | 10.5 | 25.5 | 26.9 | 22.2 | 22.2 (dE76 27) |
+| D | `#FFD08A` | blue `#409CFF` (system tint/info) | 51.1 | 16.4 | 51.9 | 57.1 | 56.0 | 51.1 (dE76 100) |
+
+#### T4-ref - Baseline: iOS system colours against each other (same maths)
+
+Context for reading T4: Apple's own status palette already contains pairs that are close under dichromacy simulation.
+
+| Appearance | Pair | Normal | Grayscale | Protanopia | Deuteranopia | Tritanopia | Min (excl. grayscale) |
+|---|---|---|---|---|---|---|---|
+| Light | green vs orange | 50.2 | 0.3 | **7.3 !!** | *11.3 !* | 62.5 | **7.3 !!** (dE76 17) |
+| Light | green vs red | 76.0 | 12.0 | 25.0 | **8.3 !!** | 71.7 | **8.3 !!** (dE76 21) |
+| Light | green vs gray | 32.1 | 9.9 | 30.1 | 25.7 | 26.0 | 25.7 (dE76 43) |
+| Light | green vs blue | 59.1 | 15.3 | 59.7 | 59.0 | *19.2 !* | *19.2 !* (dE76 31) |
+| Light | orange vs red | 27.9 | 12.3 | 20.9 | *10.7 !* | *15.1 !* | *10.7 !* (dE76 22) |
+| Light | orange vs gray | 32.9 | 10.2 | 31.2 | 34.0 | 26.3 | 26.3 (dE76 56) |
+| Light | orange vs blue | 59.2 | 15.6 | 62.0 | 69.9 | 63.0 | 59.2 (dE76 152) |
+| Light | red vs gray | 30.9 | 2.1 | 27.1 | 28.9 | 30.9 | 27.1 (dE76 42) |
+| Light | red vs blue | 48.6 | 3.3 | 54.2 | 63.9 | 71.3 | 48.6 (dE76 135) |
+| Light | gray vs blue | 27.6 | 5.4 | 24.1 | 26.8 | 20.7 | 20.7 (dE76 33) |
+| Dark | green vs orange | 47.9 | 0.3 | **7.1 !!** | **9.8 !!** | 61.0 | **7.1 !!** (dE76 15) |
+| Dark | green vs red | 77.1 | 13.2 | 26.3 | **7.9 !!** | 73.9 | **7.9 !!** (dE76 15) |
+| Dark | green vs gray | 33.6 | 12.1 | 32.0 | 27.5 | 27.0 | 27.0 (dE76 49) |
+| Dark | green vs blue | 59.6 | 14.9 | 60.2 | 59.1 | *18.4 !* | *18.4 !* (dE76 30) |
+| Dark | orange vs red | 30.8 | 12.9 | 22.0 | *11.7 !* | *17.0 !* | *11.7 !* (dE76 26) |
+| Dark | orange vs gray | 33.4 | 11.9 | 32.0 | 34.6 | 26.3 | 26.3 (dE76 51) |
+| Dark | orange vs blue | 58.9 | 14.6 | 61.6 | 68.4 | 63.0 | 58.9 (dE76 147) |
+| Dark | red vs gray | 30.3 | 1.0 | 25.2 | 28.3 | 30.5 | 25.2 (dE76 38) |
+| Dark | red vs blue | 48.4 | 1.8 | 52.1 | 61.5 | 73.9 | 48.4 (dE76 129) |
+| Dark | gray vs blue | 26.9 | 2.8 | 23.4 | 26.1 | 21.2 | 21.2 (dE76 34) |
+
+#### T5 - Simulated appearance of each accent (hex after simulation)
+
+| Cand. | Appearance | Normal | Grayscale | Protanopia | Deuteranopia | Tritanopia |
+|---|---|---|---|---|---|---|
+| A | Light | `#1F3FA8` | `#494949` | `#0050AB` | `#0043A6` | `#005A6D` |
+| A | Dark | `#7C98F5` | `#9C9C9C` | `#74A2F9` | `#6797F3` | `#49ACBB` |
+| A | Increase Contrast - Light | `#142C7A` | `#333333` | `#00387D` | `#002F79` | `#00404E` |
+| A | Increase Contrast - Dark | `#A9BCFF` | `#BEBEBE` | `#A7C2FF` | `#A0BBFD` | `#90C9D3` |
+| B | Light | `#0E6F7C` | `#656565` | `#646A7D` | `#56607C` | `#007573` |
+| B | Dark | `#4FC3D1` | `#B3B3B3` | `#B4BCD2` | `#A0ADD1` | `#00CBC7` |
+| B | Increase Contrast - Light | `#084C55` | `#454545` | `#444956` | `#3A4155` | `#00504F` |
+| B | Increase Contrast - Dark | `#8ADFE9` | `#D1D1D1` | `#D3D8EA` | `#C3CCE9` | `#60E5E2` |
+| C | Light | `#5B7C99` | `#787878` | `#707C9A` | `#687698` | `#458386` |
+| C | Dark | `#9DB7CF` | `#B4B4B4` | `#AEB7D0` | `#A8B2CF` | `#8FBDBF` |
+| C | Increase Contrast - Light | `#3D5A73` | `#575757` | `#505A74` | `#495573` | `#276062` |
+| C | Increase Contrast - Dark | `#C3D6E6` | `#D3D3D3` | `#D0D6E7` | `#CBD2E6` | `#BADADB` |
+| D | Light | `#B26A00` | `#7B7B7B` | `#817100` | `#928203` | `#C3595A` |
+| D | Dark | `#F0B55A` | `#BFBFBF` | `#CBB751` | `#D9C55D` | `#FFA5A1` |
+| D | Increase Contrast - Light | `#7A4800` | `#545454` | `#584C00` | `#645802` | `#863C3C` |
+| D | Increase Contrast - Dark | `#FFD08A` | `#D7D7D7` | `#E2D185` | `#EEDC8C` | `#FFC3BF` |
+
+#### T6 - Worst-case separation per candidate (normal vision + 3 CVD simulations, all appearances)
+
+| Cand. | Closest status/system colour over all appearances and simulations | dE00 | dE76 |
+|---|---|---|---|
+| A | blue (system tint/info), Dark, tritanopia | **4.3 !!** | 7 |
+| B | green (pass), Dark, tritanopia | **6.0 !!** | 10 |
+| C | blue (system tint/info), Light, normal | **9.9 !!** | 60 |
+| D | red (fail), Increase Contrast - Light, protanopia | **2.0 !!** | 5 |
+<!-- END GENERATED TABLES -->
+
+---
+
+## 5. Observations
+
+### 5.1 Contrast (T1, T2, T3)
+
+- **A and B pass everywhere they were tested in the light appearance**: accent on both system backgrounds >= 5.25:1, white label on accent >= 5.86:1, all icon treatments >= 5.86:1.
+- **C accent `#5B7C99` and D accent `#B26A00` fail 4.5:1** as text/tint on white (4.39 and 4.24) and more clearly on `#F2F2F7` (3.93 and 3.80), and as a filled-button fill under a white label. They still clear 3:1, so icon treatment 2 and non-text uses are acceptable, but neither can be used as-is for tinted text buttons. T3 proposes `#51728E` (C) and `#A45E00` (D) to clear both backgrounds; both shifts are small (dE00 4–5).
+- **Every dark-appearance accent fails under a white label** (1.4–2.7:1). This is structural, not a tuning problem: an accent light enough to read on black cannot carry white text. SwiftUI's `.borderedProminent` draws a white label on the tint in Dark Mode, so for all four candidates a filled primary button in Dark Mode needs either a dark label (all pass >= 7.6:1 with black) or a dedicated, darker "filled-control" colour separate from the text/tint accent. This must be settled in the product-context test (handoff Step 4), whichever hue is chosen.
+- All Increase-Contrast values raise contrast over their defaults, as they must (light >= 6.4:1, dark >= 9.1:1 on both backgrounds).
+- Context: the iOS system colours themselves do not meet 4.5:1 on white (system blue 4.02, green 2.22, orange 2.20). Holding the brand accent to 4.5:1 is a deliberately stricter bar than Apple's default tint.
+
+### 5.2 Semantic separation from status colours (T4, T4-ref, T6, swatch rows)
+
+- **A (deep blue):** clearly separated from pass / warn / fail / manual_check in every simulation (min dE00 16, typically > 40). Its only neighbour is **system blue**: light is adequately apart (dE00 22 normal, 19 deuteranopia), but the **dark value `#7C98F5` sits close to system blue `#0A84FF`** (dE00 10.5 normal, 4.3 under tritanopia). This is the "generic blue" failure mode of §8 of the colour research showing up numerically in Dark Mode; a slightly more violet-free, lighter or less saturated dark value should be tried, without drifting toward purple.
+- **B (blue-teal):** well separated from warn and fail. Two notes: (i) under **tritanopia** the dark accent `#4FC3D1` converges with system green (dE00 6.0; Increase-Contrast dark 8.5) — congenital tritanopia is rare (well under 0.1 % of people) but blue-yellow discrimination also degrades with age and blue-light filters; (ii) under **protanopia/deuteranopia B loses its teal identity and renders as a blue-grey almost identical to C's accent** (see the deuteranopia sheet): for roughly 1 in 12 men, B's differentiation argument over C largely disappears, though it stays distinct from A.
+- **C (graphite + cool accent):** the ink mark is achromatic, so the icon is essentially immune to CVD. The accent is low-chroma, which makes it the **closest of all candidates to the neutral `manual_check` grey** (dE00 11–19 in every appearance and simulation, never clear of the `< 20` flag). If C is pursued, the accent must never be used for a state-like chip or badge, and `manual_check` needs a symbol-led treatment. The `!!` flag against system blue is a CIEDE2000 artefact (dE76 60): same hue family, clearly different swatch.
+- **D (amber-ochre):** confirms the conflict predicted in research §6. It is close to **warn** in normal vision in the dark appearances (dE00 8.7 and 9.7) and, under protanopia/deuteranopia, it converges with **fail red** (light: 5.7 / 7.4; Increase-Contrast light: 2.0) and with **pass green** (dark: 2.4 / 6.4). In the red-green simulations D is simultaneously near warn, fail and pass. This is tolerable only where no status colour can ever appear — i.e. the app icon — which matches its brief as an *icon-only* challenger. D should not be carried into the UI accent role.
+- Baseline (T4-ref): Apple's own green/orange and green/red pairs fall to dE00 7–8 under dichromacy. No accent choice fixes that; it re-confirms the standing rule that **status must always carry a symbol and a label, never colour alone**.
+
+### 5.3 Grayscale
+
+- All icon treatments survive grayscale because every treatment is a two-tone figure/ground pair with >= 4.2:1 luminance contrast; the mark never relies on hue.
+- Among the accents, grayscale weight ranks A (darkest, `#494949`) > B (`#656565`) > C accent (`#787878`) ~ D (`#7B7B7B`). C's ink mark is the strongest treatment-1 mark overall; D on white is the weakest (4.24:1).
+- In the dark appearance the B, C and D accents and system green/orange land within about 3 dE of each other in grayscale (A is slightly darker, about 7 dE away). That is expected and harmless provided status is never colour-only.
+
+### 5.4 Increase Contrast
+
+- The IC variants keep hue identity for all candidates while increasing figure/ground contrast (A 12.6, B 9.7, C-field 7.2, D 7.6 for treatments 1/2-IC).
+- iOS does not swap the Home Screen app icon for Increase Contrast; the IC *icon* renders are therefore evidence for in-app brand marks and for how far each hue can be pushed, not a proposal for an alternate app icon.
+- D's IC-light value `#7A4800` is the single worst semantic collision in the study (dE00 2.0 vs IC red under protanopia).
+
+---
+
+## 6. Recommendation (not a decision)
+
+| Candidate | Accessibility verdict on current values | Needed before the next round |
+|---|---|---|
+| **A — Deep blue** | Passes contrast everywhere; best status separation. | Re-test the **dark** value for distance from system blue `#0A84FF` (currently dE00 10.5; aim for a clearly larger gap without moving toward violet). |
+| **B — Dark cyan / blue-teal** | Passes contrast everywhere; good status separation for red-green CVD. | Accept or mitigate the tritanopia convergence of the dark value with system green; note that its hue identity collapses toward blue-grey for protan/deutan viewers. |
+| **C — Graphite + cool accent** | Icon is the most CVD-robust. Accent **fails 4.5:1** as text/tint in the light appearance. | Adopt an adjusted light accent (computed proposal **`#51728E`**, 5.06 / 4.54:1) and keep the accent away from anything state-like because of its proximity to neutral grey. |
+| **D — Warm challenger** | Accent **fails 4.5:1** in light (proposal **`#A45E00`**, 5.02 / 4.50:1); collides with warn in normal vision and with fail/pass under red-green CVD. | Keep strictly as an icon-only challenger; do not use as a UI accent. The contrast fix does not address the semantic collision. |
+
+Across all candidates: decide the Dark Mode filled-button treatment (dark label or separate fill colour) during the product-context test; and keep symbol + text redundancy on every status.
+
+From an accessibility standpoint alone, **A and B are ready to proceed unchanged to icon-size and product-context testing, C proceeds with an adjusted light accent, and D proceeds only as an icon.** Which of them best serves the brand is outside this document's evidence and remains open under BD-033.
+
+---
+
+## 7. Caveats, and what may change when the icon is refined
+
+Conclusions that are **independent of the icon drawing** (they depend only on the hex values): all contrast ratios in T1/T3, all accent-vs-status differences in T4–T6, the Dark Mode white-label finding, the D/status collision, and the B/C convergence under red-green CVD.
+
+Conclusions that **could change once depth, shadow and texture are added**:
+
+- T2 treats mark and field as flat colours. Shading will create a *range* of luminances: highlights on an accent field lower local contrast against a white mark, and shadows beneath the mark can raise or lower edge contrast. Borderline cases (C treatment 2 at 4.39:1, D treatments 1–2 at 4.24:1) are the ones most likely to flip; re-run on the refined SVG.
+- The hair-strand cutout is a thin, field-coloured line inside the mark, so its visibility equals the mark/field contrast and is highly sensitive to any texture or inner shadow. Its survival is a drawing and size question (owned by the icon-size unit), not settled here.
+- Texture and soft shadows introduce intermediate tones; a dichromacy matrix may push those toward a neighbouring status hue even where the flat accent is safe. The simulation filter works on arbitrary artwork (it is not a flat-colour swap), and the embedder keeps the icon's root attributes and makes `<defs>` ids unique per copy, so a re-run covers this. The *recolouring* step, however, is a three-token substitution: a refined icon with gradients, shadow tints or masks (a `#FFFFFF` inside a mask would be recoloured too) needs that step extended to its new colour structure, and this path is untested until such an icon exists.
+- The near-black quantisation of the renderer (§3.1) will matter more for an icon with deep shadows; consider verifying critical dark tones numerically rather than by eye.
+- Overall grayscale weight ranking of the treatments may change with finishing.
+
+General limits:
+
+- Simulations model full dichromacy on an sRGB display for a standard observer; they approximate what is *lost*, not the viewer's experience. They do not replace testing with colour-blind users or on-device checks with iOS Colour Filters, Increase Contrast, Reduce Transparency, and bright/dim ambient light (research §5).
+- Display P3 was not evaluated; all values are sRGB.
+- WCAG 2.x contrast is a coarse model (it is known to over-credit dark-on-dark and under-credit some light-on-colour pairs). Treat ratios within about +/-0.3 of a threshold as "borderline", not pass/fail certainties.
+- The dE flag thresholds are heuristic; adjacent flat swatches are a harsher test than real UI, where status colours appear with SF Symbols and text.
+- Increase-Contrast system values should be confirmed against the current iOS SDK on device.
