@@ -1,4 +1,4 @@
-# Foto carnet feasibility prototype
+# Calipic feasibility prototype
 
 Native iPhone app for the first M1 import/render experiment. This is disposable spike code, not the production application or a published DNI-compliance implementation.
 
