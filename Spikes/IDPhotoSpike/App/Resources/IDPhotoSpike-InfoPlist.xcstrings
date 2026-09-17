@@ -15,6 +15,12 @@
             "state" : "translated",
             "value" : "Calipic"
           }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic"
+          }
         }
       }
     },
@@ -28,6 +34,12 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic"
+          }
+        },
+        "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Calipic"
@@ -49,6 +61,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La cámara se usa solo para hacer tu foto de carnet. Las fotos se quedan en este iPhone."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A câmera é usada apenas para tirar sua foto para documento. As fotos ficam neste iPhone."
           }
         }
       }
