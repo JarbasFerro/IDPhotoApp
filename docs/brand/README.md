@@ -2,18 +2,46 @@
 
 This directory defines the strategic, verbal, visual, interaction, and implementation rules that make Calipic feel like one coherent product.
 
-The goal is not to create a decorative brand layer on top of iOS. Calipic should feel unmistakably itself while remaining deeply native to iPhone. The system therefore starts with product character and experience principles before specifying logo, color, typography, motion, or design tokens.
+The goal is not to create a decorative brand layer on top of iOS. Calipic should feel unmistakably itself while remaining deeply native to iPhone. The system starts with product character and experience principles before finalizing logo, color, typography, motion, or design tokens.
 
 ## Status
 
-**Working brand name:** Calipic  
-**Brand system status:** Discovery / foundation draft  
+**Product/brand name:** Calipic  
+**Consumer naming direction:** `Calipic — ID Photos`  
+**Brand-system status:** Strategic foundation approved; visual identity prototyping/research in progress  
 **Technical repository name:** remains `IDPhotoApp` for now  
-**Technical project identifiers:** unchanged until a separate implementation decision is made
+**Technical project identifiers:** unchanged until a separate implementation decision
+
+## Approved strategic direction
+
+Calipic should be known for:
+
+- being exceptionally simple and intuitive;
+- completing the job from portrait to correct digital output or physical print;
+- being beautiful through restraint rather than decoration;
+- treating privacy/on-device processing as a primary promise;
+- feeling completely native to iPhone;
+- producing satisfaction through an easy, finished real-world outcome.
+
+Approved personality:
+
+> **Elegant · Friendly · Photographic · Practical · Sophisticated**
+
+Strong anti-traits:
+
+> **Complicated · AI-branded · Generic · Childish · Cheap**
+
+When design goals conflict, prioritize:
+
+1. native iOS familiarity;
+2. beauty;
+3. accessibility.
+
+Correctness, privacy, and rule integrity remain non-negotiable constraints rather than ranked preferences.
 
 ## Existing product constraints inherited by the brand system
 
-The brand system must preserve the product decisions already documented elsewhere in the repository:
+The brand system must preserve the product decisions documented elsewhere in the repository:
 
 - iPhone / iOS only;
 - native SwiftUI and Apple platform conventions;
@@ -26,80 +54,86 @@ The brand system must preserve the product decisions already documented elsewher
 - restrained motion and haptics that communicate state;
 - no identity-changing retouching in official-photo workflows;
 - no intrusive advertising or conversion pressure in the correction path;
-- internationalization and localization are structural requirements.
+- internationalization and localization as structural requirements.
 
-Brand decisions may refine the expression of these principles, but should not silently contradict them.
+Brand decisions may refine the expression of these principles, but may not silently contradict them.
 
-## Documentation architecture
+## Current documents
 
-### Phase 1 — Define the brand core
+### Discovery and strategy
 
-1. [`00-discovery-questionnaire.md`](00-discovery-questionnaire.md)  
-   Open questions, assumptions, and founder decisions needed before identity work is locked.
+- [`00-discovery-questionnaire.md`](00-discovery-questionnaire.md) — original discovery framework.
+- [`00-discovery-answers.md`](00-discovery-answers.md) — founder answers from 2026-09-17.
+- [`01-brand-foundations.md`](01-brand-foundations.md) — approved strategic direction, positioning, audience, personality, voice, commercial posture, visual boundaries.
+- [`02-experience-constitution.md`](02-experience-constitution.md) — durable product/brand experience rules.
+- [`99-brand-decisions-log.md`](99-brand-decisions-log.md) — authoritative accepted/working/deferred decision record.
 
-2. [`01-brand-foundations.md`](01-brand-foundations.md)  
-   Purpose, promise, positioning, audience, personality, differentiation, emotional territory, and brand boundaries.
+### Active research
 
-3. [`02-experience-constitution.md`](02-experience-constitution.md)  
-   Short set of durable rules that every Calipic experience should satisfy.
+- [`03-color-strategy-research.md`](03-color-strategy-research.md) — evidence-led evaluation of color perception, accessibility, semantics, and first color candidates.
+- [`04-market-prioritization.md`](04-market-prioritization.md) — launch-market evidence and current U.S.-first commercial lens.
+- [`05-creative-territories.md`](05-creative-territories.md) — four controlled identity territories and prototype matrix.
 
-4. `03-ux-principles.md`  
-   Product-level behavioral principles derived from the brand and the existing UX architecture.
+## Current creative hypothesis
 
-### Phase 2 — Define the visual language
+The most promising synthesis to prototype is:
 
-5. `04-visual-identity.md`  
-   Logo, wordmark, app icon, color system, typographic expression, graphic language, composition, and misuse rules.
+> **A highly ownable face + crop-frame symbol, inside an almost invisible native iOS interface, with print as the satisfying final transformation.**
 
-6. `05-product-design-language.md`  
-   How Calipic expresses itself inside native iOS interfaces: hierarchy, spacing, surfaces, photo treatment, controls, states, and component behavior.
+The four creative territories are:
 
-7. `06-photography-and-image-language.md`  
-   Marketing photography, in-product imagery, user-photo treatment, before/after examples, and manipulation boundaries.
+1. **Portrait Frame** — category recognition and core symbol.
+2. **Quiet Studio** — product UI/design philosophy.
+3. **Photo to Print** — completion and marketing proposition.
+4. **Optical Order** — geometric ownability and calibration meaning.
 
-8. `07-iconography-and-symbols.md`  
-   SF Symbols policy, custom-symbol exceptions, rendering modes, weights, semantic consistency, and animation.
+No final symbol or color is approved yet.
 
-### Phase 3 — Make the system executable
+## Planned documentation
 
-9. `08-design-tokens.md`  
-   Semantic colors, spacing, radii, typography roles, materials, motion values, icon sizing, and SwiftUI mapping.
+### Visual system
 
-10. `09-motion-and-haptics.md`  
-    Motion grammar, transitions, timing, spring behavior, haptics, reduced-motion alternatives, and sensory-feedback policy.
+- `06-visual-identity.md` — final symbol, wordmark, app icon, color system, composition and misuse rules.
+- `07-product-design-language.md` — hierarchy, spacing, surfaces, photo treatment, controls, states, component behavior.
+- `08-photography-and-image-language.md` — marketing photography, in-product imagery, manipulation boundaries, representation.
+- `09-iconography-and-symbols.md` — SF Symbols policy and custom-symbol exceptions.
 
-11. `10-voice-and-writing.md`  
-    Product voice, vocabulary, instruction patterns, error language, confidence language, localization principles, and terminology.
+### Executable design system
 
-12. `11-accessibility-standard.md`  
-    Brand expression under Dynamic Type, VoiceOver, Voice Control, Reduce Motion, Reduce Transparency, Increased Contrast, and Differentiate Without Color.
+- `10-design-tokens.md` — semantic colors, spacing, radii, typography roles, materials, motion values, icon sizing and SwiftUI mapping.
+- `11-motion-and-haptics.md` — motion grammar, transitions, haptics and Reduce Motion behavior.
+- `12-voice-and-writing.md` — product voice, vocabulary, instructions, errors, confidence language and localization.
+- `13-accessibility-standard.md` — brand expression under Dynamic Type, VoiceOver, Voice Control, Reduce Motion, Reduce Transparency, Increased Contrast and Differentiate Without Color.
 
-### Phase 4 — Govern and extend
+### Brand extension and governance
 
-13. `12-app-store-and-marketing.md`  
-    App Store screenshots, preview video, website, press assets, product mockups, launch imagery, and social presence.
-
-14. `13-brand-qa-checklist.md`  
-    Review checklist for screens, copy, assets, new features, App Store materials, and implementation pull requests.
-
-15. [`99-brand-decisions-log.md`](99-brand-decisions-log.md)  
-    Durable record of accepted, rejected, and deferred brand decisions.
+- `14-app-store-and-marketing.md` — App Store screenshots, preview video, website, press assets and launch imagery.
+- `15-brand-qa-checklist.md` — review checklist for screens, copy, assets, features and implementation PRs.
 
 ## Source-of-truth hierarchy
 
 When documents disagree, use this order:
 
-1. accepted architectural/product ADRs and safety/privacy requirements;
-2. the Calipic Experience Constitution;
-3. Brand Foundations;
-4. Product Design Language and Voice & Writing standards;
-5. implementation tokens and component specifications;
-6. one-off campaign or marketing executions.
+1. accepted architectural/product decisions and safety/privacy requirements;
+2. accepted entries in `99-brand-decisions-log.md`;
+3. the Calipic Experience Constitution;
+4. Brand Foundations;
+5. final Visual Identity / Product Design Language / Voice standards;
+6. implementation tokens and component specifications;
+7. one-off campaign or marketing executions.
 
 A campaign, mockup, or visual experiment must never redefine the product's core behavior by accident.
 
-## Working principle
+## Next milestone
 
-> Calipic should not look like a branded shell around iOS. It should feel like a focused Apple-platform product whose precision, restraint, photography, and language consistently reveal the Calipic character.
+Produce controlled visual prototypes rather than isolated moodboards.
 
-This statement is a working hypothesis until the foundation questions are answered.
+The first prototype round should compare:
+
+- four symbol constructions based on portrait + frame geometry;
+- four color systems (deep distinctive blue, restrained violet, graphite + cool accent, dark cyan/teal);
+- the same key surfaces in Light and Dark Mode;
+- App Store/Home Screen small-size recognition;
+- camera, Photo Check, editor, print-sheet and credit-purchase contexts.
+
+Color and symbol should be chosen together after testing, not independently.
