@@ -28,6 +28,7 @@ All five documents of round 1 are on `main`. They will be regenerated when the r
 | 03 | [`03-accessibility-color.md`](03-accessibility-color.md) | Step 3 | How do the systems behave under Increased Contrast, grayscale, color-vision deficiencies and busy wallpapers? Do they stay clear of status colors? | Delivered 2026-09-17 (draft v0 stand-in) |
 | 04 | [`04-product-context.md`](04-product-context.md) | Step 4 | How little explicit branding do Home, Guided Camera, Photo Check, Editor and Print Sheet / Completion need to feel like Calipic? | Delivered 2026-09-17 (draft v0 stand-in) |
 | 05 | [`05-color-recommendation.md`](05-color-recommendation.md) | Synthesis | What do 01–04 recommend to the founder, and what remains uncertain? | Delivered 2026-09-17 — awaiting founder decision |
+| 06 | [`06-icon-refinement-v1.md`](06-icon-refinement-v1.md) | Refinement | Does a refined form inside the frozen territory fix the small-size failures, and how should finishing (depth, shadow, grain) look? | Delivered 2026-09-17 — candidate, awaiting founder review |
 
 `05-color-recommendation.md` is a recommendation. It does not change BD-033 by itself.
 
@@ -53,7 +54,7 @@ Consequences for anyone adding evidence:
 - each document names the script and the exact command that produced its images;
 - generated images live beside the document that uses them, in this folder.
 
-The scripts are in `scripts/brand/`: `render-color-matrix.sh`, `render-icon-sizes.sh`, `render-a11y.sh`, `export-brand-screenshots.sh`.
+The scripts are in `scripts/brand/`: `render-color-matrix.sh`, `render-icon-sizes.sh`, `render-a11y.sh`, `export-brand-screenshots.sh`, and `build-icon-v1.py` (refinement candidate masters and finished studies).
 
 ---
 
