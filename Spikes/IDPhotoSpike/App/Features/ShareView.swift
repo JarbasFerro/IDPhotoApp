@@ -48,7 +48,7 @@ struct ShareView: View {
                     } description: {
                         Text("Something went wrong while preparing the files.")
                     } actions: {
-                        Button("Try Again") { model.prepareExport() }.buttonStyle(.borderedProminent)
+                        Button("Try Again") { model.prepareExport() }.brandProminentButtonStyle()
                     }
                 }
             }
@@ -80,7 +80,7 @@ struct ShareView: View {
                 } label: {
                     Label("Print", systemImage: "printer").frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
+                .brandProminentButtonStyle()
                 .accessibilityIdentifier("print")
             }
             HStack(spacing: 12) {
@@ -124,7 +124,7 @@ struct ShareView: View {
                                     Image(systemName: "square.and.arrow.up.circle.fill")
                                         .font(.title2)
                                         .symbolRenderingMode(.palette)
-                                        .foregroundStyle(.white, Color.accentColor)
+                                        .foregroundStyle(.white, Color.brandAccentFill)
                                         .offset(x: 8, y: 6)
                                 }
                                 if result.jpegs.count > 1 {

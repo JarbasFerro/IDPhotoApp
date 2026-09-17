@@ -126,7 +126,7 @@ struct SheetView: View {
             Button { path.append(.share) } label: {
                 Label("Continue", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
+            .brandProminentButtonStyle()
             .controlSize(.large)
             .padding()
             .background(.bar)

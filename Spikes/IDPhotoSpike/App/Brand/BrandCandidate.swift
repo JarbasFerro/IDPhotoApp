@@ -30,6 +30,12 @@ enum BrandCandidate: String, CaseIterable, Sendable {
 
     var assetName: String { "BrandAccent\(rawValue)" }
 
-    /// Asset-catalog colour with Light/Dark and Increase Contrast variants.
+    /// Accent role (text, glyphs, selection): asset-catalog colour with Light/Dark and Increase Contrast variants.
     var color: Color { Color(assetName) }
+
+    var fillAssetName: String { "BrandAccentFill\(rawValue)" }
+
+    /// Accent fill role (filled buttons): deep enough in every appearance for the native white label to reach
+    /// 4.5:1, which the accent itself does not in Dark. Values come from scripts/brand/generate-brand-assets.py.
+    var fillColor: Color { Color(fillAssetName) }
 }
