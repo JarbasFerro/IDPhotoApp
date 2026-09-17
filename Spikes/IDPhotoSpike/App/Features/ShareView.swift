@@ -15,7 +15,7 @@ struct ShareView: View {
                     VStack(spacing: 10) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 56))
-                            .foregroundStyle(.green)
+                            .foregroundStyle(StatusStyle.pass)
                             .symbolEffect(.bounce, options: .nonRepeating, isActive: celebrated && !reduceMotion)
                         Text("Your files are ready.").font(.title2.weight(.semibold))
                         Text("Print the sheet or share the photos.").font(.subheadline).foregroundStyle(.secondary)

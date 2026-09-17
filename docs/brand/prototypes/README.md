@@ -19,15 +19,15 @@ Two facts frame everything in this folder:
 
 ## 2. Documents
 
-The documents below are being produced in separate pull requests. Until each PR lands, the file does not exist on `main` and its name is left unlinked.
+All five documents of round 1 are on `main`. They will be regenerated when the refined icon replaces the v0 stand-in.
 
 | # | Document | Handoff step | Question it answers | Status |
 |---|---|---|---|---|
-| 01 | `01-color-matrix.md` | Step 1 | How does the same v0 mark look across the four test systems, Light and Dark? | In progress (separate PR) |
-| 02 | `02-icon-size-context.md` | Step 2 | Which systems survive App Store, Home Screen, Spotlight and Settings-size rendering among real iOS icons? | In progress (separate PR) |
-| 03 | `03-accessibility-color.md` | Step 3 | How do the systems behave under Increased Contrast, grayscale, color-vision deficiencies and busy wallpapers? Do they stay clear of status colors? | In progress (separate PR) |
-| 04 | `04-product-context.md` | Step 4 | How little explicit branding do Home, Guided Camera, Photo Check, Editor and Print Sheet / Completion need to feel like Calipic? | In progress (separate PR) |
-| 05 | `05-color-recommendation.md` | Synthesis | What do 01–04 recommend to the founder, and what remains uncertain? | Pending — written after 01–04 (separate PR) |
+| 01 | [`01-color-matrix.md`](01-color-matrix.md) | Step 1 | How does the same v0 mark look across the four test systems, Light and Dark? | Delivered 2026-09-17 (draft v0 stand-in) |
+| 02 | [`02-icon-size-context.md`](02-icon-size-context.md) | Step 2 | Which systems survive App Store, Home Screen, Spotlight and Settings-size rendering among real iOS icons? | Delivered 2026-09-17 (draft v0 stand-in) |
+| 03 | [`03-accessibility-color.md`](03-accessibility-color.md) | Step 3 | How do the systems behave under Increased Contrast, grayscale, color-vision deficiencies and busy wallpapers? Do they stay clear of status colors? | Delivered 2026-09-17 (draft v0 stand-in) |
+| 04 | [`04-product-context.md`](04-product-context.md) | Step 4 | How little explicit branding do Home, Guided Camera, Photo Check, Editor and Print Sheet / Completion need to feel like Calipic? | Delivered 2026-09-17 (draft v0 stand-in) |
+| 05 | [`05-color-recommendation.md`](05-color-recommendation.md) | Synthesis | What do 01–04 recommend to the founder, and what remains uncertain? | Delivered 2026-09-17 — awaiting founder decision |
 
 `05-color-recommendation.md` is a recommendation. It does not change BD-033 by itself.
 
@@ -53,7 +53,7 @@ Consequences for anyone adding evidence:
 - each document names the script and the exact command that produced its images;
 - generated images live beside the document that uses them, in this folder.
 
-`scripts/brand/` does not exist on `main` yet; it is delivered by the same separate PRs as the documents above. Until then this section is a requirement, not a description.
+The scripts are in `scripts/brand/`: `render-color-matrix.sh`, `render-icon-sizes.sh`, `render-a11y.sh`, `export-brand-screenshots.sh`.
 
 ---
 

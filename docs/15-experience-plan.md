@@ -18,7 +18,7 @@ Audit of the current experience, screen by screen:
 | After capture | The photo appears in the crop with no transition; nothing says "we found your face and framed it"; the checks are a list of sentences. |
 | Print sheet | A functional settings list. The live preview is the best part and sits in a small cell. Cutting options read like a print-shop form. |
 | Export | A list of share links and instructions. Success has no moment. |
-| Language | English only. The product name is "Foto carnet" and the first market is Spain. |
+| Language | English only. The product name is "Foto carnet" and the first market is Spain. *Superseded 2026-09-17: the consumer name is **Calipic** (brand decision BD-001, `docs/brand/99-brand-decisions-log.md`).* |
 | Identity | No icon, default tint, no consistent voice. |
 
 ## 2. What "beautiful, easy, fun" means here
@@ -46,7 +46,7 @@ Home ──▶ Camera (full screen) ──▶ Photo Check ──▶ Your Sheet �
 ```
 
 ### Home
-- Title "Foto carnet", one line of promise: "Una foto de carnet correcta en un minuto. Se queda en tu iPhone."
+- Title "Calipic" (was "Foto carnet" before BD-001), one line of promise: "Una foto de carnet correcta en un minuto. Se queda en tu iPhone."
 - One large primary button: **Take Photo**. Secondary: **Choose Photo**.
 - Document card: "España · DNI, pasaporte · 26 × 32 mm · fondo blanco" with a chevron to requirements (source and date shown there, not here).
 - If a session exists: a "Your sheet" card with the people's faces as small circles, the copy count, and **Continue**.
@@ -123,7 +123,7 @@ Estimated effort at the current pace: stage A two sessions, B one to two, C two,
 
 Taken on 2026-09-16 with the defaults below (user: "Go ahead"). One addition from the user: the invented 10 × 15 cm paper preset is removed; 4 × 6 in (the same physical sheet) is the default and is labelled "10 × 15 cm · 4 × 6 in".
 
-1. **App name shown to people**: "Foto carnet" (current) vs "ID Photo" for international. **Default: Foto carnet in Spanish, ID Photo in English, same icon.**
+1. **App name shown to people**: "Foto carnet" (current) vs "ID Photo" for international. **Default: Foto carnet in Spanish, ID Photo in English, same icon.** *Superseded 2026-09-17 by BD-001: the name shown to people is "Calipic" in every language.*
 2. **Accent colour**: a calm blue-green, a warm orange, or system blue. **Default: blue-green.**
 3. **Voice**: friendly and warm ("Perfecto. Ya tienes tu foto.") vs neutral institutional. **Default: friendly and warm, never jokey.**
 4. **Where the checks sit**: a dedicated Photo Check screen after capture (this plan) vs checks shown inside the editor as today. **Default: dedicated screen.**
