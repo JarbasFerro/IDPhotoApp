@@ -8,9 +8,11 @@
   script fails if any fill gives a white label less than 4.5:1.
 - The choose-your-icon set (BD-038), all derived from VARIANTS in scripts/brand/build-icon-v2.py:
   - AppIcon + AppIcon-<name>: one app-icon set per VARIANTS entry. The first entry is the primary `AppIcon`, every
-    other one is an alternate `AppIcon-<name>`. Each is a single 1024 universal iOS image, full-bleed, without
-    alpha. They are rendered WITHOUT the paper-grain layer and without dithering, all of them alike: with grain the
-    PNGs weigh about 890 KB each, without about 100 KB (ICON_GRAIN below).
+    other one is an alternate `AppIcon-<name>`. Each holds three 1024 universal iOS images, one per Home Screen
+    appearance (APPEARANCES): the default, full-bleed and without alpha; dark, a light-teal mark on a transparent
+    background (the system supplies the dark field); tinted, a greyscale mark on a transparent background (the
+    system supplies field and tint). The default is rendered WITHOUT the paper-grain layer and without dithering,
+    all of them alike: with grain the PNGs weigh about 890 KB each, without about 100 KB (ICON_GRAIN below).
   - IconPreview-<name>: a small image per character for the in-app picker, pre-masked with the iOS icon corner
     shape.
   - App/Brand/AppIconCatalog.swift: the character list the app reads.
@@ -19,12 +21,15 @@
   The symbol form is still a candidate (BD-036), so the drawings remain working drawings.
 
 Changing the set is: edit VARIANTS, run this script, add or remove the "AppIcon.<name>" labels (en, es, pt-BR) in
-App/Resources/Localizable.xcstrings. `--check` (also run at the end of a normal run) writes nothing and fails when
+App/Resources/Localizable.xcstrings. `--appearance-sheet` only redraws the study sheet of the three
+appearances in docs/brand/prototypes/icon-v2/. `--check` (also run at the end of a normal run) writes nothing and fails when
 the build settings, the asset catalog, the Swift list or the label strings disagree with VARIANTS.
 
 None of these values are brand decisions. Requires inkscape on PATH.
 """
 import colorsys
+import concurrent.futures
+import copy
 import importlib.util
 import json
 import pathlib
@@ -52,6 +57,8 @@ PRIMARY_ICON = "AppIcon"
 ICON_GRAIN = False
 ICON_PIXELS = 1024
 PREVIEW_PIXELS = 240
+# Inkscape processes rendering at the same time.
+RENDER_WORKERS = 6
 # Corner radius of the iOS icon shape as a share of the side; the same value build-icon-v2.py uses in its sheets.
 ICON_CORNER_RATIO = 0.2237
 # Picker sections, in display order; AppIconChoice.Group in the app has the same cases.
@@ -207,14 +214,19 @@ def replace_once(text, old, new):
     return text.replace(old, new)
 
 
+def character_spec(character):
+    """The approved frame (Spec FULL) with `character` inside."""
+    spec = copy.copy(icon_builder.FULL)
+    spec.bust = character
+    return spec
+
+
 def icon_svg(character, grain=None, corner_mask=False):
     """The finished teal icon from build-icon-v2.py, adapted as text so that file stays untouched:
     `grain=False` drops the paper-grain layer; `corner_mask=True` clips to the iOS icon corner shape for in-app
     previews (app icons themselves must stay full-bleed; the system masks them)."""
     grain = ICON_GRAIN if grain is None else grain
-    full = icon_builder.FULL
-    spec = icon_builder.Spec(full.stroke, full.net_gap, full.right_sweep, shift_x=full.shift_x, bust=character)
-    svg = icon_builder.finished_svg(spec, character, icon_builder.FINISHES["teal"])
+    svg = icon_builder.finished_svg(character_spec(character), character, icon_builder.FINISHES["teal"])
     if not grain:
         svg = replace_once(svg, '  <rect width="1024" height="1024" filter="url(#grain)" opacity="0.10"/>\n', "")
     if corner_mask:
@@ -226,17 +238,73 @@ def icon_svg(character, grain=None, corner_mask=False):
     return svg
 
 
-def render(svg_text, png, pixels, alpha, scratch):
+# Home Screen appearances (iOS 18+): every app-icon set carries a default, a dark and a tinted 1024 image.
+APPEARANCES = ("default", "dark", "tinted")
+# Dark: light-teal mark (the BD-033 dark accent #4FC3D1 family). Tinted: greyscale only; the system adds the colour.
+APPEARANCE_MARKS = {
+    "dark": ("#7FDCE6", "#3FB2C1"),
+    "tinted": ("#FFFFFF", "#B9B9B9"),
+}
+# Option (b) of the dark study, kept so the comparison can be re-rendered: an opaque near-black teal field.
+DARK_FIELD = ("#10292D", "#07161A")
+
+
+def appearance_svg(character, appearance, opaque_field=None):
+    """The dark or tinted icon: the glyph (frame, bust, cut-out mask) that finished_svg() in build-icon-v2.py
+    draws, from the same glyph_defs(), with a vertical falloff on the mark. The background is transparent, so the system supplies its own dark field
+    and the cut-outs are real transparency; no contact shadow either, which would only muddy the system's field
+    and tint. `opaque_field` (top, bottom) renders study option (b) instead: an opaque lit field with the contact
+    shadow of the default finish."""
+    top, bottom = APPEARANCE_MARKS[appearance]
+    field_defs = field = ""
+    if opaque_field:
+        field_defs = f"""
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="{opaque_field[0]}"/><stop offset="1" stop-color="{opaque_field[1]}"/>
+    </linearGradient>
+    <radialGradient id="light" cx="0.3" cy="0.12" r="0.9">
+      <stop offset="0" stop-color="#4FC3D1" stop-opacity="0.16"/><stop offset="0.6" stop-color="#4FC3D1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-0.2" y="-0.2" width="1.4" height="1.4" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dy="14"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+    </filter>"""
+        field = ('  <rect width="1024" height="1024" fill="url(#field)"/>\n'
+                 '  <rect width="1024" height="1024" fill="url(#light)"/>\n'
+                 '  <use href="#glyph" fill="#000000" stroke="#000000" filter="url(#shadow)"/>\n')
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>Calipic icon v2 - {character}, {appearance} appearance</title>
+  <!-- Generated by scripts/brand/generate-brand-assets.py from the geometry in build-icon-v2.py. -->
+  <defs>{field_defs}
+    <linearGradient id="mark" gradientUnits="userSpaceOnUse" x1="0" y1="150" x2="0" y2="880">
+      <stop offset="0" stop-color="{top}"/><stop offset="1" stop-color="{bottom}"/>
+    </linearGradient>
+{icon_builder.glyph_defs(character_spec(character))}
+  </defs>
+{field}  <use href="#glyph" fill="url(#mark)" stroke="url(#mark)"/>
+</svg>
+"""
+
+
+def render(svg_text, png, pixels, alpha, scratch, height=None):
     svg = scratch / (png.stem + ".svg")
     svg.write_text(svg_text)
-    # RGB_8 writes a PNG without an alpha channel, as app icons require. No dithering: the noise it adds to the
-    # gradients quadruples the file size and is not visible.
-    result = subprocess.run(["inkscape", str(svg), "-w", str(pixels), "-h", str(pixels),
+    # RGB_8 writes a PNG without an alpha channel, as the default app icon requires. No dithering: the noise it
+    # adds to the gradients quadruples the file size and is not visible.
+    result = subprocess.run(["inkscape", str(svg), "-w", str(pixels), "-h", str(height or pixels),
                              f"--export-png-color-mode={'RGBA_8' if alpha else 'RGB_8'}",
                              "--export-png-compression=9", "--export-png-use-dithering=false", "-o", str(png)],
                             capture_output=True, text=True)
     if result.returncode != 0 or not png.exists():
         raise SystemExit(f"inkscape could not render {png.name} (inkscape 1.3 or later is needed):\n{result.stderr}")
+
+
+def render_all(jobs, scratch):
+    """jobs: (svg text, png path, pixels, alpha). Inkscape's start-up dominates, so the renders run side by side."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=RENDER_WORKERS) as pool:
+        for future in [pool.submit(render, svg, png, pixels, alpha, scratch) for svg, png, pixels, alpha in jobs]:
+            future.result()
 
 
 def icon_assets():
@@ -246,31 +314,109 @@ def icon_assets():
         yield character, True, preview_name(character), f"{preview_name(character)}.imageset", PREVIEW_PIXELS
 
 
+def appearance_filename(name, appearance):
+    """`AppIcon-panda.png` for the default; `AppIcon-panda.dark.png` (a dot, so no character name can collide)."""
+    return f"{name}.png" if appearance == "default" else f"{name}.{appearance}.png"
+
+
+def asset_files(name, preview):
+    """(file name, appearance) of every image of an asset: three for an app icon, one for a picker preview."""
+    return [(appearance_filename(name, appearance), appearance) for appearance in (("default",) if preview else APPEARANCES)]
+
+
 def asset_contents(name, preview):
-    image = {"filename": f"{name}.png", "idiom": "universal"}
-    if not preview:
-        image.update({"platform": "ios", "size": f"{ICON_PIXELS}x{ICON_PIXELS}"})
-    return {"images": [image], "info": INFO}
+    images = []
+    for filename, appearance in asset_files(name, preview):
+        image = {}
+        if appearance != "default":
+            image["appearances"] = [{"appearance": "luminosity", "value": appearance}]
+        image.update({"filename": filename, "idiom": "universal"})
+        if not preview:
+            image.update({"platform": "ios", "size": f"{ICON_PIXELS}x{ICON_PIXELS}"})
+        images.append(image)
+    return {"images": images, "info": INFO}
+
+
+def asset_svg(character, preview, appearance):
+    if appearance == "default":
+        return icon_svg(character, corner_mask=preview)
+    return appearance_svg(character, appearance)
 
 
 def write_icons():
     if not shutil.which("inkscape"):
         raise SystemExit("inkscape is required")
-    total = {False: 0, True: 0}
+    total = dict.fromkeys(APPEARANCES + ("preview",), 0)
     with tempfile.TemporaryDirectory() as scratch:
         scratch = pathlib.Path(scratch)
         # Render everything first: the catalog is only touched once every image exists.
-        for character, preview, name, _, pixels in icon_assets():
-            render(icon_svg(character, corner_mask=preview), scratch / f"{name}.png", pixels, alpha=preview,
-                   scratch=scratch)
+        render_all([(asset_svg(character, preview, appearance), scratch / filename, pixels,
+                     preview or appearance != "default")
+                    for character, preview, name, _, pixels in icon_assets()
+                    for filename, appearance in asset_files(name, preview)], scratch)
         for stale in icon_asset_directories(CATALOG):
             shutil.rmtree(stale)
         for _, preview, name, directory, _ in icon_assets():
             write_json(CATALOG / directory / "Contents.json", asset_contents(name, preview))
-            shutil.move(str(scratch / f"{name}.png"), str(CATALOG / directory / f"{name}.png"))
-            total[preview] += (CATALOG / directory / f"{name}.png").stat().st_size
-    print(f"{len(characters())} app icons: {total[False] / 1e6:.2f} MB; previews: {total[True] / 1e6:.2f} MB "
+            for filename, appearance in asset_files(name, preview):
+                shutil.move(str(scratch / filename), str(CATALOG / directory / filename))
+                total["preview" if preview else appearance] += (CATALOG / directory / filename).stat().st_size
+    print(f"{len(characters())} app icons: "
+          + ", ".join(f"{appearance} {total[appearance] / 1e6:.2f} MB" for appearance in APPEARANCES)
+          + f" = {sum(total[a] for a in APPEARANCES) / 1e6:.2f} MB; previews: {total['preview'] / 1e6:.2f} MB "
           f"(grain {'on' if ICON_GRAIN else 'off'})")
+
+
+# The study sheet for docs/brand/prototypes/07: characters with and without cut-outs.
+SHEET = ROOT / "docs/brand/prototypes/icon-v2/sheet-appearances.png"
+SHEET_CHARACTERS = ["swept", "afro", "glasses", "hijab", "panda", "dinosaur", "astronaut", "robot"]
+# Stand-in for the field iOS puts behind a transparent dark or tinted icon; only used to draw the sheet.
+SHEET_SYSTEM_FIELD = ("#313131", "#141414")
+# (title, second line, character -> svg)
+SHEET_COLUMNS = [
+    ("Default", "", lambda character: icon_svg(character)),
+    ("Dark - shipped (a)", "transparent; system field simulated", lambda character: appearance_svg(character, "dark")),
+    ("Dark - study (b)", "opaque near-black teal field",
+     lambda character: appearance_svg(character, "dark", opaque_field=DARK_FIELD)),
+    ("Tinted - shipped", "greyscale; field simulated, no tint", lambda character: appearance_svg(character, "tinted")),
+]
+
+
+def write_appearance_sheet():
+    """docs/brand/prototypes/icon-v2/sheet-appearances.png: default / dark (a) / dark (b) / tinted at 180 px."""
+    pixels, pad, label_w, gap, head = 180, 48, 170, 56, 170
+    width = pad * 2 + label_w + (pixels + gap) * len(SHEET_COLUMNS)
+    height = head + (pixels + 40) * len(SHEET_CHARACTERS) + pad
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{width}" '
+           f'height="{height}" viewBox="0 0 {width} {height}" font-family="Helvetica, Arial, sans-serif">',
+           '<defs><linearGradient id="system" x1="0" y1="0" x2="0" y2="1">'
+           f'<stop offset="0" stop-color="{SHEET_SYSTEM_FIELD[0]}"/><stop offset="1" stop-color="{SHEET_SYSTEM_FIELD[1]}"/>'
+           '</linearGradient></defs>',
+           f'<rect width="{width}" height="{height}" fill="#1C1C1E"/>',
+           f'<text x="{pad}" y="62" font-size="30" font-weight="700" fill="#FFF">Calipic - Home Screen appearances</text>']
+    for column, (title, subtitle, _) in enumerate(SHEET_COLUMNS):
+        x = pad + label_w + column * (pixels + gap)
+        out.append(f'<text x="{x}" y="118" font-size="14" font-weight="700" fill="#EEE">{title}</text>')
+        out.append(f'<text x="{x}" y="138" font-size="13" fill="#AAA">{subtitle}</text>')
+    jobs = []
+    with tempfile.TemporaryDirectory() as scratch:
+        scratch = pathlib.Path(scratch)
+        for row, character in enumerate(SHEET_CHARACTERS):
+            y = head + row * (pixels + 40)
+            out.append(f'<text x="{pad}" y="{y + pixels / 2 + 6}" font-size="20" font-weight="700" fill="#FFF">{character}</text>')
+            for column, (_, _, svg) in enumerate(SHEET_COLUMNS):
+                x = pad + label_w + column * (pixels + gap)
+                png = scratch / f"{character}-{column}.png"
+                jobs.append((svg(character), png, pixels, True))
+                clip, radius = f"clip-{row}-{column}", ICON_CORNER_RATIO * pixels
+                out.append(f'<clipPath id="{clip}"><rect x="{x}" y="{y}" width="{pixels}" height="{pixels}" rx="{radius:.2f}"/></clipPath>')
+                out.append(f'<g clip-path="url(#{clip})"><rect x="{x}" y="{y}" width="{pixels}" height="{pixels}" fill="url(#system)"/>'
+                           f'<image xlink:href="{png.name}" x="{x}" y="{y}" width="{pixels}" height="{pixels}"/></g>')
+        out.append("</svg>")
+        render_all(jobs, scratch)
+        render("\n".join(out), scratch / "sheet.png", width, alpha=False, scratch=scratch, height=height)
+        shutil.move(str(scratch / "sheet.png"), str(SHEET))
+    print("wrote", SHEET.relative_to(ROOT))
 
 
 def swift_catalog():
@@ -301,10 +447,11 @@ def updated_project(project_text):
 
 
 def png_header(path):
-    """(width, height, PNG colour type): colour type 2 is RGB without alpha, 6 is RGBA."""
+    """(width, height, PNG colour type): colour type 2 is RGB without alpha, 6 is RGBA. None when the file is
+    not a PNG (an empty or truncated file, for instance)."""
     data = path.read_bytes()[:26]
-    if data[:8] != b"\x89PNG\r\n\x1a\n":
-        raise ValueError(f"{path} is not a PNG")
+    if len(data) < 26 or data[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
     return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big"), data[25]
 
 
@@ -325,13 +472,22 @@ def icon_sync_problems(project_text=None, swift_text=None, strings=None, catalog
         problems.append(f"{ICON_CATALOG_SWIFT.name} is not what VARIANTS generates")
 
     for character, preview, name, directory, pixels in icon_assets():
-        png, contents = catalog / directory / f"{name}.png", catalog / directory / "Contents.json"
-        if not png.exists():
-            problems.append(f"missing {directory}/{name}.png")
-        elif png_header(png) != (pixels, pixels, 6 if preview else 2):
-            problems.append(f"{directory}/{name}.png must be {pixels} px, {'RGBA' if preview else 'RGB without alpha'}")
+        contents = catalog / directory / "Contents.json"
+        for filename, appearance in asset_files(name, preview):
+            png, alpha = catalog / directory / filename, preview or appearance != "default"
+            if not png.exists():
+                problems.append(f"missing {directory}/{filename}"
+                                + ("" if preview else f" (the {appearance} appearance)"))
+            elif png_header(png) != (pixels, pixels, 6 if alpha else 2):
+                problems.append(f"{directory}/{filename} must be {pixels} px, {'RGBA' if alpha else 'RGB without alpha'}")
         if not contents.exists() or json.loads(contents.read_text()) != asset_contents(name, preview):
-            problems.append(f"{directory}/Contents.json is not what the generator writes")
+            problems.append(f"{directory}/Contents.json is not what the generator writes"
+                            + ("" if preview else f" (one 1024 image per appearance: {', '.join(APPEARANCES)})"))
+        expected = {"Contents.json"} | {filename for filename, _ in asset_files(name, preview)}
+        if (catalog / directory).is_dir():
+            # Dotfiles (.DS_Store) are the Finder's, not the catalog's.
+            problems += [f"stale {directory}/{path.name}" for path in sorted((catalog / directory).iterdir())
+                         if path.name not in expected and not path.name.startswith(".")]
     for character in characters():
         localizations = strings.get(label_key(character), {}).get("localizations", {})
         for language in LANGUAGES:
@@ -359,6 +515,9 @@ def check_icon_sync():
 def main():
     if "--check" in sys.argv[1:]:
         check_icon_sync()
+        return
+    if "--appearance-sheet" in sys.argv[1:]:
+        write_appearance_sheet()
         return
     fill_palette = fills()
     check_fills(fill_palette)

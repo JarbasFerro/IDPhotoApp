@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """Unit tests for generate-brand-assets.py: the fill-role contrast logic and the choose-your-icon sync check
-(stdlib only; writes nothing, renders nothing).
+(stdlib only; renders nothing and writes only to a temporary copy of the asset catalog).
 
 Run: python3 scripts/brand/test_generate_brand_assets.py
 """
 import colorsys
 import importlib.util
+import json
 import pathlib
+import re
+import shutil
+import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location(
@@ -94,6 +98,67 @@ class AppIconSetTests(unittest.TestCase):
         problems = generator.icon_sync_problems(strings=strings)
         self.assertTrue(any(f'"AppIcon.{second}" has no pt-BR label' in problem for problem in problems))
         self.assertTrue(any('"AppIcon.nobody" has no character' in problem for problem in problems))
+
+    def test_every_app_icon_set_declares_default_dark_and_tinted(self):
+        for character in generator.characters():
+            name = generator.app_icon_name(character)
+            images = generator.asset_contents(name, preview=False)["images"]
+            self.assertEqual([image.get("appearances") for image in images],
+                             [None, [{"appearance": "luminosity", "value": "dark"}],
+                              [{"appearance": "luminosity", "value": "tinted"}]], name)
+            self.assertEqual(len({image["filename"] for image in images}), 3, name)
+            for image in images:
+                self.assertEqual((image["idiom"], image["platform"], image["size"]), ("universal", "ios", "1024x1024"))
+        preview = generator.asset_contents(generator.preview_name("swept"), preview=True)["images"]
+        self.assertEqual(preview, [{"filename": "IconPreview-swept.png", "idiom": "universal"}])
+
+    def test_a_set_without_all_three_appearances_is_reported(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            catalog = pathlib.Path(scratch) / "Assets.xcassets"
+            shutil.copytree(generator.CATALOG, catalog)
+            # Only what the damage below adds is asserted, so unrelated drift in the repository fails
+            # test_the_repository_is_in_sync_with_variants and not this test.
+            before = generator.icon_sync_problems(catalog=catalog)
+            (catalog / "AppIcon.appiconset/.DS_Store").write_bytes(b"")
+            self.assertEqual(generator.icon_sync_problems(catalog=catalog), before)
+            panda = catalog / "AppIcon-panda.appiconset"
+            (panda / "AppIcon-panda.dark.png").unlink()
+            contents = json.loads((panda / "Contents.json").read_text())
+            contents["images"] = contents["images"][:1]  # what the set looked like before the appearances existed
+            (panda / "Contents.json").write_text(json.dumps(contents))
+            # A default image that carries alpha, and a dark one that does not, are both wrong.
+            afro = catalog / "AppIcon-afro.appiconset"
+            shutil.copy(afro / "AppIcon-afro.png", afro / "AppIcon-afro.tinted.png")
+            (afro / "leftover.png").write_bytes(b"")
+            (catalog / "AppIcon-bald.appiconset/AppIcon-bald.dark.png").write_bytes(b"")  # an interrupted render
+            problems = [p for p in generator.icon_sync_problems(catalog=catalog) if p not in before]
+        self.assertIn("missing AppIcon-panda.appiconset/AppIcon-panda.dark.png (the dark appearance)", problems)
+        self.assertTrue(any(problem.startswith("AppIcon-panda.appiconset/Contents.json is not what the generator writes")
+                            for problem in problems), problems)
+        self.assertIn("AppIcon-afro.appiconset/AppIcon-afro.tinted.png must be 1024 px, RGBA", problems)
+        self.assertIn("stale AppIcon-afro.appiconset/leftover.png", problems)
+        self.assertIn("AppIcon-bald.appiconset/AppIcon-bald.dark.png must be 1024 px, RGBA", problems)
+        self.assertEqual(len(problems), 5, problems)
+
+    def test_dark_and_tinted_are_the_same_glyph_on_a_transparent_background(self):
+        for character in ("swept", "glasses", "panda"):
+            glyph = generator.icon_builder.glyph_defs(generator.character_spec(character))
+            self.assertIn('<mask id="cut"', glyph)
+            self.assertIn(glyph, generator.icon_svg(character))
+            for appearance in ("dark", "tinted"):
+                svg = generator.appearance_svg(character, appearance)
+                self.assertIn(glyph, svg, f"{character} {appearance}: mark differs from the default icon")
+                body = svg.split("</defs>")[1]
+                self.assertNotIn("<rect", body)  # nothing painted behind the mark: cut-outs are real transparency
+                self.assertNotIn("url(#shadow)", body)
+        self.assertIn('fill="url(#field)"', generator.appearance_svg("swept", "dark", opaque_field=generator.DARK_FIELD))
+
+    def test_the_tinted_mark_has_no_colour(self):
+        for value in generator.APPEARANCE_MARKS["tinted"]:
+            self.assertEqual(len({value[1:3], value[3:5], value[5:7]}), 1, value)
+        colours = set(re.findall(r"#[0-9A-Fa-f]{6}", generator.appearance_svg("glasses", "tinted")))
+        # The mark's two greys, plus the white and black of the cut-out mask.
+        self.assertEqual(colours, set(generator.APPEARANCE_MARKS["tinted"]) | {"#FFFFFF", "#000000"})
 
     def test_project_update_needs_both_configurations(self):
         with self.assertRaises(SystemExit):

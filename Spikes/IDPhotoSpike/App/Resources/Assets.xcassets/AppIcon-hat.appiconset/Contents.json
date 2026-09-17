@@ -5,6 +5,30 @@
       "idiom": "universal",
       "platform": "ios",
       "size": "1024x1024"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "AppIcon-hat.dark.png",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "tinted"
+        }
+      ],
+      "filename": "AppIcon-hat.tinted.png",
+      "idiom": "universal",
+      "platform": "ios",
+      "size": "1024x1024"
     }
   ],
   "info": {

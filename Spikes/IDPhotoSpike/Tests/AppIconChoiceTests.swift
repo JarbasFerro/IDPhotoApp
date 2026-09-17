@@ -27,6 +27,47 @@ struct AppIconChoiceTests {
         #expect(primary?["CFBundleIconName"] as? String == "AppIcon")
     }
 
+    /// BD-038: every icon ships a default, a dark and a tinted 1024 image, so iOS never invents an appearance.
+    /// The compiled catalog cannot be read with public API, so this reads the source catalog next to this file.
+    /// The simulator sees the Mac's file system, so there a missing catalog is a failure; on a device the sources
+    /// are out of reach and the python `--check` remains the gate.
+    @Test func everyAppIconSetHasDefaultDarkAndTintedImages() throws {
+        let catalog = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("App/Resources/Assets.xcassets")
+        #if targetEnvironment(simulator)
+        try #require(FileManager.default.fileExists(atPath: catalog.path), "asset catalog not found at \(catalog.path)")
+        #else
+        guard FileManager.default.fileExists(atPath: catalog.path) else { return }
+        #endif
+        struct Contents: Decodable {
+            struct Image: Decodable {
+                struct Appearance: Decodable { let appearance: String; let value: String }
+                let filename: String
+                let idiom: String
+                let platform: String?
+                let size: String
+                let appearances: [Appearance]?
+            }
+            let images: [Image]
+        }
+        for choice in AppIconChoice.all {
+            let set = catalog.appendingPathComponent("\(choice.alternateIconName ?? "AppIcon").appiconset")
+            let data = try Data(contentsOf: set.appendingPathComponent("Contents.json"))
+            let images = try JSONDecoder().decode(Contents.self, from: data).images
+            let appearances = images.map { image in
+                (image.appearances ?? []).map { "\($0.appearance)=\($0.value)" }.joined(separator: ",")
+            }
+            #expect(appearances == ["", "luminosity=dark", "luminosity=tinted"], "\(choice.name)")
+            for image in images {
+                #expect(image.idiom == "universal" && image.platform == "ios" && image.size == "1024x1024", "\(choice.name)")
+                #expect(FileManager.default.fileExists(atPath: set.appendingPathComponent(image.filename).path),
+                        "\(choice.name) \(image.filename)")
+            }
+            #expect(Set(images.map(\.filename)).count == 3, "\(choice.name)")
+        }
+    }
+
     @Test func everyChoiceHasAPreviewImage() {
         for choice in AppIconChoice.all {
             #expect(UIImage(named: choice.previewAssetName) != nil, "\(choice.previewAssetName)")
