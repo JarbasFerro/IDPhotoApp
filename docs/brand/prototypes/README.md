@@ -30,6 +30,7 @@ All five documents of round 1 are on `main`. They will be regenerated when the r
 | 05 | [`05-color-recommendation.md`](05-color-recommendation.md) | Synthesis | What do 01–04 recommend to the founder, and what remains uncertain? | Delivered 2026-09-17 — awaiting founder decision |
 | 06 | [`06-icon-refinement-v1.md`](06-icon-refinement-v1.md) | Refinement | Does a refined form inside the frozen territory fix the small-size failures, and how should finishing (depth, shadow, grain) look? | Delivered 2026-09-17 — candidate, awaiting founder review |
 | 07 | [`07-icon-v2-and-icon-choice.md`](07-icon-v2-and-icon-choice.md) | Refinement | Founder direction applied: simpler bust, 72 stroke, wider C opening, teal; plus the choose-your-icon set | Delivered 2026-09-17 — candidate, awaiting founder review |
+| 09 | [`09-wordmark.md`](09-wordmark.md) | Step 5 | A drawn wordmark built from the frame's stroke, and four lock-ups | Delivered 2026-09-17 — candidate, awaiting founder review |
 
 `05-color-recommendation.md` is a recommendation. It does not change BD-033 by itself.
 
@@ -55,7 +56,7 @@ Consequences for anyone adding evidence:
 - each document names the script and the exact command that produced its images;
 - generated images live beside the document that uses them, in this folder.
 
-The scripts are in `scripts/brand/`: `render-color-matrix.sh`, `render-icon-sizes.sh`, `render-a11y.sh`, `export-brand-screenshots.sh`, and `build-icon-v1.py` (refinement candidate masters and finished studies).
+The scripts are in `scripts/brand/`: `render-color-matrix.sh`, `render-icon-sizes.sh`, `render-a11y.sh`, `export-brand-screenshots.sh`, `build-icon-v1.py` / `build-icon-v2.py` (icon masters, finished studies, character set) and `build-wordmark.py` (wordmark and lock-ups).
 
 ---
 
