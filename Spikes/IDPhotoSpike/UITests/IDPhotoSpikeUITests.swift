@@ -131,7 +131,12 @@ final class IDPhotoSpikeUITests: XCTestCase {
         adjustScreenshot.name = "Adjust"
         adjustScreenshot.lifetime = .keepAlways
         add(adjustScreenshot)
-        app.buttons["adjustDone"].tap()
+        // If this tap is lost, the Adjust sheet stays open and every later step fails with a misleading
+        // message, so make sure the sheet is really gone before moving on.
+        let adjustDone = app.buttons["adjustDone"]
+        adjustDone.tap()
+        if !adjustDone.waitForNonExistence(timeout: 3) { adjustDone.tap() }
+        XCTAssertTrue(adjustDone.waitForNonExistence(timeout: 5))
         // Sheet.
         reveal(app.buttons["addToSheet"], in: app)
         app.buttons["addToSheet"].tap()
