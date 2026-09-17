@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Unit tests for the fill-role contrast logic in generate-brand-assets.py (stdlib only; writes nothing).
+"""Unit tests for generate-brand-assets.py: the fill-role contrast logic and the choose-your-icon sync check
+(stdlib only; writes nothing, renders nothing).
 
 Run: python3 scripts/brand/test_generate_brand_assets.py
 """
@@ -59,6 +60,44 @@ class FillContrastTests(unittest.TestCase):
 
     def test_passing_fills_are_accepted(self):
         generator.check_fills(generator.fills())
+
+
+class AppIconSetTests(unittest.TestCase):
+    def test_the_repository_is_in_sync_with_variants(self):
+        self.assertEqual(generator.icon_sync_problems(), [])
+
+    def test_names_derive_from_variants(self):
+        names = generator.characters()
+        self.assertEqual(names, list(generator.icon_builder.VARIANTS))
+        self.assertEqual(generator.app_icon_name(names[0]), "AppIcon")
+        self.assertEqual(generator.app_icon_name(names[1]), f"AppIcon-{names[1]}")
+        self.assertEqual(generator.alternate_icon_setting().split(" "), [f"AppIcon-{name}" for name in names[1:]])
+        self.assertEqual(generator.swift_catalog().count("AppIconChoice(name:"), len(names))
+
+    def test_grain_and_corner_mask_are_the_only_changes_to_the_finished_icon(self):
+        name = generator.characters()[0]
+        with_grain = generator.icon_svg(name, grain=True)
+        self.assertEqual(with_grain.count('filter="url(#grain)"'), 1)
+        self.assertNotIn('filter="url(#grain)"', generator.icon_svg(name, grain=False))
+        self.assertNotIn("clip-path", with_grain)
+        masked = generator.icon_svg(name, grain=True, corner_mask=True)
+        self.assertIn('rx="229.07"', masked)
+        self.assertEqual(masked.count('<g clip-path="url(#corner)">'), 1)
+
+    def test_a_changed_set_is_reported(self):
+        second = generator.characters()[1]
+        project = generator.PROJECT.read_text().replace(f"AppIcon-{second} ", "")
+        self.assertTrue(any("project.pbxproj" in problem for problem in generator.icon_sync_problems(project_text=project)))
+        swift = generator.swift_catalog().replace(f'AppIconChoice(name: "{second}", group: .people),\n', "")
+        self.assertTrue(any("AppIconCatalog" in problem for problem in generator.icon_sync_problems(swift_text=swift)))
+        strings = {generator.label_key("nobody"): {}}
+        problems = generator.icon_sync_problems(strings=strings)
+        self.assertTrue(any(f'"AppIcon.{second}" has no pt-BR label' in problem for problem in problems))
+        self.assertTrue(any('"AppIcon.nobody" has no character' in problem for problem in problems))
+
+    def test_project_update_needs_both_configurations(self):
+        with self.assertRaises(SystemExit):
+            generator.updated_project("ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;\n")
 
 
 if __name__ == "__main__":

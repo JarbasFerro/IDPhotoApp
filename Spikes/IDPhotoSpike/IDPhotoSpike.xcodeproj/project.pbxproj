@@ -299,7 +299,9 @@
 		00000000000000000000006E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-short AppIcon-bald AppIcon-spiky AppIcon-curly AppIcon-afro AppIcon-bob AppIcon-bun AppIcon-spacebuns AppIcon-ponytail AppIcon-pigtails AppIcon-braids AppIcon-cap AppIcon-beanie AppIcon-hat AppIcon-locs AppIcon-turban AppIcon-hijab AppIcon-glasses AppIcon-headphones AppIcon-graduate AppIcon-cat AppIcon-bunny AppIcon-bear AppIcon-fox AppIcon-panda AppIcon-frog AppIcon-dinosaur AppIcon-astronaut AppIcon-robot AppIcon-alien AppIcon-party AppIcon-viking";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = U97K67BK4R;
@@ -322,6 +324,9 @@
 		00000000000000000000006F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-short AppIcon-bald AppIcon-spiky AppIcon-curly AppIcon-afro AppIcon-bob AppIcon-bun AppIcon-spacebuns AppIcon-ponytail AppIcon-pigtails AppIcon-braids AppIcon-cap AppIcon-beanie AppIcon-hat AppIcon-locs AppIcon-turban AppIcon-hijab AppIcon-glasses AppIcon-headphones AppIcon-graduate AppIcon-cat AppIcon-bunny AppIcon-bear AppIcon-fox AppIcon-panda AppIcon-frog AppIcon-dinosaur AppIcon-astronaut AppIcon-robot AppIcon-alien AppIcon-party AppIcon-viking";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 55;
 				DEVELOPMENT_TEAM = U97K67BK4R;

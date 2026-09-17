@@ -43,6 +43,68 @@ final class IDPhotoSpikeUITests: XCTestCase {
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 
+    /// Opens the App Icon sheet from Home (BD-038) and keeps a screenshot for docs/brand/prototypes/07.
+    @MainActor
+    func testAppIconPickerShowsTheSetAndTheCurrentIcon() throws {
+        let app = XCUIApplication()
+        app.launch()
+        let picker = try openAppIconPicker(app)
+        XCTAssertTrue(app.staticTexts["People"].exists)
+        XCTAssertGreaterThan(picker.count, 8)
+        // The grid is lazy, so the selected icon is only in the hierarchy while it is on screen, and the simulator
+        // may hold another icon than the default after testChangeAppIconOnRequest.
+        XCTAssertLessThanOrEqual(picker.allElementsBoundByIndex.filter(\.isSelected).count, 1)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "AppIconPicker"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+        app.buttons["Done"].tap()
+        XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 5))
+    }
+
+    /// End-to-end icon change. It leaves the simulator's Home Screen changed, so it only runs on request:
+    /// `TEST_RUNNER_APP_ICON_E2E=panda xcodebuild test -only-testing:…/testChangeAppIconOnRequest` (a VARIANTS
+    /// name; `swept` puts the default back).
+    @MainActor
+    func testChangeAppIconOnRequest() throws {
+        guard let name = ProcessInfo.processInfo.environment["APP_ICON_E2E"], !name.isEmpty else {
+            throw XCTSkip("Set TEST_RUNNER_APP_ICON_E2E to a character name to run this.")
+        }
+        let app = XCUIApplication()
+        app.launch()
+        _ = try openAppIconPicker(app)
+        let cell = app.buttons["appIcon-\(name)"]
+        reveal(cell, in: app)
+        XCTAssertTrue(cell.exists, name)
+        if !cell.isSelected {
+            cell.tap()
+            // iOS announces every icon change with its own alert; it belongs to SpringBoard, not to the app.
+            let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+            let confirm = springboard.alerts.buttons.firstMatch
+            XCTAssertTrue(confirm.waitForExistence(timeout: 10), "system alert")
+            confirm.tap()
+        }
+        XCTAssertTrue(cell.waitForExistence(timeout: 5))
+        XCTAssertTrue(cell.isSelected)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "AppIconPicker-\(name)"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+
+    /// Taps the quiet "App Icon" row on Home and returns the icon buttons of the sheet.
+    @MainActor
+    private func openAppIconPicker(_ app: XCUIApplication) throws -> XCUIElementQuery {
+        XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
+        let row = app.buttons["appIconRow"]
+        reveal(row, in: app)
+        XCTAssertTrue(row.exists)
+        row.tap()
+        XCTAssertTrue(app.navigationBars["App Icon"].waitForExistence(timeout: 5))
+        return app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'appIcon-'"))
+    }
+
     @MainActor
     func testCheckAdjustSheetShareFlow() throws {
         let app = XCUIApplication()

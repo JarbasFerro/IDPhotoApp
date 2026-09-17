@@ -30,6 +30,7 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
 
 ## Implemented
 
+- Choose your app icon (BD-038): an "App Icon" row on Home opens a grid of alternate icons generated from `VARIANTS` in `scripts/brand/build-icon-v2.py` by `scripts/brand/generate-brand-assets.py` (icon sets, previews, Swift list and build setting; `--check` verifies they agree).
 - PhotosPicker with file-based Transferable import; no broad photo-library permission.
 - Immutable, privately stored source; protected and excluded-from-backup working directories.
 - ImageIO orientation normalization and a preview bounded to a 1,600-pixel long edge.
