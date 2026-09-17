@@ -89,15 +89,6 @@ struct StatusLabel: View {
     let state: CheckState
 
     var body: some View {
-        Label { Text(text) } icon: { Image(systemName: AlignmentPresentation.symbol(for: state)).foregroundStyle(tint) }
-    }
-
-    private var tint: Color {
-        switch state {
-        case .pass: .green
-        case .warn: .orange
-        case .fail: .red
-        case .manualCheck: .secondary
-        }
+        Label { Text(text) } icon: { Image(systemName: StatusStyle.symbol(for: state)).foregroundStyle(StatusStyle.color(for: state)) }
     }
 }

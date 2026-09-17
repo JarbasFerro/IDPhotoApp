@@ -143,7 +143,7 @@ struct CameraView: View {
             let height = geometry.size.height * 0.32
             let width = height * 0.78
             Ellipse()
-                .strokeBorder(camera.hint == .ready ? Color.green : Color.white.opacity(0.7), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
+                .strokeBorder(camera.hint == .ready ? StatusStyle.pass : Color.white.opacity(0.7), style: StrokeStyle(lineWidth: 2, dash: [8, 6]))
                 .frame(width: width, height: height)
                 .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: camera.hint == .ready)
@@ -159,7 +159,7 @@ struct CameraView: View {
             GeometryReader { geometry in
                 let ok = abs(roll) <= CaptureGuidanceThresholds.default.maxRollDegrees
                 Rectangle()
-                    .fill(ok ? Color.green : Color.white.opacity(0.8))
+                    .fill(ok ? StatusStyle.pass : Color.white.opacity(0.8))
                     .frame(width: ok ? 140 : 110, height: 2)
                     .rotationEffect(.degrees(roll))
                     .position(x: geometry.size.width / 2, y: geometry.size.height * 0.44)
@@ -178,7 +178,7 @@ struct CameraView: View {
             ReadinessRing(readiness: camera.readiness.staged, ready: ready, animated: !reduceMotion)
                 .frame(width: 100, height: 100)
             Circle().strokeBorder(.white, lineWidth: 4).frame(width: 76, height: 76)
-            Circle().fill(ready ? Color.green : .white).frame(width: 62, height: 62)
+            Circle().fill(ready ? StatusStyle.pass : .white).frame(width: 62, height: 62)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: ready)
             if let countdown {
                 Text("\(countdown)")
@@ -484,9 +484,9 @@ struct CameraIntroView: View {
             }
             HStack(spacing: 14) {
                 legend(.white.opacity(0.35), "Not yet")
-                legend(.orange, "Needs attention")
-                legend(.green, "Fine")
-                legend(.green, "All four: ready", closed: true)
+                legend(StatusStyle.warn, "Needs attention")
+                legend(StatusStyle.pass, "Fine")
+                legend(StatusStyle.pass, "All four: ready", closed: true)
             }
             .font(.caption)
             .frame(maxWidth: .infinity)
@@ -568,7 +568,7 @@ struct ReadinessRing: View {
                     let angle = (Double(index) + 0.5) * span * 2 * .pi - .pi / 2
                     Image(systemName: CameraPresentation.symbol(for: group))
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(ready ? Color.green : color(for: readiness[group]))
+                        .foregroundStyle(color(for: ready ? .ok : readiness[group]))
                         .symbolEffect(.bounce, options: .nonRepeating, value: readiness[group] == .ok)
                         .shadow(color: .black.opacity(0.6), radius: 2)
                         .position(x: geometry.size.width / 2 + cos(angle) * radius, y: geometry.size.height / 2 + sin(angle) * radius)
@@ -582,8 +582,8 @@ struct ReadinessRing: View {
 
     private func color(for state: CaptureReadiness.State) -> Color {
         switch state {
-        case .ok: .green
-        case .attention: .orange
+        case .ok: StatusStyle.pass
+        case .attention: StatusStyle.warn
         case .unknown: .white.opacity(0.28)
         }
     }
