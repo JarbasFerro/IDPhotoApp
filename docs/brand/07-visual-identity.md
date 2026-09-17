@@ -82,7 +82,7 @@ In-product: system typography with Dynamic Type, always (BD-003). The wordmark's
 
 ## 6. Motif
 
-The crop frame with small gaps and an open right side may appear in the product where a frame already exists (crop guide, camera guide) — see `prototypes/08-frame-motif-in-product.md` (in progress). Rejected motifs stay rejected: registration marks, calipers, passport-agency seals (BD-020).
+The crop frame with small gaps and an open right side appears in the product in exactly one place: the guided-camera framing guide, in the photo's 26:32 proportions, taking the guide's status colour and never teal over a portrait. It was tried and **rejected in the crop editor** (it read as a broken guide and as chrome) — see `prototypes/08-frame-motif-in-product.md`. Executable spacing, radii, type roles and motion live in `11-design-tokens.md`. Rejected motifs stay rejected: registration marks, calipers, passport-agency seals (BD-020).
 
 ---
 
