@@ -149,7 +149,7 @@ enum CheckPresentation {
         case .checking: "Finding your face and preparing the background."
         case .good: "Everything we can measure is fine. Also check by eye: neutral expression, eyes open, no glare on glasses."
         case .review: "You can continue, or fix the items below first."
-        case .retake: "This photo is unlikely to be accepted. A new one takes a minute."
+        case .retake: "This photo has problems we can't fix. A new one takes a minute."
         }
     }
 
