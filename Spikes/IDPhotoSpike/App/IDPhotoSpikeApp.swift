@@ -15,6 +15,8 @@ struct IDPhotoSpikeApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(model: model)
+                // Brand test hook: nil (the default) keeps the system tint untouched.
+                .tint(BrandCandidate.current?.color)
                 .task {
                     guard !model.isInitialized else { return }
                     do {
