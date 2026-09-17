@@ -235,3 +235,43 @@ Before considering work complete, ask:
 10. Does this feature make the ID-photo task better, or is it merely showcasing an API?
 
 When the answer changes a foundational decision, update `docs/10-decisions.md` before quietly implementing a workaround.
+## 19. Model tiering for AI agents
+
+Contributors may run on a frontier model or on a small/fast model. Tier is chosen by task, not by convenience.
+
+A small/fast model is acceptable only when all of the following hold:
+
+- the task is fully specified: what to change, where, and what "done" means;
+- the result is cheap to verify by build, test, grep, diff, or schema check;
+- a wrong result is cheap: local, reversible, and unable to silently corrupt later work;
+- it needs roughly ten tool calls or fewer, with no branching decisions.
+
+Suitable small-tier work:
+
+- locating definitions, usages, and files (search and inventory, not auditing);
+- mechanical edits following a supplied pattern, such as renames or adding listed String Catalog keys;
+- extraction, classification, or summary of bounded input;
+- boilerplate mirroring an existing file;
+- running a build or test suite and reporting the raw failures;
+- format conversions and translation drafts that will be reviewed.
+
+Use a frontier model for:
+
+- ambiguous scope, API shape, architecture, or any design judgment;
+- reasoning across several files: concurrency, state flow, stale-result handling;
+- debugging an unknown cause;
+- long or interdependent multi-step work;
+- code, security, privacy, or accessibility review, where a missed finding looks identical to a clean result;
+- the deterministic domain core (section 10), rule data and provenance (section 11), and Vision calibration (section 9);
+- irreversible or outward-facing actions: commits, pushes, version bumps, tags, signing, App Store;
+- planning for, or synthesizing results from, other agents.
+
+Operating rules:
+
+- The frontier model plans and writes the brief, including file paths, the exact pattern, and the acceptance check; the small model executes.
+- Small-model output must be checkable: `file:line` lists, diffs, or pass/fail with raw output. A prose claim of success is not evidence.
+- Gate every small-model edit batch with a build or test run, and spot-check a "no matches" search result before acting on it.
+- Escalate rather than retry: after two failed or confused attempts, hand the task to the frontier tier instead of rephrasing.
+- Search and summary agents stay read-only.
+- One bounded task per small agent. If it would need the whole conversation to succeed, it is the wrong agent.
+- Every other section of this file applies to every tier without exception.
