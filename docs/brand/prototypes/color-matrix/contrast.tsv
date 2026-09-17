@@ -1,0 +1,13 @@
+cell	candidate	treatment	mark	field	mark_vs_field_contrast
+A1	Deep blue	accent mark on white field	#1F3FA8	#FFFFFF	8.99
+A2	Deep blue	white mark on accent field	#FFFFFF	#1F3FA8	8.99
+A3	Deep blue	accent mark on dark-mode field	#7C98F5	#111214	6.84
+B1	Dark cyan / blue-teal	accent mark on white field	#0E6F7C	#FFFFFF	5.86
+B2	Dark cyan / blue-teal	white mark on accent field	#FFFFFF	#0E6F7C	5.86
+B3	Dark cyan / blue-teal	accent mark on dark-mode field	#4FC3D1	#111214	8.98
+C1	Graphite + cool accent	ink mark on white field	#1C1F24	#FFFFFF	16.52
+C2	Graphite + cool accent	ink mark on accent field	#1C1F24	#5B7C99	3.77
+C3	Graphite + cool accent	ink mark on dark-mode field	#F2F3F5	#111214	16.88
+D1	Warm challenger (amber-ochre)	accent mark on white field	#B26A00	#FFFFFF	4.24
+D2	Warm challenger (amber-ochre)	white mark on accent field	#FFFFFF	#B26A00	4.24
+D3	Warm challenger (amber-ochre)	accent mark on dark-mode field	#F0B55A	#111214	10.23
