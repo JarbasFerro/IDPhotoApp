@@ -214,7 +214,29 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 | C — graphite ink + cool accent | ink `#1C1F24`; accent `#5B7C99` | accent `#9DB7CF` |
 | D — warm challenger (deep amber-ochre) | `#B26A00` | `#F0B55A` |
 
-**Not yet defined:** a Dark Mode ink for system C, and Increase Contrast Light/Dark values for all four systems. The first prototype that needs them adds them to this table; they are not to be defined locally in a script or document.  
+**Update 2026-09-17 (after prototype round 1) — TEST VALUES, still not a color decision; status stays Working and BD-033 is unchanged.** The test palette now has two roles per system, as `05-color-recommendation.md` §4.1 requires. The table above is superseded by the two below for the next test round; the round-1 documents (01–05) keep showing the values they were rendered with.
+
+*Accent role* (text, glyphs, selection). The light accents of C and D are corrected to reach 4.5:1 as text on white (`03-accessibility-color.md`): C `#5B7C99` → `#51728E` (5.1:1), D `#B26A00` → `#A45E00` (5.0:1). The Increase Contrast values are the ones the product-context test (04) already used; they are recorded here for the first time.
+
+| Test system | Light | Dark | Increase Contrast light | Increase Contrast dark |
+|---|---|---|---|---|
+| A — deep blue | `#1F3FA8` | `#7C98F5` | `#142C7A` | `#A9BCFF` |
+| B — dark cyan / blue-teal | `#0E6F7C` | `#4FC3D1` | `#084C55` | `#8ADFE9` |
+| C — cool accent (ink unchanged) | `#51728E` | `#9DB7CF` | `#3D5A73` | `#C3D6E6` |
+| D — warm challenger | `#A45E00` | `#F0B55A` | `#7A4800` | `#FFD08A` |
+
+*Accent fill role* (filled buttons; the label on a fill is white, `#FFFFFF`, in every appearance, as on a native iOS filled button). Each fill is the accent of the same appearance with its HLS lightness lowered only as far as a white label needs — hue and saturation kept — to at least 4.5:1, and at least 7:1 under Increase Contrast. Where the accent already passes, the fill is the accent. Ratios are white label on fill.
+
+| Test system | Light | Dark | Increase Contrast light | Increase Contrast dark |
+|---|---|---|---|---|
+| A | `#1F3FA8` (9.0) | `#446CF1` (4.5) | `#142C7A` (12.6) | `#0038FE` (7.0) |
+| B | `#0E6F7C` (5.9) | `#25828E` (4.5) | `#084C55` (9.7) | `#14626B` (7.0) |
+| C | `#51728E` (5.1) | `#4F7AA2` (4.5) | `#3D5A73` (7.2) | `#345C7E` (7.0) |
+| D | `#A45E00` (5.0) | `#A4690F` (4.6) | `#7A4800` (7.6) | `#814D00` (7.0) |
+
+`scripts/brand/generate-brand-assets.py` derives the fills, writes both roles to the spike's asset catalog (`BrandAccent*`, `BrandAccentFill*`) and fails if any fill gives a white label less than 4.5:1. The fills are mechanical derivations, not tuned colors: A's Increase Contrast dark fill in particular comes out as a fully saturated blue because its accent `#A9BCFF` is fully saturated, and would be re-derived with whichever dark accent survives (05 §3).
+
+**Not yet defined:** a Dark Mode ink for system C. The first prototype that needs it adds it to this entry; values are not to be defined locally in a script or document.  
 **Known risk — system D:** amber-ochre sits in the same hue family as the `warn` status color, which `03-color-strategy-research.md` §6 rates as a high identity-conflict risk, and `#B26A00` on white measures about 4.2:1 (below 4.5:1 for body text; `#5B7C99` is about 4.4:1). 03 §8 allows yellow/orange only as a challenger *if the first set lacks warmth or shelf recognition*; that condition has not been evaluated — D is included up front so the batch has one clearly differentiated alternative. D is in the batch to be tested against the status-independence rule, not because it is assumed to pass it.  
 **Notes:** System D is the "one evidence-backed differentiated alternative" from the handoff, drawn from the conditional yellow/orange challenger line in 03 §8; purple/violet is not in the batch. The letters are test labels and do not match the candidate letters in 03 §8 (see the dated update there). Values may change between test rounds without a new BD entry, provided this table is kept current. Status colors (`pass`, `warn`, `fail`, `manual_check`) must remain independent of whichever system is chosen; a system that cannot meet this is rejected. Any winner still needs Increase Contrast variants, P3/sRGB evaluation and device testing (03 §5), and a re-run on the refined icon (BD-036 amendment), before BD-033 can change.
 

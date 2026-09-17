@@ -285,7 +285,7 @@ struct CameraView: View {
                 Text("Allow camera access in Settings, or choose an existing photo instead. Photos stay on this iPhone.")
             }
             if let url = URL(string: UIApplication.openSettingsURLString) {
-                Link("Open Settings", destination: url).buttonStyle(.borderedProminent)
+                Link("Open Settings", destination: url).brandProminentButtonStyle()
             }
             Button("Choose Photo Instead") { dismiss() }.buttonStyle(.bordered)
         }
@@ -298,7 +298,7 @@ struct CameraView: View {
             ContentUnavailableView("No camera on this device", systemImage: "camera.slash",
                                    description: Text("Choose an existing photo instead."))
             Button("Choose Photo Instead") { dismiss() }
-                .buttonStyle(.borderedProminent)
+                .brandProminentButtonStyle()
                 .accessibilityIdentifier("cameraUnavailableChoose")
         }
         .padding()
@@ -452,7 +452,7 @@ struct CameraIntroView: View {
                         Text(page == 0 ? LocalizedStringKey("Next") : cancel == nil ? LocalizedStringKey("Done") : LocalizedStringKey("Open the camera"))
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .brandProminentButtonStyle()
                     .controlSize(.large)
                     .accessibilityIdentifier(page == 0 ? "introNext" : "introStart")
                 }

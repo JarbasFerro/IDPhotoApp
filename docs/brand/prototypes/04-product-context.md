@@ -155,6 +155,16 @@ Consequence for the eventual colour system (whatever the hue): one accent value 
 
 Light + Increase Contrast behaves well for all four.
 
+### Update 2026-09-17 — accent fill role in the test hook
+
+The `-brandCandidate` hook now carries the two roles asked for above, as test values (BD-037 update; BD-033 unchanged). Prominent filled buttons take `BrandAccentFill*`, a deeper value of the same hue derived so the native white label reaches at least 4.5:1 in every appearance (7:1 under Increase Contrast); everything else still takes the accent through the root tint. The delete toolbar button no longer takes the tint. Without a candidate the app is unchanged. The light accents of C and D also moved to their 4.5:1 corrections (`#51728E`, `#A45E00`); sections 1–5 and their screenshots still show the round-1 values.
+
+| | A before — fill `#7C98F5`, 2.7:1 | A after — fill `#446CF1`, 4.5:1 | B before — fill `#4FC3D1`, 2.1:1 | B after — fill `#25828E`, 4.5:1 |
+|---|---|---|---|---|
+| Photo Check, Dark | ![](product-context/accent-fill-before-A-dark-PhotoCheck.png) | ![](product-context/accent-fill-after-A-dark-PhotoCheck.png) | ![](product-context/accent-fill-before-B-dark-PhotoCheck.png) | ![](product-context/accent-fill-after-B-dark-PhotoCheck.png) |
+
+In the "after" shots "Adjust" and "Retake" keep the light accent (accent role, text on a pale fill), the trash glyph is the neutral label colour as in the baseline, and the status marks are unchanged. The "after" shots are from an iPhone Air simulator (iOS 26.5), the "before" shots from the round-1 iPhone 17 Pro run, so the layout differs slightly. The four files are hand-made copies named `accent-fill-*` so that the export script, which refreshes every embedded `brand-*.png`, leaves them alone: "before" is the round-1 `brand-<candidate>-dark-PhotoCheck.png`, "after" the same file from this run's `Artifacts/brand-review/`. Re-running the export script now would refresh the `brand-*.png` files in sections 2–5 with the fill role and the corrected C/D values; do that together with a rewrite of those sections, not on its own. Not re-tested here: Increase Contrast captures, and the switch (white knob on the accent), which still uses the accent role.
+
 ---
 
 ## 6. Answer to the question

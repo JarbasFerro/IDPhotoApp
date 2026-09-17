@@ -54,6 +54,7 @@ struct PhotoCheckView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Remove Photo", systemImage: "trash", role: .destructive) { confirmRemove = true }
                     .disabled(model.activity != nil)
+                    .brandNeutralToolbarItem()
             }
         }
         .confirmationDialog("Remove this photo and its copies on the sheet?", isPresented: $confirmRemove, titleVisibility: .visible) {
@@ -143,7 +144,7 @@ struct PhotoCheckView: View {
             Button { path.append(.sheet) } label: {
                 Label("Add to sheet", systemImage: "printer").frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
+            .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(model.activity != nil)
             .accessibilityIdentifier("addToSheet")

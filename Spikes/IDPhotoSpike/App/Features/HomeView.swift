@@ -23,7 +23,7 @@ struct HomeView: View {
                     Button { acquire(.camera, model.entries.isEmpty ? .replace : .add) } label: {
                         Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .brandProminentButtonStyle()
                     .controlSize(.large)
                     .disabled(!model.isInitialized || model.activity != nil || !model.canAddPhoto)
                     .accessibilityIdentifier("takePhoto")
