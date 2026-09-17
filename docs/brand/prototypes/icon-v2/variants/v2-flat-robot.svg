@@ -10,11 +10,15 @@
     <path d="M 577 844 H 728 A 130 130 0 0 0 830.44 794.04"/>
   </g>
   <g fill="#111111">
-    <path d="M 472 596 C 472 640 460 664 426 676 C 350 694 308 716 294 760 H 758 C 744 716 702 694 626 676 C 592 664 580 640 580 596 Z"/>
+    <rect x="496" y="596" width="60" height="52"/>
+    <path d="M 320 760 V 674 A 34 34 0 0 1 354 640 H 698 A 34 34 0 0 1 732 674 V 760 Z"/>
     <rect x="394" y="322" width="264" height="284" rx="40"/>
     <rect x="518" y="262" width="16" height="64"/>
     <circle cx="526" cy="258" r="24"/>
     <rect x="364" y="426" width="32" height="76" rx="10"/>
     <rect x="656" y="426" width="32" height="76" rx="10"/>
   </g>
+  <circle fill="#FFFFFF" stroke="none" cx="472" cy="428" r="27"/>
+  <circle fill="#FFFFFF" stroke="none" cx="580" cy="428" r="27"/>
+  <rect fill="#FFFFFF" stroke="none" x="464" y="520" width="124" height="26" rx="13"/>
 </svg>

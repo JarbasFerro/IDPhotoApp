@@ -10,9 +10,12 @@
     <path d="M 577 844 H 728 A 130 130 0 0 0 830.44 794.04"/>
   </g>
   <g fill="#111111">
-    <path d="M 472 596 C 472 640 460 664 426 676 C 350 694 308 716 294 760 H 758 C 744 716 702 694 626 676 C 592 664 580 640 580 596 Z"/>
+    <path d="M 388 760 C 388 666 440 596 526 596 C 612 596 664 666 664 760 Z"/>
     <ellipse cx="526" cy="474" rx="152" ry="130"/>
     <path d="M 380 430 L 394 262 L 488 356 Z"/>
     <path d="M 672 430 L 658 262 L 564 356 Z"/>
   </g>
+  <ellipse fill="#FFFFFF" stroke="none" cx="468" cy="468" rx="26" ry="17" transform="rotate(14 468 468)"/>
+  <ellipse fill="#FFFFFF" stroke="none" cx="584" cy="468" rx="26" ry="17" transform="rotate(-14 584 468)"/>
+  <path fill="#FFFFFF" fill-rule="evenodd" stroke="none" d="M 510 516 L 542 516 L 526 536 Z"/>
 </svg>

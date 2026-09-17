@@ -18,7 +18,7 @@ struct AppIconPickerView: View {
                             Text(group.title)
                                 .font(.headline)
                                 .accessibilityAddTraits(.isHeader)
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: side, maximum: side + 8), spacing: 16)],
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: side, maximum: side + 8), spacing: 16, alignment: .top)],
                                       alignment: .leading, spacing: 16) {
                                 ForEach(AppIconChoice.choices(in: group)) { choice in
                                     cell(choice)
@@ -53,29 +53,43 @@ struct AppIconPickerView: View {
         return Button {
             Task { await controller.select(choice) }
         } label: {
-            Image(choice.previewAssetName)
-                .resizable()
-                .interpolation(.high)
-                .aspectRatio(1, contentMode: .fit)
-                .overlay(alignment: .bottomTrailing) {
-                    if isSelected {
-                        // Shape and position carry the state; the colour only matches the brand.
-                        Image(systemName: "checkmark")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.white)
-                            .padding(6)
-                            .background(Color.brandAccentFill, in: Circle())
-                            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 2))
-                            .offset(x: 6, y: 6)
-                            .accessibilityHidden(true)
-                    }
-                }
-                .contentShape(Rectangle())
+            VStack(spacing: 6) {
+                Image(choice.previewAssetName)
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(1, contentMode: .fit)
+                    .overlay(alignment: .bottomTrailing) { selectionBadge(isSelected) }
+                // Two lines keep longer names ("Fones de ouvido") whole; cells are top-aligned in the grid.
+                Text(choice.label)
+                    .font(.caption)
+                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .fontWeight(isSelected ? .semibold : .regular)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                    .frame(maxWidth: .infinity)
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(controller.isChanging)
         .accessibilityLabel(Text(choice.label))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityIdentifier("appIcon-\(choice.name)")
+    }
+
+    @ViewBuilder
+    private func selectionBadge(_ isSelected: Bool) -> some View {
+        if isSelected {
+            // Shape and position carry the state; the colour only matches the brand.
+            Image(systemName: "checkmark")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(6)
+                .background(Color.brandAccentFill, in: Circle())
+                .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: 2))
+                .offset(x: 6, y: 6)
+                .accessibilityHidden(true)
+        }
     }
 }

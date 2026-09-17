@@ -139,7 +139,8 @@ def _dino(x):
     return out
 
 
-# name -> (group, draws the shared human head?, narrow child shoulders?, extra shapes[, cut-out shapes])
+# name -> (group, draws the shared human head?, shoulders: False standard / True narrow / a BODIES key,
+#          extra shapes[, cut-out shapes])
 VARIANTS = {
     "swept":     ("people", True, False, _swept),
     "short":     ("people", True, False, lambda x: [_cap(x)]),
@@ -189,43 +190,74 @@ VARIANTS = {
     "graduate":  ("people", True, False, lambda x: [_cap(x), _p(
         f"M {x - 178} 306 L {x} 250 L {x + 178} 306 L {x} 362 Z"),
         f'<rect x="{x + 132}" y="306" width="12" height="96" rx="6"/>', f'<circle cx="{x + 138}" cy="410" r="16"/>']),
-    "cat":       ("fun", False, False, lambda x: [f'<ellipse cx="{x}" cy="474" rx="152" ry="130"/>'] + _both(
-        lambda s: _p(f"M {x + s * 146} 430 L {x + s * 132} 262 L {x + s * 38} 356 Z"))),
-    "bunny":     ("fun", False, False, lambda x: [f'<ellipse cx="{x}" cy="494" rx="126" ry="118"/>'] + _both(
-        lambda s: f'<ellipse cx="{x + s * 58}" cy="336" rx="34" ry="94" '
-                  f'transform="rotate({s * 12} {x + s * 58} 430)"/>')),
-    "bear":      ("fun", False, False, lambda x: [f'<circle cx="{x}" cy="476" r="140"/>'] + _both(
-        lambda s: f'<circle cx="{x + s * 108}" cy="352" r="52"/>')),
-    "fox":       ("fun", False, False, lambda x: [_p(
-        f"M {x} 644 C {x - 40} 624 {x - 150} 548 {x - 184} 474 L {x - 132} 446 C {x - 132} 384 {x - 80} 344 {x} 344 "
-        f"C {x + 80} 344 {x + 132} 384 {x + 132} 446 L {x + 184} 474 C {x + 150} 548 {x + 40} 624 {x} 644 Z")] + _both(
-        lambda s: _p(f"M {x + s * 138} 452 L {x + s * 154} 248 L {x + s * 34} 352 Z"))),
-    "panda":     ("fun", False, False, lambda x: [f'<circle cx="{x}" cy="476" r="140"/>'] + _both(
-        lambda s: f'<circle cx="{x + s * 108}" cy="352" r="52"/>'), lambda x: _both(
-        lambda s: f'<ellipse cx="{x + s * 54}" cy="468" rx="30" ry="42" '
-                  f'transform="rotate({s * -22} {x + s * 54} 468)"/>') + [f'<ellipse cx="{x}" cy="540" rx="22" ry="14"/>']),
-    "frog":      ("fun", False, False, lambda x: [f'<ellipse cx="{x}" cy="506" rx="156" ry="112"/>'] + _both(
-        lambda s: f'<circle cx="{x + s * 84}" cy="392" r="52"/>'), lambda x: _both(
-        lambda s: f'<circle cx="{x + s * 84}" cy="388" r="20"/>')),
-    "dinosaur":  ("fun", False, False, _dino, lambda x: [
-        f'<circle cx="{x + 36}" cy="388" r="15"/>',
-        _p(f"M {x + 212} 432 L {x + 84} 442 L {x + 84} 454 L {x + 208} 450 Z")]),
-    "astronaut": ("fun", False, False, lambda x: [f'<circle cx="{x}" cy="444" r="170"/>',
-                                                  f'<rect x="{x - 118}" y="596" width="236" height="44" rx="22"/>'],
-                  lambda x: [f'<rect x="{x - 110}" y="376" width="220" height="132" rx="60"/>']),
-    "robot":     ("fun", False, False, lambda x: [
-        f'<rect x="{x - 132}" y="322" width="264" height="284" rx="40"/>',
-        f'<rect x="{x - 8}" y="262" width="16" height="64"/>', f'<circle cx="{x}" cy="258" r="24"/>'] + _both(
-        lambda s: f'<rect x="{x + s * 146 - 16}" y="426" width="32" height="76" rx="10"/>')),
-    "alien":     ("fun", False, True, _alien),
-    "party":     ("fun", True, False, lambda x: [_cap(x), _p(f"M {x + 20} 300 L {x + 168} 240 L {x + 128} 396 Z"),
+    "party":     ("people", True, False, lambda x: [_cap(x), _p(f"M {x + 20} 300 L {x + 168} 240 L {x + 128} 396 Z"),
                                                  f'<circle cx="{x + 172}" cy="238" r="20"/>']),
-    "viking":    ("fun", True, False, lambda x: [_p(
+    "viking":    ("people", True, False, lambda x: [_p(
         f"M {x - 130} 412 C {x - 134} 318 {x - 72} 272 {x} 272 C {x + 72} 272 {x + 134} 318 {x + 130} 412 Z")] + _both(
         lambda s: _p(f"M {x + s * 118} 366 C {x + s * 190} 356 {x + s * 216} 294 {x + s * 198} 238 "
                      f"C {x + s * 180} 292 {x + s * 152} 312 {x + s * 110} 318 Z"))),
+    "cat":       ("fun", False, "slim", lambda x: [f'<ellipse cx="{x}" cy="474" rx="152" ry="130"/>'] + _both(
+        lambda s: _p(f"M {x + s * 146} 430 L {x + s * 132} 262 L {x + s * 38} 356 Z")),
+                  lambda x: _both(lambda s: f'<ellipse cx="{x + s * 58}" cy="468" rx="26" ry="17" transform="rotate({s * -14} {x + s * 58} 468)"/>') + [_p(f"M {x - 16} 516 L {x + 16} 516 L {x} 536 Z")]),
+    "bunny":     ("fun", False, "slim", lambda x: [f'<ellipse cx="{x}" cy="494" rx="126" ry="118"/>'] + _both(
+        lambda s: f'<ellipse cx="{x + s * 58}" cy="336" rx="34" ry="94" '
+                  f'transform="rotate({s * 12} {x + s * 58} 430)"/>'),
+                  lambda x: _both(lambda s: f'<circle cx="{x + s * 46}" cy="478" r="15"/>') + [f'<ellipse cx="{x}" cy="526" rx="14" ry="9"/>']),
+    "bear":      ("fun", False, "round", lambda x: [f'<circle cx="{x}" cy="476" r="140"/>'] + _both(
+        lambda s: f'<circle cx="{x + s * 108}" cy="352" r="52"/>'),
+                  lambda x: _both(lambda s: f'<circle cx="{x + s * 52}" cy="448" r="15"/>') + [f'<ellipse cx="{x}" cy="512" rx="26" ry="17"/>']),
+    "fox":       ("fun", False, "slim", lambda x: [_p(
+        f"M {x} 644 C {x - 40} 624 {x - 150} 548 {x - 184} 474 L {x - 132} 446 C {x - 132} 384 {x - 80} 344 {x} 344 "
+        f"C {x + 80} 344 {x + 132} 384 {x + 132} 446 L {x + 184} 474 C {x + 150} 548 {x + 40} 624 {x} 644 Z")] + _both(
+        lambda s: _p(f"M {x + s * 138} 452 L {x + s * 154} 248 L {x + s * 34} 352 Z")),
+                  lambda x: _both(lambda s: f'<ellipse cx="{x + s * 60}" cy="466" rx="26" ry="13" transform="rotate({s * -22} {x + s * 60} 466)"/>') + [f'<circle cx="{x}" cy="606" r="17"/>']),
+    "panda":     ("fun", False, "round", lambda x: [f'<circle cx="{x}" cy="476" r="140"/>'] + _both(
+        lambda s: f'<circle cx="{x + s * 108}" cy="352" r="52"/>'), lambda x: _both(
+        lambda s: f'<ellipse cx="{x + s * 54}" cy="468" rx="30" ry="42" '
+                  f'transform="rotate({s * -22} {x + s * 54} 468)"/>') + [f'<ellipse cx="{x}" cy="540" rx="22" ry="14"/>']),
+    "frog":      ("fun", False, "frog", lambda x: [f'<ellipse cx="{x}" cy="506" rx="156" ry="112"/>'] + _both(
+        lambda s: f'<circle cx="{x + s * 84}" cy="392" r="52"/>'), lambda x: _both(
+        lambda s: f'<circle cx="{x + s * 84}" cy="388" r="20"/>')),
+    "dinosaur":  ("fun", False, "dinosaur", _dino, lambda x: [
+        f'<circle cx="{x + 36}" cy="388" r="15"/>',
+        _p(f"M {x + 212} 432 L {x + 84} 442 L {x + 84} 454 L {x + 208} 450 Z")]),
+    "astronaut": ("fun", False, "astronaut", lambda x: [f'<circle cx="{x}" cy="444" r="170"/>'] + _both(
+        lambda s: f'<rect x="{x + s * 182 - 18}" y="404" width="36" height="84" rx="12"/>'),
+                  lambda x: [f'<rect x="{x - 110}" y="376" width="220" height="132" rx="60"/>']),
+    "robot":     ("fun", False, "robot", lambda x: [
+        f'<rect x="{x - 132}" y="322" width="264" height="284" rx="40"/>',
+        f'<rect x="{x - 8}" y="262" width="16" height="64"/>', f'<circle cx="{x}" cy="258" r="24"/>'] + _both(
+        lambda s: f'<rect x="{x + s * 146 - 16}" y="426" width="32" height="76" rx="10"/>'),
+                  lambda x: _both(lambda s: f'<circle cx="{x + s * 54}" cy="428" r="27"/>') + [f'<rect x="{x - 62}" y="520" width="124" height="26" rx="13"/>']),
+    "alien":     ("fun", False, "alien", _alien,
+                  lambda x: _both(lambda s: f'<ellipse cx="{x + s * 64}" cy="438" rx="48" ry="28" transform="rotate({s * -32} {x + s * 64} 438)"/>')),
 }
 BUSTS = list(VARIANTS)
+
+
+def _mound(x, half, top):
+    """An animal's chest and shoulders: one soft mound, no neck."""
+    return [_p(f"M {x - half} 760 C {x - half} {top + 70} {x - half * 0.62:.0f} {top} {x} {top} "
+               f"C {x + half * 0.62:.0f} {top} {x + half} {top + 70} {x + half} 760 Z")]
+
+
+# Bodies for characters that are not people. Same base line (y = 760) as everyone else.
+BODIES = {
+    "slim":      lambda x: _mound(x, 138, 596),
+    "round":     lambda x: _mound(x, 186, 590),
+    "frog":      lambda x: [_p(f"M {x - 214} 760 C {x - 214} 676 {x - 150} 600 {x} 600 "
+                               f"C {x + 150} 600 {x + 214} 676 {x + 214} 760 Z")],
+    "dinosaur":  lambda x: [_p(f"M {x - 92} 590 C {x - 150} 640 {x - 214} 690 {x - 232} 760 H {x + 150} "
+                               f"C {x + 140} 700 {x + 100} 650 {x + 56} 596 Z"),
+                            _p(f"M {x - 124} 612 L {x - 204} 596 L {x - 170} 668 Z")],
+    "robot":     lambda x: [f'<rect x="{x - 30}" y="596" width="60" height="52"/>',
+                            _p(f"M {x - 206} 760 V 674 A 34 34 0 0 1 {x - 172} 640 H {x + 172} A 34 34 0 0 1 {x + 206} 674 V 760 Z")],
+    "alien":     lambda x: [_p(f"M {x - 20} 630 V 676 C {x - 80} 686 {x - 124} 712 {x - 136} 760 H {x + 136} "
+                               f"C {x + 124} 712 {x + 80} 686 {x + 20} 676 V 630 Z")],
+    "astronaut": lambda x: [f'<rect x="{x - 122}" y="592" width="244" height="46" rx="23"/>',
+                            _p(f"M {x - 236} 760 C {x - 236} 684 {x - 190} 636 {x - 120} 628 H {x + 120} "
+                               f"C {x + 190} 636 {x + 236} 684 {x + 236} 760 Z")],
+}
 
 
 def bust_paths(s):
@@ -240,6 +272,8 @@ def bust_paths(s):
                         f"C {x + 100} 592 {x + 60} 628 {x} 628 C {x - 60} 628 {x - 100} 592 {x - 110} 542 "
                         f"C {x - 122} 542 {x - 130} 534 {x - 134} 516 C {x - 142} 490 {x - 136} 466 {x - 116} 470 "
                         f"C {x - 120} 370 {x - 70} 296 {x} 296 C {x + 70} 296 {x + 120} 370 {x + 116} 470 Z"))
+    if isinstance(narrow, str):
+        return BODIES[narrow](x) + extras(x)
     w, n = (176, 44) if narrow else (232, 54)  # shoulder half-width, neck half-width
     parts.append(_p(f"M {x - n} 596 C {x - n} 640 {x - n - 12} 664 {x - n - 46} 676 "
                     f"C {x - w + 56} 694 {x - w + 14} 716 {x - w} 760 H {x + w} "
@@ -253,10 +287,11 @@ def cut_paths(s, paint):
     entry = VARIANTS[s.bust]
     if len(entry) < 5:
         return []
-    return [shape.replace("<path ", f'<path fill="{paint}" fill-rule="evenodd" stroke="none" ', 1)
+    shapes = [shape.replace("<path ", f'<path fill="{paint}" fill-rule="evenodd" stroke="none" ', 1)
             .replace("<ellipse ", f'<ellipse fill="{paint}" stroke="none" ', 1)
             .replace("<circle ", f'<circle fill="{paint}" stroke="none" ', 1)
             .replace("<rect ", f'<rect fill="{paint}" stroke="none" ', 1) for shape in entry[4](C + s.shift_x)]
+    return shapes
 
 
 def flat_svg(s, title):

@@ -48,7 +48,7 @@ struct AppIconChoice: Identifiable, Hashable, Sendable {
     /// (`extractionState: manual`) and checked by the generator and by AppIconChoiceTests.
     var labelKey: String { "AppIcon.\(name)" }
 
-    /// Short plain noun for VoiceOver and Voice Control, for example "Short hair" or "Unicorn".
+    /// Short plain noun shown under the icon and read by VoiceOver and Voice Control, for example "Short hair" or "Unicorn".
     var label: String {
         Bundle.main.localizedString(forKey: labelKey, value: nil, table: nil)
     }

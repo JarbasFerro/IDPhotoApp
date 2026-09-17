@@ -74,10 +74,18 @@ Unchanged from v1: lit single-hue teal field (`#15899A` → `#0A5863`, around th
 - **Added:** locs, turban, hijab, glasses, headphones, graduate; fox, panda, frog, dinosaur, astronaut.
 - **New technique — cut-outs.** A character may carry negative-space details (5th element of a `VARIANTS` entry): glasses, the turban fold, the hijab's face opening, panda eye patches, frog pupils, the dinosaur's eye and mouth, the astronaut's visor. Flat masters paint them in the field colour; finished icons mask them so the lit teal shows through. This is what makes characters readable that a plain silhouette cannot express.
 
-The set now has **33 characters** — 21 people and 12 fun. Everyone sits on the same shoulders and base line inside the same frame; people share one head with ears, so only hair, headwear or accessories change.
+The set now has **33 characters** — 23 people and 10 fun. Everyone sits on the same shoulders and base line inside the same frame; people share one head with ears, so only hair, headwear or accessories change.
 
-- **People:** swept (default), short, bald, spiky, curly, afro, bob, bun, spacebuns, ponytail, pigtails, braids, cap, beanie, hat, locs, turban, hijab, glasses, headphones, graduate.
-- **Fun:** cat, bunny, bear, fox, panda, frog, dinosaur, astronaut, robot, alien, party, viking.
+- **People:** swept (default), short, bald, spiky, curly, afro, bob, bun, spacebuns, ponytail, pigtails, braids, cap, beanie, hat, locs, turban, hijab, glasses, headphones, graduate, party, viking.
+- **Fun:** cat, bunny, bear, fox, panda, frog, dinosaur, astronaut, robot, alien.
+
+**Third pass (founder, after trying 0.11.0 on device, 2026-09-17):**
+
+- **Names under each icon** in the picker (caption, up to two lines, the selected one emphasised) so a character is understood at a glance; the same string is the VoiceOver label.
+- **Fun characters no longer sit on human shoulders** — that looked strange. Each now has a body of its own kind on the same base line (`BODIES` in the script): a soft neckless mound for cat, bunny, fox (slim) and bear, panda (round); a squat body for the frog; a sloping back with spikes for the dinosaur; boxy shoulders and a neck post for the robot; a thin neck and narrow shoulders for the alien; a suit with a collar ring for the astronaut.
+- **Simple cut-out faces** (eyes, nose; a mouth for the robot) on the animals, robot and alien, so they read as characters rather than blobs.
+- Party hat and viking are people in costume: they keep human shoulders and moved to the end of the People group.
+
 
 Assessment: all 33 are identifiable at 180 px. Closest pairs to watch: short / bald, afro / bob, cat / fox. **Locs** is the least confident drawing (strands hanging beside the face, separated by gaps) and would benefit most from a designer's hand; representation there deserves better than my geometry. Below 60 px everything converges to "a character in a C", which is fine — the choice is for the Home Screen.
 

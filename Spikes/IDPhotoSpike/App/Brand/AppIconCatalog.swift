@@ -24,6 +24,8 @@ extension AppIconChoice {
         AppIconChoice(name: "glasses", group: .people),
         AppIconChoice(name: "headphones", group: .people),
         AppIconChoice(name: "graduate", group: .people),
+        AppIconChoice(name: "party", group: .people),
+        AppIconChoice(name: "viking", group: .people),
         AppIconChoice(name: "cat", group: .fun),
         AppIconChoice(name: "bunny", group: .fun),
         AppIconChoice(name: "bear", group: .fun),
@@ -34,7 +36,5 @@ extension AppIconChoice {
         AppIconChoice(name: "astronaut", group: .fun),
         AppIconChoice(name: "robot", group: .fun),
         AppIconChoice(name: "alien", group: .fun),
-        AppIconChoice(name: "party", group: .fun),
-        AppIconChoice(name: "viking", group: .fun),
     ]
 }
