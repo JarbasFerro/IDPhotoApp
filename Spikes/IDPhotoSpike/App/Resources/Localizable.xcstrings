@@ -166,6 +166,7 @@
       }
     },
     "Got it" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1049,6 +1050,7 @@
       }
     },
     "About an arm's length. Too close distorts the nose." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2256,6 +2258,7 @@
       }
     },
     "Before you start" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2304,6 +2307,7 @@
       }
     },
     "Bright enough, not lit from behind." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -3332,6 +3336,7 @@
       }
     },
     "Fine" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4121,6 +4126,7 @@
       }
     },
     "Next" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4274,6 +4280,7 @@
       }
     },
     "Not yet" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -4308,6 +4315,7 @@
       }
     },
     "Off, you press the shutter yourself when the ring is green." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5571,6 +5579,7 @@
       }
     },
     "Straight, level and looking at the camera. If the phone is tilted, you move the phone." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6614,6 +6623,7 @@
       }
     },
     "When the ring closes, a 3-second countdown runs and the photo is taken for you. Look at the lens during the countdown." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6921,6 +6931,7 @@
       }
     },
     "The ring shows framing, pose, light and distance." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6969,6 +6980,7 @@
       }
     },
     "Camera checks clear. Check background and remove headphones." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6985,6 +6997,7 @@
       }
     },
     "One face, big enough and centred in the guide." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7001,6 +7014,7 @@
       }
     },
     "The ring around the shutter checks framing, head position, light and distance. The message above the shutter tells you what to do." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7017,6 +7031,7 @@
       }
     },
     "Camera checks clear" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7033,6 +7048,7 @@
       }
     },
     "Automatic capture when camera checks clear" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7525,6 +7541,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quando as verificações da câmera se estabilizam, começa uma contagem regressiva de três segundos. Você também pode tocar no obturador."
+          }
+        }
+      }
+    },
+    "Move your face slightly down" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco hacia abajo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para baixo"
+          }
+        }
+      }
+    },
+    "Move your face slightly left" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco a la izquierda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para a esquerda"
+          }
+        }
+      }
+    },
+    "Move your face slightly right" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco a la derecha"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para a direita"
+          }
+        }
+      }
+    },
+    "Move your face slightly up" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco hacia arriba"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para cima"
           }
         }
       }

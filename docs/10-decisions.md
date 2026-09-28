@@ -670,9 +670,11 @@ A physical iPhone screenshot showed C-shaped marks, a dense readiness ring aroun
 
 Use one continuous white oval for head placement, one actionable instruction near the shutter, and a plain white system-style shutter. Keep the guide independent of readiness color; measured state is expressed through words and VoiceOver. Put optional Automatic capture in a one-page native Help Form, accessible from a native glass top control. The four-second first-use tip occupies the instruction slot and expires automatically. Use Liquid Glass only for native camera controls where it keeps the photo visually primary. Manual capture remains possible when checks need attention.
 
+The 2026-09-28 follow-up adds spatial feedback to this guide. A single arrow on the relevant oval edge and the same spoken/visible instruction show a stable left, right, up, or down correction; distance gets one size cue. Pose and lighting leave the oval neutral. When the live checks first settle, the oval briefly brightens and returns to rest, paired with one haptic. Reduce Motion removes the animation. The guide fades at shutter press; Photo Check keeps its existing source-to-crop landing transition. The oval is sized for the visible head rather than the face detector's narrower box, but it never promises an exact final crop.
+
 ### Evidence
 
-The founder requested a Face ID setup-inspired redesign after reviewing physical-device screenshots. The 2026-09-28 simulator fixture and camera UI test show the new guide, tip, and settled hint without overlap; final real-camera validation remains required.
+The founder requested a Face ID setup-inspired redesign after reviewing physical-device screenshots, then asked for directional oval feedback and a useful capture moment. The 2026-09-28 simulator fixtures and camera UI tests show the guide, direction cue, tip, and settled hint without overlap; final real-camera validation remains required.
 
 ### Consequences
 

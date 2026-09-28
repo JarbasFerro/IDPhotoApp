@@ -63,6 +63,39 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 10) == .ready)
     }
 
+    @Test func ovalCueUsesDisplayedFaceDirectionAndWaitsForStableChanges() {
+        var tracker = GuidanceTracker()
+        _ = feed(&tracker, face(height: 0.3, centerX: 0.2), times: 5)
+        #expect(tracker.hint == .centerFace && tracker.correction == .right)
+        _ = feed(&tracker, face(height: 0.3, centerX: 0.8), times: 4)
+        #expect(tracker.correction == .right)
+        _ = feed(&tracker, face(height: 0.3, centerX: 0.8), times: 1)
+        #expect(tracker.correction == .left)
+        _ = feed(&tracker, face(height: 0.3, centerY: 0.15), times: 5)
+        #expect(tracker.correction == .down)
+        _ = feed(&tracker, face(height: 0.3, centerY: 0.75), times: 5)
+        #expect(tracker.correction == .up)
+        _ = feed(&tracker, face(height: 0.3), times: 5)
+        #expect(tracker.hint == .holdStill && tracker.correction == nil)
+    }
+
+    @Test func sizeUsesOvalCueButPoseAndLightDoNot() {
+        var tracker = GuidanceTracker()
+        _ = feed(&tracker, face(height: 0.12), times: 5)
+        #expect(tracker.correction == .closer)
+        tracker = GuidanceTracker()
+        _ = feed(&tracker, face(height: 0.5), times: 5)
+        #expect(tracker.correction == .farther)
+        tracker = GuidanceTracker()
+        _ = feed(&tracker, face(height: 0.3, roll: 20), times: 5)
+        #expect(tracker.correction == nil)
+        tracker = GuidanceTracker()
+        var dark = face(height: 0.3)
+        dark.lowLight = true
+        _ = feed(&tracker, dark, times: 5)
+        #expect(tracker.correction == nil)
+    }
+
     @Test func poseErrorsAreRelativeAndBlamedOnWhateverIsTilted() {
         var tracker = GuidanceTracker()
         // A tilted phone with a matching tilted head is a level portrait: no hint at all.

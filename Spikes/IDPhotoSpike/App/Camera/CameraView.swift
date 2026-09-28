@@ -54,6 +54,7 @@ struct CameraView: View {
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
     @State private var showCameraHelp = false
+    @State private var readyFeedbackFired = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -67,6 +68,18 @@ struct CameraView: View {
         #endif
     }
 
+    private var reviewOffCenter: Bool {
+        #if DEBUG
+        ProcessInfo.processInfo.arguments.contains("--camera-review-off-center")
+        #else
+        false
+        #endif
+    }
+
+    private var spokenHint: String {
+        String(localized: CameraPresentation.text(for: camera.hint, correction: camera.guideCorrection))
+    }
+
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
@@ -75,7 +88,7 @@ struct CameraView: View {
         .task {
             #if DEBUG
             if reviewFixture {
-                camera.installReviewFixture()
+                camera.installReviewFixture(offCenter: reviewOffCenter)
                 helpTipSeen = false
                 return
             }
@@ -97,7 +110,7 @@ struct CameraView: View {
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
-        .sensoryFeedback(.success, trigger: camera.hint) { _, hint in hint == .ready }
+        .sensoryFeedback(.success, trigger: readyFeedbackFired) { old, new in !old && new }
         .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showCameraHelp)") {
             // Auto capture: "ready" held through a visible countdown; any hint change cancels it.
             guard autoCapture, !showCameraHelp, camera.hint == .ready, camera.state == .running, !camera.isCapturing
@@ -113,8 +126,13 @@ struct CameraView: View {
             takePhoto()
         }
         .onChange(of: camera.hint) { _, hint in
-            // One spoken update per hint change; hints are already debounced.
-            AccessibilityNotification.Announcement(String(localized: CameraPresentation.text(for: hint))).post()
+            if hint == .ready && !readyFeedbackFired { readyFeedbackFired = true }
+        }
+        .task(id: "\(spokenHint)-\(showCameraHelp)") {
+            // Coalesce a hint change and its directional cue into one spoken instruction.
+            try? await Task.sleep(for: .milliseconds(150))
+            guard !Task.isCancelled, !showCameraHelp, camera.state == .running else { return }
+            AccessibilityNotification.Announcement(spokenHint).post()
         }
         .alert("Unable to take the photo", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
             Button("OK", role: .cancel) { errorMessage = nil }
@@ -130,7 +148,9 @@ struct CameraView: View {
         Group {
             #if DEBUG
             if reviewFixture {
-                CameraFramingGuidePreviewScene(ready: true)
+                CameraFramingGuidePreviewScene(ready: !reviewOffCenter,
+                                               correction: camera.guideCorrection,
+                                               faceOffset: reviewOffCenter ? -65 : 0)
                 overlayControls
             } else {
                 liveCameraContent
@@ -174,7 +194,10 @@ struct CameraView: View {
 
     /// One quiet composition guide; camera checks are communicated beside the shutter.
     private var headGuide: some View {
-        CameraFramingGuide(ready: camera.hint == .ready)
+        CameraFramingGuide(ready: camera.hint == .ready,
+                           correction: camera.guideCorrection,
+                           isCapturing: camera.isCapturing)
+            .ignoresSafeArea() // The guide and AVCaptureVideoPreviewLayer must use the same displayed frame.
     }
 
     /// A familiar shutter. Readiness is communicated in words, not by arcs around the control.
@@ -232,11 +255,12 @@ struct CameraView: View {
                     if camera.state == .interrupted {
                         Text("Camera paused. It resumes when the interruption ends.")
                             .frame(maxWidth: .infinity)
-                    } else if !helpTipSeen && !voiceOverEnabled {
+                    } else if !helpTipSeen && !voiceOverEnabled && camera.guideCorrection == nil {
                         Label("Keep your face inside the oval", systemImage: "person.crop.circle")
                         .accessibilityIdentifier("cameraOptionalTip")
                     } else {
-                        Label(countdown != nil ? LocalizedStringResource("Look at the lens") : CameraPresentation.text(for: camera.hint),
+                        Label(countdown != nil ? LocalizedStringResource("Look at the lens")
+                              : CameraPresentation.text(for: camera.hint, correction: camera.guideCorrection),
                               systemImage: countdown != nil ? "eye" : CameraPresentation.symbol(for: camera.hint))
                             .accessibilityIdentifier("cameraHint")
                     }
@@ -256,7 +280,8 @@ struct CameraView: View {
                         .disabled(camera.state != .running || camera.isCapturing)
                         .accessibilityLabel("Take Photo")
                         .accessibilityValue(Text(CameraPresentation.readinessSummary(camera.readiness.staged)))
-                        .accessibilityHint(Text(CameraPresentation.text(for: camera.hint)))
+                        .accessibilityHint(Text(CameraPresentation.text(for: camera.hint,
+                                                                        correction: camera.guideCorrection)))
                         .accessibilityIdentifier("shutter")
                     Spacer()
                     if reviewFixture || camera.canSwitchCamera {
@@ -350,14 +375,21 @@ struct CameraView: View {
 }
 
 enum CameraPresentation {
-    static func text(for hint: CaptureHint) -> LocalizedStringResource {
+    static func text(for hint: CaptureHint, correction: GuideCorrection? = nil) -> LocalizedStringResource {
         switch hint {
         case .noFace: "Position your face inside the guide"
         case .multipleFaces: "Only one person in the frame"
         case .moveCloser: "Move a little closer"
         case .moveBack: "Move a little farther away"
         case .tooClose: "Too close: move back, or ask someone to take it"
-        case .centerFace: "Centre your face in the guide"
+        case .centerFace:
+            switch correction {
+            case .left: "Move your face slightly left"
+            case .right: "Move your face slightly right"
+            case .up: "Move your face slightly up"
+            case .down: "Move your face slightly down"
+            default: "Centre your face in the guide"
+            }
         case .levelPhone: "Level the phone to match your head"
         case .uprightPhone: "Straighten the phone; it is leaning"
         case .keepLevel: "Keep your head level"

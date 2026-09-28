@@ -51,7 +51,13 @@ enum CaptureHint: String, Sendable, Hashable, CaseIterable {
     case holdStill, ready
 }
 
-/// Which readiness segment a hint belongs to, in the order the ring reveals them (and the hints are given).
+/// Direction is in the displayed preview, after AVFoundation has applied orientation and mirroring.
+/// This is a coaching cue, not a measurement of the final document crop.
+enum GuideCorrection: String, Sendable, Hashable {
+    case left, right, up, down, closer, farther
+}
+
+/// Order used for the spoken readiness summary; one actionable hint remains visually primary.
 enum ReadinessGroup: String, Sendable, Hashable, CaseIterable { case framing, distance, pose, light }
 
 struct CaptureReadiness: Sendable, Hashable {
@@ -133,6 +139,7 @@ struct CaptureGuidanceThresholds: Sendable, Hashable {
 /// Debounced hint tracker. Feed one summary per frame; read `hint` and `readiness`.
 struct GuidanceTracker: Sendable, Hashable {
     private(set) var hint: CaptureHint = .noFace
+    private(set) var correction: GuideCorrection?
     private(set) var readiness = CaptureReadiness()
     /// A non-blocking tip (one-sided light) shown under the hint once framing and pose are fine.
     private(set) var advisory: CaptureHint?
@@ -141,12 +148,15 @@ struct GuidanceTracker: Sendable, Hashable {
     private var goodStreak = 0
     private var advisoryCandidate: CaptureHint?
     private var advisoryStreak = 0
+    private var correctionCandidate: GuideCorrection?
+    private var correctionStreak = 0
     let thresholds: CaptureGuidanceThresholds
 
     init(thresholds: CaptureGuidanceThresholds = .default) { self.thresholds = thresholds }
 
     @discardableResult
     mutating func update(_ frame: FaceFrameSummary) -> CaptureHint {
+        let previousHint = hint
         let raw = rawHint(for: frame)
         readiness = Self.readiness(for: frame, thresholds: thresholds)
         if raw == candidate { streak += 1 } else { candidate = raw; streak = 1 }
@@ -160,7 +170,38 @@ struct GuidanceTracker: Sendable, Hashable {
         } else if raw != hint, streak >= thresholds.switchFrames {
             hint = raw
         }
+        let nextCorrection = Self.correction(for: hint, frame: frame, thresholds: thresholds)
+        if hint != previousHint {
+            // The hint has already survived the frame debounce, so its first cue can appear immediately.
+            correction = nextCorrection
+            correctionCandidate = nextCorrection
+            correctionStreak = 0
+        } else if nextCorrection == correctionCandidate {
+            correctionStreak += 1
+            if correctionStreak >= thresholds.switchFrames { correction = nextCorrection }
+        } else {
+            correctionCandidate = nextCorrection
+            correctionStreak = 1
+        }
         return hint
+    }
+
+    private static func correction(for hint: CaptureHint, frame: FaceFrameSummary,
+                                   thresholds t: CaptureGuidanceThresholds) -> GuideCorrection? {
+        switch hint {
+        case .moveCloser: return .closer
+        case .moveBack, .tooClose: return .farther
+        case .centerFace:
+            guard let box = frame.bounds else { return nil }
+            let dx = box.x + box.width / 2 - 0.5
+            let dy = box.y + box.height / 2 - t.targetCenterY
+            guard abs(dx) > t.horizontalTolerance || abs(dy) > t.verticalTolerance else { return nil }
+            if abs(dx) / t.horizontalTolerance >= abs(dy) / t.verticalTolerance {
+                return dx < 0 ? .right : .left
+            }
+            return dy < 0 ? .down : .up
+        default: return nil
+        }
     }
 
     /// Hints in priority order: presence, size, position, distance, head pose relative to the camera, light.

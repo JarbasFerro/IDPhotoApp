@@ -33,6 +33,7 @@ final class CameraController: NSObject {
 
     private(set) var state: State = .idle
     private(set) var hint: CaptureHint = .noFace
+    private(set) var guideCorrection: GuideCorrection?
     private(set) var readiness = CaptureReadiness()
     /// Non-blocking tip shown under the hint while the frame is otherwise good.
     private(set) var advisory: CaptureHint?
@@ -83,10 +84,11 @@ final class CameraController: NSObject {
 
     #if DEBUG
     /// A camera-free visual fixture for the actual overlay on Simulator. It never starts an AVFoundation session.
-    func installReviewFixture() {
+    func installReviewFixture(offCenter: Bool = false) {
         state = .running
-        hint = .ready
-        readiness = CaptureReadiness(framing: .ok, pose: .ok, light: .ok, distance: .ok)
+        hint = offCenter ? .centerFace : .ready
+        guideCorrection = offCenter ? .right : nil
+        readiness = CaptureReadiness(framing: offCenter ? .attention : .ok, pose: .ok, light: .ok, distance: .ok)
     }
     #endif
 
@@ -158,6 +160,7 @@ final class CameraController: NSObject {
         slowFrame = nil
         tracker = GuidanceTracker()
         hint = .noFace
+        guideCorrection = nil
         readiness = CaptureReadiness()
         advisory = nil
         faceRollDegrees = nil
@@ -169,6 +172,9 @@ final class CameraController: NSObject {
         position = next
         tracker = GuidanceTracker()
         slowFrame = nil
+        hint = .noFace
+        readiness = CaptureReadiness()
+        guideCorrection = nil
         sessionQueue.async { [self] in
             do { try configureSession(position: next) } catch { logger.error("Camera switch failed") }
         }
@@ -385,6 +391,7 @@ extension CameraController: @preconcurrency AVCaptureMetadataOutputObjectsDelega
             if faces.count == 1, let raw = faces.first { meterOnFace(rawBounds: raw.bounds) }
             let next = tracker.update(summary)
             readiness = tracker.readiness
+            if guideCorrection != tracker.correction { guideCorrection = tracker.correction }
             if advisory != tracker.advisory { advisory = tracker.advisory }
             if faceRollDegrees != summary.rollDegrees { faceRollDegrees = summary.rollDegrees }
             if next != hint { hint = next }

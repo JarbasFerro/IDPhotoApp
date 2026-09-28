@@ -86,6 +86,22 @@ final class IDPhotoSpikeUITests: XCTestCase {
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 
+    /// Directional framing advice stays beside the subject and matches the visible instruction.
+    @MainActor
+    func testCameraOvalShowsOneActionableCorrection() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--camera-review-fixture", "--camera-review-off-center"]
+        app.launch()
+        XCTAssertTrue(any(app, "cameraHint").waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Move your face slightly right"].exists)
+        XCTAssertTrue(app.buttons["shutter"].exists)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Camera directional cue, synthetic subject"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+    }
+
     /// Opens the App Icon sheet from Home (BD-038) and keeps a screenshot for docs/brand/prototypes/07.
     @MainActor
     func testAppIconPickerShowsTheSetAndTheCurrentIcon() throws {
