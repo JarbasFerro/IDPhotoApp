@@ -1,65 +1,36 @@
 import SwiftUI
 
-/// One composition guide: the Calipic frame when it fits, otherwise the head oval.
-///
-/// The frame has the photo's proportions and leaves room for the head. The oval is retained as the fallback on
-/// narrow or landscape layouts. Neither is the final crop. The guide remains white so a measured camera state
-/// does not paint an approval mark across the person's face; the shutter ring and spoken hint carry that state.
+/// A single face guide inspired by the calm focus of Face ID setup. It is a composition aid, never a
+/// compliance mark or a promise that the final crop will be accepted.
 struct CameraFramingGuide: View {
     let ready: Bool
-    var format: PhotoFormat = .spainPrototype
-    var composition: CompositionSpec = .icaoEngineeringDefault
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var contrast
 
-    /// Where the guide sits in the camera view. Pure geometry, so it can be tested without a camera.
     struct Layout: Equatable {
-        /// The eye line's height in the camera view; the oval is centred on it for geometry only.
         static let eyeLineFraction: CGFloat = 0.44
-
         let oval: CGRect
-        /// `nil` when the frame has no room to stand clear of the oval and the controls: landscape, or a view too
-        /// narrow for the photo's proportions. The oval is never changed to make room for it.
-        let frame: CGRect?
 
-        init(in size: CGSize, format: PhotoFormat = .spainPrototype, composition: CompositionSpec = .icaoEngineeringDefault) {
-            // Sized for a comfortable arm's-length framing.
-            let ovalHeight = size.height * 0.32
-            let ovalWidth = ovalHeight * 0.78
+        init(in size: CGSize) {
+            // Keep the guide at a comfortable arm's-length size, including on narrow devices.
+            let height = max(0, min(size.height * 0.32, size.width * 0.68))
+            let width = height * 0.78
             let eyeLine = size.height * Self.eyeLineFraction
-            oval = CGRect(x: size.width / 2 - ovalWidth / 2, y: eyeLine - ovalHeight / 2, width: ovalWidth, height: ovalHeight)
-            // The oval stands for the head: the frame is the photo that head height implies, with the oval's centre
-            // on the photo's eye line.
-            let headHeight = composition.headHeightTarget
-            guard size.height > size.width, headHeight > 0, headHeight <= 1, format.aspectRatio > 0 else { frame = nil; return }
-            let frameHeight = ovalHeight / headHeight
-            let frameWidth = frameHeight * format.aspectRatio
-            let candidate = CGRect(x: size.width / 2 - frameWidth / 2, y: eyeLine - frameHeight * composition.eyeLineTarget,
-                                   width: frameWidth, height: frameHeight)
-            let room = CGRect(origin: .zero, size: size).insetBy(dx: Design.Spacing.group, dy: 0)
-            let clearsOval = candidate.insetBy(dx: Design.Stroke.guideHighContrast, dy: Design.Stroke.guideHighContrast).contains(oval)
-            frame = room.contains(candidate) && clearsOval ? candidate : nil
+            oval = CGRect(x: (size.width - width) / 2, y: eyeLine - height / 2,
+                          width: width, height: height)
         }
     }
 
     var body: some View {
         GeometryReader { geometry in
-            let layout = Layout(in: geometry.size, format: format, composition: composition)
-            let lineWidth = Design.Stroke.guide(for: contrast)
-            let color = Color.white.opacity(contrast == .increased ? 1 : ready ? 0.9 : 0.75)
-            ZStack {
-                if let frame = layout.frame {
-                    CalipicFrameGuide(color: color)
-                        .frame(width: frame.width, height: frame.height)
-                        .position(x: frame.midX, y: frame.midY)
-                } else {
-                    Ellipse()
-                        .strokeBorder(color, style: StrokeStyle(lineWidth: lineWidth, dash: [8, 6]))
-                        .frame(width: layout.oval.width, height: layout.oval.height)
-                        .position(x: layout.oval.midX, y: layout.oval.midY)
-                }
-            }
-            .animation(Design.Motion.guideState.resolved(reduceMotion: reduceMotion), value: ready)
+            let oval = Layout(in: geometry.size).oval
+            Ellipse()
+                .strokeBorder(.white.opacity(contrast == .increased ? 1 : ready ? 0.94 : 0.76),
+                              lineWidth: Design.Stroke.guide(for: contrast))
+                .shadow(color: .black.opacity(0.38), radius: 4)
+                .frame(width: oval.width, height: oval.height)
+                .position(x: oval.midX, y: oval.midY)
+                .animation(Design.Motion.guideState.resolved(reduceMotion: reduceMotion), value: ready)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -67,22 +38,21 @@ struct CameraFramingGuide: View {
 }
 
 #if DEBUG
-/// Stand-in for the live view: a neutral wall and a plain bust, so the guide can be judged without a camera.
+/// Neutral stand-in for the camera feed. It contains no real person's image and exercises the production guide.
 struct CameraFramingGuidePreviewScene: View {
     let ready: Bool
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [Color(white: 0.55), Color(white: 0.32)], startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: [Color(white: 0.53), Color(white: 0.30)], startPoint: .top, endPoint: .bottom)
             GeometryReader { geometry in
-                let layout = CameraFramingGuide.Layout(in: geometry.size)
-                let frame = layout.frame ?? layout.oval
-                let head = layout.oval.insetBy(dx: layout.oval.width * 0.06, dy: layout.oval.height * 0.04)
-                Ellipse().fill(Color(white: 0.2))
+                let oval = CameraFramingGuide.Layout(in: geometry.size).oval
+                let head = oval.insetBy(dx: oval.width * 0.07, dy: oval.height * 0.04)
+                Ellipse().fill(Color(white: 0.19))
                     .frame(width: head.width, height: head.height).position(x: head.midX, y: head.midY)
-                Ellipse().fill(Color(white: 0.2))
-                    .frame(width: frame.width * 1.15, height: frame.height * 0.6)
-                    .position(x: frame.midX, y: frame.maxY + frame.height * 0.08)
+                Ellipse().fill(Color(white: 0.19))
+                    .frame(width: oval.width * 1.9, height: oval.height * 0.72)
+                    .position(x: oval.midX, y: oval.maxY + oval.height * 0.25)
             }
             CameraFramingGuide(ready: ready)
         }

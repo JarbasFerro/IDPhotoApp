@@ -118,7 +118,7 @@ Estimated effort at the current pace: stage A two sessions, B one to two, C two,
 - Photo Check rows come from `AlignmentSolution.checks`, `BackgroundAssessment`, `MaskQuality` and `ToneAssessment` through one `CheckPresentation` that maps states to the three headline states and plain words; the mapping is a pure function with tests.
 - The landing transition uses `matchedGeometryEffect` between the camera's frozen frame and the Photo Check portrait; the frozen frame is the preview-resolution image already produced by ingest, so nothing waits for the full-resolution render.
 - Sheet re-flow animates `Placement` by a stable identity (`itemID` + `copyIndex`), which the solver already provides.
-- The readiness ring is a `Canvas` fed by `CaptureReadiness`; no new signals.
+- Historical camera plan: the readiness ring was fed by `CaptureReadiness`. ADR-044 supersedes its visual treatment with one oval and a plain shutter; the measured signals remain.
 - UI tests gain one flow per step and keep the accessibility audits; screenshots from these tests become the App Store set.
 
 ## 8. Decisions

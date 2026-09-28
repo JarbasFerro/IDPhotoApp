@@ -43,6 +43,10 @@ final class CameraController: NSObject {
     /// Latest slow-pass result, for the debug overlay.
     private(set) var lastSlowFrame: SlowFrameResult?
     private(set) var position: AVCaptureDevice.Position = .front
+    var canSwitchCamera: Bool {
+        AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) != nil
+            && AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil
+    }
     private(set) var isCapturing = false
     /// Milliseconds from `start()` to the running session, for the spike report.
     private(set) var startupMilliseconds: Int?

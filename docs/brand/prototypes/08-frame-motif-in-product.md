@@ -1,5 +1,7 @@
 # Calipic — The C-frame as a product detail (prototype)
 
+**Historical prototype:** ADR-044 replaced the camera C-frame with one continuous oval after physical-device review. The app icon's C-frame is unaffected.
+
 **Status:** Evidence and recommendation — one placement kept, one rejected; nothing here is a brand decision  
 **Date:** 2026-09-17  
 **Follows:** [`04-product-context.md`](04-product-context.md), [`05-color-recommendation.md`](05-color-recommendation.md) §4 finding 2, [`07-icon-v2-and-icon-choice.md`](07-icon-v2-and-icon-choice.md)  

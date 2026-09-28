@@ -656,6 +656,34 @@ Task testing shows that the extra output choice or preflight summary slows or co
 
 ---
 
+## ADR-044 — Calm guided camera composition
+
+**Status:** Accepted
+
+**Date:** 2026-09-28
+
+### Context
+
+A physical iPhone screenshot showed C-shaped marks, a dense readiness ring around the shutter, and stacked help/status text covering the subject. The visual treatment made capture harder to understand even when live analysis reported readiness.
+
+### Decision
+
+Use one continuous white oval for head placement, one actionable instruction near the shutter, and a plain white system-style shutter. Keep the guide independent of readiness color; measured state is expressed through words and VoiceOver. Put optional Automatic capture in a one-page native Help Form, accessible from a native glass top control. The four-second first-use tip occupies the instruction slot and expires automatically. Use Liquid Glass only for native camera controls where it keeps the photo visually primary. Manual capture remains possible when checks need attention.
+
+### Evidence
+
+The founder requested a Face ID setup-inspired redesign after reviewing physical-device screenshots. The 2026-09-28 simulator fixture and camera UI test show the new guide, tip, and settled hint without overlap; final real-camera validation remains required.
+
+### Consequences
+
+The old C-frame, readiness arcs, floating Auto toggle, and two-page ring tutorial are superseded. Help copy, String Catalog, screen specification, and camera screenshots follow this decision. Live analysis and its accessibility summary remain in place.
+
+### Revisit trigger
+
+Physical-device task tests show that the oval misguides positioning, the single hint is hard to read over real backgrounds, or the hidden Auto setting becomes difficult to discover.
+
+---
+
 # Open decisions before production implementation
 
 Immediate M1 decisions:

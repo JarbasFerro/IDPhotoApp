@@ -38,12 +38,9 @@ final class BrandContextUITests: XCTestCase {
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
         attach(app, prefix + "Home")
         app.buttons["takePhoto"].tap()
-        if app.buttons["introNext"].waitForExistence(timeout: 5) {
-            attach(app, prefix + "CameraIntro")
-            app.buttons["introNext"].tap()
-            XCTAssertTrue(app.buttons["introStart"].waitForExistence(timeout: 5))
-            app.buttons["introStart"].tap()
-        }
+        XCTAssertTrue(app.buttons["preparationContinue"].waitForExistence(timeout: 5))
+        attach(app, prefix + "Preparation")
+        app.buttons["preparationContinue"].tap()
         XCTAssertTrue(app.buttons["cameraUnavailableChoose"].waitForExistence(timeout: 10))
         attach(app, prefix + "CameraUnavailable")
         app.terminate()

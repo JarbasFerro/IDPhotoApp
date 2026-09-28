@@ -102,36 +102,20 @@ struct CalipicFrameTests {
 struct CameraFramingGuideLayoutTests {
     @Test(arguments: [CGSize(width: 420, height: 912), CGSize(width: 393, height: 852), CGSize(width: 375, height: 667),
                       CGSize(width: 320, height: 568)])
-    func theFrameSurroundsTheOvalAndStaysOnScreen(size: CGSize) throws {
+    func theSingleOvalStaysCenteredAndClearOfTheEdges(size: CGSize) {
         let layout = CameraFramingGuide.Layout(in: size)
-        // The oval is exactly where the camera always drew it.
-        #expect(abs(layout.oval.height - size.height * 0.32) < 0.001)
+        #expect(abs(layout.oval.height - min(size.height * 0.32, size.width * 0.68)) < 0.001)
         #expect(abs(layout.oval.midY - size.height * 0.44) < 0.001)
         #expect(abs(layout.oval.width - layout.oval.height * 0.78) < 0.001)
-        // The frame clears the oval, and so the face, on every side, and fits the view.
-        let frame = try #require(layout.frame)
-        #expect(frame.insetBy(dx: 4, dy: 4).contains(layout.oval))
-        #expect(CGRect(origin: .zero, size: size).contains(frame))
-        #expect(abs(frame.midX - size.width / 2) < 0.001)
-        #expect(abs(frame.width / frame.height - PhotoFormat.spainPrototype.aspectRatio) < 0.001)
-        // The photo's eye line runs through the oval's centre.
-        #expect(abs(frame.minY + frame.height * CompositionSpec.icaoEngineeringDefault.eyeLineTarget - layout.oval.midY) < 0.001)
+        #expect(abs(layout.oval.midX - size.width / 2) < 0.001)
+        #expect(CGRect(origin: .zero, size: size).contains(layout.oval))
     }
 
-    /// Without room the frame is dropped; the oval never moves or shrinks to make room for it.
     @Test(arguments: [CGSize(width: 852, height: 393), CGSize(width: 320, height: 1_000), CGSize(width: 400, height: 400), CGSize.zero])
-    func noFrameInLandscapeOrWhenItCannotClearTheOval(size: CGSize) {
+    func theGuideRemainsFiniteAtExtremeSizes(size: CGSize) {
         let layout = CameraFramingGuide.Layout(in: size)
-        #expect(layout.frame == nil)
-        #expect(abs(layout.oval.height - size.height * 0.32) < 0.001)
-    }
-
-    @Test func unusableCompositionValuesDropTheFrameInsteadOfProducingNaN() {
-        var spec = CompositionSpec()
-        for value in [0.0, -1.0, 1.5, Double.nan] {
-            spec.headHeightTarget = value
-            #expect(CameraFramingGuide.Layout(in: CGSize(width: 393, height: 852), composition: spec).frame == nil)
-        }
+        #expect(layout.oval.width.isFinite && layout.oval.height.isFinite)
+        #expect(layout.oval.width >= 0 && layout.oval.height >= 0)
     }
 }
 

@@ -53,7 +53,7 @@ struct CameraView: View {
     @AppStorage("autoCaptureEnabled") private var autoCapture = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
-    @State private var showRingHelp = false
+    @State private var showCameraHelp = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -82,9 +82,9 @@ struct CameraView: View {
             #endif
             await camera.start()
         }
-        .task {
-            guard !reviewFixture, !helpTipSeen, !voiceOverEnabled else { return }
-            try? await Task.sleep(for: .seconds(5))
+        .task(id: helpTipSeen) {
+            guard !helpTipSeen, !voiceOverEnabled else { return }
+            try? await Task.sleep(for: .seconds(4))
             if !Task.isCancelled { helpTipSeen = true }
         }
         .onDisappear { if !reviewFixture { camera.stop() } }
@@ -98,9 +98,9 @@ struct CameraView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
         .sensoryFeedback(.success, trigger: camera.hint) { _, hint in hint == .ready }
-        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showRingHelp)") {
+        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showCameraHelp)") {
             // Auto capture: "ready" held through a visible countdown; any hint change cancels it.
-            guard autoCapture, !showRingHelp, camera.hint == .ready, camera.state == .running, !camera.isCapturing
+            guard autoCapture, !showCameraHelp, camera.hint == .ready, camera.state == .running, !camera.isCapturing
             else { countdown = nil; return }
             // Three seconds: enough to stop reading the screen and look at the lens.
             for value in [3, 2, 1] {
@@ -119,8 +119,8 @@ struct CameraView: View {
         .alert("Unable to take the photo", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: { Text(errorMessage ?? "") }
-        .sheet(isPresented: $showRingHelp) {
-            CameraIntroView(autoCapture: $autoCapture) { showRingHelp = false }
+        .sheet(isPresented: $showCameraHelp) {
+            CameraHelpView(autoCapture: $autoCapture) { showCameraHelp = false }
         }
         .preferredColorScheme(.dark)
         .statusBarHidden()
@@ -177,15 +177,11 @@ struct CameraView: View {
         CameraFramingGuide(ready: camera.hint == .ready)
     }
 
-    /// The shutter with the readiness ring around it: four arcs (framing, head position, light, distance) that
-    /// turn green as checks pass; when everything is ready the ring closes and the countdown runs inside.
+    /// A familiar shutter. Readiness is communicated in words, not by arcs around the control.
     private var shutter: some View {
-        let ready = camera.hint == .ready
         return ZStack {
-            ReadinessRing(readiness: camera.readiness.staged, ready: ready, animated: !reduceMotion)
-                .frame(width: 100, height: 100)
-            Circle().strokeBorder(.white, lineWidth: 4).frame(width: 76, height: 76)
-            Circle().fill(.white).frame(width: 62, height: 62)
+            Circle().strokeBorder(.white, lineWidth: 3).frame(width: 82, height: 82)
+            Circle().fill(.white).frame(width: 68, height: 68)
             if let countdown {
                 Text("\(countdown)")
                     .font(.system(size: 34, weight: .bold, design: .rounded)).monospacedDigit()
@@ -203,22 +199,18 @@ struct CameraView: View {
 
     private var overlayControls: some View {
         VStack(spacing: 0) {
-            HStack(spacing: Design.Spacing.control) {
+            HStack {
                 Button("Cancel") { dismiss() }
                     .accessibilityIdentifier("cameraCancel")
                 Spacer()
-                Button { showRingHelp = true } label: {
+                Button { showCameraHelp = true } label: {
                     Label("Help", systemImage: "questionmark.circle")
+                        .labelStyle(.iconOnly)
                 }
-                .accessibilityIdentifier("ringHelp")
-                Toggle(isOn: $autoCapture) {
-                    Label("Auto", systemImage: autoCapture ? "timer" : "timer.slash")
-                }
-                .toggleStyle(.button)
-                .accessibilityLabel("Automatic capture when camera checks clear")
-                .accessibilityIdentifier("autoCapture")
+                .accessibilityLabel("Help")
+                .accessibilityIdentifier("cameraHelp")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.glass)
             .tint(.white)
             .controlSize(.regular)
             .font(.subheadline.weight(.semibold))
@@ -235,30 +227,27 @@ struct CameraView: View {
                     .accessibilityHidden(true)
             }
             Spacer()
-            VStack(spacing: 16) {
+            VStack(spacing: Design.Spacing.control) {
                 Group {
                     if camera.state == .interrupted {
                         Text("Camera paused. It resumes when the interruption ends.")
                             .frame(maxWidth: .infinity)
-                    } else if !helpTipSeen {
-                        HStack(spacing: Design.Spacing.control) {
-                            Text("The ring shows framing, pose, light and distance.")
-                            Spacer(minLength: 0)
-                            Button("Got it") { helpTipSeen = true }
-                                .fontWeight(.semibold)
-                        }
+                    } else if !helpTipSeen && !voiceOverEnabled {
+                        Label("Keep your face inside the oval", systemImage: "person.crop.circle")
                         .accessibilityIdentifier("cameraOptionalTip")
                     } else {
                         Label(countdown != nil ? LocalizedStringResource("Look at the lens") : CameraPresentation.text(for: camera.hint),
                               systemImage: countdown != nil ? "eye" : CameraPresentation.symbol(for: camera.hint))
-                            .frame(maxWidth: .infinity)
                             .accessibilityIdentifier("cameraHint")
                     }
                 }
                 .font(.subheadline.weight(.medium))
-                .multilineTextAlignment(.leading)
-                .padding(.horizontal, 24)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
                 .frame(minHeight: 44)
+                .background(.black.opacity(0.48), in: Capsule())
+                .frame(maxWidth: .infinity)
 
                 HStack {
                     Color.clear.frame(width: 52, height: 52)
@@ -270,21 +259,23 @@ struct CameraView: View {
                         .accessibilityHint(Text(CameraPresentation.text(for: camera.hint)))
                         .accessibilityIdentifier("shutter")
                     Spacer()
-                    Button { camera.switchCamera() } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath.camera")
-                            .font(.title2).frame(width: 44, height: 44)
+                    if reviewFixture || camera.canSwitchCamera {
+                        Button { camera.switchCamera() } label: {
+                            Image(systemName: "arrow.triangle.2.circlepath.camera")
+                                .font(.title2).frame(width: 52, height: 52)
+                        }
+                        .buttonStyle(.glass)
+                        .tint(.white)
+                        .accessibilityLabel("Switch Camera")
+                        .accessibilityIdentifier("switchCamera")
                     }
-                    .buttonStyle(.bordered)
-                    .tint(.white)
-                    .accessibilityLabel("Switch Camera")
-                    .accessibilityIdentifier("switchCamera")
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 20)
             }
-            .padding(.top, 48)
+            .padding(.top, 36)
             .padding(.bottom, 16)
             .background {
-                LinearGradient(colors: [.clear, .black.opacity(0.72), .black.opacity(0.82)],
+                LinearGradient(colors: [.clear, .black.opacity(0.46), .black.opacity(0.72)],
                                startPoint: .top, endPoint: .bottom)
                     .ignoresSafeArea(edges: .bottom)
             }
@@ -377,16 +368,7 @@ enum CameraPresentation {
         case .turnLeft: "Tip: turn slightly to your left, towards the light"
         case .turnRight: "Tip: turn slightly to your right, towards the light"
         case .holdStill: "Hold still"
-        case .ready: "Camera checks clear. Check background and remove headphones."
-        }
-    }
-
-    static func symbol(for group: ReadinessGroup) -> String {
-        switch group {
-        case .framing: "person.crop.rectangle"
-        case .pose: "face.dashed"
-        case .light: "sun.max"
-        case .distance: "ruler"
+        case .ready: "Ready to take photo"
         }
     }
 
@@ -411,15 +393,6 @@ enum CameraPresentation {
         }
     }
 
-    static func explanation(for group: ReadinessGroup) -> LocalizedStringResource {
-        switch group {
-        case .framing: "One face, big enough and centred in the guide."
-        case .pose: "Straight, level and looking at the camera. If the phone is tilted, you move the phone."
-        case .light: "Bright enough, not lit from behind."
-        case .distance: "About an arm's length. Too close distorts the nose."
-        }
-    }
-
     static func symbol(for hint: CaptureHint) -> String {
         switch hint {
         case .ready: "checkmark.circle"
@@ -439,146 +412,39 @@ enum CameraPresentation {
 }
 
 
-/// Optional camera help, available from the persistent Instructions button.
-struct CameraIntroView: View {
+/// Persistent camera help. The short first-use tip uses the live instruction slot and fades on its own.
+struct CameraHelpView: View {
     @Binding var autoCapture: Bool
     let done: () -> Void
-    @State private var page = 0
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                TabView(selection: $page) {
-                    ringPage.tag(0)
-                    autoPage.tag(1)
+            Form {
+                Section {
+                    Label("Keep your face inside the oval", systemImage: "person.crop.circle")
+                    Label("Look straight at the lens and hold still", systemImage: "eye")
+                    Label("Use even light and remove headphones", systemImage: "sun.max")
+                } header: {
+                    Text("Taking your photo")
+                } footer: {
+                    Text("The guide helps you frame the source photo. Review the result after capture.")
                 }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .indexViewStyle(.page(backgroundDisplayMode: .always))
-                VStack(spacing: 12) {
-                    Button {
-                        if page == 0 { withAnimation { page = 1 } } else { done() }
-                    } label: {
-                        Text(page == 0 ? LocalizedStringKey("Next") : LocalizedStringKey("Done"))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .brandProminentButtonStyle()
-                    .controlSize(.large)
-                    .accessibilityIdentifier(page == 0 ? "introNext" : "introStart")
+                Section {
+                    Toggle("Automatic capture", isOn: $autoCapture)
+                        .accessibilityIdentifier("introAutoToggle")
+                    Text("When camera checks settle, a three-second countdown starts. You can also press the shutter yourself.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
-                .padding()
             }
-            .navigationTitle(page == 0 ? Text("Before you start") : Text("Automatic capture"))
+            .navigationTitle("Camera Help")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button("Done", action: done).accessibilityIdentifier("introDone") }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done", action: done).accessibilityIdentifier("introDone")
+                }
             }
         }
         .preferredColorScheme(.dark)
-    }
-
-    /// The ring, its colours, and the four checks. Sized to fit one screen without scrolling.
-    private var ringPage: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .center, spacing: 18) {
-                ReadinessRing(readiness: CaptureReadiness(framing: .ok, pose: .unknown, light: .unknown, distance: .attention), ready: false, animated: false)
-                    .frame(width: 84, height: 84)
-                    .padding(14)
-                    .accessibilityHidden(true)
-                Text("The ring around the shutter checks framing, head position, light and distance. The message above the shutter tells you what to do.")
-                    .font(.subheadline)
-            }
-            HStack(spacing: 14) {
-                legend(.white.opacity(0.35), "Not yet")
-                legend(StatusStyle.warn, "Needs attention")
-                legend(StatusStyle.pass, "Fine")
-                legend(StatusStyle.pass, "Camera checks clear", closed: true)
-            }
-            .font(.caption)
-            .frame(maxWidth: .infinity)
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(ReadinessGroup.allCases, id: \.self) { group in
-                    Label {
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(CameraPresentation.name(for: group)).font(.subheadline.weight(.semibold))
-                            Text(CameraPresentation.explanation(for: group)).font(.footnote).foregroundStyle(.secondary)
-                        }
-                    } icon: { Image(systemName: CameraPresentation.symbol(for: group)).frame(width: 24) }
-                }
-            }
-            .padding(14)
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 14))
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal)
-        .padding(.top, 8)
-    }
-
-    /// Auto explained, with the switch right here so the decision is made before the camera opens.
-    private var autoPage: some View {
-        VStack(spacing: 22) {
-            Image(systemName: "timer")
-                .font(.system(size: 64, weight: .light))
-                .foregroundStyle(Color.brandAccent)
-                .padding(.top, 12)
-                .accessibilityHidden(true)
-            Text("When the ring closes, a 3-second countdown runs and the photo is taken for you. Look at the lens during the countdown.")
-                .multilineTextAlignment(.center)
-            Text("Off, you press the shutter yourself when the ring is green.")
-                .font(.subheadline).foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            Toggle(isOn: $autoCapture) {
-                Label("Automatic capture", systemImage: "timer")
-            }
-            .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: 14))
-            .accessibilityIdentifier("introAutoToggle")
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal)
-    }
-
-    private func legend(_ color: Color, _ text: LocalizedStringResource, closed: Bool = false) -> some View {
-        VStack(spacing: 6) {
-            if closed {
-                Circle().strokeBorder(color, lineWidth: 4).frame(width: 24, height: 24)
-            } else {
-                Circle().trim(from: 0.55, to: 0.95).stroke(color, style: StrokeStyle(lineWidth: 4, lineCap: .round)).frame(width: 24, height: 24)
-            }
-            Text(text).multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
-    }
-}
-
-/// Four arcs around the shutter, one per camera check; closes when the measured checks are clear.
-struct ReadinessRing: View {
-    let readiness: CaptureReadiness
-    let ready: Bool
-    var animated = true
-
-    var body: some View {
-        let groups = ReadinessGroup.allCases
-        let gap = ready ? 0.0 : 0.035
-        let span = 1.0 / Double(groups.count)
-        ZStack {
-            ForEach(Array(groups.enumerated()), id: \.element) { index, group in
-                Circle()
-                    .trim(from: Double(index) * span + gap / 2, to: Double(index + 1) * span - gap / 2)
-                    .stroke(color(for: ready ? .ok : readiness[group]), style: StrokeStyle(lineWidth: 5, lineCap: gap == 0 ? .butt : .round))
-                    .rotationEffect(.degrees(-90))
-            }
-        }
-        .animation(animated ? .easeInOut(duration: 0.3) : nil, value: readiness)
-        .animation(animated ? .spring(duration: 0.45, bounce: 0.2) : nil, value: ready)
-        .accessibilityHidden(true)
-    }
-
-    private func color(for state: CaptureReadiness.State) -> Color {
-        switch state {
-        case .ok: StatusStyle.pass
-        case .attention: StatusStyle.warn
-        case .unknown: .white.opacity(0.28)
-        }
     }
 }

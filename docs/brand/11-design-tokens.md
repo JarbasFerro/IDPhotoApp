@@ -150,7 +150,7 @@ Adopted in this pass: Home, Photo Check (including `PortraitView`), Sheet (inclu
 - **Photo and print geometry.** Crop maths, the 26 × 32 mm aspect ratio, millimetre-to-point scales, sheet page heights (130 / 220 pt): these are product correctness (constitution rule 2), owned by the domain layer.
 - **One-off layout maths.** Portrait widths on Photo Check (220 / 300 / 340), the 86 pt share thumbnail, badge offsets, the overlap of session faces, list row insets on the sheet.
 - **Opacities of edges and shadows** (`0.15`, `0.25`, shadow radii). They are tuned per surface against a photo and have no shared role yet. Candidates for the product design language, not before.
-- **The camera.** Shutter, readiness ring and hint sizes belong to one custom control and change together; they stay local to `CameraView`.
+- **The camera.** Shutter, single oval guide, and hint sizes are tuned against the live preview; they stay local to `CameraView` and `CameraFramingGuide`.
 - **The Calipic frame's proportions.** Corner ratio, gap ratio and the 52° sweep are icon geometry and live with the shape (`CalipicFrame.Icon`), sourced from `scripts/brand/build-icon-v2.py`.
 - **Haptics.** Too few to need names; they sit next to the state they confirm.
 - **Anything the system provides** (rule 3 above).

@@ -62,23 +62,28 @@ final class IDPhotoSpikeUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["--camera-review-fixture"]
         app.launch()
-        XCTAssertTrue(app.buttons["ringHelp"].waitForExistence(timeout: 10))
-        XCTAssertTrue(any(app, "autoCapture").exists)
+        XCTAssertTrue(app.buttons["cameraHelp"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["cameraCancel"].exists)
         XCTAssertTrue(any(app, "cameraOptionalTip").waitForExistence(timeout: 5))
         let tipScreenshot = XCTAttachment(screenshot: app.screenshot())
         tipScreenshot.name = "Camera first-use tip, synthetic subject"
         tipScreenshot.lifetime = .keepAlways
         add(tipScreenshot)
-        app.buttons["Got it"].tap()
-        XCTAssertTrue(any(app, "cameraHint").waitForExistence(timeout: 5))
+        XCTAssertTrue(any(app, "cameraHint").waitForExistence(timeout: 8))
+        XCTAssertTrue(app.buttons["shutter"].exists)
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "Camera overlay, synthetic subject"
         screenshot.lifetime = .keepAlways
         add(screenshot)
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
-        app.buttons["ringHelp"].tap()
-        XCTAssertTrue(app.navigationBars["Before you start"].waitForExistence(timeout: 5))
+        app.buttons["cameraHelp"].tap()
+        XCTAssertTrue(app.navigationBars["Camera Help"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.switches["introAutoToggle"].exists)
+        let helpScreenshot = XCTAttachment(screenshot: app.screenshot())
+        helpScreenshot.name = "Camera Help"
+        helpScreenshot.lifetime = .keepAlways
+        add(helpScreenshot)
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 
     /// Opens the App Icon sheet from Home (BD-038) and keeps a screenshot for docs/brand/prototypes/07.

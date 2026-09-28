@@ -18,6 +18,7 @@
       }
     },
     "Calipic frames the result. Check expression, glasses and any headwear requirements by eye." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -50,6 +51,7 @@
       }
     },
     "Check expression, eyes and glasses by eye. Calipic does not decide whether an office accepts the photo." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -82,6 +84,7 @@
       }
     },
     "Choose your result" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -130,6 +133,7 @@
       }
     },
     "Face the camera with your eyes open" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -194,6 +198,7 @@
       }
     },
     "Keep your full head and shoulders in the photo" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -290,6 +295,7 @@
       }
     },
     "One JPEG for online forms, ready to share." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -466,6 +472,7 @@
       }
     },
     "Review expression, eyes and glasses by eye before using the photo. The receiving office decides acceptance." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -482,6 +489,7 @@
       }
     },
     "Set paper and copies for one or more people." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -530,6 +538,7 @@
       }
     },
     "Take it or choose one. The app frames it for Spain's DNI. Save a digital photo or prepare a print sheet. Everything stays on your iPhone." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -595,6 +604,7 @@
       }
     },
     "Use even light and a plain, light background" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -627,6 +637,7 @@
       }
     },
     "Your framing and adjustments are saved for both choices." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -674,7 +685,9 @@
         }
       }
     },
-    "" : {},
+    "" : {
+
+    },
     "%@ · ^[%lld copy](inflect: true) · ^[%lld page](inflect: true)" : {
       "localizations" : {
         "es" : {
@@ -948,6 +961,7 @@
       }
     },
     "A correct ID photo in a minute." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -964,6 +978,7 @@
       }
     },
     "A few things to check" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2968,6 +2983,7 @@
       }
     },
     "Everything we can measure is fine. Also check by eye: neutral expression, eyes open, no glare on glasses." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5055,6 +5071,7 @@
       }
     },
     "Print the sheet or share the photos." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -5657,6 +5674,7 @@
       }
     },
     "The app formats the photo. Acceptance is decided by the office that receives it." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -6666,6 +6684,7 @@
       }
     },
     "You can continue, or fix the items below first." : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7254,6 +7273,7 @@
       }
     },
     "Share page JPEG" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -7361,6 +7381,150 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão antes de usar a foto. O órgão destinatário decide se a aceita."
+          }
+        }
+      }
+    },
+    "Camera Help" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda de la cámara"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda da câmera"
+          }
+        }
+      }
+    },
+    "Keep your face inside the oval" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca la cara dentro del óvalo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posicione o rosto dentro do oval"
+          }
+        }
+      }
+    },
+    "Look straight at the lens and hold still" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira de frente a la lente y mantente quieto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olhe diretamente para a lente e fique imóvel"
+          }
+        }
+      }
+    },
+    "Opens a single digital photo ready to share." : {
+      "comment" : "A hint for the \"Digital Photo\" button.",
+      "isCommentAutoGenerated" : true
+    },
+    "Page 1 of %lld: %lld photos" : {
+      "comment" : "A label displaying the page number and the number of photos on that page. The first argument is the page number. The second argument is the total number of pages. The third argument is the number of photos on that page.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Page 1 of %1$lld: %2$lld photos"
+          }
+        }
+      }
+    },
+    "Ready to take photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo para hacer la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronto para tirar a foto"
+          }
+        }
+      }
+    },
+    "Taking your photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al hacer la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao tirar a foto"
+          }
+        }
+      }
+    },
+    "The guide helps you frame the source photo. Review the result after capture." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La guía te ayuda a encuadrar la foto original. Revisa el resultado después de hacerla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A guia ajuda a enquadrar a foto original. Revise o resultado após a captura."
+          }
+        }
+      }
+    },
+    "Use even light and remove headphones" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca una luz uniforme y quítate los auriculares"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use luz uniforme e retire os fones de ouvido"
+          }
+        }
+      }
+    },
+    "When camera checks settle, a three-second countdown starts. You can also press the shutter yourself." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando las comprobaciones de la cámara se estabilizan, comienza una cuenta atrás de tres segundos. También puedes pulsar el obturador."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando as verificações da câmera se estabilizam, começa uma contagem regressiva de três segundos. Você também pode tocar no obturador."
           }
         }
       }
