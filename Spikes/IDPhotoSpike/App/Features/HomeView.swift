@@ -15,9 +15,9 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Design.Spacing.section) {
                 VStack(alignment: .leading, spacing: Design.Spacing.text) {
-                    Text("A correct ID photo in a minute.")
+                    Text("Make an ID photo")
                         .font(Design.Typography.screenTitle)
-                    Text("Take it or choose one. The app frames it for Spain's DNI. Save a digital photo or prepare a print sheet. Everything stays on your iPhone.")
+                    Text("Take a photo or choose one for Spain's DNI. Save a JPEG or print a sheet.")
                         .foregroundStyle(.secondary)
                 }
                 .accessibilityElement(children: .combine)
@@ -57,10 +57,7 @@ struct HomeView: View {
 
                 documentCard
 
-                VStack(alignment: .leading, spacing: Design.Spacing.caption) {
-                    Label("Your photos stay on your iPhone.", systemImage: "lock")
-                    Text("The app formats the photo. Acceptance is decided by the office that receives it.")
-                }
+                Label("Your photos stay on your iPhone.", systemImage: "lock")
                 .font(Design.Typography.note)
                 .foregroundStyle(.secondary)
 

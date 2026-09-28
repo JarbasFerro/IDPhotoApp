@@ -5,25 +5,23 @@ struct ShareView: View {
     @Bindable var model: PhotoWorkflow
     @Binding var path: [Route]
     @State private var completed = false
-    @State private var celebrated = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 if let result = model.exported {
-                    VStack(spacing: Design.Spacing.row) {
+                    HStack(alignment: .top, spacing: Design.Spacing.row) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: Design.Size.completionSeal))
+                            .font(Design.Typography.titleGlyph)
                             .foregroundStyle(StatusStyle.pass)
-                            .symbolEffect(.bounce, options: .nonRepeating, isActive: celebrated && !reduceMotion)
-                        Text("Your files are ready.").font(Design.Typography.screenTitle)
-                        Text("Print the sheet or share the photos.").font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                            Text("Your files are ready.").font(Design.Typography.screenTitle)
+                            Text("Check each photo by eye before use.")
+                                .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                        }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityElement(children: .combine)
-                    .onAppear { celebrated = true }
                     printCard(result)
                     digitalCard(result)
                     Button {
@@ -65,7 +63,7 @@ struct ShareView: View {
         VStack(alignment: .leading, spacing: Design.Spacing.cardContent) {
             HStack(alignment: .top, spacing: Design.Spacing.cardContent) {
                 SheetPreview(layout: result.layout, thumbnails: model.sheetThumbnails, compact: true)
-                    .frame(width: 96)
+                    .frame(width: 110)
                 VStack(alignment: .leading, spacing: Design.Spacing.tight) {
                     Text("Print sheet").font(Design.Typography.cardTitle)
                     Text("\(PaperNames.name(for: model.printJob.paper)) · ^[\(result.layout.placedCount) copy](inflect: true) · ^[\(result.layout.pages.count) page](inflect: true)")
@@ -89,8 +87,9 @@ struct ShareView: View {
                 ShareLink(item: result.pdf) { Label("Share PDF", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("sharePDF")
-                ShareLink(items: result.pages) { Label("Share JPEG", systemImage: "photo.on.rectangle.angled").frame(maxWidth: .infinity) }
+                ShareLink(items: result.pages) { Label("Page JPEG", systemImage: "photo.on.rectangle.angled").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered)
+                    .accessibilityLabel("Share print sheet as JPEG")
                     .accessibilityIdentifier("sharePages")
             }
         }
@@ -118,8 +117,13 @@ struct ShareView: View {
                         ShareLink(item: url) {
                             VStack(spacing: Design.Spacing.caption) {
                                 ZStack(alignment: .bottomTrailing) {
-                                    if let entry = model.entries.dropFirst(index).first {
-                                        PortraitView(entry: entry).frame(width: 86)
+                                    // Export JPEGs are small (520 × 640) and ordered like entries. Show the actual file
+                                    // being shared, rather than a possibly stale editor preview.
+                                    if let image = UIImage(contentsOfFile: url.path) {
+                                        Image(uiImage: image)
+                                            .resizable().scaledToFit()
+                                            .frame(width: 86)
+                                            .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))
                                     } else {
                                         RoundedRectangle(cornerRadius: Design.Radius.photo).fill(.fill).frame(width: 86, height: 106)
                                     }

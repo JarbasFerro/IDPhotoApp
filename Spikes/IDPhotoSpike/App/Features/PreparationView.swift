@@ -10,13 +10,13 @@ struct PreparationView: View {
         NavigationStack {
             List {
                 Section {
-                    Label("Face the camera with your eyes open", systemImage: "person.crop.rectangle")
-                    Label("Use even light and a plain, light background", systemImage: "sun.max")
-                    Label("Keep your full head and shoulders in the photo", systemImage: "viewfinder")
+                    Label("Face forward with your eyes open", systemImage: "person.crop.rectangle")
+                    Label("Remove headphones; check headwear and glasses", systemImage: "headphones")
+                    Label("Use even light and a plain white background", systemImage: "sun.max")
                 } header: {
                     Text("Spain · DNI photo")
                 } footer: {
-                    Text("Calipic frames the result. Check expression, glasses and any headwear requirements by eye.")
+                    Text("Leave room around your head and shoulders. You can adjust the framing later.")
                 }
                 Section {
                     NavigationLink("Full requirements") {

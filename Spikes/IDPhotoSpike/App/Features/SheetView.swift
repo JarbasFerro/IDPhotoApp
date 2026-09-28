@@ -228,31 +228,38 @@ struct SheetPreview: View {
 
     var body: some View {
         let pages = compact ? Array(layout.pages.prefix(1)) : layout.pages
-        ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: Design.Spacing.group) {
-                ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                    VStack(spacing: Design.Spacing.tight) {
-                        SheetPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion)
-                            .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
-                            .frame(height: compact ? 130 : 220)
-                            .shadow(color: .black.opacity(compact ? 0 : 0.10), radius: 6, y: 3)
-                        if !compact { Text("Page \(index + 1) of \(layout.pages.count)").font(Design.Typography.caption) }
+        if compact, let page = pages.first {
+            SheetPageView(page: page, thumbnails: thumbnails, animated: false)
+                .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
+                .frame(height: 130)
+                .accessibilityLabel(Text("Page 1 of \(layout.pages.count): \(page.placements.count) photos"))
+                .accessibilityIdentifier("sheetThumbnail")
+        } else {
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: Design.Spacing.group) {
+                    ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
+                        VStack(spacing: Design.Spacing.tight) {
+                            SheetPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion)
+                                .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
+                                .frame(width: 260, height: 260)
+                                .shadow(color: .black.opacity(0.10), radius: 6, y: 3)
+                            Text("Page \(index + 1) of \(layout.pages.count)").font(Design.Typography.caption)
+                        }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(Text("Page \(index + 1) of \(layout.pages.count): \(page.placements.count) photos"))
                     }
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text("Page \(index + 1) of \(layout.pages.count): \(page.placements.count) photos"))
+                    if layout.pages.isEmpty {
+                        ContentUnavailableView("Nothing to print", systemImage: "printer",
+                                               description: Text("Add copies or choose a larger paper."))
+                            .frame(height: 220)
+                    }
                 }
-                if layout.pages.isEmpty, !compact {
-                    ContentUnavailableView("Nothing to print", systemImage: "printer",
-                                           description: Text("Add copies or choose a larger paper."))
-                        .frame(height: 220)
-                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 6)
             }
-            .padding(.horizontal, 4)
-            .padding(.vertical, 6)
+            .accessibilityIdentifier("sheetPreview")
         }
-        .scrollIndicators(compact ? .hidden : .visible)
-        .scrollDisabled(compact)
-        .accessibilityIdentifier(compact ? "sheetThumbnail" : "sheetPreview")
     }
 }
 

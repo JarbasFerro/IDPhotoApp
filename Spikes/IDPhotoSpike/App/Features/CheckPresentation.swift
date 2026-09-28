@@ -138,8 +138,8 @@ enum CheckPresentation {
     static func title(for headline: PhotoCheckSummary.Headline) -> LocalizedStringResource {
         switch headline {
         case .checking: "Checking your photo…"
-        case .good: "Looks good"
-        case .review: "A few things to check"
+        case .good: "Camera checks look good"
+        case .review: "Review your photo"
         case .retake: "Better to retake"
         }
     }
@@ -147,8 +147,8 @@ enum CheckPresentation {
     static func subtitle(for headline: PhotoCheckSummary.Headline) -> LocalizedStringResource {
         switch headline {
         case .checking: "Finding your face and preparing the background."
-        case .good: "Everything we can measure is fine. Also check by eye: neutral expression, eyes open, no glare on glasses."
-        case .review: "You can continue, or fix the items below first."
+        case .good: "Review the details below before using this photo."
+        case .review: "Fix these issues or continue after checking by eye."
         case .retake: "This photo has problems we can't fix. A new one takes a minute."
         }
     }

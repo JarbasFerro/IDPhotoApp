@@ -24,20 +24,17 @@ struct PhotoCheckView: View {
     var body: some View {
         Group {
             if let entry {
-                if dynamicTypeSize.isAccessibilitySize {
-                    // Large text: everything scrolls, actions included, so nothing can be pushed off screen.
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: Design.Spacing.block) { portrait(entry); summaryBlock(entry); actions }.padding()
-                    }
-                } else {
-                    // One screen, no scrolling: the portrait takes whatever height the summary leaves.
+                ScrollView {
                     VStack(alignment: .leading, spacing: Design.Spacing.group) {
-                        portrait(entry).frame(maxHeight: .infinity)
-                        summaryBlock(entry).fixedSize(horizontal: false, vertical: true)
+                        portrait(entry)
+                        summaryBlock(entry)
+                        if dynamicTypeSize.isAccessibilitySize { actions }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 8)
-                    .safeAreaInset(edge: .bottom) {
+                    .padding(.vertical, 8)
+                }
+                .safeAreaInset(edge: .bottom) {
+                    if !dynamicTypeSize.isAccessibilitySize {
                         actions
                             .padding(.horizontal)
                             .padding(.top, 10)
@@ -87,12 +84,11 @@ struct PhotoCheckView: View {
     /// Press and hold to see the original.
     private func portrait(_ entry: PhotoEntry) -> some View {
         let checking = entry.isAnalyzing || !landed
-        let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 340 : 300)
+        let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 280 : 250)
         return VStack(spacing: Design.Spacing.caption) {
             PortraitView(entry: entry, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
                          animated: !reduceMotion)
                 .frame(maxWidth: width)
-                .frame(maxHeight: .infinity)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
                 .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
                 .sensoryFeedback(.impact(weight: .light), trigger: landed) { old, new in !old && new }
@@ -130,6 +126,17 @@ struct PhotoCheckView: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("checkHeadline")
+            HStack(alignment: .top, spacing: Design.Spacing.row) {
+                Image(systemName: StatusStyle.symbol(for: .manualCheck))
+                    .foregroundStyle(StatusStyle.color(for: .manualCheck))
+                    .frame(width: 20)
+                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                    Text("Check by eye").font(Design.Typography.rowTitle)
+                    Text("Remove headphones. Check headwear, glasses, eyes and expression.")
+                        .font(Design.Typography.note).foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityElement(children: .combine)
             ForEach(summary.rows) { row in
                 HStack(alignment: .top, spacing: Design.Spacing.row) {
                     Image(systemName: StatusStyle.symbol(for: row.state))

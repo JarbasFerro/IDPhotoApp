@@ -151,6 +151,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
         // Import lands on Photo Check.
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         XCTAssertTrue(any(app, "checkHeadline").waitForExistence(timeout: 15))
+        XCTAssertTrue(app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS %@", "Remove headphones"))
+            .firstMatch.exists)
         let checkScreenshot = XCTAttachment(screenshot: app.screenshot())
         checkScreenshot.name = "Photo Check"
         checkScreenshot.lifetime = .keepAlways
@@ -190,6 +193,10 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.buttons["printChoice"].tap()
         XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
+        let sheetScreenshot = XCTAttachment(screenshot: app.screenshot())
+        sheetScreenshot.name = "Print sheet"
+        sheetScreenshot.lifetime = .keepAlways
+        add(sheetScreenshot)
         app.buttons["continueToShare"].tap()
         // Share: files prepared on arrival.
         XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))

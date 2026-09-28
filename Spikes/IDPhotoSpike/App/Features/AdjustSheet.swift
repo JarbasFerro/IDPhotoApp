@@ -15,9 +15,9 @@ struct AdjustSheet: View {
         NavigationStack {
             ScrollView {
                 if let entry {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: Design.Spacing.group) {
                         CropPreview(photo: entry.photo, image: model.showsOriginal ? nil : entry.backgroundPreview, adjustment: $model.adjustment)
-                            .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 220 : 320)
+                            .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 220 : 260)
                             .frame(maxWidth: .infinity)
                         Text("Drag to move, pinch to zoom.")
                             .font(.caption).foregroundStyle(.secondary)
@@ -38,7 +38,6 @@ struct AdjustSheet: View {
                         .accessibilityIdentifier("details")
                     }
                     .padding()
-                    .padding(.top, 20)
                 }
             }
             .navigationTitle("Adjust")

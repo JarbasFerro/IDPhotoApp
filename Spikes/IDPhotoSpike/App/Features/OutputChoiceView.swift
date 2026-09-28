@@ -10,33 +10,33 @@ struct OutputChoiceView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Design.Spacing.section) {
+            VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 if let entry {
-                    HStack(alignment: .top, spacing: Design.Spacing.block) {
-                        PortraitView(entry: entry, label: "Prepared photo")
-                            .frame(width: 92)
-                        VStack(alignment: .leading, spacing: Design.Spacing.text) {
-                            Text("Choose your result")
-                                .font(Design.Typography.screenTitle)
-                            Text("Your framing and adjustments are saved for both choices.")
-                                .foregroundStyle(.secondary)
-                        }
+                    PortraitView(entry: entry, label: "Prepared photo")
+                        .frame(width: 160)
+                        .frame(maxWidth: .infinity)
+                    VStack(alignment: .leading, spacing: Design.Spacing.text) {
+                        Text("How will you use it?")
+                            .font(Design.Typography.screenTitle)
+                        Text("Your edits are saved for either option.")
+                            .foregroundStyle(.secondary)
                     }
                     .accessibilityElement(children: .contain)
 
                     Button { path.append(.digital(photoID)) } label: {
-                        choice(title: "Digital Photo", detail: "One JPEG for online forms, ready to share.", symbol: "photo")
+                        choice(title: "Digital Photo", detail: "One JPEG to share or upload", symbol: "photo")
                     }
-                    .brandProminentButtonStyle()
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Opens a single digital photo ready to share.")
                     .accessibilityIdentifier("digitalChoice")
 
                     Button { path.append(.sheet) } label: {
-                        choice(title: "Print Sheet", detail: "Set paper and copies for one or more people.", symbol: "printer")
+                        choice(title: "Print Sheet", detail: "Set paper size and copies", symbol: "printer")
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
                     .accessibilityIdentifier("printChoice")
 
-                    Text("Review expression, eyes and glasses by eye before using the photo. The receiving office decides acceptance.")
+                    Text("Check the photo by eye before use. The receiving office decides acceptance.")
                         .font(Design.Typography.note)
                         .foregroundStyle(.secondary)
                 } else {
@@ -52,17 +52,20 @@ struct OutputChoiceView: View {
     private func choice(title: LocalizedStringKey, detail: LocalizedStringKey, symbol: String) -> some View {
         HStack(alignment: .center, spacing: Design.Spacing.cardContent) {
             Image(systemName: symbol).font(Design.Typography.titleGlyph)
-                .frame(width: Design.Size.minimumTarget, height: Design.Size.minimumTarget)
+                .foregroundStyle(Color.brandAccent)
+                .frame(width: 32, height: Design.Size.minimumTarget)
             VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                 Text(title).font(Design.Typography.cardTitle)
-                Text(detail).font(Design.Typography.cardDetail)
+                Text(detail).font(Design.Typography.cardDetail).foregroundStyle(.secondary)
             }
             .multilineTextAlignment(.leading)
             Spacer(minLength: 0)
-            Image(systemName: "chevron.right").font(.footnote)
+            Image(systemName: "chevron.right").font(.footnote).foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, Design.Spacing.control)
+        .padding()
+        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+        .contentShape(RoundedRectangle(cornerRadius: Design.Radius.card))
     }
 }
 
@@ -70,8 +73,6 @@ struct DigitalShareView: View {
     @Bindable var model: PhotoWorkflow
     let photoID: UUID
     @Binding var path: [Route]
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var celebrated = false
 
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
     private var result: DigitalExport? {
@@ -83,19 +84,20 @@ struct DigitalShareView: View {
         ScrollView {
             VStack(alignment: .center, spacing: Design.Spacing.block) {
                 if let result, let entry {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: Design.Size.completionSeal))
-                        .foregroundStyle(StatusStyle.pass)
-                        .symbolEffect(.bounce, options: .nonRepeating, isActive: celebrated && !reduceMotion)
-                        .accessibilityHidden(true)
-                    Text("Your digital photo is ready.")
-                        .font(Design.Typography.screenTitle)
+                    HStack(spacing: Design.Spacing.row) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(Design.Typography.titleGlyph)
+                            .foregroundStyle(StatusStyle.pass)
+                            .accessibilityHidden(true)
+                        Text("Your digital photo is ready.")
+                            .font(Design.Typography.screenTitle)
+                    }
                     PortraitView(entry: entry, label: "Digital photo ready to share")
                         .frame(maxWidth: 240)
                     Text("JPEG · \(PhotoFormat.spainPrototype.output.width) × \(PhotoFormat.spainPrototype.output.height) pixels")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
-                    Text("Check expression, eyes and glasses by eye. Calipic does not decide whether an office accepts the photo.")
+                    Text("Remove headphones. Check headwear, glasses, eyes and expression before use. The receiving office decides acceptance.")
                         .font(Design.Typography.note)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -129,7 +131,6 @@ struct DigitalShareView: View {
         .navigationTitle("Digital Photo")
         .navigationBarTitleDisplayMode(.inline)
         .task { if result == nil, model.activity == nil { model.prepareDigitalExport(for: photoID) } }
-        .onChange(of: result?.id) { _, new in if new != nil { celebrated = true } }
         .onDisappear { model.finishExport() }
         .sensoryFeedback(.success, trigger: result?.id)
     }
