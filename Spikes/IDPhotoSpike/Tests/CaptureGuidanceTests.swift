@@ -63,20 +63,38 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, face(height: 0.3, roll: nil, yaw: nil), times: 10) == .ready)
     }
 
-    @Test func ovalCueUsesDisplayedFaceDirectionAndWaitsForStableChanges() {
+    @Test func ovalCueUsesPhysicalPhoneDirectionAndWaitsForStableChanges() {
         var tracker = GuidanceTracker()
         _ = feed(&tracker, face(height: 0.3, centerX: 0.2), times: 5)
-        #expect(tracker.hint == .centerFace && tracker.correction == .right)
+        #expect(tracker.hint == .centerFace && tracker.correction == .left)
         _ = feed(&tracker, face(height: 0.3, centerX: 0.8), times: 4)
-        #expect(tracker.correction == .right)
-        _ = feed(&tracker, face(height: 0.3, centerX: 0.8), times: 1)
         #expect(tracker.correction == .left)
+        _ = feed(&tracker, face(height: 0.3, centerX: 0.8), times: 1)
+        #expect(tracker.correction == .right)
         _ = feed(&tracker, face(height: 0.3, centerY: 0.15), times: 5)
-        #expect(tracker.correction == .down)
+        #expect(tracker.correction == .raise)
         _ = feed(&tracker, face(height: 0.3, centerY: 0.75), times: 5)
-        #expect(tracker.correction == .up)
+        #expect(tracker.correction == .lower)
         _ = feed(&tracker, face(height: 0.3), times: 5)
         #expect(tracker.hint == .holdStill && tracker.correction == nil)
+    }
+
+    @Test func horizontalPhoneCueAccountsForLensFacingAndPreviewMirroring() {
+        var tracker = GuidanceTracker()
+        var frame = face(height: 0.3, centerX: 0.2)
+        _ = feed(&tracker, frame, times: 5)
+        #expect(tracker.correction == .left)
+        frame.frontCamera = false
+        frame.previewMirrored = false
+        _ = feed(&tracker, frame, times: 5)
+        #expect(tracker.correction == .left)
+        frame.frontCamera = true
+        _ = feed(&tracker, frame, times: 5)
+        #expect(tracker.correction == .right)
+        frame = face(height: 0.3, centerX: 0.8)
+        frame.previewMirrored = false
+        _ = feed(&tracker, frame, times: 5)
+        #expect(tracker.correction == .left)
     }
 
     @Test func sizeUsesOvalCueButPoseAndLightDoNot() {
@@ -115,13 +133,30 @@ struct CaptureGuidanceTests {
         frame.pitchDegrees = 18
         frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: 20)
         #expect(feed(&tracker, frame, times: 5) == .uprightPhone)
+        #expect(tracker.correction == .tiltDown)
+        frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: -20)
+        #expect(feed(&tracker, frame, times: 5) == .uprightPhone)
+        #expect(tracker.correction == .tiltUp)
         frame.device = DeviceLevel(rollDegrees: 0, pitchDegrees: 3)
         #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
+        #expect(tracker.correction == .raise)
         frame.device = nil
         #expect(feed(&tracker, frame, times: 5) == .eyeLevel)
         frame.pitchDegrees = 0
         #expect(feed(&tracker, frame, times: 5) == .holdStill)
         #expect(tracker.readiness.light == .unknown && tracker.readiness.distance == .unknown)
+    }
+
+    @Test func phoneMovementCopyMatchesEveryCue() {
+        let expected: [(CaptureHint, GuideCorrection?, String)] = [
+            (.centerFace, .left, "Move the phone left"), (.centerFace, .right, "Move the phone right"),
+            (.centerFace, .raise, "Raise the phone"), (.centerFace, .lower, "Lower the phone"),
+            (.uprightPhone, .tiltUp, "Tilt the phone up"), (.uprightPhone, .tiltDown, "Tilt the phone down"),
+            (.moveCloser, .closer, "Bring the phone closer"), (.moveBack, .farther, "Move the phone farther away")
+        ]
+        for (hint, correction, message) in expected {
+            #expect(String(localized: CameraPresentation.text(for: hint, correction: correction)) == message)
+        }
     }
 
     @Test func framingSegmentTracksSizeAndCentre() {

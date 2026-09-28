@@ -4,9 +4,8 @@ import Foundation
 // Vision pass every few frames (pitch, distance, lighting) and the motion sensors; outputs are one calm hint at
 // a time, debounced with hysteresis so nothing flickers (FR-022, C9-003).
 //
-// Reference frame: the photo records the head relative to the camera, so the head pose in the image is what is
-// checked. The phone's absolute attitude is never a requirement; it only decides whether a pose error is worded
-// as "move the phone" (the phone is tilted) or as "move your head" (the phone is fine).
+// Reference frame: face bounds use the displayed preview. Framing cues describe how to move the phone,
+// accounting for preview mirroring. Head pose is still checked relative to the camera.
 
 /// Phone attitude from the motion sensors, degrees, used only to attribute a relative pose error to the phone.
 /// Roll: lean left/right about the lens axis (0 = level). Pitch: lean back (+) or forward (−) from vertical.
@@ -40,6 +39,10 @@ struct FaceFrameSummary: Sendable, Hashable {
     /// The sensor is at (or near) its gain limit.
     var lowLight = false
     var device: DeviceLevel?
+    /// Whether the displayed preview is horizontally mirrored (usually the front camera).
+    var previewMirrored = true
+    /// Front and rear lenses face opposite directions, so mirroring alone cannot determine phone motion.
+    var frontCamera = true
 
     static let empty = FaceFrameSummary(faceCount: 0, bounds: nil, rollDegrees: nil, yawDegrees: nil)
 }
@@ -51,10 +54,9 @@ enum CaptureHint: String, Sendable, Hashable, CaseIterable {
     case holdStill, ready
 }
 
-/// Direction is in the displayed preview, after AVFoundation has applied orientation and mirroring.
-/// This is a coaching cue, not a measurement of the final document crop.
+/// Physical movement of the phone, from the user's point of view. It is a coaching cue, not crop geometry.
 enum GuideCorrection: String, Sendable, Hashable {
-    case left, right, up, down, closer, farther
+    case left, right, raise, lower, tiltUp, tiltDown, closer, farther
 }
 
 /// Order used for the spoken readiness summary; one actionable hint remains visually primary.
@@ -197,9 +199,19 @@ struct GuidanceTracker: Sendable, Hashable {
             let dy = box.y + box.height / 2 - t.targetCenterY
             guard abs(dx) > t.horizontalTolerance || abs(dy) > t.verticalTolerance else { return nil }
             if abs(dx) / t.horizontalTolerance >= abs(dy) / t.verticalTolerance {
-                return dx < 0 ? .right : .left
+                // A mirrored front preview and an unmirrored rear preview both move scenery opposite
+                // to a sideways phone motion. The unusual mirror configurations reverse that relation.
+                let direct = frame.previewMirrored == frame.frontCamera
+                return (dx < 0) == direct ? .left : .right
             }
-            return dy < 0 ? .down : .up
+            return dy < 0 ? .raise : .lower
+        case .uprightPhone:
+            guard let pitch = frame.device?.pitchDegrees,
+                  abs(pitch) > t.devicePitchAttribution else { return nil }
+            return pitch > 0 ? .tiltDown : .tiltUp
+        case .eyeLevel:
+            guard let pitch = frame.pitchDegrees, abs(pitch) > t.maxPitchDegrees else { return nil }
+            return pitch > 0 ? .raise : .lower
         default: return nil
         }
     }

@@ -87,7 +87,7 @@ final class CameraController: NSObject {
     func installReviewFixture(offCenter: Bool = false) {
         state = .running
         hint = offCenter ? .centerFace : .ready
-        guideCorrection = offCenter ? .right : nil
+        guideCorrection = offCenter ? .left : nil
         readiness = CaptureReadiness(framing: offCenter ? .attention : .ok, pose: .ok, light: .ok, distance: .ok)
     }
     #endif
@@ -380,6 +380,8 @@ extension CameraController: @preconcurrency AVCaptureMetadataOutputObjectsDelega
                 rollDegrees: largest?.1.hasRollAngle == true ? largest?.1.rollAngle.normalizedRoll : nil,
                 yawDegrees: largest?.1.hasYawAngle == true ? largest?.1.yawAngle.normalizedRoll : nil)
             summary.device = deviceLevel
+            summary.previewMirrored = previewLayer.connection?.isVideoMirrored ?? (position == .front)
+            summary.frontCamera = position == .front
             if let slow = freshSlowFrame {
                 summary.pitchDegrees = slow.pitchDegrees
                 summary.distanceCM = slow.distanceCM

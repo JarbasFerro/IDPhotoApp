@@ -7608,6 +7608,182 @@
           }
         }
       }
+    },
+    "Bring the phone closer" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acerca el teléfono"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aproxime o telefone"
+          }
+        }
+      }
+    },
+    "Move the phone farther away" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aleja el teléfono"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afaste o telefone"
+          }
+        }
+      }
+    },
+    "Move the phone left" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mueve el teléfono a la izquierda"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mova o telefone para a esquerda"
+          }
+        }
+      }
+    },
+    "Move the phone right" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mueve el teléfono a la derecha"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mova o telefone para a direita"
+          }
+        }
+      }
+    },
+    "Raise the phone" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sube el teléfono"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Levante o telefone"
+          }
+        }
+      }
+    },
+    "Lower the phone" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baja el teléfono"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abaixe o telefone"
+          }
+        }
+      }
+    },
+    "Tilt the phone up" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inclina el teléfono hacia arriba"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incline o telefone para cima"
+          }
+        }
+      }
+    },
+    "Tilt the phone down" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inclina el teléfono hacia abajo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incline o telefone para baixo"
+          }
+        }
+      }
+    },
+    "Hold the phone upright" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantén el teléfono vertical"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mantenha o telefone na vertical"
+          }
+        }
+      }
+    },
+    "Raise the phone to eye level" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sube el teléfono a la altura de los ojos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Levante o telefone até a altura dos olhos"
+          }
+        }
+      }
+    },
+    "Lower the phone to eye level" : {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baja el teléfono a la altura de los ojos"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abaixe o telefone até a altura dos olhos"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

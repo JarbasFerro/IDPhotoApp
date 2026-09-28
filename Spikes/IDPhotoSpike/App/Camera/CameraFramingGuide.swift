@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// One quiet target over the head. Only framing and distance errors put a cue on the oval; pose and light
-/// remain verbal instructions so the guide never implies that the wrong part of the photo is at fault.
+/// One quiet head target. A short arrow grows from its edge when a phone movement is useful.
 struct CameraFramingGuide: View {
     let ready: Bool
     let correction: GuideCorrection?
@@ -17,9 +16,9 @@ struct CameraFramingGuide: View {
         let oval: CGRect
 
         init(in size: CGSize) {
-            // The face detector excludes some hair and headwear. Give the visible head more room than its box.
-            let height = max(0, min(size.height * 0.40, size.width * 0.85))
-            let width = height * 0.78
+            // A target for the head, with room for hair. It must not dominate the visible preview.
+            let height = max(0, min(size.height * 0.34, size.width * 0.82))
+            let width = height * 0.74
             let eyeLine = size.height * Self.eyeLineFraction
             oval = CGRect(x: (size.width - width) / 2, y: eyeLine - height / 2,
                           width: width, height: height)
@@ -31,21 +30,19 @@ struct CameraFramingGuide: View {
             let oval = Layout(in: geometry.size).oval
             ZStack {
                 Ellipse()
-                    .strokeBorder(.white.opacity(contrast == .increased ? 1 : ready ? 0.96 : 0.82),
+                    .strokeBorder(ready ? Color.green : Color.white.opacity(contrast == .increased ? 1 : 0.9),
                                   lineWidth: Design.Stroke.guide(for: contrast))
                     .shadow(color: .black.opacity(0.48), radius: 4)
-                    .shadow(color: .white.opacity(settleGlow ? 0.62 : 0), radius: 11)
+                    .shadow(color: .green.opacity(settleGlow ? 0.62 : 0), radius: 11)
                     .frame(width: oval.width, height: oval.height)
                     .scaleEffect(settleScale)
                     .position(x: oval.midX, y: oval.midY)
                 if let correction {
-                    Image(systemName: correction.symbol)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.9), radius: 4)
-                        .position(correction.point(on: oval))
-                        .environment(\.layoutDirection, .leftToRight)
-                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                    GuideArrow(correction: correction, oval: oval)
+                        .stroke(.white, style: StrokeStyle(lineWidth: contrast == .increased ? 4 : 3,
+                                                           lineCap: .round, lineJoin: .round))
+                        .shadow(color: .black.opacity(0.8), radius: 4)
+                        .transition(.opacity)
                 }
             }
             .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: correction)
@@ -84,27 +81,58 @@ struct CameraFramingGuide: View {
     }
 }
 
-private extension GuideCorrection {
-    var symbol: String {
-        switch self {
-        case .left: "arrow.left"
-        case .right: "arrow.right"
-        case .up: "arrow.up"
-        case .down: "arrow.down"
-        case .closer: "arrow.up.left.and.arrow.down.right"
-        case .farther: "arrow.down.right.and.arrow.up.left"
-        }
-    }
+/// The stem starts on the oval, so its arrowhead reads as movement of the phone rather than of the face.
+private struct GuideArrow: Shape {
+    let correction: GuideCorrection
+    let oval: CGRect
 
-    func point(on oval: CGRect) -> CGPoint {
-        let inset: CGFloat = 19
-        return switch self {
-        case .left: CGPoint(x: oval.minX - inset, y: oval.midY)
-        case .right: CGPoint(x: oval.maxX + inset, y: oval.midY)
-        case .up: CGPoint(x: oval.midX, y: oval.minY - inset)
-        case .down: CGPoint(x: oval.midX, y: oval.maxY + inset)
-        case .closer, .farther: CGPoint(x: oval.maxX + inset, y: oval.maxY - oval.height * 0.13)
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        func arrow(from start: CGPoint, to end: CGPoint) {
+            path.move(to: start)
+            path.addLine(to: end)
+            arrowHead(at: end, angle: atan2(end.y - start.y, end.x - start.x))
         }
+        func arrowHead(at end: CGPoint, angle: CGFloat) {
+            let wing: CGFloat = 8
+            for offset in [-CGFloat.pi / 4, CGFloat.pi / 4] {
+                path.move(to: CGPoint(x: end.x - wing * cos(angle + offset),
+                                      y: end.y - wing * sin(angle + offset)))
+                path.addLine(to: end)
+            }
+        }
+        func tiltArrow(up: Bool) {
+            let sign: CGFloat = up ? -1 : 1
+            let start = CGPoint(x: oval.midX + oval.width * 0.19,
+                                y: oval.midY + sign * oval.height * 0.46)
+            let control = CGPoint(x: start.x + 31, y: start.y + sign * 30)
+            let end = CGPoint(x: start.x + 14, y: start.y + sign * 40)
+            path.move(to: start)
+            path.addQuadCurve(to: end, control: control)
+            arrowHead(at: end, angle: atan2(end.y - control.y, end.x - control.x))
+        }
+        let reach: CGFloat = 30
+        switch correction {
+        case .left:
+            arrow(from: CGPoint(x: oval.minX, y: oval.midY), to: CGPoint(x: oval.minX - reach, y: oval.midY))
+        case .right:
+            arrow(from: CGPoint(x: oval.maxX, y: oval.midY), to: CGPoint(x: oval.maxX + reach, y: oval.midY))
+        case .raise:
+            arrow(from: CGPoint(x: oval.midX, y: oval.minY), to: CGPoint(x: oval.midX, y: oval.minY - reach))
+        case .lower:
+            arrow(from: CGPoint(x: oval.midX, y: oval.maxY), to: CGPoint(x: oval.midX, y: oval.maxY + reach))
+        case .tiltUp: tiltArrow(up: true)
+        case .tiltDown: tiltArrow(up: false)
+        case .closer:
+            // The portrait grows as the phone comes closer.
+            arrow(from: CGPoint(x: oval.minX, y: oval.midY), to: CGPoint(x: oval.minX - reach, y: oval.midY))
+            arrow(from: CGPoint(x: oval.maxX, y: oval.midY), to: CGPoint(x: oval.maxX + reach, y: oval.midY))
+        case .farther:
+            // The portrait shrinks as the phone moves farther away.
+            arrow(from: CGPoint(x: oval.minX - reach, y: oval.midY), to: CGPoint(x: oval.minX, y: oval.midY))
+            arrow(from: CGPoint(x: oval.maxX + reach, y: oval.midY), to: CGPoint(x: oval.maxX, y: oval.midY))
+        }
+        return path
     }
 }
 
@@ -134,6 +162,6 @@ struct CameraFramingGuidePreviewScene: View {
     }
 }
 
-#Preview("Framing") { CameraFramingGuidePreviewScene(ready: false, correction: .right, faceOffset: -65) }
+#Preview("Framing") { CameraFramingGuidePreviewScene(ready: false, correction: .left, faceOffset: -65) }
 #Preview("Ready") { CameraFramingGuidePreviewScene(ready: true) }
 #endif

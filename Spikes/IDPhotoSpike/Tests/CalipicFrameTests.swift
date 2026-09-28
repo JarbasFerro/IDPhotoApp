@@ -104,9 +104,9 @@ struct CameraFramingGuideLayoutTests {
                       CGSize(width: 320, height: 568)])
     func theSingleOvalStaysCenteredAndClearOfTheEdges(size: CGSize) {
         let layout = CameraFramingGuide.Layout(in: size)
-        #expect(abs(layout.oval.height - min(size.height * 0.40, size.width * 0.85)) < 0.001)
+        #expect(abs(layout.oval.height - min(size.height * 0.34, size.width * 0.82)) < 0.001)
         #expect(abs(layout.oval.midY - size.height * 0.44) < 0.001)
-        #expect(abs(layout.oval.width - layout.oval.height * 0.78) < 0.001)
+        #expect(abs(layout.oval.width - layout.oval.height * 0.74) < 0.001)
         #expect(abs(layout.oval.midX - size.width / 2) < 0.001)
         #expect(CGRect(origin: .zero, size: size).contains(layout.oval))
     }

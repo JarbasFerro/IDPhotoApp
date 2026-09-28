@@ -379,22 +379,32 @@ enum CameraPresentation {
         switch hint {
         case .noFace: "Position your face inside the guide"
         case .multipleFaces: "Only one person in the frame"
-        case .moveCloser: "Move a little closer"
-        case .moveBack: "Move a little farther away"
-        case .tooClose: "Too close: move back, or ask someone to take it"
+        case .moveCloser: "Bring the phone closer"
+        case .moveBack: "Move the phone farther away"
+        case .tooClose: "Move the phone farther away"
         case .centerFace:
             switch correction {
-            case .left: "Move your face slightly left"
-            case .right: "Move your face slightly right"
-            case .up: "Move your face slightly up"
-            case .down: "Move your face slightly down"
-            default: "Centre your face in the guide"
+            case .left: "Move the phone left"
+            case .right: "Move the phone right"
+            case .raise: "Raise the phone"
+            case .lower: "Lower the phone"
+            default: "Centre your face in the oval"
             }
         case .levelPhone: "Level the phone to match your head"
-        case .uprightPhone: "Straighten the phone; it is leaning"
+        case .uprightPhone:
+            switch correction {
+            case .tiltUp: "Tilt the phone up"
+            case .tiltDown: "Tilt the phone down"
+            default: "Hold the phone upright"
+            }
         case .keepLevel: "Keep your head level"
         case .faceCamera: "Look straight at the camera"
-        case .eyeLevel: "Hold the phone at eye level"
+        case .eyeLevel:
+            switch correction {
+            case .raise: "Raise the phone to eye level"
+            case .lower: "Lower the phone to eye level"
+            default: "Hold the phone at eye level"
+            }
         case .backlit: "Move away from the bright light behind you"
         case .moreLight: "Find more light on your face"
         case .turnLeft: "Tip: turn slightly to your left, towards the light"
@@ -430,12 +440,12 @@ enum CameraPresentation {
         case .ready: "checkmark.circle"
         case .holdStill: "hand.raised"
         case .noFace, .multipleFaces: "person.crop.circle.badge.questionmark"
-        case .moveCloser, .moveBack, .tooClose: "arrow.up.left.and.arrow.down.right"
-        case .centerFace: "scope"
+        case .moveCloser, .moveBack, .tooClose: "iphone"
+        case .centerFace: "iphone"
         case .levelPhone, .uprightPhone: "iphone"
         case .keepLevel: "level"
         case .faceCamera: "face.dashed"
-        case .eyeLevel: "arrow.up.and.down"
+        case .eyeLevel: "iphone"
         case .backlit, .moreLight: "sun.max"
         case .turnLeft: "arrow.turn.up.left"
         case .turnRight: "arrow.turn.up.right"

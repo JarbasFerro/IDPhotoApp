@@ -93,7 +93,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments = ["--camera-review-fixture", "--camera-review-off-center"]
         app.launch()
         XCTAssertTrue(any(app, "cameraHint").waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Move your face slightly right"].exists)
+        XCTAssertTrue(app.staticTexts["Move the phone left"].exists)
         XCTAssertTrue(app.buttons["shutter"].exists)
         let screenshot = XCTAttachment(screenshot: app.screenshot())
         screenshot.name = "Camera directional cue, synthetic subject"
