@@ -42,6 +42,12 @@ struct PhotoExport: Sendable, Identifiable {
     var jpeg: URL { jpegs[0] }
 }
 
+struct DigitalExport: Sendable, Identifiable {
+    let id: UUID
+    let photoID: UUID
+    let jpeg: URL
+}
+
 protocol PhotoProcessing: Sendable {
     func ingest(_ staged: StagedPhoto) async throws -> PreparedPhoto
     func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis
@@ -52,6 +58,7 @@ protocol PhotoProcessing: Sendable {
     func thumbnail(photo: PreparedPhoto, adjustment: CropAdjustment, format: PhotoFormat) async -> CGImage?
     /// Digital JPEGs for every edit plus the print sheet described by `job`, whose items reference the edits' photos.
     func export(edits: [PhotoEdit], job: PrintJob) async throws -> PhotoExport
+    func exportDigital(edit: PhotoEdit) async throws -> DigitalExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
 }
@@ -239,6 +246,33 @@ actor PhotoPipeline: PhotoProcessing {
             for url in jpegs + [pdf] + pages { try PhotoFiles.protect(url) }
             try Task.checkCancellation()
             return PhotoExport(id: id, jpegs: jpegs, pdf: pdf, pages: pages, layout: layout)
+        } catch {
+            try? FileManager.default.removeItem(at: directory)
+            throw error
+        }
+    }
+
+    /// A direct digital result does not solve a paper layout or render PDF/page files.
+    func exportDigital(edit: PhotoEdit) throws -> DigitalExport {
+        let interval = signposter.beginInterval("DigitalExport")
+        defer { signposter.endInterval("DigitalExport", interval) }
+        try Task.checkCancellation()
+        let original = photoDirectory(edit.photo.id).appendingPathComponent("original")
+        guard FileManager.default.fileExists(atPath: original.path) else { throw PhotoError.expired }
+        let source = try open(original)
+        let format = PhotoFormat.spainPrototype
+        let image = try render(source, photo: edit.photo, adjustment: edit.adjustment, format: format, bleedMM: 0)
+        try Task.checkCancellation()
+        let id = UUID()
+        let directory = exportDirectory(id)
+        try PhotoFiles.createPrivateDirectory(directory)
+        do {
+            let jpeg = directory.appendingPathComponent("Foto-carnet.jpg")
+            try writeJPEG(image, to: jpeg, pixelsPerInch: format.pixelsPerInch)
+            try Self.verifyJPEG(jpeg, expected: format.output)
+            try PhotoFiles.protect(jpeg)
+            try Task.checkCancellation()
+            return DigitalExport(id: id, photoID: edit.photo.id, jpeg: jpeg)
         } catch {
             try? FileManager.default.removeItem(at: directory)
             throw error

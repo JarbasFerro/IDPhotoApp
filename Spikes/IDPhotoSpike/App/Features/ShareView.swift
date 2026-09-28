@@ -46,7 +46,7 @@ struct ShareView: View {
                     ContentUnavailableView {
                         Label("Files not ready", systemImage: "exclamationmark.triangle")
                     } description: {
-                        Text("Something went wrong while preparing the files.")
+                        Text(model.errorMessage ?? String(localized: "Something went wrong while preparing the files."))
                     } actions: {
                         Button("Try Again") { model.prepareExport() }.brandProminentButtonStyle()
                     }
@@ -70,7 +70,9 @@ struct ShareView: View {
                     Text("Print sheet").font(Design.Typography.cardTitle)
                     Text("\(PaperNames.name(for: model.printJob.paper)) · ^[\(result.layout.placedCount) copy](inflect: true) · ^[\(result.layout.pages.count) page](inflect: true)")
                         .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
-                    Text("Print at Actual Size (100 %), not Fit to Page. Then measure the 50 mm bar before cutting.")
+                    Text(model.printJob.options.calibrationBar
+                         ? "Print at Actual Size (100 %), not Fit to Page. Then measure the 50 mm bar before cutting."
+                         : "Print at Actual Size (100 %), not Fit to Page. Measure a photo before use.")
                         .font(Design.Typography.note).foregroundStyle(.secondary)
                 }
             }

@@ -10,6 +10,19 @@ struct PhotoPipelineTests {
         FileManager.default.temporaryDirectory.appendingPathComponent("PipelineTests-" + UUID().uuidString)
     }
 
+    @Test func directDigitalExportHasOneVerifiedJPEGAndNoPrintFiles() async throws {
+        let root = isolatedRoot()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pipeline = PhotoPipeline(root: root)
+        let photo = try await pipeline.ingest(SyntheticFixture.staged())
+        let result = try await pipeline.exportDigital(edit: PhotoEdit(photo: photo, adjustment: CropAdjustment()))
+        try PhotoPipeline.verifyJPEG(result.jpeg, expected: PhotoFormat.spainPrototype.output)
+        let names = try FileManager.default.contentsOfDirectory(atPath: result.jpeg.deletingLastPathComponent().path)
+        #expect(names == ["Foto-carnet.jpg"])
+        await pipeline.discard(exportID: result.id)
+        #expect(!FileManager.default.fileExists(atPath: result.jpeg.path))
+    }
+
     @Test func stagingSurvivesProviderFileRemoval() async throws {
         let root = isolatedRoot()
         defer { try? FileManager.default.removeItem(at: root) }

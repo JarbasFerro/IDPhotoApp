@@ -38,7 +38,9 @@ final class PhotoWorkflow {
     var showsOriginal = false
     let policy = DocumentPolicy.spainEngineering
     var exported: PhotoExport?
+    var digitalExport: DigitalExport?
     var errorMessage: String?
+    private(set) var errorActivity: Activity?
     /// Timings from the last in-app capture, shown in debug builds for the camera spike.
     var lastCameraMetrics: CameraMetrics?
     private(set) var activity: Activity?
@@ -102,6 +104,7 @@ final class PhotoWorkflow {
         let currentRevision = revision
         activity = .importing
         errorMessage = nil
+        errorActivity = nil
         task = Task {
             do {
                 guard let staged = try await loader() else { throw PhotoError.unreadable }
@@ -236,6 +239,7 @@ final class PhotoWorkflow {
         let job = printJob
         activity = .exporting
         errorMessage = nil
+        errorActivity = nil
         task = Task {
             do {
                 let result = try await pipeline.export(edits: edits, job: job)
@@ -245,6 +249,32 @@ final class PhotoWorkflow {
                 }
                 exportLease = result.id
                 exported = result
+                digitalExport = nil
+                activity = nil
+            } catch {
+                handle(error, revision: currentRevision)
+            }
+        }
+    }
+
+    func prepareDigitalExport(for photoID: UUID) {
+        guard let entry = entries.first(where: { $0.id == photoID }), activity == nil else { return }
+        cancelWork()
+        let currentRevision = revision
+        let edit = PhotoEdit(photo: entry.photo, adjustment: entry.adjustment)
+        activity = .exporting
+        errorMessage = nil
+        errorActivity = nil
+        task = Task {
+            do {
+                let result = try await pipeline.exportDigital(edit: edit)
+                guard revision == currentRevision, !Task.isCancelled else {
+                    await pipeline.discard(exportID: result.id)
+                    return
+                }
+                exportLease = result.id
+                digitalExport = result
+                exported = nil
                 activity = nil
             } catch {
                 handle(error, revision: currentRevision)
@@ -256,6 +286,7 @@ final class PhotoWorkflow {
         guard let id = exportLease else { return }
         exportLease = nil
         exported = nil
+        digitalExport = nil
         Task { await pipeline.discard(exportID: id) }
     }
 
@@ -354,8 +385,10 @@ final class PhotoWorkflow {
 
     private func handle(_ error: Error, revision currentRevision: UUID) {
         guard revision == currentRevision else { return }
+        let failedActivity = activity
         activity = nil
         if error is CancellationError { return }
+        errorActivity = failedActivity
         // Do not surface framework errors, which can contain sensitive local file paths.
         errorMessage = (error as? PhotoError)?.errorDescription
             ?? String(localized: "The operation could not be completed. Try again or choose another photo.")

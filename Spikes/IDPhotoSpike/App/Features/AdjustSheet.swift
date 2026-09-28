@@ -7,6 +7,7 @@ struct AdjustSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showDetails = false
+    @State private var showPosition = false
 
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
 
@@ -22,6 +23,13 @@ struct AdjustSheet: View {
                             .font(.caption).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity)
                         controls(entry)
+                        DisclosureGroup(isExpanded: $showPosition) {
+                            positionControls
+                        } label: {
+                            Text("Move and zoom").font(.headline)
+                        }
+                        .accessibilityHint("Opens buttons to move or zoom without gestures.")
+                        .accessibilityIdentifier("positionControls")
                         DisclosureGroup(isExpanded: $showDetails) {
                             details
                         } label: {
@@ -30,6 +38,7 @@ struct AdjustSheet: View {
                         .accessibilityIdentifier("details")
                     }
                     .padding()
+                    .padding(.top, 20)
                 }
             }
             .navigationTitle("Adjust")
@@ -41,6 +50,50 @@ struct AdjustSheet: View {
             .onDisappear { model.showsOriginal = false }
         }
         .presentationDetents([.large])
+    }
+
+    private var positionControls: some View {
+        VStack(spacing: Design.Spacing.control) {
+            HStack(spacing: Design.Spacing.control) {
+                moveButton("Move Up", symbol: "arrow.up", dx: 0, dy: 0.05)
+                moveButton("Move Down", symbol: "arrow.down", dx: 0, dy: -0.05)
+            }
+            HStack(spacing: Design.Spacing.control) {
+                moveButton("Move Left", symbol: "arrow.left", dx: 0.05, dy: 0)
+                moveButton("Move Right", symbol: "arrow.right", dx: -0.05, dy: 0)
+            }
+            HStack(spacing: Design.Spacing.control) {
+                Button { changeZoom(by: 0.1) } label: { Label("Zoom In", systemImage: "plus.magnifyingglass").frame(maxWidth: .infinity) }
+                Button { changeZoom(by: -0.1) } label: { Label("Zoom Out", systemImage: "minus.magnifyingglass").frame(maxWidth: .infinity) }
+            }
+            Button("Reset Position") {
+                var next = model.adjustment
+                next.horizontal = 0.5
+                next.vertical = 0.5
+                model.adjustment = next
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.large)
+        .padding(.top, Design.Spacing.text)
+    }
+
+    private func moveButton(_ title: LocalizedStringKey, symbol: String, dx: Double, dy: Double) -> some View {
+        Button {
+            var next = model.adjustment
+            next.horizontal += dx
+            next.vertical += dy
+            model.adjustment = next.clamped()
+        } label: {
+            Label(title, systemImage: symbol).frame(maxWidth: .infinity)
+        }
+    }
+
+    private func changeZoom(by amount: Double) {
+        var next = model.adjustment
+        next.zoom += amount
+        model.adjustment = next.clamped()
     }
 
     private func controls(_ entry: PhotoEntry) -> some View {

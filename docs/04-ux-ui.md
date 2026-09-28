@@ -65,17 +65,18 @@ Every core editing operation has a non-precision-gesture alternative and clear s
 
 ## 4. Information architecture
 
-Recommended structure:
+Production direction (profiles, favorites, and Settings are future destinations; the current spike has one Spain DNI profile):
 
 ```text
 Home
 ├── Create ID photo
 │   ├── Country / document profile
 │   ├── Requirements
+│   ├── Brief requirements before capture or import
 │   ├── Capture or Choose Photo
 │   ├── Photo Check
-│   ├── Editor
-│   └── Export
+│   ├── Native Adjust sheet, when needed
+│   └── Digital Photo or Print Sheet
 ├── Recent / Favorite Profiles
 ├── Help
 └── Settings
@@ -314,6 +315,8 @@ Use a clear native list/card decision:
 
 - `Digital Photo`
 - `Print Sheet`
+
+This choice follows Photo Check. The current Spain profile is labeled **Spain · DNI photo**. Digital Photo prepares the selected person's JPEG directly, with no paper setup; Print Sheet leads to paper and copy controls. The camera opens after a brief requirements preflight, with an optional tip and persistent Help in place of a required tutorial. These decisions are recorded in [ADR-043](10-decisions.md#adr-043--revised-capture-output-and-adjustment-flow); the [current screen contract](16-screen-experience-spec.md) describes the spike in detail.
 
 Do not introduce a generic “Export Center.”
 

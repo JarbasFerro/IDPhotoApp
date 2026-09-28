@@ -7,6 +7,7 @@ struct PhotoCheckView: View {
     @Binding var path: [Route]
     let acquire: Acquire
     @State private var showAdjust = false
+    @State private var showRequirements = false
     @State private var confirmRemove = false
     @State private var comparing = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
@@ -52,6 +53,10 @@ struct PhotoCheckView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                Button("Requirements", systemImage: "info.circle") { showRequirements = true }
+                    .brandNeutralToolbarItem()
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("Remove Photo", systemImage: "trash", role: .destructive) { confirmRemove = true }
                     .disabled(model.activity != nil)
                     .brandNeutralToolbarItem()
@@ -65,6 +70,7 @@ struct PhotoCheckView: View {
             }
         } message: { Text("The original in your photo library is kept.") }
         .sheet(isPresented: $showAdjust) { AdjustSheet(model: model, photoID: photoID) }
+        .sheet(isPresented: $showRequirements) { RequirementsView() }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
         .task(id: photoID) {
             // Landing: show the uncropped photo first, wait for the push to settle and the check to finish, then frame it.
@@ -125,15 +131,17 @@ struct PhotoCheckView: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("checkHeadline")
             ForEach(summary.rows) { row in
-                HStack(alignment: .firstTextBaseline, spacing: Design.Spacing.row) {
+                HStack(alignment: .top, spacing: Design.Spacing.row) {
                     Image(systemName: StatusStyle.symbol(for: row.state))
                         .foregroundStyle(StatusStyle.color(for: row.state))
                         .frame(width: 20)
-                    Text(row.title).font(Design.Typography.rowTitle)
-                    Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
-                        .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+                    VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                        Text(row.title).font(Design.Typography.rowTitle)
+                        Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
+                    }
                 }
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(verbatim: "\(String(localized: row.title)), \(String(localized: StatusStyle.name(for: row.state))). \(String(localized: row.detail))"))
             }
         }
         .animation(.default, value: summary)
@@ -141,13 +149,13 @@ struct PhotoCheckView: View {
 
     private var actions: some View {
         VStack(spacing: Design.Spacing.control) {
-            Button { path.append(.sheet) } label: {
-                Label("Add to sheet", systemImage: "printer").frame(maxWidth: .infinity)
+            Button { path.append(.outputChoice(photoID)) } label: {
+                Label("Continue", systemImage: "arrow.right").frame(maxWidth: .infinity)
             }
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(model.activity != nil)
-            .accessibilityIdentifier("addToSheet")
+            .accessibilityIdentifier("continueFromCheck")
             let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
             layout {
                 Button { showAdjust = true } label: {

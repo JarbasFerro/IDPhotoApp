@@ -17,7 +17,7 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: Design.Spacing.text) {
                     Text("A correct ID photo in a minute.")
                         .font(Design.Typography.screenTitle)
-                    Text("Take it or choose one. The app frames it, whitens the background and prepares the print sheet. Everything stays on your iPhone.")
+                    Text("Take it or choose one. The app frames it for Spain's DNI. Save a digital photo or prepare a print sheet. Everything stays on your iPhone.")
                         .foregroundStyle(.secondary)
                 }
                 .accessibilityElement(children: .combine)
@@ -37,6 +37,10 @@ struct HomeView: View {
                     .controlSize(.large)
                     .disabled(!model.isInitialized || model.activity != nil || !model.canAddPhoto)
                     .accessibilityIdentifier("choosePhoto")
+                }
+
+                if !model.isInitialized {
+                    ProgressView("Preparing private photo storage…")
                 }
 
                 if let activity = model.activity {
@@ -114,7 +118,7 @@ struct HomeView: View {
                     .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
                     .background(.fill.secondary, in: RoundedRectangle(cornerRadius: Design.Radius.tile))
                 VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    Text("Spain · DNI and passport").font(Design.Typography.cardTitle)
+                    Text("Spain · DNI photo").font(Design.Typography.cardTitle)
                     Text("26 × 32 mm · white background").font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -179,12 +183,22 @@ struct RequirementsView: View {
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         NavigationStack {
-            List {
+            RequirementsContent()
+            .navigationTitle("Photo requirements")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+}
+
+struct RequirementsContent: View {
+    var body: some View {
+        List {
                 Section("Before you take the photo") {
                     Label("Recent colour photo, facing forward", systemImage: "person.crop.rectangle")
-                    Label("Plain, light background; the app makes it white", systemImage: "rectangle")
+                    Label("Plain, uniform white background", systemImage: "rectangle")
                     Label("Face and eyes clearly visible, neutral expression", systemImage: "eye")
-                    Label("No headphones, hats or sunglasses", systemImage: "headphones")
+                    Label("Remove headphones; check headwear and glasses exceptions below", systemImage: "headphones")
                     Label("Even light from the front, no strong shadows", systemImage: "sun.max")
                 }
                 Section("Official guidance") {
@@ -195,12 +209,8 @@ struct RequirementsView: View {
                         .font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("What the app does") {
-                    Text("Frames the photo to 26 × 32 mm, levels the eyes, replaces the background with white, corrects exposure and colour, and prepares a print sheet. It does not retouch your face and does not decide acceptance.")
+                    Text("Frames the photo to 26 × 32 mm, levels the eyes, and prepares a print sheet. It can replace the background with white and even out light and colour when the photo allows. It does not retouch your face or decide acceptance.")
                 }
-            }
-            .navigationTitle("Photo requirements")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
     }
 }

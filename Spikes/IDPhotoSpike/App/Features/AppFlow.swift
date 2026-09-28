@@ -1,11 +1,19 @@
 import PhotosUI
 import SwiftUI
 
-/// The four-step task: Home → (Camera or picker) → Photo Check → Your Sheet → Share.
+/// Home → preparation → acquisition → Photo Check → output choice → digital result or print sheet.
 enum Route: Hashable {
     case check(UUID)
+    case outputChoice(UUID)
+    case digital(UUID)
     case sheet
     case share
+}
+
+private struct PendingAcquisition: Identifiable {
+    let id = UUID()
+    let source: AcquisitionSource
+    let mode: PhotoWorkflow.ImportMode
 }
 
 /// Owns navigation and the two acquisition presentations; every screen reads the shared workflow.
@@ -14,6 +22,9 @@ struct RootView: View {
     @State private var path: [Route] = []
     @State private var showCamera = false
     @State private var showPicker = false
+    @State private var pendingAcquisition: PendingAcquisition?
+    @State private var approvedAcquisition: PendingAcquisition?
+    @State private var choosePhotoAfterCamera = false
     @State private var selection: PhotosPickerItem?
     @State private var importMode: PhotoWorkflow.ImportMode = .replace
 
@@ -24,6 +35,10 @@ struct RootView: View {
                     switch route {
                     case .check(let id):
                         PhotoCheckView(model: model, photoID: id, path: $path, acquire: acquire)
+                    case .outputChoice(let id):
+                        OutputChoiceView(model: model, photoID: id, path: $path)
+                    case .digital(let id):
+                        DigitalShareView(model: model, photoID: id, path: $path)
                     case .sheet:
                         SheetView(model: model, path: $path, acquire: acquire)
                     case .share:
@@ -31,13 +46,22 @@ struct RootView: View {
                     }
                 }
         }
+        .sheet(item: $pendingAcquisition, onDismiss: startApprovedAcquisition) {
+            pending in
+            PreparationView(source: pending.source, onContinue: { selectedSource in
+                approvedAcquisition = PendingAcquisition(source: selectedSource, mode: pending.mode)
+                pendingAcquisition = nil
+            })
+        }
         .photosPicker(isPresented: $showPicker, selection: $selection, matching: .images, preferredItemEncoding: .current)
-        .fullScreenCover(isPresented: $showCamera) {
-            CameraView { staged, metrics in
+        .fullScreenCover(isPresented: $showCamera, onDismiss: {
+            if choosePhotoAfterCamera { choosePhotoAfterCamera = false; showPicker = true }
+        }) {
+            CameraView(onCapture: { staged, metrics in
                 showCamera = false
                 model.lastCameraMetrics = metrics
                 model.importPhoto(mode: importMode) { staged }
-            }
+            }, onChoosePhoto: { choosePhotoAfterCamera = true; showCamera = false })
         }
         .onChange(of: selection) { _, item in
             guard let item else { return }
@@ -49,14 +73,30 @@ struct RootView: View {
             // A retake replaces the current Photo Check; a new person gets their own.
             if case .check = path.last { path[path.count - 1] = .check(event.id) } else { path.append(.check(event.id)) }
         }
-        .alert("Unable to complete", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
+        .alert("Unable to complete", isPresented: Binding(get: {
+            if case .digital = path.last { return false }
+            if case .share = path.last { return false }
+            return model.errorMessage != nil
+        }, set: { if !$0 { model.errorMessage = nil } })) {
+            if model.errorActivity == .importing {
+                Button("Choose Another Photo") {
+                    model.errorMessage = nil
+                    acquire(.library, mode: importMode)
+                }
+            }
             Button("OK", role: .cancel) { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "") }
     }
 
     private func acquire(_ source: AcquisitionSource, mode: PhotoWorkflow.ImportMode) {
-        importMode = mode
-        switch source {
+        pendingAcquisition = PendingAcquisition(source: source, mode: mode)
+    }
+
+    private func startApprovedAcquisition() {
+        guard let approvedAcquisition else { return }
+        self.approvedAcquisition = nil
+        importMode = approvedAcquisition.mode
+        switch approvedAcquisition.source {
         case .camera: showCamera = true
         case .library: showPicker = true
         }

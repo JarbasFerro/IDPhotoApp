@@ -29,4 +29,13 @@ enum StatusStyle {
     }
 
     static func symbol(for state: CheckState) -> String { AlignmentPresentation.symbol(for: state) }
+
+    static func name(for state: CheckState) -> LocalizedStringResource {
+        switch state {
+        case .pass: "Looks good"
+        case .warn: "Needs attention"
+        case .fail: "Better to retake"
+        case .manualCheck: "Check by eye"
+        }
+    }
 }

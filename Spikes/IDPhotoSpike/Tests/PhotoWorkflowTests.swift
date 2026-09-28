@@ -37,6 +37,22 @@ struct PhotoWorkflowTests {
         #expect(model.activity == nil)
     }
 
+    @Test func digitalExportUsesOnlyTheSelectedPhotoAndDiscardsLateResult() async throws {
+        let pipeline = DelayedPipeline()
+        let model = PhotoWorkflow(pipeline: pipeline)
+        let first = try await fixture(), second = try await fixture()
+        model.install(first, mode: .add)
+        model.install(second, mode: .add)
+        model.prepareDigitalExport(for: second.id)
+        await pipeline.waitForDigitalExport()
+        #expect(await pipeline.digitalExportedIDs == [second.id])
+        model.cancel()
+        let result = DigitalExport(id: UUID(), photoID: second.id, jpeg: URL(fileURLWithPath: "/unused.jpg"))
+        await pipeline.completeDigitalExport(with: result)
+        await pipeline.waitForExportDiscard(result.id)
+        #expect(model.digitalExport == nil)
+    }
+
     @Test func addingASecondPersonKeepsTheFirstAndGivesEachTheirOwnCopies() async throws {
         let pipeline = DelayedPipeline()
         let model = PhotoWorkflow(pipeline: pipeline)
@@ -120,6 +136,7 @@ struct PhotoWorkflowTests {
 private actor DelayedPipeline: PhotoProcessing {
     private var imports: [CheckedContinuation<PreparedPhoto, any Error>] = []
     private var pendingExport: CheckedContinuation<PhotoExport, any Error>?
+    private var pendingDigitalExport: CheckedContinuation<DigitalExport, any Error>?
     private var discardedPhotos: Set<UUID> = []
     private var discardedExports: Set<UUID> = []
 
@@ -140,11 +157,17 @@ private actor DelayedPipeline: PhotoProcessing {
         exportedEdits.append(edits.map(\.photo.id))
         return try await withCheckedThrowingContinuation { pendingExport = $0 }
     }
+    func exportDigital(edit: PhotoEdit) async throws -> DigitalExport {
+        digitalExportedIDs.append(edit.photo.id)
+        return try await withCheckedThrowingContinuation { pendingDigitalExport = $0 }
+    }
     private(set) var exportedEdits: [[UUID]] = []
+    private(set) var digitalExportedIDs: [UUID] = []
     func discard(photoID: UUID) { discardedPhotos.insert(photoID) }
     func discard(exportID: UUID) { discardedExports.insert(exportID) }
     func completeImport(index: Int, with result: PreparedPhoto) { imports[index].resume(returning: result) }
     func completeExport(with result: PhotoExport) { pendingExport?.resume(returning: result); pendingExport = nil }
+    func completeDigitalExport(with result: DigitalExport) { pendingDigitalExport?.resume(returning: result); pendingDigitalExport = nil }
 
     func waitForImports(_ count: Int) async {
         for _ in 0..<10_000 { if imports.count >= count { return }; await Task.yield() }
@@ -153,6 +176,10 @@ private actor DelayedPipeline: PhotoProcessing {
     func waitForExport() async {
         for _ in 0..<10_000 { if pendingExport != nil { return }; await Task.yield() }
         Issue.record("Export did not start")
+    }
+    func waitForDigitalExport() async {
+        for _ in 0..<10_000 { if pendingDigitalExport != nil { return }; await Task.yield() }
+        Issue.record("Digital export did not start")
     }
     func waitForPhotoDiscard(_ id: UUID) async {
         for _ in 0..<10_000 { if discardedPhotos.contains(id) { return }; await Task.yield() }

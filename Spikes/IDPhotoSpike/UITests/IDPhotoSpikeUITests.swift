@@ -32,6 +32,10 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["takePhoto"].exists)
         XCTAssertFalse(app.buttons["yourSheet"].exists)
+        let homeScreenshot = XCTAttachment(screenshot: app.screenshot())
+        homeScreenshot.name = "Home"
+        homeScreenshot.lifetime = .keepAlways
+        add(homeScreenshot)
         let version = app.staticTexts["appVersion"]
         XCTAssertTrue(version.exists)
         // The accessibility label reads "Version 0.9.0 (52)".
@@ -40,6 +44,15 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Before you take the photo"].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
         XCTAssertTrue(app.buttons["choosePhoto"].exists)
+        app.buttons["choosePhoto"].tap()
+        XCTAssertTrue(app.staticTexts["Spain · DNI photo"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["preparationContinue"].exists)
+        let preparationScreenshot = XCTAttachment(screenshot: app.screenshot())
+        preparationScreenshot.name = "Preparation"
+        preparationScreenshot.lifetime = .keepAlways
+        add(preparationScreenshot)
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 5))
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 
@@ -122,6 +135,14 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.buttons["adjust"].tap()
         XCTAssertTrue(app.otherElements["cropPreview"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.segmentedControls["backgroundPicker"].exists)
+        let adjustTopScreenshot = XCTAttachment(screenshot: app.screenshot())
+        adjustTopScreenshot.name = "Adjust, top"
+        adjustTopScreenshot.lifetime = .keepAlways
+        add(adjustTopScreenshot)
+        reveal(app.buttons["positionControls"], in: app)
+        app.buttons["positionControls"].tap()
+        XCTAssertTrue(app.buttons["Zoom In"].waitForExistence(timeout: 5))
+        app.buttons["Zoom In"].tap()
         reveal(app.buttons["details"], in: app)
         app.buttons["details"].tap()
         let zoom = app.sliders["Zoom"]
@@ -138,8 +159,10 @@ final class IDPhotoSpikeUITests: XCTestCase {
         if !adjustDone.waitForNonExistence(timeout: 3) { adjustDone.tap() }
         XCTAssertTrue(adjustDone.waitForNonExistence(timeout: 5))
         // Sheet.
-        reveal(app.buttons["addToSheet"], in: app)
-        app.buttons["addToSheet"].tap()
+        reveal(app.buttons["continueFromCheck"], in: app)
+        app.buttons["continueFromCheck"].tap()
+        XCTAssertTrue(app.buttons["printChoice"].waitForExistence(timeout: 5))
+        app.buttons["printChoice"].tap()
         XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
         app.buttons["continueToShare"].tap()
@@ -159,21 +182,42 @@ final class IDPhotoSpikeUITests: XCTestCase {
     }
 
     @MainActor
+    func testDigitalPhotoSkipsPrintSetup() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture"]
+        app.launch()
+        XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        reveal(app.buttons["continueFromCheck"], in: app)
+        app.buttons["continueFromCheck"].tap()
+        XCTAssertTrue(app.buttons["digitalChoice"].waitForExistence(timeout: 5))
+        let choiceScreenshot = XCTAttachment(screenshot: app.screenshot())
+        choiceScreenshot.name = "Output choice"
+        choiceScreenshot.lifetime = .keepAlways
+        add(choiceScreenshot)
+        app.buttons["digitalChoice"].tap()
+        XCTAssertFalse(app.buttons["continueToShare"].exists)
+        XCTAssertTrue(app.buttons["shareDigitalJPEG"].waitForExistence(timeout: 20))
+        XCTAssertFalse(app.buttons["sharePDF"].exists)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Digital result"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        app.buttons["digitalDone"].tap()
+        XCTAssertTrue(app.buttons["yourSheet"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testCameraUnavailableOffersPhotoImport() throws {
         let app = XCUIApplication()
         app.launch()
         XCTAssertTrue(app.buttons["takePhoto"].waitForExistence(timeout: 10))
         app.buttons["takePhoto"].tap()
-        // The instructions come first (two pages) unless dismissed for good on this simulator.
-        if app.buttons["introNext"].waitForExistence(timeout: 5) {
-            app.buttons["introNext"].tap()
-            XCTAssertTrue(app.buttons["introStart"].waitForExistence(timeout: 5))
-            app.buttons["introStart"].tap()
-        }
+        XCTAssertTrue(app.buttons["preparationContinue"].waitForExistence(timeout: 5))
+        app.buttons["preparationContinue"].tap()
         // Simulators have no camera; the screen must explain and offer the import path.
         XCTAssertTrue(app.buttons["cameraUnavailableChoose"].waitForExistence(timeout: 10))
         app.buttons["cameraUnavailableChoose"].tap()
-        XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["cameraUnavailableChoose"].waitForNonExistence(timeout: 5))
     }
 
     @MainActor
@@ -182,8 +226,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments = ["--uitesting-fixture"]
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["addToSheet"], in: app)
-        app.buttons["addToSheet"].tap()
+        reveal(app.buttons["continueFromCheck"], in: app)
+        app.buttons["continueFromCheck"].tap()
+        app.buttons["printChoice"].tap()
         XCTAssertTrue(app.scrollViews["sheetPreview"].waitForExistence(timeout: 10))
         let summary = app.staticTexts["layoutSummary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 5))
@@ -211,8 +256,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         XCTAssertTrue(app.navigationBars["Photo 2 of 2"].waitForExistence(timeout: 15))
-        reveal(app.buttons["addToSheet"], in: app)
-        app.buttons["addToSheet"].tap()
+        reveal(app.buttons["continueFromCheck"], in: app)
+        app.buttons["continueFromCheck"].tap()
+        app.buttons["printChoice"].tap()
         XCTAssertTrue(app.buttons["person-1"].waitForExistence(timeout: 10))
         reveal(app.buttons["person-2"], in: app)
         XCTAssertTrue(app.buttons["person-2"].exists)
@@ -239,13 +285,15 @@ final class IDPhotoSpikeUITests: XCTestCase {
                                "UICTContentSizeCategoryAccessibilityXXXL"]
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["addToSheet"], in: app, attempts: 10)
-        XCTAssertTrue(app.buttons["addToSheet"].isHittable)
+        reveal(app.buttons["continueFromCheck"], in: app, attempts: 10)
+        XCTAssertTrue(app.buttons["continueFromCheck"].isHittable)
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Photo Check at accessibility text size"
         attachment.lifetime = .keepAlways
         add(attachment)
-        app.buttons["addToSheet"].tap()
+        app.buttons["continueFromCheck"].tap()
+        XCTAssertTrue(app.buttons["printChoice"].waitForExistence(timeout: 5))
+        app.buttons["printChoice"].tap()
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["continueToShare"].isHittable)
         app.buttons["continueToShare"].tap()

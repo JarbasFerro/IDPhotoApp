@@ -44,6 +44,7 @@ struct CameraMetrics: Sendable, Hashable {
 
 struct CameraView: View {
     let onCapture: (StagedPhoto, CameraMetrics) -> Void
+    let onChoosePhoto: () -> Void
     @State private var camera = CameraController()
     @State private var errorMessage: String?
     @State private var flash = false
@@ -51,41 +52,31 @@ struct CameraView: View {
     /// New key on purpose: devices that ran 0.8 to 0.10.1 have the old key stored as true.
     @AppStorage("autoCaptureEnabled") private var autoCapture = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
-    /// The instructions screen (ring, then Auto) shows before the camera on every launch until dismissed for good.
-    @AppStorage("cameraIntroDismissed") private var introDismissed = false
-    @State private var introSeen = false
+    @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
     @State private var showRingHelp = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var showingIntro: Bool { !introDismissed && !introSeen }
-
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            if showingIntro {
-                CameraIntroView(autoCapture: $autoCapture, dismissed: $introDismissed, cancel: { dismiss() }) { introSeen = true }
-            } else {
-                cameraContent
-            }
+            cameraContent
         }
-        .task(id: showingIntro) { if !showingIntro { await camera.start() } }
+        .task { await camera.start() }
         .onDisappear { camera.stop() }
         .onChange(of: scenePhase) { _, phase in
-            guard !showingIntro else { return }
             if phase == .background { camera.stop() } else if phase == .active { Task { await camera.start() } }
         }
-        .onCameraCaptureEvent(isEnabled: camera.state == .running && !showingIntro) { event in
+        .onCameraCaptureEvent(isEnabled: camera.state == .running) { event in
             if event.phase == .ended { takePhoto() }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
         .sensoryFeedback(.success, trigger: camera.hint) { _, hint in hint == .ready }
-        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showRingHelp)-\(showingIntro)") {
-            // Auto capture: "ready" held through a visible countdown; any hint change cancels it. Never while the
-            // instructions are showing.
-            guard autoCapture, !showRingHelp, !showingIntro, camera.hint == .ready, camera.state == .running, !camera.isCapturing
+        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showRingHelp)") {
+            // Auto capture: "ready" held through a visible countdown; any hint change cancels it.
+            guard autoCapture, !showRingHelp, camera.hint == .ready, camera.state == .running, !camera.isCapturing
             else { countdown = nil; return }
             // Three seconds: enough to stop reading the screen and look at the lens.
             for value in [3, 2, 1] {
@@ -105,7 +96,7 @@ struct CameraView: View {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: { Text(errorMessage ?? "") }
         .sheet(isPresented: $showRingHelp) {
-            CameraIntroView(autoCapture: $autoCapture, dismissed: $introDismissed, cancel: nil) { showRingHelp = false }
+            CameraIntroView(autoCapture: $autoCapture) { showRingHelp = false }
         }
         .preferredColorScheme(.dark)
         .statusBarHidden()
@@ -129,8 +120,14 @@ struct CameraView: View {
             case .unavailable:
                 unavailableView
             case .failed(let message):
-                ContentUnavailableView(message, systemImage: "exclamationmark.triangle")
-                    .foregroundStyle(.white)
+                VStack(spacing: Design.Spacing.control) {
+                    ContentUnavailableView(message, systemImage: "exclamationmark.triangle",
+                                           description: Text("Try the camera again or choose an existing photo."))
+                    Button("Try Again") { Task { await camera.start() } }.brandProminentButtonStyle()
+                    Button("Choose Photo Instead", action: onChoosePhoto).buttonStyle(.bordered)
+                }
+                .padding()
+                .foregroundStyle(.white)
             case .idle, .requestingAccess:
                 ProgressView().tint(.white)
             }
@@ -225,6 +222,19 @@ struct CameraView: View {
                     .padding(.top, 6)
                     .accessibilityIdentifier("cameraTip")
             }
+            if !helpTipSeen {
+                HStack(spacing: 10) {
+                    Text("The ring checks framing, head position, light and distance.")
+                        .font(.footnote)
+                    Button("Got it") { helpTipSeen = true }
+                        .font(.footnote.weight(.semibold))
+                }
+                .padding(10)
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+                .accessibilityIdentifier("cameraOptionalTip")
+            }
 
             if camera.state == .interrupted {
                 Text("Camera paused. It resumes when the interruption ends.")
@@ -277,7 +287,7 @@ struct CameraView: View {
             if let url = URL(string: UIApplication.openSettingsURLString) {
                 Link("Open Settings", destination: url).brandProminentButtonStyle()
             }
-            Button("Choose Photo Instead") { dismiss() }.buttonStyle(.bordered)
+            Button("Choose Photo Instead", action: onChoosePhoto).buttonStyle(.bordered)
         }
         .padding()
         .foregroundStyle(.white)
@@ -287,7 +297,7 @@ struct CameraView: View {
         VStack(spacing: 16) {
             ContentUnavailableView("No camera on this device", systemImage: "camera.slash",
                                    description: Text("Choose an existing photo instead."))
-            Button("Choose Photo Instead") { dismiss() }
+            Button("Choose Photo Instead", action: onChoosePhoto)
                 .brandProminentButtonStyle()
                 .accessibilityIdentifier("cameraUnavailableChoose")
         }
@@ -414,13 +424,9 @@ enum CameraPresentation {
 }
 
 
-/// Instructions before the camera: page one is the ring, page two is Auto with its own switch. Shown full screen
-/// on every launch until "Don't show this again"; the "?" button on the camera presents the same view as a sheet.
+/// Optional camera help, available from the persistent Instructions button.
 struct CameraIntroView: View {
     @Binding var autoCapture: Bool
-    @Binding var dismissed: Bool
-    /// Present on the full-screen launch variant (goes back to Home); nil when presented from "?".
-    var cancel: (() -> Void)?
     let done: () -> Void
     @State private var page = 0
 
@@ -434,12 +440,10 @@ struct CameraIntroView: View {
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
                 VStack(spacing: 12) {
-                    Toggle("Don't show this again", isOn: $dismissed)
-                        .accessibilityIdentifier("introDismiss")
                     Button {
                         if page == 0 { withAnimation { page = 1 } } else { done() }
                     } label: {
-                        Text(page == 0 ? LocalizedStringKey("Next") : cancel == nil ? LocalizedStringKey("Done") : LocalizedStringKey("Open the camera"))
+                        Text(page == 0 ? LocalizedStringKey("Next") : LocalizedStringKey("Done"))
                             .frame(maxWidth: .infinity)
                     }
                     .brandProminentButtonStyle()
@@ -451,11 +455,7 @@ struct CameraIntroView: View {
             .navigationTitle(page == 0 ? Text("Before you start") : Text("Automatic capture"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if let cancel {
-                    ToolbarItem(placement: .cancellationAction) { Button("Cancel", action: cancel).accessibilityIdentifier("introCancel") }
-                } else {
-                    ToolbarItem(placement: .confirmationAction) { Button("Done", action: done).accessibilityIdentifier("introDone") }
-                }
+                ToolbarItem(placement: .confirmationAction) { Button("Done", action: done).accessibilityIdentifier("introDone") }
             }
         }
         .preferredColorScheme(.dark)

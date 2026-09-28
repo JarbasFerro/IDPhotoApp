@@ -40,6 +40,9 @@ Development baseline as of September 2026:
 
 The detailed rationale and platform capability map are in [`docs/11-ios-excellence-strategy.md`](docs/11-ios-excellence-strategy.md).
 
+The proposed screen-by-screen appearance, controls, copy, states, and accessibility behavior for the current spike are in [`docs/16-screen-experience-spec.md`](docs/16-screen-experience-spec.md).
+The accepted flow decisions and implementation sequence for its next revision are in [`docs/17-screen-experience-implementation-plan.md`](docs/17-screen-experience-implementation-plan.md).
+
 ## Product intent
 
 The app should make the complete ID-photo workflow fast and understandable:

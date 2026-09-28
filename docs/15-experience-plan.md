@@ -4,6 +4,8 @@
 **Status:** In progress. Decisions in §8 taken with the defaults on 2026-09-16; stage A shipped as 0.9.0, stage B as 0.10.0.  
 **Builds on:** [04-ux-ui.md](04-ux-ui.md) (principles and screen catalogue), [11-ios-excellence-strategy.md](11-ios-excellence-strategy.md) (signature experiences), the spike app at version 0.8.2.
 
+**2026-09-28 update:** This file records the historical stage plan. [ADR-043](10-decisions.md#adr-043--revised-capture-output-and-adjustment-flow) supersedes its future glass-cluster and mandatory camera-introduction proposals and adds a direct digital-photo path and pre-acquisition requirements summary. The implementation sequence is in [the screen-experience implementation plan](17-screen-experience-implementation-plan.md).
+
 ## 1. Where we are
 
 The spike app does everything the product needs for Spain DNI: guided capture with live aids, automatic alignment, white background, Document Tone, several people per sheet, exact print sheets, digital JPEGs. It works on the user's iPhone. It also looks like what it is: one long developer screen that grew a section per spike.

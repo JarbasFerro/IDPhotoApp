@@ -624,6 +624,38 @@ If the optional Photo Coach ships, it uses on-device `SystemLanguageModel` with 
 
 ---
 
+## ADR-043 — Revised capture, output, and adjustment flow
+
+**Status:** Accepted
+
+**Date:** 2026-09-28
+
+### Context
+
+The current Spain spike sends every prepared photo through the print-sheet composer before sharing, hides essential pre-capture requirements behind a Home card, and requires a two-page camera introduction on first use. The earlier experience plan also proposes floating glass editor controls while the newer screen specification proposes native controls below the photo. These differences leave the next UI pass ambiguous.
+
+### Decision
+
+1. After Photo Check, offer **Digital Photo** and **Print Sheet**. A digital JPEG can be shared without configuring paper. The print path keeps the multi-person sheet composer.
+2. Show a brief, relevant requirements summary before starting either camera capture or PhotosPicker import. Keep the full sourced guidance available from that summary and Home.
+3. Use a native scrolling **Adjust** sheet with controls below the photo. Do not plan a floating glass control cluster over the portrait.
+4. Name the current profile **Spain · DNI photo** until passport-specific requirements have been sourced and validated. Matching image dimensions alone do not expand the claim.
+5. Replace the mandatory two-page first-use camera tutorial with a brief optional tip and persistent camera Help. Camera permission remains at the Take Photo point of use.
+
+### Evidence
+
+The founder selected each option in the 2026-09-28 screen-spec review. The decision responds to `docs/16-screen-experience-spec.md`, `docs/15-experience-plan.md`, and the provenance limitation in `docs/13-spain-foto-carnet.md`.
+
+### Consequences
+
+The navigation and export workflow need distinct digital and print paths, while both reuse the immutable source and current adjustments. Requirements need a lightweight preflight presentation. Camera Help remains available after first use. Copy, String Catalog entries, UI tests, screenshots, and the screen specification must be revised together. Historical stage descriptions in `docs/15-experience-plan.md` remain evidence of the earlier iterations; its future glass-cluster and mandatory-intro proposals are superseded by this ADR.
+
+### Revisit trigger
+
+Task testing shows that the extra output choice or preflight summary slows or confuses users, or a validated profile makes a different acquisition/export sequence necessary.
+
+---
+
 # Open decisions before production implementation
 
 Immediate M1 decisions:
