@@ -77,6 +77,15 @@ final class CameraController: NSObject {
         }
     }
 
+    #if DEBUG
+    /// A camera-free visual fixture for the actual overlay on Simulator. It never starts an AVFoundation session.
+    func installReviewFixture() {
+        state = .running
+        hint = .ready
+        readiness = CaptureReadiness(framing: .ok, pose: .ok, light: .ok, distance: .ok)
+    }
+    #endif
+
     /// 12.6 MP: covers 4032 x 3024 stills while excluding 24 and 48 MP modes.
     nonisolated static let maxStillPixels = 12_600_000
 

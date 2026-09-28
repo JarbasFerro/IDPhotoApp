@@ -57,18 +57,42 @@ struct CameraView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
+
+    private var reviewFixture: Bool {
+        #if DEBUG
+        ProcessInfo.processInfo.arguments.contains("--camera-review-fixture")
+        #else
+        false
+        #endif
+    }
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             cameraContent
         }
-        .task { await camera.start() }
-        .onDisappear { camera.stop() }
+        .task {
+            #if DEBUG
+            if reviewFixture {
+                camera.installReviewFixture()
+                helpTipSeen = false
+                return
+            }
+            #endif
+            await camera.start()
+        }
+        .task {
+            guard !reviewFixture, !helpTipSeen, !voiceOverEnabled else { return }
+            try? await Task.sleep(for: .seconds(5))
+            if !Task.isCancelled { helpTipSeen = true }
+        }
+        .onDisappear { if !reviewFixture { camera.stop() } }
         .onChange(of: scenePhase) { _, phase in
+            guard !reviewFixture else { return }
             if phase == .background { camera.stop() } else if phase == .active { Task { await camera.start() } }
         }
-        .onCameraCaptureEvent(isEnabled: camera.state == .running) { event in
+        .onCameraCaptureEvent(isEnabled: camera.state == .running && !reviewFixture) { event in
             if event.phase == .ended { takePhoto() }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
@@ -104,13 +128,27 @@ struct CameraView: View {
 
     @ViewBuilder private var cameraContent: some View {
         Group {
+            #if DEBUG
+            if reviewFixture {
+                CameraFramingGuidePreviewScene(ready: true)
+                overlayControls
+            } else {
+                liveCameraContent
+            }
+            #else
+            liveCameraContent
+            #endif
+        }
+    }
+
+    @ViewBuilder private var liveCameraContent: some View {
+        Group {
             switch camera.state {
             case .running, .interrupted, .configuring:
                 CameraPreviewView(layer: camera.previewLayer)
                     .ignoresSafeArea()
                     .accessibilityHidden(true)
                 headGuide
-                eyeLine
                 overlayControls
                 // Immediate acknowledgement of the shutter press while the still is processed.
                 Color.white.ignoresSafeArea().opacity(flash ? 0.85 : 0).allowsHitTesting(false)
@@ -134,27 +172,9 @@ struct CameraView: View {
         }
     }
 
-    /// The head oval inside the Calipic frame; green when every check is ready.
+    /// One quiet composition guide; camera checks are communicated beside the shutter.
     private var headGuide: some View {
         CameraFramingGuide(ready: camera.hint == .ready)
-    }
-
-    /// The detected eye line, rotated by the head's roll relative to the camera; green when level in the frame.
-    /// What matters is this relative angle, not the phone's absolute attitude.
-    @ViewBuilder private var eyeLine: some View {
-        if let roll = camera.faceRollDegrees, abs(roll) < 25 {
-            GeometryReader { geometry in
-                let ok = abs(roll) <= CaptureGuidanceThresholds.default.maxRollDegrees
-                Rectangle()
-                    .fill(ok ? StatusStyle.pass : Color.white.opacity(0.8))
-                    .frame(width: ok ? 140 : 110, height: 2)
-                    .rotationEffect(.degrees(roll))
-                    .position(x: geometry.size.width / 2, y: geometry.size.height * CameraFramingGuide.Layout.eyeLineFraction)
-                    .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: ok)
-            }
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-        }
     }
 
     /// The shutter with the readiness ring around it: four arcs (framing, head position, light, distance) that
@@ -165,8 +185,7 @@ struct CameraView: View {
             ReadinessRing(readiness: camera.readiness.staged, ready: ready, animated: !reduceMotion)
                 .frame(width: 100, height: 100)
             Circle().strokeBorder(.white, lineWidth: 4).frame(width: 76, height: 76)
-            Circle().fill(ready ? StatusStyle.pass : .white).frame(width: 62, height: 62)
-                .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: ready)
+            Circle().fill(.white).frame(width: 62, height: 62)
             if let countdown {
                 Text("\(countdown)")
                     .font(.system(size: 34, weight: .bold, design: .rounded)).monospacedDigit()
@@ -184,62 +203,27 @@ struct CameraView: View {
 
     private var overlayControls: some View {
         VStack(spacing: 0) {
-            // Controls first, on one line and one height; the message sits below them, large enough to read at arm's length.
-            HStack(spacing: 10) {
+            HStack(spacing: Design.Spacing.control) {
+                Button("Cancel") { dismiss() }
+                    .accessibilityIdentifier("cameraCancel")
                 Spacer()
                 Button { showRingHelp = true } label: {
-                    Image(systemName: "questionmark").font(.subheadline.weight(.semibold)).frame(width: 36, height: 36)
+                    Label("Help", systemImage: "questionmark.circle")
                 }
-                .buttonStyle(.bordered).buttonBorderShape(.circle)
-                .accessibilityLabel("Instructions")
                 .accessibilityIdentifier("ringHelp")
                 Toggle(isOn: $autoCapture) {
                     Label("Auto", systemImage: autoCapture ? "timer" : "timer.slash")
-                        .font(.subheadline.weight(.semibold)).frame(height: 36)
                 }
                 .toggleStyle(.button)
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
-                .accessibilityLabel("Automatic capture when ready")
+                .accessibilityLabel("Automatic capture when camera checks clear")
                 .accessibilityIdentifier("autoCapture")
             }
+            .buttonStyle(.bordered)
+            .tint(.white)
+            .controlSize(.regular)
+            .font(.subheadline.weight(.semibold))
             .padding(.horizontal, 16)
             .padding(.top, 8)
-            Label(countdown != nil ? LocalizedStringResource("Look at the lens") : CameraPresentation.text(for: camera.hint),
-                  systemImage: countdown != nil ? "eye" : CameraPresentation.symbol(for: camera.hint))
-                .font(.title3.weight(.semibold))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 18).padding(.vertical, 12)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
-                .padding(.horizontal, 24)
-                .padding(.top, 28)
-                .accessibilityIdentifier("cameraHint")
-            if let advisory = camera.advisory, camera.hint == .holdStill || camera.hint == .ready {
-                Label(CameraPresentation.text(for: advisory), systemImage: CameraPresentation.symbol(for: advisory))
-                    .font(.footnote)
-                    .padding(.horizontal, 10).padding(.vertical, 6)
-                    .background(.regularMaterial, in: Capsule())
-                    .padding(.top, 6)
-                    .accessibilityIdentifier("cameraTip")
-            }
-            if !helpTipSeen {
-                HStack(spacing: 10) {
-                    Text("The ring checks framing, head position, light and distance.")
-                        .font(.footnote)
-                    Button("Got it") { helpTipSeen = true }
-                        .font(.footnote.weight(.semibold))
-                }
-                .padding(10)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal, 24)
-                .padding(.top, 8)
-                .accessibilityIdentifier("cameraOptionalTip")
-            }
-
-            if camera.state == .interrupted {
-                Text("Camera paused. It resumes when the interruption ends.")
-                    .font(.footnote).padding(8).background(.regularMaterial, in: Capsule())
-            }
             if developerMode {
                 if let startup = camera.startupMilliseconds {
                     Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? ""))
@@ -251,28 +235,59 @@ struct CameraView: View {
                     .accessibilityHidden(true)
             }
             Spacer()
-            HStack {
-                Button("Cancel") { dismiss() }
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("cameraCancel")
-                Spacer()
-                Button(action: takePhoto) { shutter }
-                .disabled(camera.state != .running || camera.isCapturing)
-                .accessibilityLabel("Take Photo")
-                .accessibilityValue(Text(CameraPresentation.readinessSummary(camera.readiness.staged)))
-                .accessibilityHint(Text(CameraPresentation.text(for: camera.hint)))
-                .accessibilityIdentifier("shutter")
-                Spacer()
-                Button { camera.switchCamera() } label: {
-                    Image(systemName: "arrow.triangle.2.circlepath.camera")
-                        .font(.title2).frame(width: 44, height: 44)
+            VStack(spacing: 16) {
+                Group {
+                    if camera.state == .interrupted {
+                        Text("Camera paused. It resumes when the interruption ends.")
+                            .frame(maxWidth: .infinity)
+                    } else if !helpTipSeen {
+                        HStack(spacing: Design.Spacing.control) {
+                            Text("The ring shows framing, pose, light and distance.")
+                            Spacer(minLength: 0)
+                            Button("Got it") { helpTipSeen = true }
+                                .fontWeight(.semibold)
+                        }
+                        .accessibilityIdentifier("cameraOptionalTip")
+                    } else {
+                        Label(countdown != nil ? LocalizedStringResource("Look at the lens") : CameraPresentation.text(for: camera.hint),
+                              systemImage: countdown != nil ? "eye" : CameraPresentation.symbol(for: camera.hint))
+                            .frame(maxWidth: .infinity)
+                            .accessibilityIdentifier("cameraHint")
+                    }
                 }
-                .buttonStyle(.bordered)
-                .accessibilityLabel("Switch Camera")
-                .accessibilityIdentifier("switchCamera")
+                .font(.subheadline.weight(.medium))
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 24)
+                .frame(minHeight: 44)
+
+                HStack {
+                    Color.clear.frame(width: 52, height: 52)
+                    Spacer()
+                    Button(action: takePhoto) { shutter }
+                        .disabled(camera.state != .running || camera.isCapturing)
+                        .accessibilityLabel("Take Photo")
+                        .accessibilityValue(Text(CameraPresentation.readinessSummary(camera.readiness.staged)))
+                        .accessibilityHint(Text(CameraPresentation.text(for: camera.hint)))
+                        .accessibilityIdentifier("shutter")
+                    Spacer()
+                    Button { camera.switchCamera() } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath.camera")
+                            .font(.title2).frame(width: 44, height: 44)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.white)
+                    .accessibilityLabel("Switch Camera")
+                    .accessibilityIdentifier("switchCamera")
+                }
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 24)
+            .padding(.top, 48)
+            .padding(.bottom, 16)
+            .background {
+                LinearGradient(colors: [.clear, .black.opacity(0.72), .black.opacity(0.82)],
+                               startPoint: .top, endPoint: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+            }
         }
         .foregroundStyle(.white)
     }
@@ -325,7 +340,7 @@ struct CameraView: View {
     }
 
     private func takePhoto() {
-        guard camera.state == .running, !camera.isCapturing else { return }
+        guard !reviewFixture, camera.state == .running, !camera.isCapturing else { return }
         flash = true
         Task {
             try? await Task.sleep(for: .milliseconds(120))
@@ -346,12 +361,12 @@ struct CameraView: View {
 enum CameraPresentation {
     static func text(for hint: CaptureHint) -> LocalizedStringResource {
         switch hint {
-        case .noFace: "Show your face in the oval"
+        case .noFace: "Position your face inside the guide"
         case .multipleFaces: "Only one person in the frame"
         case .moveCloser: "Move a little closer"
         case .moveBack: "Move a little farther away"
         case .tooClose: "Too close: move back, or ask someone to take it"
-        case .centerFace: "Centre your face in the oval"
+        case .centerFace: "Centre your face in the guide"
         case .levelPhone: "Level the phone to match your head"
         case .uprightPhone: "Straighten the phone; it is leaning"
         case .keepLevel: "Keep your head level"
@@ -362,7 +377,7 @@ enum CameraPresentation {
         case .turnLeft: "Tip: turn slightly to your left, towards the light"
         case .turnRight: "Tip: turn slightly to your right, towards the light"
         case .holdStill: "Hold still"
-        case .ready: "Ready. Take the photo."
+        case .ready: "Camera checks clear. Check background and remove headphones."
         }
     }
 
@@ -398,7 +413,7 @@ enum CameraPresentation {
 
     static func explanation(for group: ReadinessGroup) -> LocalizedStringResource {
         switch group {
-        case .framing: "One face, big enough and centred in the oval."
+        case .framing: "One face, big enough and centred in the guide."
         case .pose: "Straight, level and looking at the camera. If the phone is tilted, you move the phone."
         case .light: "Bright enough, not lit from behind."
         case .distance: "About an arm's length. Too close distorts the nose."
@@ -469,14 +484,14 @@ struct CameraIntroView: View {
                     .frame(width: 84, height: 84)
                     .padding(14)
                     .accessibilityHidden(true)
-                Text("The ring around the shutter checks four things, one after another. The message at the top tells you what to do.")
+                Text("The ring around the shutter checks framing, head position, light and distance. The message above the shutter tells you what to do.")
                     .font(.subheadline)
             }
             HStack(spacing: 14) {
                 legend(.white.opacity(0.35), "Not yet")
                 legend(StatusStyle.warn, "Needs attention")
                 legend(StatusStyle.pass, "Fine")
-                legend(StatusStyle.pass, "All four: ready", closed: true)
+                legend(StatusStyle.pass, "Camera checks clear", closed: true)
             }
             .font(.caption)
             .frame(maxWidth: .infinity)
@@ -536,7 +551,7 @@ struct CameraIntroView: View {
     }
 }
 
-/// Four arcs around the shutter, one per readiness group, each with its icon; closes into a full green ring when ready.
+/// Four arcs around the shutter, one per camera check; closes when the measured checks are clear.
 struct ReadinessRing: View {
     let readiness: CaptureReadiness
     let ready: Bool
@@ -552,17 +567,6 @@ struct ReadinessRing: View {
                     .trim(from: Double(index) * span + gap / 2, to: Double(index + 1) * span - gap / 2)
                     .stroke(color(for: ready ? .ok : readiness[group]), style: StrokeStyle(lineWidth: 5, lineCap: gap == 0 ? .butt : .round))
                     .rotationEffect(.degrees(-90))
-                // Icon just outside the arc's midpoint, so the ring explains itself.
-                GeometryReader { geometry in
-                    let radius = min(geometry.size.width, geometry.size.height) / 2 + 12
-                    let angle = (Double(index) + 0.5) * span * 2 * .pi - .pi / 2
-                    Image(systemName: CameraPresentation.symbol(for: group))
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(color(for: ready ? .ok : readiness[group]))
-                        .symbolEffect(.bounce, options: .nonRepeating, value: readiness[group] == .ok)
-                        .shadow(color: .black.opacity(0.6), radius: 2)
-                        .position(x: geometry.size.width / 2 + cos(angle) * radius, y: geometry.size.height / 2 + sin(angle) * radius)
-                }
             }
         }
         .animation(animated ? .easeInOut(duration: 0.3) : nil, value: readiness)

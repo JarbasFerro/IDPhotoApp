@@ -1,13 +1,10 @@
 import SwiftUI
 
-/// The guided camera's framing guide: the dashed head oval, inside the Calipic frame.
+/// One composition guide: the Calipic frame when it fits, otherwise the head oval.
 ///
-/// The oval is unchanged and stays the thing the hints talk about ("Show your face in the oval"). The frame around it
-/// has the photo's proportions and places the oval where the head sits in the finished photo (head height and eye
-/// line from `CompositionSpec`), so the live view is composed like the app icon: a person inside the C-shaped frame.
-/// Both are composition aids, not the final crop, and both take the same colour: white while framing, the pass
-/// colour when every check is ready. Nothing is drawn over the face. Decorative for assistive technologies; the
-/// hint label and the shutter's accessibility value carry the state.
+/// The frame has the photo's proportions and leaves room for the head. The oval is retained as the fallback on
+/// narrow or landscape layouts. Neither is the final crop. The guide remains white so a measured camera state
+/// does not paint an approval mark across the person's face; the shutter ring and spoken hint carry that state.
 struct CameraFramingGuide: View {
     let ready: Bool
     var format: PhotoFormat = .spainPrototype
@@ -17,7 +14,7 @@ struct CameraFramingGuide: View {
 
     /// Where the guide sits in the camera view. Pure geometry, so it can be tested without a camera.
     struct Layout: Equatable {
-        /// The eye line's height in the camera view; the oval is centred on it and the detected eye line is drawn on it.
+        /// The eye line's height in the camera view; the oval is centred on it for geometry only.
         static let eyeLineFraction: CGFloat = 0.44
 
         let oval: CGRect
@@ -49,19 +46,19 @@ struct CameraFramingGuide: View {
         GeometryReader { geometry in
             let layout = Layout(in: geometry.size, format: format, composition: composition)
             let lineWidth = Design.Stroke.guide(for: contrast)
-            let color = ready ? StatusStyle.pass : Color.white.opacity(contrast == .increased ? 1 : 0.7)
+            let color = Color.white.opacity(contrast == .increased ? 1 : ready ? 0.9 : 0.75)
             ZStack {
-                Ellipse()
-                    .strokeBorder(color, style: StrokeStyle(lineWidth: lineWidth, dash: [8, 6]))
-                    .frame(width: layout.oval.width, height: layout.oval.height)
-                    .position(x: layout.oval.midX, y: layout.oval.midY)
                 if let frame = layout.frame {
                     CalipicFrameGuide(color: color)
                         .frame(width: frame.width, height: frame.height)
                         .position(x: frame.midX, y: frame.midY)
+                } else {
+                    Ellipse()
+                        .strokeBorder(color, style: StrokeStyle(lineWidth: lineWidth, dash: [8, 6]))
+                        .frame(width: layout.oval.width, height: layout.oval.height)
+                        .position(x: layout.oval.midX, y: layout.oval.midY)
                 }
             }
-            // Colour only; it replaces the oval's own animation and adds no movement.
             .animation(Design.Motion.guideState.resolved(reduceMotion: reduceMotion), value: ready)
         }
         .allowsHitTesting(false)

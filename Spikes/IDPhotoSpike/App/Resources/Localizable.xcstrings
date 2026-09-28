@@ -6869,6 +6869,150 @@
           }
         }
       }
+    },
+    "Help" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda"
+          }
+        }
+      }
+    },
+    "The ring shows framing, pose, light and distance." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El anillo muestra el encuadre, la posición de la cabeza, la luz y la distancia."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O anel mostra o enquadramento, a posição da cabeça, a luz e a distância."
+          }
+        }
+      }
+    },
+    "Position your face inside the guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca la cara dentro de la guía"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posicione o rosto dentro da guia"
+          }
+        }
+      }
+    },
+    "Centre your face in the guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra la cara en la guía"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centralize o rosto na guia"
+          }
+        }
+      }
+    },
+    "Camera checks clear. Check background and remove headphones." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las comprobaciones de cámara están bien. Revisa el fondo y quítate los auriculares."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As verificações da câmera estão boas. Confira o fundo e tire os fones de ouvido."
+          }
+        }
+      }
+    },
+    "One face, big enough and centred in the guide." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una cara, lo bastante grande y centrada en la guía."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um rosto, grande o bastante e centralizado na guia."
+          }
+        }
+      }
+    },
+    "The ring around the shutter checks framing, head position, light and distance. The message above the shutter tells you what to do." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El anillo del disparador comprueba el encuadre, la posición de la cabeza, la luz y la distancia. El mensaje sobre el disparador te dice qué hacer."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O anel ao redor do botão de captura verifica enquadramento, posição da cabeça, luz e distância. A mensagem acima do botão diz o que fazer."
+          }
+        }
+      }
+    },
+    "Camera checks clear" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobaciones de cámara correctas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificações da câmera concluídas"
+          }
+        }
+      }
+    },
+    "Automatic capture when camera checks clear" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captura automática cuando las comprobaciones de cámara estén bien"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captura automática quando as verificações da câmera estiverem boas"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

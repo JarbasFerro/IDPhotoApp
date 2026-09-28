@@ -14,7 +14,17 @@ struct IDPhotoSpikeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(model: model)
+            Group {
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("--camera-review-fixture") {
+                    CameraView(onCapture: { _, _ in }, onChoosePhoto: {})
+                } else {
+                    RootView(model: model)
+                }
+                #else
+                RootView(model: model)
+                #endif
+            }
                 // Teal (BD-033); `-brandCandidate` in Debug builds still swaps in a test system for comparisons.
                 .tint(BrandCandidate.current?.color ?? Brand.accent)
                 .task {
