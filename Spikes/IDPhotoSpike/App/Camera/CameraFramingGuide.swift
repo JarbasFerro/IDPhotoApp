@@ -4,6 +4,7 @@ import SwiftUI
 struct CameraFramingGuide: View {
     let ready: Bool
     let correction: GuideCorrection?
+    let faceRollDegrees: Double?
     let isCapturing: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var contrast
@@ -29,6 +30,8 @@ struct CameraFramingGuide: View {
         GeometryReader { geometry in
             let oval = Layout(in: geometry.size).oval
             ZStack {
+                CameraApertureScrim(oval: oval)
+                    .fill(Color.black.opacity(contrast == .increased ? 0.12 : 0.16), style: FillStyle(eoFill: true))
                 Ellipse()
                     .strokeBorder(ready ? Color.green : Color.white.opacity(contrast == .increased ? 1 : 0.9),
                                   lineWidth: Design.Stroke.guide(for: contrast))
@@ -37,6 +40,17 @@ struct CameraFramingGuide: View {
                     .frame(width: oval.width, height: oval.height)
                     .scaleEffect(settleScale)
                     .position(x: oval.midX, y: oval.midY)
+                if let faceRollDegrees, !ready, abs(faceRollDegrees) < 25 {
+                    HStack(spacing: 7) {
+                        Capsule().frame(width: 22, height: 1.5)
+                        Circle().frame(width: 3, height: 3)
+                        Capsule().frame(width: 22, height: 1.5)
+                    }
+                    .foregroundStyle(.white.opacity(contrast == .increased ? 0.9 : 0.55))
+                    .rotationEffect(.degrees(faceRollDegrees))
+                    .position(x: oval.midX, y: oval.minY + oval.height * 0.44)
+                    .shadow(color: .black.opacity(0.7), radius: 3)
+                }
                 if let correction {
                     GuideArrow(correction: correction, oval: oval)
                         .stroke(.white, style: StrokeStyle(lineWidth: contrast == .increased ? 4 : 3,
@@ -78,6 +92,18 @@ struct CameraFramingGuide: View {
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+}
+
+/// The aperture stays clear. The rest of the preview is only gently dimmed, so shoulders and light remain visible.
+private struct CameraApertureScrim: Shape {
+    let oval: CGRect
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.addRect(rect)
+        path.addEllipse(in: oval)
+        return path
     }
 }
 
@@ -142,6 +168,7 @@ struct CameraFramingGuidePreviewScene: View {
     let ready: Bool
     var correction: GuideCorrection? = nil
     var faceOffset: CGFloat = 0
+    var showGuide = true
 
     var body: some View {
         ZStack {
@@ -156,7 +183,10 @@ struct CameraFramingGuidePreviewScene: View {
                     .frame(width: oval.width * 1.9, height: oval.height * 0.72)
                     .position(x: oval.midX + faceOffset, y: oval.maxY + oval.height * 0.25)
             }
-            CameraFramingGuide(ready: ready, correction: correction, isCapturing: false)
+            if showGuide {
+                CameraFramingGuide(ready: ready, correction: correction,
+                                   faceRollDegrees: ready ? nil : 6, isCapturing: false)
+            }
         }
         .ignoresSafeArea()
     }

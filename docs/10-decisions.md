@@ -686,6 +686,66 @@ Physical-device task tests show that the oval misguides positioning, the single 
 
 ---
 
+## ADR-045 — Biometric guided selfie capture with relative horizon and instant freeze-frame review
+
+**Status:** Accepted, refined 2026-09-30
+**Date:** 2026-09-28
+
+### Context
+
+While ADR-044 established a calmer single-oval camera composition, deep research into ICAO Doc 9303/ISO 19794-5 standards, Apple Face ID enrollment, and identity verification leaders (Stripe Identity, Persona, Onfido) revealed critical interaction gaps:
+1. **Background Clutter:** The bare full-screen preview leaves the user distracted by peripheral room clutter.
+2. **Mental Math on Leveling:** Pure text cues (*"Tilt phone upright"*, *"Level the phone"*) cause cognitive friction. Leveling to Earth gravity is physically flawed for selfies because a tilted head with an equally tilted phone produces a level portrait in sensor space ($\\Delta \\theta = 0^\\circ$).
+3. **Capture Anxiety vs. Hand Shake:** Full auto-capture snaps prematurely before users settle their expression; conversely, a raw shutter tap without readiness arming risks camera shake.
+4. **Post-Capture Verification:** Jumping directly from capture to the full Photo Check / crop screen denies the user a fast inline inspection of their eyes/expression.
+
+### Decision
+
+1. Prototype a gentle peripheral scrim and subtle eye-level line inside the compact oval. Assess both on a physical phone, including visibility of eyes and shoulders. Keep one actionable phone-movement cue at a time. Green means measured live checks have settled, not official acceptance.
+2. Keep the familiar manual shutter. Optional three-second automatic capture remains in Help. Neither path is blocked by a visual readiness state.
+3. After capture, show the actual still image with **Retake** and **Use Photo**. Retake returns to live preview; Use Photo proceeds to Photo Check. Do not show verification chips or claimed compliance before analysis.
+
+### Evidence
+
+[18-camera-selfie-experience-research.md](18-camera-selfie-experience-research.md); ICAO Doc 9303 and ISO/IEC 19794-5 biometric standards; UX benchmarks from Apple Face ID, Stripe Identity, Persona, and Onfido Motion.
+
+### Consequences
+
+`CameraView.swift` and `CameraFramingGuide.swift` implement the capture review and visual prototypes. Physical-device testing decides whether the scrim and eye-level line remain.
+
+### Revisit trigger
+
+Physical-device task tests show that the still review adds more friction than value, or the scrim/eye-level line obscures useful image detail.
+
+---
+
+## ADR-046 — Multi-sensory capture climax and the "WOW moment"
+
+**Status:** Accepted, refined 2026-09-30
+**Date:** 2026-09-29
+
+### Context
+
+Under the Peak-End Rule, a user's long-term evaluation of an app is anchored at its emotional climax. In an ID photo app, taking the photo is that decisive peak. The current spike relies on a flat 120ms white flash and generic system sound. This feels utilitarian rather than extraordinary, leaving the app vulnerable to user dread about administrative bureaucracy.
+
+### Decision
+
+Shutter press gets one soft visual bloom and one haptic. AVFoundation supplies the system shutter sound; no custom earcon is added. Once the actual still is ready, show it for review with Retake and Use Photo. Do not add a segmentation effect or biometric verification claims to the captured image. Respect Reduce Motion and follow capture completion rather than a fixed choreography deadline.
+
+### Evidence
+
+[19-capture-wow-moment-research.md](19-capture-wow-moment-research.md); Kahneman's Peak-End Rule; Apple HIG on sensory feedback; Apple VisionKit Subject Lifting; Leica/Hasselblad acoustic leaf shutter physics.
+
+### Consequences
+
+The camera uses the existing native capture path and a restrained SwiftUI bloom. No new audio or haptics dependency is needed.
+
+### Revisit trigger
+
+Physical-device review finds the bloom distracting, or capture-to-review latency is too long for a calm experience.
+
+---
+
 # Open decisions before production implementation
 
 Immediate M1 decisions:

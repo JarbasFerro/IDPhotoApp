@@ -5262,6 +5262,22 @@
         }
       }
     },
+    "Photo captured. Review your photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto tomada. Revisa tu foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto tirada. Revise sua foto."
+          }
+        }
+      }
+    },
     "Retake" : {
       "localizations" : {
         "es" : {
@@ -5274,6 +5290,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tirar outra"
+          }
+        }
+      }
+    },
+    "Use Photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar foto"
           }
         }
       }

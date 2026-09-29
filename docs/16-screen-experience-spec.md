@@ -116,14 +116,14 @@ The live camera starts without a tutorial gate. A first-use tip, **Keep your fac
 ### Live composition
 
 - Live preview fills the display edge to edge; keep the person's face and shoulders visually primary. Force dark control styling for contrast without painting the image dark.
-- Show one compact white oval sized for the visible head, leaving room for hair beyond the detector's face box. Lay it out in the same full-screen displayed-preview coordinates as the face observations. A stable phone movement grows an arrow from the relevant oval edge: straight for translation, curved for tilt, expanding or shrinking at the sides for distance. The cue and the spoken/visible instruction agree. When measured checks settle, the oval turns green; this indicates camera readiness, not official compliance. Lighting leaves the oval neutral. No C-shaped corners, progress arcs, eye line, or second guide crosses the face. The guide is never exported.
+- Show one compact white oval sized for the visible head, leaving room for hair beyond the detector's face box. Lay it out in the same full-screen displayed-preview coordinates as the face observations. A stable phone movement grows an arrow from the relevant oval edge: straight for translation, curved for tilt, expanding or shrinking at the sides for distance. The cue and the spoken/visible instruction agree. When measured checks settle, the oval turns green; this indicates camera readiness, not official compliance. Lighting leaves the oval neutral. No C-shaped corners or progress arcs. A subtle eye-level line and gentle outer dimming are physical-device prototypes; remove them if they obstruct the subject. The guide is never exported.
 - The top edge holds native glass **Cancel** and **Help** controls. The optional **Automatic capture** toggle is in Help so the live camera stays focused on the photo.
 - The lower edge holds one message above the shutter on a restrained dark fade. It names the physical phone action, such as **“Move the phone right”**, **“Raise the phone”**, **“Tilt the phone down”**, or **“Bring the phone closer.”** An actionable correction replaces the brief first-use tip immediately; the tip never stacks over the head. On measured readiness, it says **“Ready to take photo”**; this means the live measurable checks have settled, not that the receiving office has approved the result. The preflight and Check screens carry manual requirements.
 - Bottom controls: large, familiar white shutter centered and native glass **Switch Camera** on the right when the device has both cameras. No readiness graphics surround the shutter. During Auto countdown, show large 3, 2, 1 numerals inside it; after shutter press show a tick while still capture finishes.
 
 The shutter remains usable in manual mode before every live check is ready; feedback informs rather than traps the user. Hints change only after stable analysis, and spoken announcements are rate limited. VoiceOver shutter value summarizes framing, head position, light, and distance in words. The camera preview and decorative guides are hidden from accessibility navigation.
 
-The first stable Ready transition draws a brief brightening and scale settle on the oval with one success haptic. It then rests; later hint changes do not create a pulsing loop. Reduce Motion switches state without the visual settle. Shutter press fades the guide before the existing Photo Check source-to-crop landing; a capture failure restores the guide.
+The first stable Ready transition draws a brief brightening and scale settle on the oval. It then rests; later hint changes do not create a pulsing loop. Reduce Motion switches state without the visual settle. Shutter press fades the guide; a capture failure restores it. The actual still appears for review before Photo Check.
 
 ### Camera states
 
@@ -133,10 +133,20 @@ The first stable Ready transition draws a brief brightening and scale settle on 
 | Denied/restricted | **Camera access is off**, short explanation, **Open Settings** and **Choose Photo Instead**. The latter dismisses camera and opens `PhotosPicker` directly. |
 | No device camera | **No camera on this device**, then **Choose Photo Instead**, which opens `PhotosPicker`. |
 | Interrupted/backgrounded | Keep the preview context, show **“Camera paused. It resumes when the interruption ends.”**; disable shutter, clear Auto countdown, restart when active. |
-| Capture in progress | Immediate brief flash/tick, disabled shutter, no duplicate capture. On success leave camera and show Check; on failure show a plain alert with a retry path. |
+| Capture in progress | Soft bloom and one haptic, disabled shutter, no duplicate capture. On success show the actual still with Retake and Use Photo; on failure show a plain alert with a retry path. |
 | Camera failure | Error headline plus a concrete **Try Again** or **Choose Photo** recovery. Avoid a dead-end `ContentUnavailableView`. |
 
 Developer timing/debug text stays hidden unless developer mode is explicitly enabled. The visual guide must remain understandable in bright, dim, high-contrast, and Reduce Transparency settings.
+
+### 6.1 Camera focus and captured photo review (ADR-045)
+
+The oval remains compact. Try a gentle dimming outside it on a physical phone; do not obscure hair, shoulders, or the lighting context. Prototype a short, low-contrast eye-level line in the oval using measured face roll. Remove it if it covers the eyes or competes with the phone-movement arrow. The existing green oval and spoken **Ready to take photo** remain the settled guidance; manual shutter remains available at any time.
+
+After the still capture finishes, display the **actual captured image** without guide graphics. Show **Review your photo**, **Retake**, and **Use Photo**. Retake returns to the live camera; Use Photo sends the immutable source to Photo Check. Do not show verification or compliance claims on this quick review. Its purpose is a fast look at expression, eyes, and obvious capture mistakes. The review is offered after manual and optional three-second automatic capture.
+
+### 6.2 Shutter feedback (ADR-046)
+
+At shutter press, acknowledge the action with one soft visual bloom and one haptic. Let AVFoundation provide the system shutter sound; do not add a custom sound. Show capture progress until the actual still is available, then reveal the review controls. The transition follows real capture completion rather than a fixed animation deadline. Reduce Motion removes the bloom. Keep the source photo unaltered and do not render a segmentation effect into it.
 
 ## 7. Short requirements preflight, system photo selection, and processing bridge
 
@@ -296,7 +306,7 @@ Shipped English phrases in the inventory below are String Catalog keys unless id
 | Preflight | **Before your photo**, **Spain · DNI photo**; three requirement rows and footer in §7 | `person.crop.rectangle`, `sun.max`, `viewfinder` | Rows read in list order; no tap action. |
 | Preflight actions | **Full requirements**, **Choose Photo Instead** / **Take Photo Instead**, **Open Camera** / **Choose Photo**, **Cancel** | Native navigation, source switch row, bottom prominent button | Button names match text; switching source closes preflight then opens selected acquisition. |
 | Requirements | **Photo requirements**, section/row copy in §4, source link and review date, **Done** | Native list and link; Done closes | Source link has link trait; each multiline row reads fully. |
-| Camera | **Cancel**, **Help**, one CameraPresentation hint or first-use oval tip, shutter, **Switch Camera** when available | Glass buttons, one white oval, hint symbol, white shutter, camera switch | Shutter value reads four readiness groups as `{group} {OK / needs attention / not measured}`. |
+| Camera | **Cancel**, **Help**, one CameraPresentation hint or first-use oval tip, shutter, **Switch Camera** when available | Glass buttons, one compact oval with an edge-connected phone-movement arrow when needed, green when ready, white shutter, camera switch | Shutter value reads four readiness groups as `{group} {OK / needs attention / not measured}`; spoken cue matches text. |
 | Camera Help | **Camera Help**, **Taking your photo**, three advice rows, **Automatic capture**, **Done** | Native scrolling Form and toggle | Advice reads in order; toggle announces its state. |
 | Photo Check | **Your photo** or **Photo {n} of {m}**, **Requirements**, **Remove Photo**, portrait caption, status title/subtitle, up to five rows | Source portrait, status symbol; toolbar and rows | Portrait action **Compare with original**; each row reads topic, pass/warn/fail/manual state, then detail. |
 | Photo Check actions | **Continue**, **Adjust**, **Retake** → **Take Photo** / **Choose Photo** | Prominent, bordered, menu | Names match text; Retake retains person identity and edits until new source installs. |

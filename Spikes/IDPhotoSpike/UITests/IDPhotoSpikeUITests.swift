@@ -102,6 +102,28 @@ final class IDPhotoSpikeUITests: XCTestCase {
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 
+    /// The quick review is distinct from live guidance, and Retake restores the camera controls.
+    @MainActor
+    func testCameraCapturedReviewOffersRetake() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--camera-review-fixture"]
+        app.launch()
+        let shutter = app.buttons["shutter"]
+        XCTAssertTrue(shutter.waitForExistence(timeout: 10))
+        shutter.tap()
+        XCTAssertTrue(app.staticTexts["Review your photo"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["cameraRetake"].exists)
+        XCTAssertTrue(app.buttons["cameraUsePhoto"].exists)
+        XCTAssertFalse(shutter.exists)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Camera captured review, synthetic subject"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+        app.buttons["cameraRetake"].tap()
+        XCTAssertTrue(shutter.waitForExistence(timeout: 5))
+    }
+
     /// Opens the App Icon sheet from Home (BD-038) and keeps a screenshot for docs/brand/prototypes/07.
     @MainActor
     func testAppIconPickerShowsTheSetAndTheCurrentIcon() throws {

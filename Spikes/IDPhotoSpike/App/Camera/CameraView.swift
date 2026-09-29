@@ -1,5 +1,6 @@
 import AVFoundation
 import AVKit
+import ImageIO
 import SwiftUI
 import UIKit
 
@@ -54,7 +55,11 @@ struct CameraView: View {
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
     @State private var showCameraHelp = false
-    @State private var readyFeedbackFired = false
+    @State private var capturedPhoto: StagedPhoto?
+    @State private var capturedImage: CGImage?
+    @State private var showingCapturedReview = false
+    @State private var preparingReview = false
+    @State private var captureRevision = UUID()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -100,20 +105,24 @@ struct CameraView: View {
             try? await Task.sleep(for: .seconds(4))
             if !Task.isCancelled { helpTipSeen = true }
         }
-        .onDisappear { if !reviewFixture { camera.stop() } }
+        .onDisappear {
+            captureRevision = UUID()
+            if let capturedPhoto { Task { await CameraStillPreview.discard(capturedPhoto) } }
+            if !reviewFixture { camera.stop() }
+        }
         .onChange(of: scenePhase) { _, phase in
             guard !reviewFixture else { return }
             if phase == .background { camera.stop() } else if phase == .active { Task { await camera.start() } }
         }
-        .onCameraCaptureEvent(isEnabled: camera.state == .running && !reviewFixture) { event in
+        .onCameraCaptureEvent(isEnabled: camera.state == .running && !reviewFixture && !preparingReview && !showingCapturedReview) { event in
             if event.phase == .ended { takePhoto() }
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: camera.isCapturing) { _, capturing in capturing }
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
-        .sensoryFeedback(.success, trigger: readyFeedbackFired) { old, new in !old && new }
-        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showCameraHelp)") {
+        .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showCameraHelp)-\(preparingReview)-\(showingCapturedReview)") {
             // Auto capture: "ready" held through a visible countdown; any hint change cancels it.
-            guard autoCapture, !showCameraHelp, camera.hint == .ready, camera.state == .running, !camera.isCapturing
+            guard autoCapture, !showCameraHelp, !preparingReview, !showingCapturedReview,
+                  camera.hint == .ready, camera.state == .running, !camera.isCapturing
             else { countdown = nil; return }
             // Three seconds: enough to stop reading the screen and look at the lens.
             for value in [3, 2, 1] {
@@ -124,9 +133,6 @@ struct CameraView: View {
             }
             countdown = nil
             takePhoto()
-        }
-        .onChange(of: camera.hint) { _, hint in
-            if hint == .ready && !readyFeedbackFired { readyFeedbackFired = true }
         }
         .task(id: "\(spokenHint)-\(showCameraHelp)") {
             // Coalesce a hint change and its directional cue into one spoken instruction.
@@ -147,7 +153,10 @@ struct CameraView: View {
     @ViewBuilder private var cameraContent: some View {
         Group {
             #if DEBUG
-            if reviewFixture {
+            if reviewFixture && showingCapturedReview {
+                CameraFramingGuidePreviewScene(ready: true, showGuide: false)
+                capturedReviewControls
+            } else if reviewFixture {
                 CameraFramingGuidePreviewScene(ready: !reviewOffCenter,
                                                correction: camera.guideCorrection,
                                                faceOffset: reviewOffCenter ? -65 : 0)
@@ -168,11 +177,21 @@ struct CameraView: View {
                 CameraPreviewView(layer: camera.previewLayer)
                     .ignoresSafeArea()
                     .accessibilityHidden(true)
-                headGuide
-                overlayControls
+                if showingCapturedReview, let capturedImage {
+                    Image(decorative: capturedImage, scale: 1, orientation: .up)
+                        .resizable().scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .accessibilityHidden(true)
+                    capturedReviewControls
+                } else {
+                    headGuide
+                    overlayControls
+                }
                 // Immediate acknowledgement of the shutter press while the still is processed.
-                Color.white.ignoresSafeArea().opacity(flash ? 0.85 : 0).allowsHitTesting(false)
-                    .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: flash)
+                RadialGradient(colors: [.white.opacity(0.55), .white.opacity(0.18), .clear],
+                               center: .center, startRadius: 20, endRadius: 380)
+                    .ignoresSafeArea().opacity(flash && !reduceMotion ? 1 : 0).allowsHitTesting(false)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.23), value: flash)
             case .denied:
                 deniedView
             case .unavailable:
@@ -196,6 +215,7 @@ struct CameraView: View {
     private var headGuide: some View {
         CameraFramingGuide(ready: camera.hint == .ready,
                            correction: camera.guideCorrection,
+                           faceRollDegrees: camera.faceRollDegrees,
                            isCapturing: camera.isCapturing)
             .ignoresSafeArea() // The guide and AVCaptureVideoPreviewLayer must use the same displayed frame.
     }
@@ -212,7 +232,7 @@ struct CameraView: View {
                     .contentTransition(.numericText(countsDown: true))
                     .animation(reduceMotion ? nil : .snappy, value: countdown)
                     .accessibilityIdentifier("countdown")
-            } else if camera.isCapturing {
+            } else if preparingReview {
                 Image(systemName: "checkmark").font(.title.weight(.bold)).foregroundStyle(.black)
                     .transition(.scale.combined(with: .opacity))
             }
@@ -277,7 +297,7 @@ struct CameraView: View {
                     Color.clear.frame(width: 52, height: 52)
                     Spacer()
                     Button(action: takePhoto) { shutter }
-                        .disabled(camera.state != .running || camera.isCapturing)
+                        .disabled(camera.state != .running || preparingReview || camera.isCapturing)
                         .accessibilityLabel("Take Photo")
                         .accessibilityValue(Text(CameraPresentation.readinessSummary(camera.readiness.staged)))
                         .accessibilityHint(Text(CameraPresentation.text(for: camera.hint,
@@ -356,7 +376,16 @@ struct CameraView: View {
     }
 
     private func takePhoto() {
-        guard !reviewFixture, camera.state == .running, !camera.isCapturing else { return }
+        #if DEBUG
+        if reviewFixture {
+            showingCapturedReview = true
+            return
+        }
+        #endif
+        guard camera.state == .running, !camera.isCapturing, !preparingReview, !showingCapturedReview else { return }
+        let revision = UUID()
+        captureRevision = revision
+        preparingReview = true
         flash = true
         Task {
             try? await Task.sleep(for: .milliseconds(120))
@@ -365,12 +394,98 @@ struct CameraView: View {
         Task {
             do {
                 let staged = try await camera.capture()
-                onCapture(staged, CameraMetrics(startupMilliseconds: camera.startupMilliseconds,
-                                                captureMilliseconds: camera.lastCaptureMilliseconds))
+                let image: CGImage
+                do { image = try await CameraStillPreview.load(staged.url) }
+                catch {
+                    await CameraStillPreview.discard(staged)
+                    throw error
+                }
+                guard captureRevision == revision else {
+                    await CameraStillPreview.discard(staged)
+                    return
+                }
+                capturedPhoto = staged
+                capturedImage = image
+                preparingReview = false
+                showingCapturedReview = true
+                AccessibilityNotification.Announcement(String(localized: "Photo captured. Review your photo.")).post()
             } catch {
+                guard captureRevision == revision else { return }
+                preparingReview = false
                 errorMessage = (error as? CameraError)?.errorDescription ?? CameraError.captureFailed.errorDescription
             }
         }
+    }
+
+    private var capturedReviewControls: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button("Cancel") { discardCapturedPhoto(); dismiss() }
+                    .accessibilityIdentifier("cameraReviewCancel")
+                Spacer()
+            }
+            .buttonStyle(.glass)
+            .tint(.white)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            Spacer()
+            VStack(spacing: 8) {
+                Text("Review your photo")
+                    .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
+                HStack(spacing: 12) {
+                    Button("Retake") { discardCapturedPhoto() }
+                        .buttonStyle(.glass)
+                        .tint(.white)
+                        .accessibilityIdentifier("cameraRetake")
+                    Button("Use Photo") {
+                        guard let capturedPhoto else { return }
+                        self.capturedPhoto = nil
+                        onCapture(capturedPhoto, CameraMetrics(startupMilliseconds: camera.startupMilliseconds,
+                                                               captureMilliseconds: camera.lastCaptureMilliseconds))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color.brandAccentFill)
+                    .disabled(capturedPhoto == nil)
+                    .accessibilityIdentifier("cameraUsePhoto")
+                }
+                .frame(maxWidth: .infinity)
+                .controlSize(.large)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background {
+                LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+            }
+        }
+        .foregroundStyle(.white)
+    }
+
+    private func discardCapturedPhoto() {
+        captureRevision = UUID()
+        if let capturedPhoto { Task { await CameraStillPreview.discard(capturedPhoto) } }
+        capturedPhoto = nil
+        capturedImage = nil
+        showingCapturedReview = false
+        preparingReview = false
+    }
+}
+
+private enum CameraStillPreview {
+    @concurrent static func load(_ url: URL) async throws -> CGImage {
+        try Task.checkCancellation()
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let image = CGImageSourceCreateThumbnailAtIndex(source, 0, [
+                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                kCGImageSourceCreateThumbnailWithTransform: true,
+                kCGImageSourceThumbnailMaxPixelSize: 1600
+              ] as CFDictionary) else { throw CameraError.captureFailed }
+        return image
+    }
+
+    @concurrent static func discard(_ photo: StagedPhoto) async {
+        try? FileManager.default.removeItem(at: photo.directory)
     }
 }
 
