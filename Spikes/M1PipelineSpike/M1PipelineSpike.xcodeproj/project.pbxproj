@@ -1,0 +1,395 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		200000000000000000000001 /* M1PipelineSpikeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000001 /* M1PipelineSpikeApp.swift */; };
+		200000000000000000000002 /* SpikeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000002 /* SpikeView.swift */; };
+		200000000000000000000003 /* SpikeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000003 /* SpikeModel.swift */; };
+		200000000000000000000004 /* CaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000004 /* CaptureService.swift */; };
+		200000000000000000000005 /* CameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000005 /* CameraPreview.swift */; };
+		200000000000000000000006 /* PipelineModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000006 /* PipelineModels.swift */; };
+		200000000000000000000007 /* ExportVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000007 /* ExportVerifier.swift */; };
+		200000000000000000000008 /* ImagePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000008 /* ImagePipeline.swift */; };
+		200000000000000000000009 /* M1PipelineSpikeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110000000000000000000009 /* M1PipelineSpikeTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		210000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 100000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 500000000000000000000001;
+			remoteInfo = M1PipelineSpike;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		110000000000000000000001 /* M1PipelineSpikeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1PipelineSpikeApp.swift; sourceTree = "<group>"; };
+		110000000000000000000002 /* SpikeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpikeView.swift; sourceTree = "<group>"; };
+		110000000000000000000003 /* SpikeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpikeModel.swift; sourceTree = "<group>"; };
+		110000000000000000000004 /* CaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureService.swift; sourceTree = "<group>"; };
+		110000000000000000000005 /* CameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreview.swift; sourceTree = "<group>"; };
+		110000000000000000000006 /* PipelineModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineModels.swift; sourceTree = "<group>"; };
+		110000000000000000000007 /* ExportVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportVerifier.swift; sourceTree = "<group>"; };
+		110000000000000000000008 /* ImagePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePipeline.swift; sourceTree = "<group>"; };
+		110000000000000000000009 /* M1PipelineSpikeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = M1PipelineSpikeTests.swift; sourceTree = "<group>"; };
+		11000000000000000000000A /* M1PipelineSpike.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = M1PipelineSpike.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11000000000000000000000B /* M1PipelineSpikeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = M1PipelineSpikeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		300000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		300000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		100000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000004 /* M1PipelineSpike */,
+				100000000000000000000005 /* M1PipelineSpikeTests */,
+				100000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		100000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				11000000000000000000000A /* M1PipelineSpike.app */,
+				11000000000000000000000B /* M1PipelineSpikeTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		100000000000000000000004 /* M1PipelineSpike */ = {
+			isa = PBXGroup;
+			children = (
+				110000000000000000000001 /* M1PipelineSpikeApp.swift */,
+				110000000000000000000002 /* SpikeView.swift */,
+				110000000000000000000003 /* SpikeModel.swift */,
+				110000000000000000000004 /* CaptureService.swift */,
+				110000000000000000000005 /* CameraPreview.swift */,
+				110000000000000000000006 /* PipelineModels.swift */,
+				110000000000000000000007 /* ExportVerifier.swift */,
+				110000000000000000000008 /* ImagePipeline.swift */,
+			);
+			path = M1PipelineSpike;
+			sourceTree = "<group>";
+		};
+		100000000000000000000005 /* M1PipelineSpikeTests */ = {
+			isa = PBXGroup;
+			children = (
+				110000000000000000000009 /* M1PipelineSpikeTests.swift */,
+			);
+			path = M1PipelineSpikeTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		500000000000000000000001 /* M1PipelineSpike */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 800000000000000000000002 /* Build configuration list for PBXNativeTarget "M1PipelineSpike" */;
+			buildPhases = (
+				400000000000000000000001 /* Sources */,
+				300000000000000000000001 /* Frameworks */,
+				600000000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = M1PipelineSpike;
+			packageProductDependencies = (
+			);
+			productName = M1PipelineSpike;
+			productReference = 11000000000000000000000A /* M1PipelineSpike.app */;
+			productType = "com.apple.product-type.application";
+		};
+		500000000000000000000002 /* M1PipelineSpikeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 800000000000000000000003 /* Build configuration list for PBXNativeTarget "M1PipelineSpikeTests" */;
+			buildPhases = (
+				400000000000000000000002 /* Sources */,
+				300000000000000000000002 /* Frameworks */,
+				600000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				700000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = M1PipelineSpikeTests;
+			packageProductDependencies = (
+			);
+			productName = M1PipelineSpikeTests;
+			productReference = 11000000000000000000000B /* M1PipelineSpikeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		100000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					500000000000000000000001 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					500000000000000000000002 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 500000000000000000000001;
+					};
+				};
+			};
+			buildConfigurationList = 800000000000000000000001 /* Build configuration list for PBXProject "M1PipelineSpike" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 100000000000000000000002;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 100000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				500000000000000000000001 /* M1PipelineSpike */,
+				500000000000000000000002 /* M1PipelineSpikeTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		600000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		600000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		400000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200000000000000000000001 /* M1PipelineSpikeApp.swift in Sources */,
+				200000000000000000000002 /* SpikeView.swift in Sources */,
+				200000000000000000000003 /* SpikeModel.swift in Sources */,
+				200000000000000000000004 /* CaptureService.swift in Sources */,
+				200000000000000000000005 /* CameraPreview.swift in Sources */,
+				200000000000000000000006 /* PipelineModels.swift in Sources */,
+				200000000000000000000007 /* ExportVerifier.swift in Sources */,
+				200000000000000000000008 /* ImagePipeline.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		400000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				200000000000000000000009 /* M1PipelineSpikeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		700000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 500000000000000000000001 /* M1PipelineSpike */;
+			targetProxy = 210000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		900000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		900000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		900000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used only to capture an on-device photo for the M1 technical feasibility spike.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhoto.M1PipelineSpike;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		900000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used only to capture an on-device photo for the M1 technical feasibility spike.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhoto.M1PipelineSpike;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		900000000000000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhoto.M1PipelineSpikeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/M1PipelineSpike.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/M1PipelineSpike";
+			};
+			name = Debug;
+		};
+		900000000000000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jarbasferro.IDPhoto.M1PipelineSpikeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/M1PipelineSpike.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/M1PipelineSpike";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		800000000000000000000001 /* Build configuration list for PBXProject "M1PipelineSpike" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900000000000000000000001 /* Debug */,
+				900000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		800000000000000000000002 /* Build configuration list for PBXNativeTarget "M1PipelineSpike" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900000000000000000000003 /* Debug */,
+				900000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		800000000000000000000003 /* Build configuration list for PBXNativeTarget "M1PipelineSpikeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900000000000000000000005 /* Debug */,
+				900000000000000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 100000000000000000000001 /* Project object */;
+}
