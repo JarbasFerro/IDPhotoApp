@@ -800,7 +800,7 @@ Implement ADR-049: automatic drafts (source, recipe, profile, lock state, sheet)
 
 ## L19-013 — Tier 1 profile research and validation — P0 / XL
 
-**Progress (2026-11-11):** US passport, US visa, UK passport, Japan passport, and My Number card researched; index in [profiles/README.md](profiles/README.md). Search-based official evidence is accepted (ADR-051). For each profile in [25 §3](25-wave-a-document-types.md), in that order, starting with the alteration policy: one sourced profile document like [13](13-spain-foto-carnet.md) (dimensions, head and eye geometry, background colour, alteration policy, digital submission limits, children's rules, sources, last-reviewed date), rule data, fixtures, and the [01 §15](01-product-definition.md) release gate. Profiles that miss the gate move to Tier 2. Acceptance: per profile, a reviewed research document and passing rule tests. Function F-04.
+**Progress (2026-11-11):** all 13 approved profiles researched; index and open points in [profiles/README.md](profiles/README.md). Search-based official evidence is accepted (ADR-051). For each profile in [25 §3](25-wave-a-document-types.md), in that order, starting with the alteration policy: one sourced profile document like [13](13-spain-foto-carnet.md) (dimensions, head and eye geometry, background colour, alteration policy, digital submission limits, children's rules, sources, last-reviewed date), rule data, fixtures, and the [01 §15](01-product-definition.md) release gate. Profiles that miss the gate move to Tier 2. Acceptance: per profile, a reviewed research document and passing rule tests. Function F-04.
 
 ## L19-014 — Shadow and side-light advisory — P1 / M
 
@@ -827,6 +827,13 @@ Background replacement is offered on every profile (ADR-051), but a good capture
 - results are `warn` until calibrated (AGENTS.md §9).
 
 Acceptance: calibrated on consented fixtures across skin tones and wall colours; the explanation always offers setup tips and Retake; no false fail. Profile research: [US](profiles/us-passport-and-visa.md).
+
+## L19-020 — Per-profile print resolution and profile questions — P0 / S
+
+- **Print resolution as profile data:** default 300 ppi; the Netherlands requires at least 400 dpi. The lab JPEG, the PDF raster, and the source-resolution warning follow the profile value.
+- **Profile questions:** for example, the Netherlands' "10 or younger?", which switches the head-size band.
+
+Acceptance: boundary tests at 300 and 400 ppi on every catalog paper; the source-resolution warning is recomputed per profile.
 
 ## L19-016 — Quick sheet presets — P2 / S
 

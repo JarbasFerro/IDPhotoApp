@@ -12,8 +12,17 @@ One document per official profile (L19-013). Each profile must pass the release 
 | UK · passport | [uk-passport](uk-passport.md) | Researched | Digital ≥ 600 × 750 (primary) + print 35 × 45 | Unaltered by software | **No**: shop print |
 | Japan · passport | [japan-passport-and-my-number](japan-passport-and-my-number.md) | Researched | Print 35 × 45 | Not stated | Not stated |
 | Japan · My Number card | [japan-passport-and-my-number](japan-passport-and-my-number.md) | Researched | Print 35 × 45 + digital | Edited images may not be accepted | Not stated |
+| Italy · passport, CIE | [italy-passport-and-cie](italy-passport-and-cie.md) | Researched | Print 35 × 45 | CIE: not cropped, straightened, or retouched | Not stated |
+| Spain · TIE, driving licence | [spain-tie-and-driving-licence](spain-tie-and-driving-licence.md) | Researched | Print 32 × 26 | Not stated | Not stated |
+| Netherlands · passport, ID card, driving licence | [netherlands-passport-id-driving-licence](netherlands-passport-id-driving-licence.md) | Researched | Print 35 × 45 at **≥ 400 dpi** | Not stated | Allowed (self-made accepted) |
+| South Korea · passport | [south-korea-passport](south-korea-passport.md) | Researched; **flag** | Print 3.5 × 4.5 | No edited or composited backgrounds | **Self-taken digital photos unsuitable** |
+| Schengen visa | [schengen-visa](schengen-visa.md) | Researched | Print 35 × 45 | ICAO | Not stated |
 
-Remaining approved profiles, in order: Italy passport and CIE; Spain TIE and driving licence; Netherlands passport, ID card, and driving licence; South Korea passport; Schengen visa.
+All 13 approved profiles are researched. Open points:
+
+- **South Korea:** official pages say self-taken digital photos are unsuitable. The founder decides whether to keep this profile.
+- **Netherlands:** prints need **400 dpi** (L19-020), and the head size depends on age, so the profile asks whether the person is 10 or younger.
+- **Next:** verify the P2 list in [25 §3](../25-wave-a-document-types.md): Australia, the UK, Japanese, and German driving licences, the Swiss ID card, Saudi Absher, Brazil 3 × 4, the Canadian visitor visa, and Mexico.
 
 ## Editing
 
