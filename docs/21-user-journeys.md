@@ -112,6 +112,17 @@ Some people have no printer. From Print & Share, **Print at a shop** (**New**, L
 
 Home shows **Continue** with drafts and unlocked photos (ADR-049). Tapping the sheet opens it with the same layout; the person changes copies and prints. Reprinting an unlocked photo costs nothing (ADR-048). Siri or the Action button can open the camera directly ("Take an ID photo", F-56).
 
+### J9 — School photos with a custom size
+
+The school asks for three new photos of each child every year, at a size it chooses. No country or official document applies.
+
+1. Choose document → **Custom size**. Enter the size the school asked for, or tap a size shortcut. Calipic remembers it for next year.
+2. Preflight and camera as in J1 and J3. With **Someone helping**, the parent takes each child's photo.
+3. Photo Check runs only photographic checks (sharp, eyes open, good light, enough detail for the size). Headline: *Looks good for printing*. Never *Ready* for a document, and no rule sources.
+4. Adjust offers Closer or Wider framing, and Original, White, or Light grey background.
+5. Your sheet: each child gets 3 copies; the layout fits all of them on one sheet. The unlock confirmation shows one credit per child (ADR-048).
+6. Print, measure the bar, cut. Next year: Continue shows nothing older than 30 days without use, but the custom size is remembered.
+
 ### J8 — VoiceOver and Voice Control (Daniel), post-launch
 
 Deferred until after 1.0 (ADR-050). Kept as the target for the first accessibility release; the 1.0 baseline still applies.

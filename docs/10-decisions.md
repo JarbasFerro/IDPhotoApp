@@ -230,8 +230,18 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-018 — Generic/custom photo sizes
 
-**Status:** Proposed; recommended for 1.0 by ADR-047 §5 so the app is useful in countries without a profile (decision D-8 in [20 §8](20-product-blueprint.md)).  
+**Status:** Accepted (founder, 2026-11-11) for 1.0.  
 **Decision:** may use the same deterministic renderer but must be visually distinguished from sourced official profiles and make no compliance claim.
+
+**Founder direction:** people can choose a custom photo size **without choosing a country**. Example: a school asks for three new photos of each child every year.
+
+1. **Entry:** **Custom size** is a first-class choice in *Choose document* (S-02) and on Home's document card, separate from countries.
+2. **Size:** width × height in mm or inches. A few common sizes are offered as shortcuts, labelled as sizes and never as documents (for example 25 × 30 mm, 30 × 40 mm, 35 × 45 mm, 2 × 2 in). Recently used custom sizes are remembered on the device.
+3. **Framing:** head-and-shoulders by default, using non-official proportions. Closer and Wider framing in Adjust.
+4. **Background and tone:** free choice, because no rule applies. Background is Original, White, or Light grey; Document Tone is on by default and can be turned off.
+5. **Checks:** only photographic checks (sharpness, eyes, light, enough resolution for the print size). Never *Ready* for a document and never a source or requirement claim. The headline is, for example, *Looks good for printing*. Requirements say: *No official rules apply. Use the size your school or organisation asked for.*
+6. **Outputs:** the same as for any profile. People can be mixed on the print sheet (for example three children, three copies each), and there is a digital JPEG at the chosen size and 300 ppi.
+7. **Price:** one credit per person, as for any photo (ADR-048).
 
 ---
 
@@ -767,7 +777,7 @@ ADR-016 made Spain DNI 26 × 32 mm the first format, and the spike delivers it e
    - **Wave B in the first updates:** 20 more countries that take reach to 80 % of iPhone users.
    - Together: 35 countries, about 20 % of storefronts.
    - **Russia** is excluded: there have been no App Store payments there since April 2026.
-   - **China mainland** is decision D-10. The check in [25 §5](25-wave-a-document-types.md) recommends not offering the app on the mainland China storefront.
+   - **China mainland is excluded** (founder, 2026-11-11, D-10): the app is not offered on the mainland China storefront ([25 §5](25-wave-a-document-types.md)). Hong Kong, Macao, and Taiwan are separate storefronts.
    - **Documents per Wave A country:** [25](25-wave-a-document-types.md). Several main documents no longer accept home-made photos (for example the German and French passports and ID cards, and the Canadian passport); Calipic never offers profiles for those.
 4. **Release gate unchanged:** every profile needs its own sourced research document (like [13](13-spain-foto-carnet.md)), alteration policy, background colour (ADR-037), digital preset where one exists, and last-reviewed date. A profile not validated in time moves to Tier 2; it never ships with weaker provenance. Never copy a profile from another country because the sizes match (AGENTS.md §11).
 5. **Countries without a profile:** generic print sizes stay available on the sheet. A custom size (ADR-018), clearly marked as unofficial, is recommended so the app is useful in every territory.
@@ -786,7 +796,7 @@ Founder decision 2026-11-11; BD-032; [brand 04](brand/04-market-prioritization.m
 
 - Profile research becomes the longest item on the critical path ([23](23-launch-roadmap.md) P3). It starts as soon as the country list is fixed.
 - Background colour as profile data (ADR-037) becomes P0: several countries do not use pure white.
-- Localization (D-7, founder 2026-11-11): Wave A launches with **English only**; no new languages are added for Wave A. Profile names may show the official local name next to the English one ([25 §6](25-wave-a-document-types.md)).
+- Localization (D-7 and D-12, founder 2026-11-11): no new languages for Wave A. 1.0 ships **English, Spanish, and Portuguese (Brazil)** (BD-031). Profile names may show the official local name next to the English one ([25 §6](25-wave-a-document-types.md)).
 - Alteration policy decides the experience in the biggest market: the US online-renewal rules forbid changes by apps, filters, or AI, so background replacement and Document Tone may be off for some profiles ([25 §4](25-wave-a-document-types.md)).
 - The fixture set must cover a global user base ([22 §2](22-quality-and-delight-bar.md)).
 
@@ -911,14 +921,15 @@ Immediate M1 decisions:
 6. performance/memory budgets derived from device measurements.
 7. ADR-036 to ADR-042 — print composer, background colour policy, Document Tone, alignment estimator, revision pinning, iterative segmentation, Foundation Models boundary (from [the priority feature plan](14-priority-feature-plan.md)).
 
-Product decisions taken by the founder on 2026-11-11: ADR-017 (children), ADR-020 (measurement), ADR-047 (worldwide launch; 35-country list confirmed; Wave A in English only), ADR-048 (pricing), ADR-049 (drafts and capture protection), ADR-050 (accessibility scope).
+Product decisions taken by the founder on 2026-11-11: ADR-017 (children), ADR-020 (measurement), ADR-047 (worldwide launch; 35-country list confirmed; no new languages for Wave A), ADR-048 (pricing), ADR-049 (drafts and capture protection), ADR-050 (accessibility scope).
 
 Product decisions still open (see [the product blueprint §8](20-product-blueprint.md)):
 
-1. D-10 — China mainland: recommendation is to exclude the mainland China storefront ([25 §5](25-wave-a-document-types.md)); awaiting founder confirmation.
-2. Wave A profile list in [25 §3](25-wave-a-document-types.md), and ADR-018 custom size at 1.0.
-3. Whether the existing Spanish and Portuguese (Brazil) translations stay in 1.0 alongside English.
-4. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
+Also decided 2026-11-11: mainland China excluded (D-10); the first 13 Wave A profiles in [25 §3](25-wave-a-document-types.md) approved (D-11); custom size without a country accepted (ADR-018); Spanish and Portuguese (Brazil) kept in 1.0 (D-12).
+
+Still open:
+
+1. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
 
 # Decision template
 

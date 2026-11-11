@@ -814,6 +814,10 @@ Flag likely reflections on glasses and suggest tilting the glasses or moving the
 
 Implement ADR-049 D-9. A device spike on iOS 26 and 27 tests the secure-layer technique on every locked preview: Photo Check, Adjust, the sheet, and the confirmation. Fallback: hide locked previews while `sceneCaptureState` is active, and explain after a screenshot. Acceptance: screenshots and recordings on physical devices show the locked photo blank; unlocked photos are unaffected; no layout, gesture, animation, or performance regression in the W3 landing; App Review notes prepared. Keep the technique behind one small view so it can be replaced if iOS changes.
 
+## L19-018 — Custom size without a country — P0 / M
+
+Implement ADR-018 as accepted: **Custom size** entry in S-02 and on Home's document card; width × height in mm or inches with validation (minimum and maximum against paper sizes and source resolution); size shortcuts labelled as sizes; remembered recent sizes; Closer/Wider framing; Original/White/Light grey background; photographic checks only; copy that never claims compliance; outputs and credits as for any profile. Acceptance: geometry boundary tests for unusual aspect ratios and inch/mm conversion; J9 passes with first-time testers; no screen shows *Ready*, a source, or a document name for a custom size. Function F-09.
+
 ## L19-016 — Quick sheet presets — P2 / S
 
 One-tap starting layouts on Your sheet ("One person, most copies", "Family", "ID + passport sizes"). Acceptance: each preset produces a valid layout on every catalog paper.

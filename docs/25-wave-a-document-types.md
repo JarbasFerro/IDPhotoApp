@@ -90,7 +90,7 @@ Ordered by spending power ([24](24-launch-country-ranking.md)) × at-home accept
 
 **Excluded (closed to home photos, §1):** Germany passport, ID, and residence permit; France passport, ID, and e-photo documents; Canada passport; Switzerland passport; Mexico passport; US driving licences; USCIS filings photographed at biometrics.
 
-Wave A then has about 13 profiles for launch, plus up to 9 more after verification. This is a realistic research load for P3.
+Wave A then has about 13 profiles for launch, plus up to 9 more after verification. This is a realistic research load for P3. **Approved by the founder on 2026-11-11 (D-11).** Every other need is served by the custom size without a country (ADR-018).
 
 ## 4. Consequences for the product
 
@@ -111,11 +111,11 @@ Wave A then has about 13 profiles for launch, plus up to 9 more after verificati
 | Is demand for at-home ID photos there like ours? | Chinese passport photos (33 × 48 mm) are commonly taken at the exit-entry hall when applying in person; online renewal in about 50 pilot cities accepts an uploaded photo. Everyday ID-photo needs (1-inch and 2-inch photos for exams and job applications) are served by WeChat mini-programs and local shops. | S / ? |
 | Product fit | Needs Simplified Chinese, Chinese profiles, a different App Store strategy, and a Chinese partner for compliance. | — |
 
-**Recommendation for D-10:** do not offer Calipic on the mainland China storefront at 1.0 or in Wave B. Untick mainland China in App Store Connect availability (P9). Hong Kong, Macao, and Taiwan are separate storefronts and are not affected (Taiwan is in Wave B). Revisit only if a Chinese publishing partner appears and the commercial licence question is answered by counsel.
+**Decision (founder, 2026-11-11):** mainland China is excluded. Do not offer Calipic on the mainland China storefront at 1.0 or in Wave B. Untick mainland China in App Store Connect availability (P9). Hong Kong, Macao, and Taiwan are separate storefronts and are not affected (Taiwan is in Wave B). Revisit only if a Chinese publishing partner appears and the commercial licence question is answered by counsel.
 
 ## 6. Languages (D-7, decided 2026-11-11)
 
-Wave A launches with **English only**. No new languages are added for Wave A; see [20 §8](20-product-blueprint.md) for the status of the existing Spanish and Portuguese (Brazil) translations. Consequences:
+No new languages are added for Wave A. 1.0 ships in **English, Spanish, and Portuguese (Brazil)** (D-12, founder 2026-11-11). Consequences for the other Wave A countries:
 
 - Requirement and profile text for Japan, Korea, Italy, the Netherlands, and Saudi Arabia appears in English. Profile names may keep their official local name next to the English one (for example "My Number card (マイナンバーカード)"), so people recognize their document.
 - App Store metadata can still be localized per storefront later at low cost (title, subtitle, keywords, screenshots text). That is ASO work, not app localization (P9 decision).

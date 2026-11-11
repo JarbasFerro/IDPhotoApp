@@ -78,7 +78,7 @@ Every other country can still use the app at 1.0 with generic and custom sizes (
 
 ## 5. What this means for languages (D-7)
 
-> **Founder decision (2026-11-11):** Wave A launches with English only. The analysis below remains as reference for later language work.
+> **Founder decision (2026-11-11):** no new languages for Wave A; 1.0 ships English, Spanish, and Portuguese (Brazil). The analysis below remains as reference for later language work.
 
 Wave A, in one language each:
 

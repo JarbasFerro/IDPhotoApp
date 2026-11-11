@@ -66,7 +66,7 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | F-06 | Full requirements with source link and review date | Trust and exceptions (glasses, headwear) | Shipped (spike); must move to profile data | [16 §4](16-screen-experience-spec.md) |
 | F-07 | Per-profile alteration policy (background replacement and tone allowed or not) | Never sell an output the office cannot use | Partial: policy gate exists, policy data missing | ADR-037, ADR-038, FR-151, R7-016 |
 | F-08 | Children use the adult flow with helper mode; baby relaxations never block, only warn | Parents' main job | Accepted for 1.0; age relaxations as profile data Post-launch | ADR-017, [14 §5.6](14-priority-feature-plan.md) |
-| F-09 | Custom size, clearly marked unofficial | Useful in countries without a profile | **Decision D-8** (recommended) | ADR-018, ADR-047 §5 |
+| F-09 | **Custom size without a country**: width × height in mm or inches, size shortcuts, framing Closer/Wider, free background choice, photographic checks only, never *Ready* | School, club, and other non-official photos | Launch | ADR-018, L19-018, [21 J9](21-user-journeys.md) |
 
 ### 4.2 Capture and import
 
@@ -130,7 +130,7 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | F-54 | Help: taking a good photo at home, printing, cutting, using a shop | Self-service support | Launch | L19-002, L19-004, L19-005 |
 | F-55 | Choose your app icon (33 characters) | Personal delight outside the task | Shipped (spike) | BD-038 |
 | F-56 | App Intents and App Shortcut "Take an ID photo"; Spotlight for profiles | Start from Siri or the Action button | Launch (P1) | ADR-031, AI13-001–AI13-005 |
-| F-57 | Localization: English for Wave A (D-7); Spanish and Portuguese (Brazil) exist in the spike | Effortless in your language | English Launch; es and pt-BR **Decision D-12** | BD-031, ADR-047 |
+| F-57 | Localization: English, Spanish, Portuguese (Brazil) | Effortless in your language | Shipped (spike); kept for 1.0 (D-12) | BD-031 |
 | F-58 | Rating request at a calm moment after a confirmed good print, never in the task | Ratings drive the App Store rank behind "#1" | Launch | L19-009, [22 §6](22-quality-and-delight-bar.md) |
 
 ### 4.7 Not in the product
@@ -144,7 +144,7 @@ Unchanged from [01 §8.3](01-product-definition.md) and [11 §7](11-ios-excellen
 | # | Screen | Purpose | Status | Contract |
 |---|---|---|---|---|
 | S-01 | Home | Start a photo; **Continue** drafts; see the profile and trust promise | Spike; needs the profile chooser entry, Continue (drafts), and a fresh-install visual ([22 §3](22-quality-and-delight-bar.md)) | 16 §3 |
-| S-02 | Choose document (profile picker) | Pick country and document; search; recents | **New** | 04 Screen 2 → 16 |
+| S-02 | Choose document (profile picker) | Pick country and document; search; recents; **Custom size** as its own entry | **New** | 04 Screen 2 → 16 |
 | S-03 | Photo requirements | Sourced rules, exceptions, review date | Spike | 16 §4 |
 | S-04 | Before your photo (preflight), including *Find a good spot* and *Who is taking the photo?* (self / helper) | Set up for success | Spike; setup coaching and helper choice **New** | 16 §7 |
 | S-05 | Guided camera | Capture with live guidance | Spike; helper-mode wording **New** | 16 §6 |
@@ -172,7 +172,8 @@ There is deliberately no onboarding carousel ([constitution rule 1](brand/02-exp
 
 ```text
 Home ─┬─ Continue: drafts and unlocked photos (ADR-049)
-      ├─ Choose document ── Requirements
+      ├─ Choose document ─┬─ Requirements
+      │                  └─ Custom size (any size, no country)
       ├─ Settings & About ─┬─ Help topics (home setup · printing · cutting · shop)
       │                    ├─ App Icon
       │                    ├─ Credits: balance · buy · restore
@@ -231,17 +232,19 @@ Known testers tend to be kind. So measure what they **do** (time, retakes, the m
 | D-4 | Persistence | **Drafts** saved without spending credits. A locked draft can never leave the app (one export gate). 30-day retention is the proposed default. | ADR-049 |
 | D-5 | Measurement | **Beta testers the founder knows.** TestFlight and observed sessions; no analytics SDK. | ADR-020 |
 | D-6 | Accessibility | **Not a priority for 1.0.** A native baseline is kept, and BD-034 stands. | ADR-050 |
-| D-7 | Languages | **Wave A launches with English only.** No new languages for Wave A. | ADR-047, [25 §6](25-wave-a-document-types.md) |
+| D-7 | Languages | **No new languages for Wave A.** 1.0 ships English, Spanish, and Portuguese (Brazil) (D-12). | ADR-047, [25 §6](25-wave-a-document-types.md) |
 | D-8 | Launch countries | **35 countries confirmed:** Wave A (15) at 1.0, Wave B (20) after ([24](24-launch-country-ranking.md)). | ADR-047 |
 | D-9 | Locked-preview protection | **Block screenshots and screen recording of locked previews** (as banking apps do). Device spike first, with a public-API fallback; no watermark. | ADR-049 |
+| D-10 | China mainland | **Excluded.** The app is not offered on the mainland China storefront (ICP filing and commercial licence). | ADR-047, [25 §5](25-wave-a-document-types.md) |
+| D-11 | Wave A profiles | **The 13 profiles in [25 §3](25-wave-a-document-types.md) approved** as the research order; the P2 list is verified first. | ADR-047 |
+| D-12 | Spanish and Portuguese (Brazil) | **Kept in 1.0**, alongside English. | BD-031 |
+| D-13 | Custom size | **Any photo size, without choosing a country** (for example school photos), with no compliance claim. | ADR-018 |
 
-### 8.2 Still open
+### 8.2 Still open at product level
 
 | ID | Decision | Why it matters | Recommendation |
 |---|---|---|---|
-| D-10 | China mainland | 25 % of the world's iPhone users, but a paid app needs an ICP filing that a foreign developer generally cannot get without a Chinese partner, and possibly a commercial licence | **Exclude the mainland China storefront** at 1.0 and in Wave B; revisit only with a Chinese partner and legal advice ([25 §5](25-wave-a-document-types.md)) |
-| D-11 | Wave A profiles and custom size | Sets the P3 research load | Research the 13 profiles in [25 §3](25-wave-a-document-types.md) first, then verify the P2 list; ship the custom size (ADR-018) |
-| D-12 | Spanish and Portuguese (Brazil) in 1.0 | Already translated in the spike, but every new string then needs two translations and native review | Keep them if their markets (Spain, Mexico, Brazil) matter at launch; otherwise ship English only and add them with Wave B |
+| — | None open at product level | | Remaining technical decisions are in [10](10-decisions.md) (M1) |
 
 ## 9. Documentation map and source of truth
 

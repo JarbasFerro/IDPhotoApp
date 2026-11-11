@@ -196,4 +196,4 @@ A feature is not done when it renders in one simulator. It is done when:
 
 ## Immediate next action
 
-Follow [the launch roadmap §4](docs/23-launch-roadmap.md): founder decisions on China and the first 13 profiles ([25](docs/25-wave-a-document-types.md)), run the physical evidence round on device and printers, and start profile research. The production Xcode project is created only after the M1 evidence is complete.
+Follow [the launch roadmap §4](docs/23-launch-roadmap.md): research the first profiles, US passport and US visa first ([25](docs/25-wave-a-document-types.md)), run the physical evidence round on device and printers, and start profile research. The production Xcode project is created only after the M1 evidence is complete.
