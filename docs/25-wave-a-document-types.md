@@ -38,7 +38,7 @@
 | Country | Document | Size | Output | At home? | Level | Notes |
 |---|---|---|---|---|---|---|
 | United States | Passport (mail or in person) | 2 × 2 in (51 × 51 mm) | Print | Yes | S | Large volume |
-| United States | Passport online renewal | Digital upload: JPG/PNG/HEIC/HEIF, 54 KB–10 MB, color, < 6 months; no scans of prints | Digital | Yes (not excluded) | **O** (travel.state.gov) | **No filters, apps, or AI changes** → background replacement and tone **not allowed**; framing only ([profile](profiles/us-passport-and-visa.md)) |
+| United States | Passport online renewal | Digital upload: JPG/PNG/HEIC/HEIF, 54 KB–10 MB, color, < 6 months; no scans of prints | Digital | Yes (not excluded) | **O** (travel.state.gov) | Official rule: no filters, apps, or AI changes; Calipic still offers editing (ADR-051) ([profile](profiles/us-passport-and-visa.md)) |
 | United States | US visa (DS-160) | Square JPEG 600–1200 px, ≤ 240 KB; some posts also want a 2 × 2 in print | Digital + print | Generally yes; the consulate decides | S | Cross-border: applicants in every country |
 | United Kingdom | Passport (online) | Digital, at least 600 × 750 px; the service crops | Digital | **Yes, explicitly**: taken on your own device with someone's help | S (citing GOV.UK) | Plain light background (cream or light grey best); **unaltered**; within 1 month ([profile](profiles/uk-passport.md)) |
 | United Kingdom | Passport (paper) and driving licence (paper) | 35 × 45 mm | Print | Yes | S | |
@@ -94,10 +94,7 @@ Wave A then has about 13 profiles for launch, plus up to 9 more after verificati
 
 ## 4. Consequences for the product
 
-1. **Alteration policy is decisive in the biggest market.** The US State Department says online-renewal photos must not be changed with software, apps, filters, or AI. One source says Korea forbids background compositing. The UK requires light grey or cream, not white. For these profiles:
-   - automatic **background replacement and Document Tone may be off by default**, per profile (ADR-037, F-07);
-   - the result then depends on capture quality: helper mode, *Find a good spot*, and a plain light wall (F-15, F-16).
-   - The W3 "background fades to white" moment cannot be the universal wow. For unaltered profiles it becomes "it framed me perfectly". The profile research must answer the alteration question first.
+1. **Editing:** several official sources forbid or discourage editing (US, UK, Japan My Number). The founder decided to offer background replacement and tone on every profile anyway (ADR-051); the official wording is recorded per profile.
 2. **Digital output is as important as print.** Online channels exist in the UK, the US, Japan, Korea, and Saudi Arabia. Per-profile digital presets (F-41) become P0 for those profiles.
 3. **Print at a shop** (L19-005) matters more. Australia may not accept inkjet; elsewhere, booths and shops are the fallback when home printing is not allowed.
 4. **Cross-border visa profiles** (US visa, Schengen visa) are high value: they serve people in every country, including those whose national documents are closed.

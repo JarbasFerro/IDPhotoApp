@@ -33,6 +33,8 @@ The reviewed page does not establish numeric head-height/eye-line bounds, exact 
 
 Background replacement permission is not established by a requirement for a white background. Record replacement policy as `unknown`; retain the original and prioritize capture against a suitable background. Segmentation research can proceed using explicitly nonofficial fixtures while official editing policy is researched.
 
+> **Superseded 2026-11-11 (ADR-051):** Calipic offers background replacement and tone on every profile. The official wording is recorded for reference only.
+
 Photo recency and exception eligibility require human review. Face observations alone cannot certify these. Child/baby launch coverage remains unresolved under ADR-017.
 
 ## 4. Implementation acceptance targets

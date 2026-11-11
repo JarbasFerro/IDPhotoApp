@@ -1,6 +1,6 @@
 # Profile research — Japan passport and My Number card
 
-**Status:** Draft profile research (L19-013). Needs browser confirmation (§4) before release.
+**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profiles:**
 
@@ -11,24 +11,17 @@
 
 | Level | Meaning |
 |---|---|
-| **O-s** | Official page (MOFA or J-LIS), as quoted in a search restricted to that domain |
+| **O-s** | Official page (MOFA or J-LIS), as quoted in a search restricted to that domain (accepted, ADR-051) |
 | **?** | Not established |
 
-## 1. Alteration
+## 1. Editing (official wording, for reference)
 
 | Profile | What the official pages say | Evidence |
 |---|---|---|
 | My Number | "Images edited with image-editing software may not be accepted." Edits that hinder face-to-face identity checks are not allowed | O-s: [顔写真のチェックポイント](https://www.kojinbango-card.go.jp/apprec/apply/facephoto/) |
 | Passport | No editing wording found in this pass | ? |
 
-**Alteration policy (both):**
-
-| Operation | Policy | Reason |
-|---|---|---|
-| Background replacement | **Off** | Disallowed or unknown |
-| Tone and colour | **Off** | Disallowed or unknown |
-| Rotation | **Off** | Unknown |
-| Crop and scale | Allowed | Inherent to producing the size |
+**Calipic (ADR-051):** background replacement (white) and tone are offered, with **Original** one tap away.
 
 ## 2. Passport (`jp.passport`)
 
@@ -44,7 +37,7 @@
 | Basis | ICAO recommendations; page updated 2025-03-03 | O-s |
 | Home printing | Not stated | ? |
 
-The diagram values are probably the top margin (4 ± 2), the bottom margin (7 ± 2), and the face centre from the side edge (17 ± 2); the browser check must confirm the labels.
+The diagram values are probably the top margin (4 ± 2), the bottom margin (7 ± 2), and the face centre from the side edge (17 ± 2); confirm the labels when implementing the profile data.
 
 ## 3. My Number card (`jp.mynumber`)
 
@@ -56,9 +49,9 @@ The diagram values are probably the top margin (4 ± 2), the bottom margin (7 ±
 | Pose | Within 6 months, facing front, no hat, plain background without shadows, chairs, or patterns. Black-and-white is allowed | O-s |
 | Head size | ? not captured in this pass | ? |
 
-**Proposed digital preset:** JPEG, 1050 × 1350 px (35:45 at about 760 ppi), head geometry as for the passport, no alteration, 20 KB–7 MB. Never HEIC.
+**Proposed digital preset:** JPEG, 1050 × 1350 px (35:45 at about 760 ppi), head geometry as for the passport, 20 KB–7 MB. Never HEIC.
 
-## 4. Before release: browser confirmation
+## 4. Optional verification (not required, ADR-051)
 
 - [ ] [MOFA photo standard PDF](https://www.mofa.go.jp/mofaj/files/100171389.pdf): read the diagram labels; glasses, head coverings, children
 - [ ] MOFA passport pages: editing or retouching rule; home printing

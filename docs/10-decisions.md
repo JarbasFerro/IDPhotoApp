@@ -543,7 +543,7 @@ Apple adds custom AirPrint paper support or documented scaling control.
 ## ADR-037 — Background replacement colour is profile data
 
 **Status:** Proposed  
-**Update 2026-11-11:** the US profiles ([profiles/us-passport-and-visa.md](profiles/us-passport-and-visa.md)) show that `alterationPolicy` must be per operation: crop, background, tone, rotation. Unknown means off. The US disallows background and tone changes.  
+**Update 2026-11-11:** alteration gating is superseded by ADR-051. Background replacement and tone are offered on every profile, and the background colour remains profile data.  
 **Date:** 2026-09-16
 
 ### Decision
@@ -907,6 +907,40 @@ ADR-030 and AGENTS.md §6 made full accessibility part of every feature's accept
 ### Revisit trigger
 
 After 1.0; App Review or legal requirements; reviews or support contacts from people who cannot complete the task.
+
+---
+
+## ADR-051 — Background and tone editing on every profile; search-based profile evidence
+
+**Status:** Accepted (founder, 2026-11-11). Supersedes the alteration gating in ADR-037 and ADR-038 for official profiles.
+**Date:** 2026-11-11
+
+### Context
+
+Profile research ([profiles](profiles/README.md)) found the following official wording on editing:
+
+- the US State Department does not accept photos changed with software, apps, filters, or AI;
+- the UK requires photos "unaltered by computer software";
+- Japan's My Number card says edited images "may not be accepted";
+- Spain and the Japanese passport say nothing.
+
+travel.state.gov also refuses automated reading, so official wording was gathered through domain-restricted search.
+
+### Decision
+
+1. Calipic offers **background replacement and Document Tone on every profile**, official ones included, with the current defaults. Each profile document records the official editing wording as reference, but it does not switch features on or off.
+2. **Original** background and tone stay one tap away in Adjust, as today.
+3. **Evidence standard:** profile research based on official pages found through search counts as sourced for the [01 §15](01-product-definition.md) release gate. Browser confirmation is optional, not required.
+
+### Consequences
+
+- **Risk the founder accepts:** authorities that check for editing, such as the US State Department, which says it checks every photo, may reject an edited photo.
+- Watch support contacts and one-star reviews for rejections. *Ready* still never means guaranteed acceptance (AGENTS.md §11).
+- L19-019 (background and light checks) drops to P1: capture quality still matters, but replacement covers most walls.
+
+### Revisit trigger
+
+Beta testers or reviews report rejections attributed to edited backgrounds or tone.
 
 ---
 

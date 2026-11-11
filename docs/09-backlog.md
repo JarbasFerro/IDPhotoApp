@@ -800,7 +800,7 @@ Implement ADR-049: automatic drafts (source, recipe, profile, lock state, sheet)
 
 ## L19-013 — Tier 1 profile research and validation — P0 / XL
 
-**Progress (2026-11-11):** US passport, US visa, UK passport, Japan passport, and My Number card drafted, pending browser confirmation; index and pattern in [profiles/README.md](profiles/README.md). For each profile in [25 §3](25-wave-a-document-types.md), in that order, starting with the alteration policy: one sourced profile document like [13](13-spain-foto-carnet.md) (dimensions, head and eye geometry, background colour, alteration policy, digital submission limits, children's rules, sources, last-reviewed date), rule data, fixtures, and the [01 §15](01-product-definition.md) release gate. Profiles that miss the gate move to Tier 2. Acceptance: per profile, a reviewed research document and passing rule tests. Function F-04.
+**Progress (2026-11-11):** US passport, US visa, UK passport, Japan passport, and My Number card researched; index in [profiles/README.md](profiles/README.md). Search-based official evidence is accepted (ADR-051). For each profile in [25 §3](25-wave-a-document-types.md), in that order, starting with the alteration policy: one sourced profile document like [13](13-spain-foto-carnet.md) (dimensions, head and eye geometry, background colour, alteration policy, digital submission limits, children's rules, sources, last-reviewed date), rule data, fixtures, and the [01 §15](01-product-definition.md) release gate. Profiles that miss the gate move to Tier 2. Acceptance: per profile, a reviewed research document and passing rule tests. Function F-04.
 
 ## L19-014 — Shadow and side-light advisory — P1 / M
 
@@ -818,9 +818,9 @@ Implement ADR-049 D-9. A device spike on iOS 26 and 27 tests the secure-layer te
 
 Implement ADR-018 as accepted: **Custom size** entry in S-02 and on Home's document card; width × height in mm or inches with validation (minimum and maximum against paper sizes and source resolution); size shortcuts labelled as sizes; remembered recent sizes; Closer/Wider framing; Original/White/Light grey background; photographic checks only; copy that never claims compliance; outputs and credits as for any profile. Acceptance: geometry boundary tests for unusual aspect ratios and inch/mm conversion; J9 passes with first-time testers; no screen shows *Ready*, a source, or a document name for a custom size. Function F-09.
 
-## L19-019 — Background and light checks for unaltered profiles — P0 / M
+## L19-019 — Background and light checks — P1 / M
 
-For profiles that forbid background replacement (US passport and visa first), Calipic must catch a bad wall or uneven light before and after the shot, because it cannot fix them:
+Background replacement is offered on every profile (ADR-051), but a good capture still gives the best result. Catch a busy wall or uneven light before and after the shot:
 
 - live cues: "Find a plainer, lighter wall", "Light one side is brighter";
 - Photo Check rows for background colour and uniformity (white or off-white), shadows, and even lighting, using the segmentation mask to measure only the background;

@@ -1,6 +1,6 @@
 # Profile research — United States passport and US visa
 
-**Status:** Draft profile research (L19-013), first two Wave A profiles. **Not yet releasable:** a person must open each official page in a browser and confirm the quoted rules (§7). travel.state.gov refuses automated reading, so the official wording below comes from search results restricted to that domain.
+**Status:** Researched (L19-013). Accepted on search-based official evidence (ADR-051): travel.state.gov refuses automated reading, so the official wording comes from search results restricted to that domain.
 **Date:** 2026-11-11
 **Profiles:** `us.passport` (print, plus the online-renewal digital preset) and `us.visa` (digital, plus print where a post asks for it).
 **Evidence:**
@@ -8,34 +8,23 @@
 | Level | Meaning |
 |---|---|
 | **O** | Official State Department page |
-| **O-s** | Official page, as quoted in a domain-restricted search result; needs browser confirmation |
+| **O-s** | Official page, as quoted in a domain-restricted search result (accepted, ADR-051) |
 | **?** | Not stated on the official pages found |
 
-## 1. Answer to the first question: may Calipic alter the photo?
+## 1. Editing
 
-**No, apart from framing.**
+**Official wording (reference):**
 
-- The State Department "does not accept photos changed with computer software, phone apps, or filters" and checks every photo "for digital enhancement or alteration". It also bars changes made with AI. **O-s**: [Passport Photos](https://travel.state.gov/en/passports/apply/help/photos.html), [Uploading a Digital Photo](https://travel.state.gov/en/passports/renew-replace/online/upload-digital-photo.html).
-- For online renewal: "upload an original digital image with no changes, such as filters". The application itself lets you "reposition or crop" the photo. **O-s**: [Uploading a Digital Photo](https://travel.state.gov/content/travel/en/passports/how-apply/online-renewal-photo.html).
+- The State Department "does not accept photos changed with computer software, phone apps, or filters". It checks every photo "for digital enhancement or alteration" and bars changes made with AI.
+- For online renewal: "upload an original digital image with no changes, such as filters". The application lets the person "reposition or crop" the photo.
+- Sources: [Passport Photos](https://travel.state.gov/en/passports/apply/help/photos.html), [Uploading a Digital Photo](https://travel.state.gov/content/travel/en/passports/how-apply/online-renewal-photo.html).
 
-**Alteration policy for both profiles:**
+**Calipic (founder decision, ADR-051):**
 
-| Operation | Policy | Reason |
-|---|---|---|
-| Crop, scale, position within the frame | **Allowed** | Explicitly allowed for online renewal; inherent to producing a 2 × 2 in print |
-| Background replacement or removal | **Disallowed** | Digital alteration |
-| Document Tone, exposure, colour, sharpening, noise reduction | **Disallowed** | "Digital enhancement" |
-| Straightening (rotation) | **Unknown → off** | Not addressed; AGENTS.md §11 says unknown never silently authorizes. The camera's level guidance keeps the head straight instead |
-| Print-sheet layout, cut marks, calibration bar outside the photo | Allowed | Printing, not a change to the photo |
-| JPEG encoding, metadata stripping, orientation | Allowed | No change to appearance |
-| Camera capture | Allowed with limits | No Portrait mode, depth effect, or beauty filter. Output must not be mirrored. Normal iPhone processing (Smart HDR, Deep Fusion) is the camera, not an edit; revisit if guidance says otherwise |
-
-**Product consequence:** for the largest market, the photo's quality must come from **capture**, not processing:
-
-- The W3 moment is "it framed me perfectly"; the photo itself is untouched ([22](../22-quality-and-delight-bar.md)).
-- *Find a good spot* (L19-002) and helper mode (L19-001) become essential: a plain white or off-white wall, even light, the phone a few feet away.
-- Live and Photo Check **background and lighting checks** become important (L19-019). Calipic cannot fix a beige wall or a side shadow for these profiles, so it must say so before the shot.
-- Adjust shows only framing controls for these profiles. Background and Light & colour are hidden, with one line explaining why.
+- Background replacement and Document Tone are offered as on every profile, with **Original** one tap away. The accepted risk is that an edited photo may be rejected.
+- Capture rules still apply:
+  - no Portrait mode, depth effect, or beauty filter;
+  - the output is never mirrored.
 
 ## 2. US passport — printed photo (`us.passport`, print)
 
@@ -70,7 +59,6 @@
 
 - square JPEG, 1200 × 1200 px;
 - composed with the visa template geometry (head 50–69 %, eyes 56–69 % from the bottom), so the portal's cropper has room;
-- no alteration;
 - size checked to stay between 54 KB and 10 MB.
 
 ## 4. US visa (`us.visa`)
@@ -86,7 +74,7 @@
 | Printed photo | 2 × 2 in when a post asks for one at the interview | O-s (FAQ); varies by post |
 | Infants | No supporting hands or arms in the frame | O-s: Photo FAQ |
 
-**Proposed Calipic preset:** JPEG **600 × 600 px, ≤ 240 KB**, head 50–69 %, eyes 56–69 %, no alteration. This satisfies both the composition template and the stricter DV and Photo Tool wording. A 2 × 2 in print is available from the same unlocked photo.
+**Proposed Calipic preset:** JPEG **600 × 600 px, ≤ 240 KB**, head 50–69 %, eyes 56–69 %. This satisfies both the composition template and the stricter DV and Photo Tool wording. A 2 × 2 in print is available from the same unlocked photo.
 
 ## 5. What Calipic can check, and how firmly
 
@@ -95,7 +83,7 @@
 | Output size, pixels, file size, format | `pass`/`fail` (deterministic) | Verified by reopening the file (FR-096) |
 | Head height 25–35 mm or 50–69 % | `warn` until calibrated, then `pass`/`fail` | The US measures to the **top of the hair**, not the crown estimate: calibrate the hair-top estimate (A5-005) |
 | Eye height 56–69 % | `warn` | Advisory for the passport, because the rule is stated only for visas |
-| Background white or off-white, uniform, no shadow | `warn` (L19-019) | Calipic cannot fix it for these profiles; the message offers a retake with setup tips |
+| Background white or off-white, uniform, no shadow | `warn` (L19-019) | Replacement is available; setup tips still give the best result |
 | Even lighting | `warn` (L19-014) | |
 | Eyes open, mouth closed, neutral expression | `warn` / `manual_check` | Babies: eyes may be partly open → manual check, never fail |
 | No glasses | `manual_check` | Vision does not detect glasses reliably enough |
@@ -105,14 +93,9 @@
 
 ## 6. Consequences for other documents
 
-- **Product:** profile data needs `alterationPolicy` per operation (crop, background, tone, rotation), not one flag (extends ADR-037 and R7-016).
-- **Adjust:** the UI hides disallowed operations per profile and explains them in one line.
-- **Help:** *Find a good spot* gets a US-specific emphasis: a white or off-white wall, because Calipic will not replace it.
-- **App Store:** US screenshots must not show a background being replaced for a US passport.
+*Find a good spot* recommends a white or off-white wall. That gives the best result with or without replacement.
 
-## 7. Before release: browser confirmation checklist
-
-Open each page, confirm the rule, and record the page's "last updated" date in the profile data:
+## 7. Optional verification (not required, ADR-051)
 
 - [ ] [Passport Photos](https://travel.state.gov/en/passports/apply/help/photos.html): size, head size, background, alteration wording, babies, head coverings
 - [ ] [Uploading a Digital Photo](https://travel.state.gov/content/travel/en/passports/how-apply/online-renewal-photo.html): formats, 54 KB–10 MB, cropping, no changes

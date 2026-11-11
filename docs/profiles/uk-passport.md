@@ -1,6 +1,6 @@
 # Profile research — United Kingdom passport
 
-**Status:** Draft profile research (L19-013). Needs browser confirmation of the official pages (§5) before release.
+**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profile:** `gb.passport`. The **digital** route (online application) is primary. The print route is secondary and sent to a shop, not printed at home.
 
@@ -8,22 +8,17 @@
 
 | Level | Meaning |
 |---|---|
-| **O-s** | Official GOV.UK or HM Passport Office page, as quoted in a search restricted to gov.uk |
+| **O-s** | Official GOV.UK or HM Passport Office page, as quoted in a search restricted to gov.uk (accepted, ADR-051) |
 | **?** | Not established |
 
-## 1. Alteration: framing only
+## 1. Editing
 
-- Digital photos must be "unaltered by computer software". The service says the photo "must be unedited – you can't 'correct' your passport photo". **O-s**: [Get a passport photo: Digital photos](https://www.gov.uk/photos-for-passports), [Rules for digital passport photos](https://www.passport.service.gov.uk/help/photo-rules).
-- The online service crops the photo itself. Do not crop tightly.
+**Official wording (reference):**
 
-**Alteration policy:**
+- Photos must be "unaltered by computer software"; "you can't 'correct' your passport photo". Sources: [Digital photos](https://www.gov.uk/photos-for-passports), [Rules for digital passport photos](https://www.passport.service.gov.uk/help/photo-rules).
+- The online service crops the photo itself, so do not crop tightly.
 
-| Operation | Policy |
-|---|---|
-| Background replacement | Disallowed |
-| Tone and colour changes | Disallowed |
-| Rotation | Unknown → off |
-| Crop and scale | Allowed for print geometry. For the digital route, send a generous head-and-upper-body frame and let the service crop |
+**Calipic (ADR-051):** background replacement and tone are offered, with **Original** one tap away. The replacement colour for this profile is **light grey or cream**, not white.
 
 ## 2. Digital route (online application)
 
@@ -42,7 +37,6 @@
 
 - JPEG, **1200 × 1500 px** (4:5);
 - head, shoulders, and upper body framed with margin;
-- no alteration;
 - 50 KB–5 MB.
 
 These numbers are taken directly from the rules above (≥ 600 × 750, ≤ 5 MB). Validate with a beta tester who applies online.
@@ -69,7 +63,7 @@ These numbers are taken directly from the rules above (≥ 600 × 750, ≤ 5 MB)
 
 Evidence: O-s, [Photo standards](https://assets.publishing.service.gov.uk/media/69a831faa2495f2d259f1447/Photo_standards_v51.0.pdf), [Guidance for photographers](https://www.gov.uk/government/publications/passport-photos-guide-for-photographers/guidance-for-photographers).
 
-## 5. Before release: browser confirmation
+## 5. Optional verification (not required, ADR-051)
 
 - [ ] [Get a passport photo: Digital photos](https://www.gov.uk/photos-for-passports): pixels, file size (5 MB vs 10 MB), "unaltered", recency
 - [ ] [Rules for digital passport photos](https://www.passport.service.gov.uk/help/photo-rules) and [How to take a digital passport photo](https://www.passport.service.gov.uk/photo/how-to-take-a-photo): background, distances, cropping
