@@ -34,7 +34,9 @@ struct IDPhotoSpikeApp: App {
                         model.setInitialized()
                         #if DEBUG
                         // "--uitesting-fixture" loads one generated photo; "--uitesting-fixture-2" loads two people.
+                        // "--uitesting-custom-size" starts with a 30 × 40 mm custom size (ADR-018 controls).
                         let arguments = ProcessInfo.processInfo.arguments
+                        if arguments.contains("--uitesting-custom-size") { model.setDocument(.custom(widthMM: 30, heightMM: 40)) }
                         let fixtures = arguments.contains("--uitesting-fixture-2") ? 2 : arguments.contains("--uitesting-fixture") ? 1 : 0
                         for index in 0..<fixtures {
                             let palette: [CGColor] = index == 0 ? SyntheticFixture.defaultPalette

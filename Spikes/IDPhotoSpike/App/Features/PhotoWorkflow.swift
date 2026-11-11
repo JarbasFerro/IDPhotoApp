@@ -16,6 +16,8 @@ struct PhotoEntry: Identifiable {
     var backgroundPreview: CGImage?
     /// Exposure and colour-cast assessment of the current preview.
     var toneAssessment: ToneAssessment?
+    /// Closer or wider framing; applies to custom sizes only (official profiles keep their own target).
+    var framing: FramingPreset = .standard
 
     var id: UUID { photo.id }
 }
@@ -160,7 +162,8 @@ final class PhotoWorkflow {
             let measured = try? await pipeline.analyze(photo: photo)
             guard !Task.isCancelled, index(of: photo.id) != nil else { return }
             // Solve for the document chosen now, not when the analysis started (it may have changed meanwhile).
-            let result = measured.map { Self.resolved($0, for: renderTarget) }
+            guard let entry = entries.first(where: { $0.id == photo.id }) else { return }
+            let result = measured.map { Self.resolved($0, for: target(for: entry)) }
             update(photo.id) {
                 $0.isAnalyzing = false
                 $0.analysis = result
@@ -203,20 +206,12 @@ final class PhotoWorkflow {
         document = next
         let target = renderTarget
         for index in entries.indices {
-            var entry = entries[index]
-            if let analysis = entry.analysis {
-                let solved = Self.resolved(analysis, for: target)
-                entry.analysis = solved
-                if let solution = solved.solution, solved.faceCount == 1 {
-                    var adjustment = solution.adjustment
-                    adjustment.background = entry.adjustment.background
-                    adjustment.edgeSoftness = entry.adjustment.edgeSoftness
-                    adjustment.tone = entry.adjustment.tone
-                    entry.adjustment = adjustment
-                }
+            reframe(at: index)
+            if case .color = entries[index].adjustment.background {
+                entries[index].adjustment.background = .color(policy.background)
             }
-            if case .color = entry.adjustment.background { entry.adjustment.background = .color(policy.background) }
-            entries[index] = entry
+            // Black and white is a custom-size option; official documents return to colour.
+            if !next.isCustom { entries[index].adjustment.monochrome = false }
         }
         for index in printJob.items.indices
         where abs(printJob.items[index].trimWidthMM - previous.widthMM) < 0.001
@@ -226,6 +221,36 @@ final class PhotoWorkflow {
         }
         sheetThumbnails = [:]
         for entry in entries { refreshBackgroundPreview(for: entry.id) }
+    }
+
+    /// The render target for one person: the document's, framed closer or wider for custom sizes.
+    func target(for entry: PhotoEntry) -> RenderTarget {
+        document.isCustom ? renderTarget.framed(entry.framing) : renderTarget
+    }
+
+    /// Changes how much of the person a custom-size photo shows, re-solving from the measured face.
+    func setFraming(_ preset: FramingPreset, for photoID: UUID) {
+        guard let index = index(of: photoID), entries[index].framing != preset else { return }
+        entries[index].framing = preset
+        reframe(at: index)
+        sheetThumbnails = [:]
+    }
+
+    /// Re-solves one entry's crop for its current target and keeps the person's look (background, tone, mono).
+    private func reframe(at index: Int) {
+        var entry = entries[index]
+        guard let analysis = entry.analysis else { return }
+        let solved = Self.resolved(analysis, for: target(for: entry))
+        entry.analysis = solved
+        if let solution = solved.solution, solved.faceCount == 1 {
+            var adjustment = solution.adjustment
+            adjustment.background = entry.adjustment.background
+            adjustment.edgeSoftness = entry.adjustment.edgeSoftness
+            adjustment.tone = entry.adjustment.tone
+            adjustment.monochrome = entry.adjustment.monochrome
+            entry.adjustment = adjustment
+        }
+        entries[index] = entry
     }
 
     private func update(_ photoID: UUID, _ change: (inout PhotoEntry) -> Void) {
@@ -253,7 +278,8 @@ final class PhotoWorkflow {
         var edits = entry.adjustment
         let canReplace = entry.segmentation.map { $0.quality.state != .fail } ?? false
         if case .color = edits.background, !canReplace { edits.background = .original }
-        let needsWork = edits.tone.isEnabled || { if case .color = edits.background { return true } else { return false } }()
+        let needsWork = edits.tone.isEnabled || edits.monochrome
+            || { if case .color = edits.background { return true } else { return false } }()
         let faceBox = entry.analysis?.geometry?.faceBox
         let photo = entry.photo
         previewTasks[photoID] = Task {
@@ -261,7 +287,8 @@ final class PhotoWorkflow {
             let metrics = await pipeline.toneMetrics(photo: photo, adjustment: edits, faceBox: faceBox)
             guard !Task.isCancelled, let current = self.index(of: photoID) else { return }
             let now = entries[current].adjustment
-            guard now.background == edits.background, now.edgeSoftness == edits.edgeSoftness, now.tone == edits.tone else { return }
+            guard now.background == edits.background, now.edgeSoftness == edits.edgeSoftness, now.tone == edits.tone,
+                  now.monochrome == edits.monochrome else { return }
             entries[current].backgroundPreview = image
             entries[current].toneAssessment = ToneAssessment.assess(metrics)
         }
@@ -274,10 +301,12 @@ final class PhotoWorkflow {
 
     func resetCrop() {
         let background = adjustment.background, softness = adjustment.edgeSoftness, tone = adjustment.tone
+        let monochrome = adjustment.monochrome
         adjustment = automaticAdjustment
         adjustment.background = background
         adjustment.edgeSoftness = softness
         adjustment.tone = tone
+        adjustment.monochrome = monochrome
     }
 
     // MARK: - Export

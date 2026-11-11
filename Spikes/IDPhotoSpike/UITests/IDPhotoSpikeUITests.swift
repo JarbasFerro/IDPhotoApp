@@ -224,6 +224,35 @@ final class IDPhotoSpikeUITests: XCTestCase {
         return app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'appIcon-'"))
     }
 
+    /// Custom size: framing, White or Light grey background, and black and white (ADR-018), in light and dark.
+    @MainActor
+    func testCustomSizeAdjustControls() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-custom-size", "--uitesting-fixture"]
+        app.launch()
+        XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        reveal(app.buttons["adjust"], in: app)
+        app.buttons["adjust"].tap()
+        XCTAssertTrue(app.otherElements["cropPreview"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.segmentedControls["framingPicker"].exists)
+        let background = app.segmentedControls["backgroundPicker"]
+        XCTAssertTrue(background.buttons["White"].exists)
+        XCTAssertTrue(background.buttons["Light grey"].exists)
+        let mono = app.switches["monochromeToggle"]
+        reveal(mono, in: app)
+        XCTAssertTrue(mono.exists)
+        for (appearance, name) in [(XCUIDevice.Appearance.light, "Adjust, custom size, light"),
+                                   (XCUIDevice.Appearance.dark, "Adjust, custom size, dark")] {
+            XCUIDevice.shared.appearance = appearance
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = name
+            shot.lifetime = .keepAlways
+            add(shot)
+        }
+        XCUIDevice.shared.appearance = .light
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+    }
+
     @MainActor
     func testCheckAdjustSheetShareFlow() throws {
         let app = XCUIApplication()

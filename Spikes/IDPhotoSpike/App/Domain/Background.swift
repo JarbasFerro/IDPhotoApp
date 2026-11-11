@@ -11,6 +11,8 @@ struct BackgroundColor: Sendable, Hashable {
 
     /// Spain DNI: "fondo uniforme blanco y liso". Other jurisdictions supply their own colour through the profile.
     static let white = BackgroundColor(red: 1, green: 1, blue: 1)
+    /// #E6E6E6: the catalog's light grey (UK, Netherlands), also offered for custom sizes.
+    static let lightGrey = BackgroundColor(red: 230.0 / 255, green: 230.0 / 255, blue: 230.0 / 255)
 }
 
 enum BackgroundChoice: Sendable, Hashable {

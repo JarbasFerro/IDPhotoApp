@@ -111,11 +111,31 @@ struct AdjustSheet: View {
             }
             .controlSize(.large)
 
+            if model.document.isCustom {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Framing").font(.subheadline.weight(.medium))
+                    Picker("Framing", selection: framingSelection) {
+                        Text("Wider").tag(FramingPreset.wider)
+                        Text("Standard").tag(FramingPreset.standard)
+                        Text("Closer").tag(FramingPreset.closer)
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(entry.analysis?.solution == nil)
+                    .accessibilityIdentifier("framingPicker")
+                    if entry.analysis?.solution == nil, !entry.isAnalyzing {
+                        Text("Framing needs a face the app can find. Use Move and zoom instead.")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
+                }
+            }
+
             VStack(alignment: .leading, spacing: 8) {
                 Text("Background").font(.subheadline.weight(.medium))
                 Picker("Background", selection: backgroundSelection) {
-                    Text("Original").tag(false)
-                    Text("White").tag(true)
+                    Text("Original").tag(BackgroundColor?.none)
+                    ForEach(model.document.replacementColors, id: \.self) { color in
+                        Text(BackgroundPresentation.name(color)).tag(BackgroundColor?.some(color))
+                    }
                 }
                 .pickerStyle(.segmented)
                 .disabled(!model.canReplaceBackground)
@@ -144,6 +164,18 @@ struct AdjustSheet: View {
                     if let assessment = entry.toneAssessment {
                         StatusLabel(text: TonePresentation.message(for: assessment), state: assessment.state).font(.footnote)
                     }
+                }
+            }
+
+            if model.document.isCustom {
+                VStack(alignment: .leading, spacing: 8) {
+                    Toggle(isOn: Binding(get: { model.adjustment.monochrome },
+                                         set: { model.adjustment.monochrome = $0; model.refreshBackgroundPreview() })) {
+                        Text("Black and white").font(.subheadline.weight(.medium))
+                    }
+                    .accessibilityIdentifier("monochromeToggle")
+                    Text("For forms that ask for a black-and-white photo.")
+                        .font(.footnote).foregroundStyle(.secondary)
                 }
             }
         }
@@ -178,11 +210,17 @@ struct AdjustSheet: View {
         }
     }
 
-    private var backgroundSelection: Binding<Bool> {
-        Binding(get: { if case .color = model.adjustment.background { return true } else { return false } },
-                set: { white in
-                    model.adjustment.background = white ? .color(.white) : .original
+    /// nil is the original background; otherwise one of the document's replacement colours.
+    private var backgroundSelection: Binding<BackgroundColor?> {
+        Binding(get: { if case .color(let color) = model.adjustment.background { return color } else { return nil } },
+                set: { color in
+                    model.adjustment.background = color.map { .color($0) } ?? .original
                     model.refreshBackgroundPreview()
                 })
+    }
+
+    private var framingSelection: Binding<FramingPreset> {
+        Binding(get: { model.selected?.framing ?? .standard },
+                set: { model.setFraming($0, for: photoID); model.refreshBackgroundPreview() })
     }
 }

@@ -29,10 +29,11 @@ enum SheetRenderer {
 
     /// One JPEG per page at exactly the paper aspect. Kiosks read pixels, not DPI tags, so the aspect is what matters.
     static func writeJPEGPages(_ layout: PrintLayout, rasters: [PrintLayout.RasterKey: CGImage], in directory: URL,
-                               baseName: String, calibrationLabel: String) throws -> [URL] {
+                               baseName: String, calibrationLabel: String,
+                               pixelsPerInch: Double = jpegPixelsPerInch) throws -> [URL] {
         var urls: [URL] = []
         for (index, page) in layout.pages.enumerated() {
-            let pixels = jpegPixelSize(for: page)
+            let pixels = jpegPixelSize(for: page, pixelsPerInch: pixelsPerInch)
             guard let space = CGColorSpace(name: CGColorSpace.sRGB),
                   let context = CGContext(data: nil, width: pixels.width, height: pixels.height, bitsPerComponent: 8,
                                           bytesPerRow: 0, space: space, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
@@ -47,8 +48,8 @@ enum SheetRenderer {
             CGImageDestinationAddImage(destination, image, [
                 kCGImageDestinationLossyCompressionQuality: 0.92,
                 kCGImagePropertyOrientation: 1,
-                kCGImagePropertyDPIWidth: jpegPixelsPerInch,
-                kCGImagePropertyDPIHeight: jpegPixelsPerInch
+                kCGImagePropertyDPIWidth: pixelsPerInch,
+                kCGImagePropertyDPIHeight: pixelsPerInch
             ] as CFDictionary)
             guard CGImageDestinationFinalize(destination) else { throw PhotoError.renderFailed }
             urls.append(url)
@@ -56,9 +57,9 @@ enum SheetRenderer {
         return urls
     }
 
-    static func jpegPixelSize(for page: PrintPage) -> OutputPixels {
-        OutputPixels(width: Int((page.widthMM / 25.4 * jpegPixelsPerInch).rounded()),
-                     height: Int((page.heightMM / 25.4 * jpegPixelsPerInch).rounded()))
+    static func jpegPixelSize(for page: PrintPage, pixelsPerInch: Double = jpegPixelsPerInch) -> OutputPixels {
+        OutputPixels(width: Int((page.widthMM / 25.4 * pixelsPerInch).rounded()),
+                     height: Int((page.heightMM / 25.4 * pixelsPerInch).rounded()))
     }
 
     // MARK: - Drawing (context origin bottom-left; layout origin top-left)
@@ -134,10 +135,10 @@ enum SheetRenderer {
         }
     }
 
-    static func verifyJPEGPages(_ urls: [URL], layout: PrintLayout) throws {
+    static func verifyJPEGPages(_ urls: [URL], layout: PrintLayout, pixelsPerInch: Double = jpegPixelsPerInch) throws {
         guard urls.count == layout.pages.count else { throw PhotoError.verificationFailed }
         for (url, page) in zip(urls, layout.pages) {
-            let expected = jpegPixelSize(for: page)
+            let expected = jpegPixelSize(for: page, pixelsPerInch: pixelsPerInch)
             guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
                   CGImageSourceGetType(source) as String? == UTType.jpeg.identifier,
                   let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],

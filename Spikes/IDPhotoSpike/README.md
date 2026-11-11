@@ -35,6 +35,13 @@ scripts/test-spike.sh 'platform=iOS Simulator,id=<simulator UUID>'
   - Each profile sets the trim size, the composition bands and framing target, the replacement colour, the digital preset (pixels, byte limit, loose framing), whether printing is shop-only, and the requirements screen with its official sources.
   - Changing the document re-solves every analysed photo without new Vision work.
   - Spain DNI remains the default and renders exactly as before.
+- Custom-size options (0.14.0):
+  - Wider, Standard, or Closer framing per photo, re-solved from the measured face;
+  - White or Light grey background;
+  - Black and white, applied after tone and background in every output.
+
+  Official profiles offer their own replacement colour, named correctly. Page JPEGs follow the profile's resolution (Netherlands 400 ppi).
+- Capture-protection spike (L19-017): with developer details on, the Photo Check portrait is hosted in a secure text-field canvas so screenshots and recordings show it blank. A caption reports whether this iOS still supports the technique.
 - Choose your app icon (BD-038): an "App Icon" row on Home opens a grid of alternate icons generated from `VARIANTS` in `scripts/brand/build-icon-v2.py` by `scripts/brand/generate-brand-assets.py` (icon sets, previews, Swift list and build setting; `--check` verifies they agree).
 - PhotosPicker with file-based Transferable import; no broad photo-library permission.
 - Immutable, privately stored source; protected and excluded-from-backup working directories.

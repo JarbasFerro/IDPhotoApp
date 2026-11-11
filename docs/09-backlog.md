@@ -817,6 +817,12 @@ Flag likely reflections on glasses and suggest tilting the glasses or moving the
 
 ## L19-017 — Capture protection for locked previews — P0 / M
 
+**Spike in 0.14.0:**
+
+- `CaptureProtected` (App/Features/CaptureProtection.swift) wraps the Photo Check portrait while developer details are on (long press on the version line).
+- A caption reports whether the secure canvas exists on this iOS.
+- **Device result pending:** take a screenshot and a screen recording on Photo Check and confirm the portrait is blank.
+
 Implement ADR-049 D-9. A device spike on iOS 26 and 27 tests the secure-layer technique on every locked preview: Photo Check, Adjust, the sheet, and the confirmation. Fallback: hide locked previews while `sceneCaptureState` is active, and explain after a screenshot. Acceptance: screenshots and recordings on physical devices show the locked photo blank; unlocked photos are unaffected; no layout, gesture, animation, or performance regression in the W3 landing; App Review notes prepared. Keep the technique behind one small view so it can be replaced if iOS changes.
 
 ## L19-018 — Custom size without a country — P0 / M
@@ -834,6 +840,8 @@ Background replacement is offered on every profile (ADR-051), but a good capture
 Acceptance: calibrated on consented fixtures across skin tones and wall colours; the explanation always offers setup tips and Retake; no false fail. Profile research: [US](profiles/us-passport-and-visa.md).
 
 ## L19-020 — Per-profile print resolution and profile questions — P0 / S
+
+**Print resolution done in 0.14.0:** page JPEGs follow the profile's minimum (Netherlands 400 ppi, others 300). Profile questions still open.
 
 - **Print resolution as profile data:** default 300 ppi; the Netherlands requires at least 400 dpi. The lab JPEG, the PDF raster, and the source-resolution warning follow the profile value.
 - **Profile questions:** for example, the Netherlands' "10 or younger?", which switches the head-size band.

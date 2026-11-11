@@ -9415,6 +9415,134 @@
           }
         }
       }
+    },
+    "Wider" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más amplio"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais aberto"
+          }
+        }
+      }
+    },
+    "Standard" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Padrão"
+          }
+        }
+      }
+    },
+    "Closer" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más cerca"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais próximo"
+          }
+        }
+      }
+    },
+    "Black and white" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blanco y negro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preto e branco"
+          }
+        }
+      }
+    },
+    "For forms that ask for a black-and-white photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para formularios que piden una foto en blanco y negro."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para formulários que pedem uma foto em preto e branco."
+          }
+        }
+      }
+    },
+    "Light grey" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gris claro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cinza-claro"
+          }
+        }
+      }
+    },
+    "Plain colour" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color liso"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cor lisa"
+          }
+        }
+      }
+    },
+    "Framing needs a face the app can find. Use Move and zoom instead." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El encuadre necesita una cara que la app pueda encontrar. Usa Mover y ampliar."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O enquadramento precisa de um rosto que o app consiga encontrar. Use Mover e ampliar."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

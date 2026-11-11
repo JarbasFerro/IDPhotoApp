@@ -171,11 +171,15 @@ actor PhotoPipeline: PhotoProcessing {
                                                    backgroundReference: backgroundReferences[photoID],
                                                    faceBox: faceBoxes[photoID]) ?? working
         }
-        guard case .color(let color) = adjustment.background, let mask = masks[photoID] else { return working }
-        let interval = signposter.beginInterval("Composite")
-        defer { signposter.endInterval("Composite", interval) }
-        return BackgroundCompositor.shared.composite(image: working, mask: mask, color: color,
-                                                     softness: adjustment.clamped().edgeSoftness) ?? working
+        if case .color(let color) = adjustment.background, let mask = masks[photoID] {
+            let interval = signposter.beginInterval("Composite")
+            working = BackgroundCompositor.shared.composite(image: working, mask: mask, color: color,
+                                                            softness: adjustment.clamped().edgeSoftness) ?? working
+            signposter.endInterval("Composite", interval)
+        }
+        // Black and white last, so a replaced background stays a neutral grey value.
+        if adjustment.monochrome { working = BackgroundCompositor.shared.monochrome(working) ?? working }
+        return working
     }
 
     /// Tone metrics on the preview with the current edits, for the status card.
@@ -249,8 +253,9 @@ actor PhotoPipeline: PhotoProcessing {
             signposter.endInterval("PDF", pdfInterval)
             try Task.checkCancellation()
             let pages = try SheetRenderer.writeJPEGPages(layout, rasters: rasters, in: directory,
-                                                         baseName: "\(target.fileBaseName)-sheet", calibrationLabel: label)
-            try SheetRenderer.verifyJPEGPages(pages, layout: layout)
+                                                         baseName: "\(target.fileBaseName)-sheet", calibrationLabel: label,
+                                                         pixelsPerInch: target.pagePixelsPerInch)
+            try SheetRenderer.verifyJPEGPages(pages, layout: layout, pixelsPerInch: target.pagePixelsPerInch)
             for url in jpegs + [pdf] + pages { try PhotoFiles.protect(url) }
             try Task.checkCancellation()
             return PhotoExport(id: id, jpegs: jpegs, pdf: pdf, pages: pages, layout: layout)

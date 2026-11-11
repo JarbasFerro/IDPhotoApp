@@ -56,6 +56,15 @@ enum AlignmentPresentation {
 }
 
 enum BackgroundPresentation {
+    /// Name of a replacement colour in the background picker.
+    static func name(_ color: BackgroundColor) -> String {
+        switch color {
+        case .white: String(localized: "White")
+        case .lightGrey: String(localized: "Light grey")
+        default: String(localized: "Plain colour")
+        }
+    }
+
     static func originalMessage(_ assessment: BackgroundAssessment) -> LocalizedStringResource {
         switch assessment.state {
         case .pass: return "Original background is plain and light"

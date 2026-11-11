@@ -150,6 +150,15 @@ final class BackgroundCompositor: Sendable {
 
     /// Replaces everything outside the mask with `color`. `softness` 0...1 widens the feather from 0.5 to 3 px
     /// at a 1600 px long edge and scales with the image. A 1 px choke removes the background fringe first.
+    /// Neutral black and white (saturation 0); the result stays in sRGB so every output path is unchanged.
+    func monochrome(_ image: CGImage) -> CGImage? {
+        let filter = CIFilter.colorControls()
+        filter.inputImage = CIImage(cgImage: image)
+        filter.saturation = 0
+        guard let output = filter.outputImage else { return nil }
+        return context.createCGImage(output, from: output.extent, format: .RGBA8, colorSpace: srgb)
+    }
+
     func composite(image: CGImage, mask: CGImage, color: BackgroundColor, softness: Double) -> CGImage? {
         let source = CIImage(cgImage: image)
         let extent = source.extent

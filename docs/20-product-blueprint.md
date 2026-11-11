@@ -66,7 +66,7 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | F-06 | Full requirements with source link and review date | Trust and exceptions (glasses, headwear) | Shipped (spike); must move to profile data | [16 §4](16-screen-experience-spec.md) |
 | F-07 | Official editing rules recorded per profile, for reference; background replacement and tone are offered on every profile (ADR-051) | Studio result everywhere | Decided (ADR-051) | ADR-051, ADR-037, [profiles](profiles/README.md) |
 | F-08 | Children use the adult flow with helper mode; baby relaxations never block, only warn | Parents' main job | Accepted for 1.0; age relaxations as profile data Post-launch | ADR-017, [14 §5.6](14-priority-feature-plan.md) |
-| F-09 | **Custom size without a country**: width × height in mm or inches, size shortcuts, framing Closer/Wider, free background choice, photographic checks only, never *Ready* | School, club, and other non-official photos | Shipped (spike) 0.13.0: size entry in mm or in, shortcuts. black and white, Closer/Wider and a light grey background still to do | ADR-018, L19-018, [21 J9](21-user-journeys.md) |
+| F-09 | **Custom size without a country**: width × height in mm or inches, size shortcuts, framing Closer/Wider, free background choice, photographic checks only, never *Ready* | School, club, and other non-official photos | Shipped (spike) 0.14.0: size entry in mm or in, shortcuts, Closer/Wider framing, White or Light grey background, black and white | ADR-018, L19-018, [21 J9](21-user-journeys.md) |
 
 ### 4.2 Capture and import
 

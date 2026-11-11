@@ -32,12 +32,42 @@ struct RenderTarget: Sendable, Hashable {
     let spec: CompositionSpec
     let digital: DigitalOutputSpec
     let fileBaseName: String
+    /// Resolution of the page JPEGs for labs and kiosks: 300 ppi, or more when the document asks (Netherlands: 400).
+    var pagePixelsPerInch: Double = SheetRenderer.jpegPixelsPerInch
 
     /// The pre-catalog behaviour (Spain DNI engineering preset); the default for tests and fallbacks.
     static let spainPrototype = RenderTarget(
         format: .spainPrototype, spec: .icaoEngineeringDefault,
         digital: DigitalOutputSpec(pixels: PhotoFormat.spainPrototype.output, minBytes: nil, maxBytes: nil, looseFraming: false),
         fileBaseName: "Foto-carnet")
+
+    /// The same target framed closer or wider (custom sizes). Bands widen so the person's choice is never a warning.
+    func framed(_ preset: FramingPreset) -> RenderTarget {
+        guard preset != .standard else { return self }
+        var spec = spec
+        spec.headHeightTarget = preset.headHeightTarget
+        spec.eyeLineTarget = preset.eyeLineTarget
+        spec.headHeightRange = min(spec.headHeightRange.lowerBound, preset.headHeightTarget - 0.08)
+            ... max(spec.headHeightRange.upperBound, preset.headHeightTarget + 0.05)
+        return RenderTarget(format: format, spec: spec, digital: digital, fileBaseName: fileBaseName,
+                            pagePixelsPerInch: pagePixelsPerInch)
+    }
+}
+
+/// How much of the person a custom-size photo shows. Standard is the app default (head 74 %).
+enum FramingPreset: String, Sendable, Hashable, CaseIterable, Identifiable {
+    case wider, standard, closer
+    var id: String { rawValue }
+
+    /// Crown to chin as a fraction of the photo height.
+    var headHeightTarget: Double {
+        switch self { case .wider: 0.62; case .standard: 0.74; case .closer: 0.82 }
+    }
+
+    /// Eye line from the top. With crown-to-eye at 0.444 of the head (FaceGeometry), all three keep ≥ 7 % headroom.
+    var eyeLineTarget: Double {
+        switch self { case .wider: 0.40; case .standard: 0.42; case .closer: 0.44 }
+    }
 }
 
 /// The document the session is making photos for: an official catalog profile, or a custom size with no rules.
@@ -142,7 +172,13 @@ enum DocumentChoice: Sendable, Hashable, Identifiable {
     }
 
     var renderTarget: RenderTarget {
-        RenderTarget(format: format, spec: composition, digital: digital, fileBaseName: fileBaseName)
+        RenderTarget(format: format, spec: composition, digital: digital, fileBaseName: fileBaseName,
+                     pagePixelsPerInch: max(SheetRenderer.jpegPixelsPerInch, profile?.printOutput?.minPpi ?? 0))
+    }
+
+    /// Background colours offered in Adjust besides the original: the profile's colour, or two for custom sizes.
+    var replacementColors: [BackgroundColor] {
+        isCustom ? [.white, .lightGrey] : [backgroundColor]
     }
 }
 

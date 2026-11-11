@@ -14,6 +14,8 @@ struct PhotoCheckView: View {
     @State private var landed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// Developer details (long press on the version line) also switch on the L19-017 capture-protection test.
+    @AppStorage(DeveloperMode.key) private var developerMode = false
 
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
     private var position: (Int, Int)? {
@@ -85,9 +87,17 @@ struct PhotoCheckView: View {
     private func portrait(_ entry: PhotoEntry) -> some View {
         let checking = entry.isAnalyzing || !landed
         let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 280 : 250)
+        let format = model.renderTarget.format
+        let portrait = PortraitView(entry: entry, format: format, showsOriginal: comparing || !landed,
+                                    label: comparing ? "Original photo" : "Framed photo", animated: !reduceMotion)
         return VStack(spacing: Design.Spacing.caption) {
-            PortraitView(entry: entry, format: model.renderTarget.format, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
-                         animated: !reduceMotion)
+            Group {
+                if developerMode {
+                    CaptureProtected { portrait }.aspectRatio(format.aspectRatio, contentMode: .fit)
+                } else {
+                    portrait
+                }
+            }
                 .frame(maxWidth: width)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
                 .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
@@ -103,6 +113,13 @@ struct PhotoCheckView: View {
                 .animation(nil, value: checking)
                 // Leaf element that marks the screen for UI tests; identifiers on containers hide their children.
                 .accessibilityIdentifier("photoCheck")
+            if developerMode {
+                Text(verbatim: CaptureProtection.isAvailable
+                     ? "Capture protection test: on. Take a screenshot to check."
+                     : "Capture protection test: unavailable on this iOS.")
+                    .font(Design.Typography.noteDigits).foregroundStyle(.tertiary)
+                    .accessibilityIdentifier("captureProtectionStatus")
+            }
         }
         .frame(maxWidth: .infinity)
     }
