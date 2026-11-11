@@ -242,7 +242,7 @@ Moving image processing to a server for convenience is not a sufficient reason.
 5. **Checks:** only photographic checks (sharpness, eyes, light, enough resolution for the print size). Never *Ready* for a document and never a source or requirement claim. The headline is, for example, *Looks good for printing*. Requirements say: *No official rules apply. Use the size your school or organisation asked for.*
 6. **Outputs:** the same as for any profile. People can be mixed on the print sheet (for example three children, three copies each), and there is a digital JPEG at the chosen size and 300 ppi.
 7. **Price:** one credit per person, as for any photo (ADR-048).
-8. **Proposed additions (2026-11-11, [wave-a-second-group](profiles/wave-a-second-group.md)):** named shortcuts **3 × 4 cm** (Brazil) and **2.5 × 3 cm (tamaño infantil)** (Mexico), and a **Black and white** output option.
+8. **Confirmed by the founder (2026-11-11):** named shortcuts **3 × 4 cm** (Brazil) and **2.5 × 3 cm (tamaño infantil)** (Mexico), and a **Black and white** output option. Data: [Rules/catalog/v1/custom-size-shortcuts.json](../Rules/catalog/v1/custom-size-shortcuts.json).
 
 ---
 

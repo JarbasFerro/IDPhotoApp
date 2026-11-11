@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "profileId": "au.passport.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "AU",
+    "regionCode": null
+  },
+  "document": {
+    "type": "passport",
+    "variant": "standard",
+    "nameKey": "profile.au.passport.standard.name",
+    "localName": null
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "shop_only",
+      "noteKey": "output.note.dye-sub"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 32,
+      "maxInclusive": 36,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "au-passports-photos"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 75.6,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "discouraged",
+    "capability": "manual",
+    "sourceIds": [
+      "au-passports-photos"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "dye-sub-print",
+      "capability": "informational",
+      "sourceIds": [
+        "au-passports-photos"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "au-passports-photos"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "au-passports-photos",
+      "authorityName": "Australian Passport Office",
+      "title": "Passport photos",
+      "url": "https://www.passports.gov.au/help/passport-photos",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "au-camera-guidelines",
+      "authorityName": "Australian Passport Office",
+      "title": "Camera operator guidelines (2026)",
+      "url": "https://www.passports.gov.au/sites/default/files/documents/2026-06/Camera%20operator%20guidelines_0.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Allowed frame 35–40 × 45–50 mm; Calipic prints 35 × 45.",
+    "Dye-sublimation on glossy ≥ 200 gsm, professionally printed only; inkjet not accepted."
+  ]
+}

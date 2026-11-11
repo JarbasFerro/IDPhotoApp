@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "profileId": "gb.passport.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "GB",
+    "regionCode": null
+  },
+  "document": {
+    "type": "passport",
+    "variant": "standard",
+    "nameKey": "profile.gb.passport.standard.name",
+    "localName": null
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "online",
+      "kind": "digital",
+      "pixelWidth": 1200,
+      "pixelHeight": 1500,
+      "formats": [
+        "jpeg"
+      ],
+      "fileSizeBytes": {
+        "min": 51200,
+        "max": 5000000
+      },
+      "colorSpace": "srgb",
+      "composition": "loose",
+      "pixelLimits": {
+        "minWidth": 600,
+        "minHeight": 750
+      }
+    },
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "shop_only",
+      "noteKey": "output.note.uk-home-print"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 29,
+      "maxInclusive": 34,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "uk-photographers"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 70.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "light",
+    "allowedColors": [
+      "light grey",
+      "cream"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#E6E6E6",
+    "officialEditingRule": "disallowed",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "uk-digital-photos",
+      "uk-how-to-take"
+    ]
+  },
+  "recencyMonths": 1,
+  "checks": [
+    {
+      "id": "eyes-open",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "uk-photo-standards"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "uk-photo-standards"
+      ]
+    },
+    {
+      "id": "mouth-closed",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "uk-photo-standards"
+      ]
+    },
+    {
+      "id": "no-hands-or-toys",
+      "capability": "manual",
+      "sourceIds": [
+        "uk-photo-standards"
+      ]
+    },
+    {
+      "id": "even-lighting",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "uk-how-to-take"
+      ]
+    }
+  ],
+  "specialCases": [
+    {
+      "id": "baby-eyes",
+      "condition": {
+        "type": "age_lt",
+        "years": 1
+      },
+      "overrides": [
+        {
+          "target": "check:eyes-open",
+          "capability": "manual"
+        }
+      ],
+      "sourceIds": [
+        "uk-photo-standards"
+      ]
+    },
+    {
+      "id": "young-child-expression",
+      "condition": {
+        "type": "age_lt",
+        "years": 6
+      },
+      "overrides": [
+        {
+          "target": "check:neutral-expression",
+          "capability": "manual"
+        },
+        {
+          "target": "check:mouth-closed",
+          "capability": "manual"
+        }
+      ],
+      "sourceIds": [
+        "uk-photo-standards",
+        "uk-photographers"
+      ]
+    }
+  ],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "uk-digital-photos",
+      "authorityName": "HM Passport Office (GOV.UK)",
+      "title": "Get a passport photo: Digital photos",
+      "url": "https://www.gov.uk/photos-for-passports",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "uk-photo-rules",
+      "authorityName": "HM Passport Office",
+      "title": "Rules for digital passport photos",
+      "url": "https://www.passport.service.gov.uk/help/photo-rules",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "uk-how-to-take",
+      "authorityName": "HM Passport Office",
+      "title": "How to take a digital passport photo",
+      "url": "https://www.passport.service.gov.uk/photo/how-to-take-a-photo",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "uk-photographers",
+      "authorityName": "HM Passport Office (GOV.UK)",
+      "title": "Guidance for photographers",
+      "url": "https://www.gov.uk/government/publications/passport-photos-guide-for-photographers/guidance-for-photographers",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "uk-photo-standards",
+      "authorityName": "HM Passport Office",
+      "title": "Photo standards v51",
+      "url": "https://assets.publishing.service.gov.uk/media/69a831faa2495f2d259f1447/Photo_standards_v51.0.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Digital route is primary; the online service crops, so the digital output uses a loose frame.",
+    "Home-printed photos are generally not accepted; the print route goes through a shop.",
+    "File size: 10 MB on one page, 5 MB on another; 5 MB used."
+  ]
+}

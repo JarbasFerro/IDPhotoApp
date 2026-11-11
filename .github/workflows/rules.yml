@@ -1,0 +1,20 @@
+name: Rules catalog
+
+on:
+  push:
+    paths: ["Rules/**", "scripts/rules/**", ".github/workflows/rules.yml"]
+  pull_request:
+    paths: ["Rules/**", "scripts/rules/**", ".github/workflows/rules.yml"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate catalog
+        run: python3 scripts/rules/validate_catalog.py Rules/catalog/v1
+      - name: Validator tests
+        run: python3 -m unittest discover -s scripts/rules -p 'test_*.py'

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "profileId": "nl.national-id.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "NL",
+    "regionCode": null
+  },
+  "document": {
+    "type": "national_id",
+    "variant": "standard",
+    "nameKey": "profile.nl.national-id.standard.name",
+    "localName": "Identiteitskaart"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 400,
+      "preferredPpi": 400,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 26,
+      "maxInclusive": 30,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "nl-rvig-fotomatrix"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": {
+      "landmarks": [
+        "ear_base",
+        "ear_base"
+      ],
+      "unit": "mm",
+      "minInclusive": 16,
+      "maxInclusive": 20,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "nl-rvig-fotomatrix"
+      ]
+    }
+  },
+  "framingTarget": {
+    "headHeightPercent": 62.2,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "specified_colors",
+    "allowedColors": [
+      "light grey",
+      "light blue",
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#E6E6E6",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "nl-rijksoverheid"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "mouth-closed",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "nl-rijksoverheid"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "nl-rijksoverheid"
+      ]
+    },
+    {
+      "id": "head-straight",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "nl-rijksoverheid"
+      ]
+    }
+  ],
+  "specialCases": [
+    {
+      "id": "child-head",
+      "condition": {
+        "type": "age_lte",
+        "years": 10
+      },
+      "overrides": [
+        {
+          "target": "composition.headHeight",
+          "minInclusive": 19,
+          "maxInclusive": 30
+        }
+      ],
+      "sourceIds": [
+        "nl-rvig-fotomatrix"
+      ]
+    }
+  ],
+  "profileQuestions": [
+    "age_lte_10"
+  ],
+  "sources": [
+    {
+      "sourceId": "nl-rijksoverheid",
+      "authorityName": "Rijksoverheid",
+      "title": "Eisen aan de pasfoto voor paspoort of ID-kaart",
+      "url": "https://www.rijksoverheid.nl/themas/migratie-en-reizen/paspoort-en-identiteitskaart/eisen-pasfoto-paspoort-id-kaart",
+      "accessedDate": "2026-11-11",
+      "language": "nl",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "nl-rvig-fotomatrix",
+      "authorityName": "RvIG",
+      "title": "Fotomatrix model 2020",
+      "url": "https://www.rvig.nl/sites/default/files/2023-02/Fotomatrix%202020.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "nl",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Print on smooth high-quality photo paper at ≥ 400 dpi."
+  ]
+}

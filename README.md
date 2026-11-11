@@ -14,6 +14,7 @@
 | [23 — Launch roadmap](docs/23-launch-roadmap.md) | Phases P0–P9 from the spike to App Store 1.0 |
 | [24 — Launch country ranking](docs/24-launch-country-ranking.md) | The 35 countries (about 20 %) that give about 80 % of the market |
 | [25 — Wave A document types](docs/25-wave-a-document-types.md) | Which documents accept at-home photos in each Wave A country; the China check |
+| [Rules catalog](Rules/README.md) | The 22 launch profiles as versioned data, with the validator |
 | [16 — Screen experience spec](docs/16-screen-experience-spec.md) | Current screen contract |
 | [10 — Decisions](docs/10-decisions.md) | ADRs, including the founder decisions below |
 

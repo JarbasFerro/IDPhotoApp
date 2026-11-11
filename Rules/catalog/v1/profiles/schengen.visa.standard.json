@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "profileId": "schengen.visa.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": null,
+    "regionCode": "SCHENGEN"
+  },
+  "document": {
+    "type": "visa",
+    "variant": "standard",
+    "nameKey": "profile.schengen.visa.standard.name",
+    "localName": null
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "percent_output_height",
+      "minInclusive": 70,
+      "maxInclusive": 80,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "eu-icao-guide"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 75.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "white",
+    "allowedColors": [
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "eeas-schengen-guide"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "eu-icao-guide"
+      ]
+    },
+    {
+      "id": "eyes-open",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "eu-icao-guide"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "eu-visa-handbook",
+      "authorityName": "European Commission",
+      "title": "Visa Code handbook, C(2024) 4319 annex",
+      "url": "https://home-affairs.ec.europa.eu/document/download/1d79f44d-49ba-4847-951e-129f924b1051_en",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "eu-icao-guide",
+      "authorityName": "European Commission",
+      "title": "ICAO photograph guidelines",
+      "url": "https://home-affairs.ec.europa.eu/document/download/5bb16566-c8c2-4afb-b038-530f488cb72a_en?filename=icao_photograph_guidelines_en.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "eeas-schengen-guide",
+      "authorityName": "EEAS",
+      "title": "Schengen Visa Guide",
+      "url": "https://www.eeas.europa.eu/sites/default/files/2026/documents/Schengen%20Visa%20Guide%20EN.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "ICAO Doc 9303 applies; consulates may add details or take a live photo at the appointment."
+  ]
+}

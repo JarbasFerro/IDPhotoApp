@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "profileId": "es.residence-permit.tie",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "ES",
+    "regionCode": null
+  },
+  "document": {
+    "type": "residence_permit",
+    "variant": "tie",
+    "nameKey": "profile.es.residence-permit.tie.name",
+    "localName": "TIE"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 26,
+    "height": 32
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 26,
+      "physicalHeightMm": 32,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "white",
+    "allowedColors": [
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "es-inclusion-hoja041"
+    ]
+  },
+  "recencyMonths": null,
+  "checks": [
+    {
+      "id": "face-visible",
+      "capability": "manual",
+      "sourceIds": [
+        "es-policia-tie"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "es-policia-tie",
+      "authorityName": "Policía Nacional",
+      "title": "Expedición de tarjeta de identidad de extranjero (TIE)",
+      "url": "https://www.policia.es/miscelanea/extranjeros/ciudadanos_venezolanos.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "es",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "es-inclusion-hoja041",
+      "authorityName": "Ministerio de Inclusión",
+      "title": "Portal de Inmigración, hoja 41",
+      "url": "https://extranjeros.inclusion.gob.es/es/InformacionInteres/InformacionProcedimientos/Ciudadanosnocomunitarios/hoja041/index.html",
+      "accessedDate": "2026-11-11",
+      "language": "es",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Requirements of the DNI rules apply (Policía Nacional)."
+  ]
+}

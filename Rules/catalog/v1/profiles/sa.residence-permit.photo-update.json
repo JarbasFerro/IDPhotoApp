@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "profileId": "sa.residence-permit.photo-update",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "SA",
+    "regionCode": null
+  },
+  "document": {
+    "type": "residence_permit",
+    "variant": "photo-update",
+    "nameKey": "profile.sa.residence-permit.photo-update.name",
+    "localName": null
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": null,
+  "outputs": [
+    {
+      "id": "absher",
+      "kind": "digital",
+      "pixelWidth": 800,
+      "pixelHeight": 1200,
+      "formats": [
+        "jpeg"
+      ],
+      "fileSizeBytes": {
+        "min": null,
+        "max": 1000000
+      },
+      "colorSpace": "srgb",
+      "composition": "profile"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "white",
+    "allowedColors": [
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "disallowed",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "sa-ajel-resident-photo",
+      "sa-absher-services"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "no-glasses",
+      "capability": "manual",
+      "sourceIds": [
+        "sa-absher-services"
+      ]
+    },
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "sa-ajel-resident-photo"
+      ]
+    },
+    {
+      "id": "face-visible",
+      "capability": "manual",
+      "sourceIds": [
+        "sa-ajel-resident-photo"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "sa-absher-services",
+      "authorityName": "Absher",
+      "title": "Absher Services",
+      "url": "https://www.absher.sa/wps/portal/individuals/static/NewServices/!ut/p/z0/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziDQ1dLDyM3A18_F093QwCzYOCDX383Q3dTcz0g1Pz9AuyHRUBY0dtkA!!/",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "sa-ajel-resident-photo",
+      "authorityName": "Ajel (citing the General Directorate of Passports)",
+      "title": "Steps to Update Resident Photo on Absher",
+      "url": "https://english.ajel.sa/news/oh5i5jjk6",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "authoritative_secondary",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Digital only, 2:3; file rules taken from the national-ID photo page and assumed to apply.",
+    "Men bareheaded; AI-checked upload."
+  ]
+}

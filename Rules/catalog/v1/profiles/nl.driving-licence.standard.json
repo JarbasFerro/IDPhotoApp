@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "profileId": "nl.driving-licence.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "NL",
+    "regionCode": null
+  },
+  "document": {
+    "type": "driving_licence",
+    "variant": "standard",
+    "nameKey": "profile.nl.driving-licence.standard.name",
+    "localName": "Rijbewijs"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 400,
+      "preferredPpi": 400,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "light",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#E6E6E6",
+    "officialEditingRule": "unknown",
+    "capability": "manual",
+    "sourceIds": [
+      "nl-rdw-photographer"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "nl-rdw-photographer"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "nl-rdw-photographer",
+      "authorityName": "RDW",
+      "title": "Fotograferen voor online verlenging rijbewijs",
+      "url": "https://www.rdw.nl/zakelijke-partners/erkende-bedrijven/fotograferen-voor-rijbewijzen/fotograferen-voor-rijbewijs",
+      "accessedDate": "2026-11-11",
+      "language": "nl",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Print route at the municipality. The online route uses RDW-recognized photographers only (901 × 1158 px, ≤ 170 KB), not a Calipic output.",
+    "Passport geometry is not copied here (AGENTS.md §11); framing is an app default."
+  ]
+}

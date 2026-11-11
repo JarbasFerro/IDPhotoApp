@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "profileId": "jp.national-id.mynumber",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "JP",
+    "regionCode": null
+  },
+  "document": {
+    "type": "national_id",
+    "variant": "mynumber",
+    "nameKey": "profile.jp.national-id.mynumber.name",
+    "localName": "マイナンバーカード"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    },
+    {
+      "id": "online",
+      "kind": "digital",
+      "pixelWidth": 1050,
+      "pixelHeight": 1350,
+      "formats": [
+        "jpeg"
+      ],
+      "fileSizeBytes": {
+        "min": 20480,
+        "max": 7000000
+      },
+      "colorSpace": "srgb",
+      "composition": "profile",
+      "pixelLimits": {
+        "minWidth": 480,
+        "minHeight": 480,
+        "maxWidth": 6000,
+        "maxHeight": 6000
+      }
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "discouraged",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "jp-jlis-checkpoints"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "jp-jlis-checkpoints"
+      ]
+    },
+    {
+      "id": "face-visible",
+      "capability": "manual",
+      "sourceIds": [
+        "jp-jlis-checkpoints"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "jp-jlis-checkpoints",
+      "authorityName": "J-LIS",
+      "title": "顔写真のチェックポイント",
+      "url": "https://www.kojinbango-card.go.jp/apprec/apply/facephoto/",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "jp-jlis-smartphone",
+      "authorityName": "J-LIS",
+      "title": "スマートフォンで撮った写真でも申請可能でしょうか？",
+      "url": "https://www.kojinbango-card.go.jp/faq_photo11/",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "jp-jlis-filesize",
+      "authorityName": "J-LIS",
+      "title": "オンライン申請の写真データの大きさに制限はありますか？",
+      "url": "https://www.kojinbango-card.go.jp/faq_photo2/",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "jp-jlis-form",
+      "authorityName": "J-LIS",
+      "title": "記入例",
+      "url": "https://www.kojinbango-card.go.jp/hpsv/wpmng/documents/kisairei.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "HEIC is not accepted online; JPEG only.",
+    "Black-and-white photos are allowed."
+  ]
+}

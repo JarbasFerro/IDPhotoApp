@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "profileId": "kr.passport.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "KR",
+    "regionCode": null
+  },
+  "document": {
+    "type": "passport",
+    "variant": "standard",
+    "nameKey": "profile.kr.passport.standard.name",
+    "localName": "여권"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 32,
+      "maxInclusive": 36,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "kr-mofa-xian",
+        "kr-mofa-toronto"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 75.6,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "white",
+    "allowedColors": [
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "disallowed",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "kr-mofa-xian"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "no-uniform",
+      "capability": "manual",
+      "sourceIds": [
+        "kr-mofa-xian"
+      ]
+    },
+    {
+      "id": "no-white-clothing",
+      "capability": "manual",
+      "sourceIds": [
+        "kr-mofa-xian"
+      ]
+    },
+    {
+      "id": "head-straight",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "kr-mofa-xian"
+      ]
+    },
+    {
+      "id": "no-glasses",
+      "capability": "manual",
+      "sourceIds": [
+        "kr-mofa-toronto"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "kr-mofa-xian",
+      "authorityName": "Ministry of Foreign Affairs (Korea)",
+      "title": "신규 여권사진 표준규격 안내",
+      "url": "https://www.mofa.go.kr/cn-xian-ko/brd/m_753/view.do?seq=1035220&page=1",
+      "accessedDate": "2026-11-11",
+      "language": "ko",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "kr-mofa-toronto",
+      "authorityName": "Ministry of Foreign Affairs (Korea)",
+      "title": "여권사진 표준규격 안내",
+      "url": "https://www.mofa.go.kr/ca-toronto-ko/brd/m_5389/view.do?seq=1344544",
+      "accessedDate": "2026-11-11",
+      "language": "ko",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "kr-mofa-guatemala",
+      "authorityName": "Ministry of Foreign Affairs (Korea)",
+      "title": "여권사진 규정",
+      "url": "https://overseas.mofa.go.kr/gt-ko/brd/m_5678/view.do?seq=961614",
+      "accessedDate": "2026-11-11",
+      "language": "ko",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Official posts call self-taken digital photos unsuitable; kept by founder decision (2026-11-11)."
+  ]
+}

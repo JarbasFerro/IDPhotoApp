@@ -43,7 +43,7 @@ With a worldwide launch, **profile research and validation** (L19-013) is the lo
 
 ## 4. Next three work batches
 
-1. **Profile research (P3 ∥).** The 13 approved profiles and the verification list are researched ([profiles](profiles/README.md)). **Founder:** confirm the 7 proposed profiles and the Brazil and Mexico custom-size shortcuts. Then turn each profile into rule data (R7) and fixtures.
+1. **Rules in the app (P2/P3).** Catalog v1 is done: 22 Wave A profiles as validated data with sources ([Rules](../Rules/README.md)), plus the validator, tests, and CI. Next: the typed Swift loader (R7-004) and the profile picker. Load the catalog in the spike first, so profiles can be tested on device before M2.
 2. **Physical evidence round (P1).** On the iPhone 15 Pro Max and one older supported iPhone: camera direction calibration on front and back cameras; first-frame and shutter latency; 48 MP import memory; capture-protection spike (L19-017); three printers × two papers measured at Actual Size against tolerances written down first; record results in the spike reports.
 3. **Start profile research (P3 ∥).** One sourced profile document per profile, in the order of [25 §3](25-wave-a-document-types.md). **Answer the alteration question first** (are background replacement and tone allowed?), because it decides the experience for that profile. Then: background colour, children's rules, and digital submission limits. In parallel, verify the P2 list (Australia inkjet, driving licences, Saudi Absher, Brazil 3 × 4, Mexico).
 

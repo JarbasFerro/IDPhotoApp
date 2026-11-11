@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "profileId": "es.national-id.dni",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "ES",
+    "regionCode": null
+  },
+  "document": {
+    "type": "national_id",
+    "variant": "dni",
+    "nameKey": "profile.es.national-id.dni.name",
+    "localName": "DNI"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 26,
+    "height": 32
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 26,
+      "physicalHeightMm": 32,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "white",
+    "allowedColors": [
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "es-interior-dni"
+    ]
+  },
+  "recencyMonths": null,
+  "checks": [
+    {
+      "id": "eyes-open",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "es-interior-dni"
+      ]
+    },
+    {
+      "id": "face-visible",
+      "capability": "manual",
+      "sourceIds": [
+        "es-interior-dni"
+      ]
+    },
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "es-interior-dni"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "es-interior-dni",
+      "authorityName": "Ministerio del Interior",
+      "title": "Documentación necesaria para la tramitación del DNI",
+      "url": "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/documentacion-necesaria-para-su-tramitacion/",
+      "accessedDate": "2026-11-11",
+      "language": "es",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Reference profile (doc 13). Head and eye bounds not stated; framing is an app default."
+  ]
+}

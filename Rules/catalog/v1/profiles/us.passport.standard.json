@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "profileId": "us.passport.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "US",
+    "regionCode": null
+  },
+  "document": {
+    "type": "passport",
+    "variant": "standard",
+    "nameKey": "profile.us.passport.standard.name",
+    "localName": null
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 50.8,
+    "height": 50.8
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 50.8,
+      "physicalHeightMm": 50.8,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    },
+    {
+      "id": "online-renewal",
+      "kind": "digital",
+      "pixelWidth": 1200,
+      "pixelHeight": 1200,
+      "formats": [
+        "jpeg"
+      ],
+      "fileSizeBytes": {
+        "min": 55296,
+        "max": 10000000
+      },
+      "colorSpace": "srgb",
+      "composition": "profile"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "top_of_hair",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 25.4,
+      "maxInclusive": 34.925,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "us-dos-passport-photos",
+        "us-dos-photo-faq"
+      ]
+    },
+    "eyeLine": {
+      "landmarks": [
+        "bottom_edge",
+        "eye_line"
+      ],
+      "unit": "percent_output_height",
+      "minInclusive": 56,
+      "maxInclusive": 69,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "us-dos-visa-template"
+      ],
+      "note": "Stated for visa photos; used as advisory for the passport."
+    },
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 59.4,
+    "eyeLineFromBottomPercent": 62.5,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "white_or_off_white",
+    "allowedColors": [
+      "white",
+      "off-white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "disallowed",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "us-dos-passport-photos"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "eyes-open",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "us-dos-passport-photos"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "us-dos-passport-photos"
+      ]
+    },
+    {
+      "id": "mouth-closed",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "us-dos-passport-photos"
+      ]
+    },
+    {
+      "id": "no-glasses",
+      "capability": "manual",
+      "sourceIds": [
+        "us-dos-eyeglasses"
+      ]
+    },
+    {
+      "id": "no-other-people",
+      "capability": "manual",
+      "sourceIds": [
+        "us-dos-photo-faq"
+      ]
+    },
+    {
+      "id": "even-lighting",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "us-dos-passport-photos"
+      ]
+    }
+  ],
+  "specialCases": [
+    {
+      "id": "baby-eyes",
+      "condition": {
+        "type": "age_lt",
+        "years": 1
+      },
+      "overrides": [
+        {
+          "target": "check:eyes-open",
+          "capability": "manual"
+        }
+      ],
+      "sourceIds": [
+        "us-dos-passport-photos"
+      ]
+    }
+  ],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "us-dos-passport-photos",
+      "authorityName": "U.S. Department of State",
+      "title": "Passport Photos",
+      "url": "https://travel.state.gov/en/passports/apply/help/photos.html",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "us-dos-online-renewal-photo",
+      "authorityName": "U.S. Department of State",
+      "title": "Uploading a Digital Photo",
+      "url": "https://travel.state.gov/content/travel/en/passports/how-apply/online-renewal-photo.html",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "us-dos-visa-template",
+      "authorityName": "U.S. Department of State",
+      "title": "Photo Composition Template",
+      "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos/photo-composition-template.html",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "us-dos-photo-faq",
+      "authorityName": "U.S. Department of State",
+      "title": "Photo Frequently Asked Questions",
+      "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos/frequently-asked-questions.html",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "us-dos-eyeglasses",
+      "authorityName": "U.S. Department of State",
+      "title": "New Eyeglasses Policy for Visa and Passport Photographs",
+      "url": "https://travel.state.gov/content/dam/visas/policy_updates/16-STATE-106142.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Official wording forbids software, app, filter, or AI changes; Calipic offers editing anyway (ADR-051).",
+    "Online renewal: JPG/PNG/HEIC/HEIF, 54 KB–10 MB; pixel size not stated. 1200 × 1200 is a Calipic choice."
+  ]
+}

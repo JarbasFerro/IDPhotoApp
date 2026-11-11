@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "profileId": "it.national-id.cie",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "IT",
+    "regionCode": null
+  },
+  "document": {
+    "type": "national_id",
+    "variant": "cie",
+    "nameKey": "profile.it.national-id.cie.name",
+    "localName": "Carta d'identità elettronica"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 32,
+      "maxInclusive": 35,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "it-cons-toronto"
+      ]
+    },
+    "eyeLine": {
+      "landmarks": [
+        "bottom_edge",
+        "eye_line"
+      ],
+      "unit": "mm",
+      "minInclusive": 23,
+      "maxInclusive": 31,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "it-cie-photo"
+      ]
+    },
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.4,
+    "eyeLineFromBottomPercent": 60.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "specified_colors",
+    "allowedColors": [
+      "light blue",
+      "beige",
+      "light brown",
+      "light grey",
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "disallowed",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "it-cie-photo"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "it-cie-photo"
+      ]
+    },
+    {
+      "id": "mouth-closed",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "it-cie-photo"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "it-cie-photo",
+      "authorityName": "Ministero dell'Interno",
+      "title": "Photo acquisition process (CIE)",
+      "url": "https://www.cartaidentita.interno.gov.it/en/request-cie/photo-acquisition-process/",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "it-cons-toronto",
+      "authorityName": "Consolato Generale d'Italia a Toronto",
+      "title": "Carte d'identità",
+      "url": "https://constoronto.esteri.it/en/servizi-consolari-e-visti/servizi-per-il-cittadino-italiano/carte-didentita/",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "CIE portal: not cropped to exclude the background, not straightened, not retouched (reference; ADR-051)."
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "profileId": "es.driving-licence.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "ES",
+    "regionCode": null
+  },
+  "document": {
+    "type": "driving_licence",
+    "variant": "standard",
+    "nameKey": "profile.es.driving-licence.standard.name",
+    "localName": "Permiso de conducción"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 26,
+    "height": 32
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 26,
+      "physicalHeightMm": 32,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "es-dgt-permisos"
+    ]
+  },
+  "recencyMonths": null,
+  "checks": [
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "es-dgt-permisos"
+      ]
+    },
+    {
+      "id": "no-dark-glasses",
+      "capability": "manual",
+      "sourceIds": [
+        "es-dgt-permisos"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "es-dgt-permisos",
+      "authorityName": "Dirección General de Tráfico",
+      "title": "Sede Electrónica DGT — Permisos de conducir",
+      "url": "https://sede.dgt.gob.es/es/permisos-de-conducir/",
+      "accessedDate": "2026-11-11",
+      "language": "es",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Religious veil allowed if the face oval is visible from hairline to chin.",
+    "Since 6 Nov 2024 DGT reuses a valid photo it already holds."
+  ]
+}

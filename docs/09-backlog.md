@@ -450,6 +450,11 @@ Measure uniformity/colour of the original background and recommend "Original" wh
 
 # EPIC 7 — Rules engine
 
+**Progress 2026-11-11:**
+
+- **Done as data and tooling:** R7-001 (schema v1, [Rules/README.md](../Rules/README.md)), R7-003 (semantic validator), R7-005 (provenance), R7-014 (22 Wave A profiles), R7-015 (CI), R7-016 and R7-017 (fields), R7-018 (digital presets).
+- **Still to build in the app:** R7-004 (Swift loader) and the evaluators (R7-006 to R7-013).
+
 ## R7-001 — canonical schema — P0 / L
 
 ## R7-002 — schema validator — P0 / M

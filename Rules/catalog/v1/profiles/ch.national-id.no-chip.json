@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "profileId": "ch.national-id.no-chip",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "CH",
+    "regionCode": null
+  },
+  "document": {
+    "type": "national_id",
+    "variant": "no-chip",
+    "nameKey": "profile.ch.national-id.no-chip.name",
+    "localName": "Identitätskarte"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home",
+      "noteKey": "output.note.ask-commune"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 29,
+      "maxInclusive": 34,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "ch-eda-identity"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 70.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#E6E6E6",
+    "officialEditingRule": "unknown",
+    "capability": "manual",
+    "sourceIds": [
+      "ch-fedpol-criteria"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "eyes-open",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "ch-fedpol-criteria"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "ch-eda-identity"
+      ]
+    },
+    {
+      "id": "no-other-people",
+      "capability": "manual",
+      "sourceIds": [
+        "ch-fedpol-criteria"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "ch-fedpol-apply",
+      "authorityName": "fedpol",
+      "title": "Beantragen",
+      "url": "https://www.fedpol.admin.ch/de/beantragen",
+      "accessedDate": "2026-11-11",
+      "language": "de",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "ch-fedpol-criteria",
+      "authorityName": "fedpol",
+      "title": "Kriterien für die Annahme von Fotos für Pässe und Identitätskarten",
+      "url": "https://www.fedpol.admin.ch/dam/de/sd-web/ZA--3ny9zRWt/fotomustertafel.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "de",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "ch-eda-identity",
+      "authorityName": "Federal Department of Foreign Affairs",
+      "title": "Passport and identity card",
+      "url": "https://www.eda.admin.ch/countries/usa/en/home/services/identity-documents.html",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Whether a brought photo is accepted depends on the canton or commune.",
+    "The biometric ID card (from 2 Nov 2026) is photographed at the centre and is not a Calipic profile."
+  ]
+}

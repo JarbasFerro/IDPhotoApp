@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "profileId": "gb.driving-licence.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "GB",
+    "regionCode": null
+  },
+  "document": {
+    "type": "driving_licence",
+    "variant": "standard",
+    "nameKey": "profile.gb.driving-licence.standard.name",
+    "localName": null
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "shop_only",
+      "noteKey": "output.note.uk-home-print"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "light",
+    "allowedColors": [
+      "light grey",
+      "cream"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#E6E6E6",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "ni-dva-photo"
+    ]
+  },
+  "recencyMonths": 1,
+  "checks": [
+    {
+      "id": "eyes-open",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "ni-dva-photo"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "ni-dva-photo"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "gb-dvla-change-photo",
+      "authorityName": "DVLA (GOV.UK)",
+      "title": "Change the photo on your driving licence",
+      "url": "https://www.gov.uk/renew-photo-driving-licence",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "ni-dva-photo",
+      "authorityName": "DVA Northern Ireland (nidirect)",
+      "title": "The photo for your driving licence",
+      "url": "https://www.nidirect.gov.uk/articles/photo-your-driving-licence",
+      "accessedDate": "2026-11-11",
+      "language": "en",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Online renewal reuses the UK passport photo or a digital upload; Calipic serves the postal (D1) print route.",
+    "Size rules come from Northern Ireland's DVA; Great Britain's are assumed equal."
+  ]
+}

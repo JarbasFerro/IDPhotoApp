@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "profileId": "it.passport.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "IT",
+    "regionCode": null
+  },
+  "document": {
+    "type": "passport",
+    "variant": "standard",
+    "nameKey": "profile.it.passport.standard.name",
+    "localName": "Passaporto"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "white",
+    "allowedColors": [
+      "white"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "it-polizia-passport"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "it-cons-rosario"
+      ]
+    },
+    {
+      "id": "mouth-closed",
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "it-cons-rosario"
+      ]
+    },
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "it-cons-rosario"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "it-polizia-passport",
+      "authorityName": "Polizia di Stato",
+      "title": "Il rilascio del passaporto",
+      "url": "https://www.poliziadistato.it/articolo/il-rilascio",
+      "accessedDate": "2026-11-11",
+      "language": "it",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "it-cons-rosario",
+      "authorityName": "Consolato d'Italia a Rosario",
+      "title": "Qualità delle fotografie",
+      "url": "https://consrosario.esteri.it/it/servizi-consolari-e-visti/servizi-per-il-cittadino-italiano/passaporti-e-carte-didentita/documentazione-necessaria-per-il-rilascio-del-passaporto/qualita-delle-fotografie/",
+      "accessedDate": "2026-11-11",
+      "language": "it",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Rosario consulate: face 70–80 % of the height 'from chin to forehead'; landmark ambiguous, not encoded."
+  ]
+}

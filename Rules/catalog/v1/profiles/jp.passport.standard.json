@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "profileId": "jp.passport.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "JP",
+    "regionCode": null
+  },
+  "document": {
+    "type": "passport",
+    "variant": "standard",
+    "nameKey": "profile.jp.passport.standard.name",
+    "localName": "パスポート"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": {
+      "landmarks": [
+        "crown",
+        "chin"
+      ],
+      "unit": "mm",
+      "minInclusive": 32,
+      "maxInclusive": 36,
+      "capability": "machine_advisory",
+      "sourceIds": [
+        "jp-mofa-photo-pdf"
+      ]
+    },
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 75.6,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "official_midpoint"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [
+      "white (recommended)"
+    ],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "jp-mofa-passport"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "face-visible",
+      "capability": "manual",
+      "sourceIds": [
+        "jp-mofa-passport"
+      ]
+    },
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "jp-mofa-passport"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "jp-mofa-photo-pdf",
+      "authorityName": "Ministry of Foreign Affairs of Japan",
+      "title": "Passport photo standard",
+      "url": "https://www.mofa.go.jp/mofaj/files/100171389.pdf",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "jp-mofa-passport",
+      "authorityName": "Ministry of Foreign Affairs of Japan",
+      "title": "パスポートの申請から受領まで",
+      "url": "https://www.mofa.go.jp/mofaj/toko/passport/pass_2.html",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Diagram also lists margins (4 ± 2, 7 ± 2, 17 ± 2 mm); labels unconfirmed, not encoded.",
+    "If the crown is unclear, MOFA says to place it above the eyes at the eyes-to-chin distance."
+  ]
+}

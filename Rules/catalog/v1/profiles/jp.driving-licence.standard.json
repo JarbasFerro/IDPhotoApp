@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "profileId": "jp.driving-licence.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "JP",
+    "regionCode": null
+  },
+  "document": {
+    "type": "driving_licence",
+    "variant": "standard",
+    "nameKey": "profile.jp.driving-licence.standard.name",
+    "localName": "運転免許証"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 24,
+    "height": 30
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 24,
+      "physicalHeightMm": 30,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home",
+      "noteKey": "output.note.photo-paper"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 65.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#FFFFFF",
+    "officialEditingRule": "unknown",
+    "capability": "machine_advisory",
+    "sourceIds": [
+      "jp-npa-renewal"
+    ]
+  },
+  "recencyMonths": 6,
+  "checks": [
+    {
+      "id": "no-head-covering",
+      "capability": "manual",
+      "sourceIds": [
+        "jp-npa-renewal"
+      ]
+    },
+    {
+      "id": "chest-up-framing",
+      "capability": "informational",
+      "sourceIds": [
+        "jp-npa-renewal"
+      ]
+    },
+    {
+      "id": "photo-paper",
+      "capability": "informational",
+      "sourceIds": [
+        "jp-tokyo-mpd-photo"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "jp-npa-renewal",
+      "authorityName": "National Police Agency",
+      "title": "日本在住で日本の運転免許証をお持ちの方",
+      "url": "https://www.npa.go.jp/policies/application/license_renewal/japan.html",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "official",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "jp-tokyo-mpd-photo",
+      "authorityName": "Tokyo Metropolitan Police Department",
+      "title": "申請用写真及び持参写真のご案内",
+      "url": "https://www.keishicho.metro.tokyo.lg.jp/menkyo/koshin/koshin/koshin02_2.html",
+      "accessedDate": "2026-11-11",
+      "language": "ja",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Write the name (and per the NPA, the date taken) on the back.",
+    "Chest-up framing: app default head height lowered to 65 %."
+  ]
+}

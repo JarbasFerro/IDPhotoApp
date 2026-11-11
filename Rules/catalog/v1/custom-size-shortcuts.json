@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "shortcuts": [
+    {
+      "id": "25x30",
+      "widthMm": 25,
+      "heightMm": 30,
+      "nameKey": "custom.25x30.name",
+      "localeNameKeys": {
+        "es-MX": "custom.25x30.name.es-MX"
+      }
+    },
+    {
+      "id": "30x40",
+      "widthMm": 30,
+      "heightMm": 40,
+      "nameKey": "custom.30x40.name",
+      "localeNameKeys": {
+        "pt-BR": "custom.30x40.name.pt-BR"
+      }
+    },
+    {
+      "id": "35x45",
+      "widthMm": 35,
+      "heightMm": 45,
+      "nameKey": "custom.35x45.name",
+      "localeNameKeys": {}
+    },
+    {
+      "id": "2x2in",
+      "widthMm": 50.8,
+      "heightMm": 50.8,
+      "nameKey": "custom.2x2in.name",
+      "localeNameKeys": {}
+    }
+  ],
+  "options": {
+    "blackAndWhite": true
+  }
+}

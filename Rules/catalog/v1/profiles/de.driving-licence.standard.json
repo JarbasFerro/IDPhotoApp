@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "profileId": "de.driving-licence.standard",
+  "profileVersion": "1.0.0",
+  "status": "active",
+  "kind": "official",
+  "wave": "A",
+  "jurisdiction": {
+    "countryCode": "DE",
+    "regionCode": null
+  },
+  "document": {
+    "type": "driving_licence",
+    "variant": "standard",
+    "nameKey": "profile.de.driving-licence.standard.name",
+    "localName": "Führerschein"
+  },
+  "effective": {
+    "from": null,
+    "to": null,
+    "lastReviewed": "2026-11-11"
+  },
+  "referenceFrameMm": {
+    "width": 35,
+    "height": 45
+  },
+  "outputs": [
+    {
+      "id": "print",
+      "kind": "print",
+      "physicalWidthMm": 35,
+      "physicalHeightMm": 45,
+      "minPpi": 300,
+      "preferredPpi": 300,
+      "route": "home"
+    }
+  ],
+  "composition": {
+    "headHeight": null,
+    "eyeLine": null,
+    "faceWidth": null
+  },
+  "framingTarget": {
+    "headHeightPercent": 74.0,
+    "eyeLineFromBottomPercent": 58.0,
+    "basis": "app_default"
+  },
+  "background": {
+    "requiredAppearance": "plain",
+    "allowedColors": [],
+    "uniformity": "required",
+    "shadows": "forbidden",
+    "replacementColor": "#E6E6E6",
+    "officialEditingRule": "unknown",
+    "capability": "manual",
+    "sourceIds": [
+      "de-mol-pm23"
+    ]
+  },
+  "recencyMonths": null,
+  "checks": [
+    {
+      "id": "no-data-matrix-photo",
+      "capability": "informational",
+      "sourceIds": [
+        "de-tuebingen"
+      ]
+    },
+    {
+      "id": "neutral-expression",
+      "capability": "manual",
+      "sourceIds": [
+        "de-mol-pm23"
+      ]
+    }
+  ],
+  "specialCases": [],
+  "profileQuestions": [],
+  "sources": [
+    {
+      "sourceId": "de-mol-pm23",
+      "authorityName": "Landkreis Märkisch-Oderland",
+      "title": "Pressemitteilung 23/2025",
+      "url": "https://www.maerkisch-oderland.de/service-aktuelles/aktuelles/pressemitteilungen/pressemitteilung-23-2025",
+      "accessedDate": "2026-11-11",
+      "language": "de",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    },
+    {
+      "sourceId": "de-tuebingen",
+      "authorityName": "Landratsamt Tübingen",
+      "title": "Lichtbild für den Führerschein",
+      "url": "https://www.kreis-tuebingen.de/bauen_verkehr/verkehr/feb/lichtbild+fuer+den+fuehrerschein",
+      "accessedDate": "2026-11-11",
+      "language": "de",
+      "sourceType": "delegated_authority",
+      "retrieval": "search_summary"
+    }
+  ],
+  "notes": [
+    "Printed biometric photo still required; the May 2025 digital-only rule covers passports and ID cards only.",
+    "Biometric geometry not encoded from another document (AGENTS.md §11); framing is an app default."
+  ]
+}
