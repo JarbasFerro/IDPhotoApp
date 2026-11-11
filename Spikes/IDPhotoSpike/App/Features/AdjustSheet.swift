@@ -16,7 +16,7 @@ struct AdjustSheet: View {
             ScrollView {
                 if let entry {
                     VStack(alignment: .leading, spacing: Design.Spacing.group) {
-                        CropPreview(photo: entry.photo, image: model.showsOriginal ? nil : entry.backgroundPreview, adjustment: $model.adjustment)
+                        CropPreview(photo: entry.photo, format: model.renderTarget.format, image: model.showsOriginal ? nil : entry.backgroundPreview, adjustment: $model.adjustment)
                             .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? 220 : 260)
                             .frame(maxWidth: .infinity)
                         Text("Drag to move, pinch to zoom.")

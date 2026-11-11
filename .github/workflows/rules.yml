@@ -2,9 +2,9 @@ name: Rules catalog
 
 on:
   push:
-    paths: ["Rules/**", "scripts/rules/**", ".github/workflows/rules.yml"]
+    paths: ["Rules/**", "scripts/rules/**", "Spikes/IDPhotoSpike/App/Resources/CalipicCatalog.json", ".github/workflows/rules.yml"]
   pull_request:
-    paths: ["Rules/**", "scripts/rules/**", ".github/workflows/rules.yml"]
+    paths: ["Rules/**", "scripts/rules/**", "Spikes/IDPhotoSpike/App/Resources/CalipicCatalog.json", ".github/workflows/rules.yml"]
 
 jobs:
   validate:
@@ -16,5 +16,7 @@ jobs:
           python-version: "3.12"
       - name: Validate catalog
         run: python3 scripts/rules/validate_catalog.py Rules/catalog/v1
+      - name: App catalog matches Rules
+        run: python3 scripts/rules/build_app_catalog.py --check
       - name: Validator tests
         run: python3 -m unittest discover -s scripts/rules -p 'test_*.py'

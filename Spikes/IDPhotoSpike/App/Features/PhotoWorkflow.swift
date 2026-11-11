@@ -36,7 +36,11 @@ final class PhotoWorkflow {
     private(set) var sheetThumbnails: [UUID: CGImage] = [:]
     /// When true the editor shows the untouched preview (before/after comparison).
     var showsOriginal = false
-    let policy = DocumentPolicy.spainEngineering
+    /// The document every photo in the session is made for. Changing it re-frames each photo (setDocument).
+    private(set) var document: DocumentChoice = .initial
+    /// Editing is offered on every profile (ADR-051); the replacement colour comes from the document.
+    var policy: DocumentPolicy { DocumentPolicy(alteration: .allowed, background: document.backgroundColor) }
+    var renderTarget: RenderTarget { document.renderTarget }
     var exported: PhotoExport?
     var digitalExport: DigitalExport?
     var errorMessage: String?
@@ -152,9 +156,11 @@ final class PhotoWorkflow {
         analysisTasks[photo.id]?.cancel()
         update(photo.id) { $0.analysis = nil; $0.analysisUnavailable = false; $0.isAnalyzing = true
                             $0.segmentation = nil; $0.backgroundPreview = nil; $0.isSegmenting = true }
-        analysisTasks[photo.id] = Task { [policy] in
-            let result = try? await pipeline.analyze(photo: photo)
+        analysisTasks[photo.id] = Task {
+            let measured = try? await pipeline.analyze(photo: photo)
             guard !Task.isCancelled, index(of: photo.id) != nil else { return }
+            // Solve for the document chosen now, not when the analysis started (it may have changed meanwhile).
+            let result = measured.map { Self.resolved($0, for: renderTarget) }
             update(photo.id) {
                 $0.isAnalyzing = false
                 $0.analysis = result
@@ -167,14 +173,59 @@ final class PhotoWorkflow {
             update(photo.id) {
                 $0.isSegmenting = false
                 $0.segmentation = segmented
-                // Spain requires white; offer it by default when the mask is trustworthy and the original is not already plain.
+                // Offer the document's colour by default when the mask is trustworthy and the original is not already plain.
                 if let segmented, segmented.quality.state == .pass, segmented.background.state != .pass {
-                    $0.adjustment.background = .color(.white)
+                    $0.adjustment.background = .color(policy.background)
                 }
                 $0.adjustment.tone = policy.alteration == .allowed ? ToneSettings() : .off
             }
             refreshBackgroundPreview(for: photo.id)
         }
+    }
+
+    /// Re-runs the deterministic crop solver for `target` on already measured geometry; no Vision work.
+    static func resolved(_ analysis: FaceAnalysis, for target: RenderTarget) -> FaceAnalysis {
+        guard let geometry = analysis.geometry else { return analysis }
+        return FaceAnalysis(faceCount: analysis.faceCount, geometry: geometry,
+                            solution: CropSolver.solve(geometry: geometry, format: target.format, spec: target.spec),
+                            visionRollDegrees: analysis.visionRollDegrees, lensSmudgeConfidence: analysis.lensSmudgeConfidence)
+    }
+
+    // MARK: - Document
+
+    /// Switches the session to another document: re-frames every analysed photo for it, moves the default
+    /// print sizes along, recolours replaced backgrounds, and drops files made for the previous document.
+    func setDocument(_ next: DocumentChoice) {
+        guard next != document else { return }
+        let previous = renderTarget.format
+        cancelWork()
+        finishExport()
+        document = next
+        let target = renderTarget
+        for index in entries.indices {
+            var entry = entries[index]
+            if let analysis = entry.analysis {
+                let solved = Self.resolved(analysis, for: target)
+                entry.analysis = solved
+                if let solution = solved.solution, solved.faceCount == 1 {
+                    var adjustment = solution.adjustment
+                    adjustment.background = entry.adjustment.background
+                    adjustment.edgeSoftness = entry.adjustment.edgeSoftness
+                    adjustment.tone = entry.adjustment.tone
+                    entry.adjustment = adjustment
+                }
+            }
+            if case .color = entry.adjustment.background { entry.adjustment.background = .color(policy.background) }
+            entries[index] = entry
+        }
+        for index in printJob.items.indices
+        where abs(printJob.items[index].trimWidthMM - previous.widthMM) < 0.001
+            && abs(printJob.items[index].trimHeightMM - previous.heightMM) < 0.001 {
+            printJob.items[index].trimWidthMM = target.format.widthMM
+            printJob.items[index].trimHeightMM = target.format.heightMM
+        }
+        sheetThumbnails = [:]
+        for entry in entries { refreshBackgroundPreview(for: entry.id) }
     }
 
     private func update(_ photoID: UUID, _ change: (inout PhotoEntry) -> Void) {
@@ -237,12 +288,13 @@ final class PhotoWorkflow {
         let currentRevision = revision
         let edits = entries.map { PhotoEdit(photo: $0.photo, adjustment: $0.adjustment) }
         let job = printJob
+        let target = renderTarget
         activity = .exporting
         errorMessage = nil
         errorActivity = nil
         task = Task {
             do {
-                let result = try await pipeline.export(edits: edits, job: job)
+                let result = try await pipeline.export(edits: edits, job: job, target: target)
                 guard revision == currentRevision, !Task.isCancelled else {
                     await pipeline.discard(exportID: result.id)
                     return
@@ -262,12 +314,13 @@ final class PhotoWorkflow {
         cancelWork()
         let currentRevision = revision
         let edit = PhotoEdit(photo: entry.photo, adjustment: entry.adjustment)
+        let target = renderTarget
         activity = .exporting
         errorMessage = nil
         errorActivity = nil
         task = Task {
             do {
-                let result = try await pipeline.exportDigital(edit: edit)
+                let result = try await pipeline.exportDigital(edit: edit, target: target)
                 guard revision == currentRevision, !Task.isCancelled else {
                     await pipeline.discard(exportID: result.id)
                     return
@@ -331,8 +384,9 @@ final class PhotoWorkflow {
     // MARK: - Print job editing
 
     private func appendDefaultPrintItem(for photo: PreparedPhoto, copies: Int) {
-        printJob.items.append(PrintItem(photoID: photo.id, trimWidthMM: PhotoFormat.spainPrototype.widthMM,
-                                        trimHeightMM: PhotoFormat.spainPrototype.heightMM, copies: copies))
+        let format = renderTarget.format
+        printJob.items.append(PrintItem(photoID: photo.id, trimWidthMM: format.widthMM,
+                                        trimHeightMM: format.heightMM, copies: copies))
     }
 
     func addPrintItem(format: PhotoFormat, photoID: UUID? = nil) {
@@ -377,8 +431,9 @@ final class PhotoWorkflow {
 
     var sourceIsSmall: Bool {
         guard let photo else { return false }
-        let crop = adjustment.crop(in: photo.pixels)
-        let output = PhotoFormat.spainPrototype.output
+        let format = renderTarget.format
+        let crop = adjustment.crop(in: photo.pixels, format: format)
+        let output = format.output
         return Double(photo.pixels.width) * crop.width < Double(output.width)
             || Double(photo.pixels.height) * crop.height < Double(output.height)
     }

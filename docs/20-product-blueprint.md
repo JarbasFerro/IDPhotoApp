@@ -59,14 +59,14 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | ID | Function | User value | Status | Specified in |
 |---|---|---|---|---|
 | F-01 | Current profile: Spain · DNI photo, 26 × 32 mm, white background | Correct format without research | Shipped (spike); copy is literal UI text | [13](13-spain-foto-carnet.md), [16 §3](16-screen-experience-spec.md) |
-| F-02 | Versioned, sourced profile catalog with review dates | Rules stay current and traceable | Launch | [05](05-rules-engine.md), FR-110–FR-116, R7-001–R7-018 |
-| F-03 | Country and document picker with search, recents, and favourites | Find "my" document in seconds | Launch (picker); recents and favourites Post-launch | [04 §Screen 2](04-ux-ui.md), FR-010–FR-016, U10-002, U10-013 |
+| F-02 | Versioned, sourced profile catalog with review dates | Rules stay current and traceable | Shipped (spike) 0.13.0: 22 Wave A profiles, bundled and validated | [05](05-rules-engine.md), FR-110–FR-116, R7-001–R7-018 |
+| F-03 | Country and document picker with search, recents, and favourites | Find "my" document in seconds | Shipped (spike) 0.13.0: picker with search, grouped by country; recents and favourites Post-launch | [04 §Screen 2](04-ux-ui.md), FR-010–FR-016, U10-002, U10-013 |
 | F-04 | Worldwide launch catalog: most-used photo documents of the most relevant App Store countries, Wave A at 1.0 | Serve people wherever they are | Launch; country list proposed in [24](24-launch-country-ranking.md), **Decision D-8** | [ADR-047](10-decisions.md), L19-010, L19-013 |
 | F-05 | Short requirements preflight before every capture or import | Avoid an unusable photo before it is taken | Shipped (spike) | [16 §7](16-screen-experience-spec.md), ADR-043 |
 | F-06 | Full requirements with source link and review date | Trust and exceptions (glasses, headwear) | Shipped (spike); must move to profile data | [16 §4](16-screen-experience-spec.md) |
 | F-07 | Official editing rules recorded per profile, for reference; background replacement and tone are offered on every profile (ADR-051) | Studio result everywhere | Decided (ADR-051) | ADR-051, ADR-037, [profiles](profiles/README.md) |
 | F-08 | Children use the adult flow with helper mode; baby relaxations never block, only warn | Parents' main job | Accepted for 1.0; age relaxations as profile data Post-launch | ADR-017, [14 §5.6](14-priority-feature-plan.md) |
-| F-09 | **Custom size without a country**: width × height in mm or inches, size shortcuts, framing Closer/Wider, free background choice, photographic checks only, never *Ready* | School, club, and other non-official photos | Launch | ADR-018, L19-018, [21 J9](21-user-journeys.md) |
+| F-09 | **Custom size without a country**: width × height in mm or inches, size shortcuts, framing Closer/Wider, free background choice, photographic checks only, never *Ready* | School, club, and other non-official photos | Shipped (spike) 0.13.0: size entry in mm or in, shortcuts. black and white, Closer/Wider and a light grey background still to do | ADR-018, L19-018, [21 J9](21-user-journeys.md) |
 
 ### 4.2 Capture and import
 
@@ -144,7 +144,7 @@ Unchanged from [01 §8.3](01-product-definition.md) and [11 §7](11-ios-excellen
 | # | Screen | Purpose | Status | Contract |
 |---|---|---|---|---|
 | S-01 | Home | Start a photo; **Continue** drafts; see the profile and trust promise | Spike; needs the profile chooser entry, Continue (drafts), and a fresh-install visual ([22 §3](22-quality-and-delight-bar.md)) | 16 §3 |
-| S-02 | Choose document (profile picker) | Pick country and document; search; recents; **Custom size** as its own entry | **New** | 04 Screen 2 → 16 |
+| S-02 | Choose document (profile picker) | Pick country and document; search; recents; **Custom size** as its own entry | Spike 0.13.0 | 04 Screen 2 → 16 |
 | S-03 | Photo requirements | Sourced rules, exceptions, review date | Spike | 16 §4 |
 | S-04 | Before your photo (preflight), including *Find a good spot* and *Who is taking the photo?* (self / helper) | Set up for success | Spike; setup coaching and helper choice **New** | 16 §7 |
 | S-05 | Guided camera | Capture with live guidance | Spike; helper-mode wording **New** | 16 §6 |

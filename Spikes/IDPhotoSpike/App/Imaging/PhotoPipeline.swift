@@ -57,15 +57,23 @@ protocol PhotoProcessing: Sendable {
     /// Small crop at the given trim format, for the sheet preview.
     func thumbnail(photo: PreparedPhoto, adjustment: CropAdjustment, format: PhotoFormat) async -> CGImage?
     /// Digital JPEGs for every edit plus the print sheet described by `job`, whose items reference the edits' photos.
-    func export(edits: [PhotoEdit], job: PrintJob) async throws -> PhotoExport
-    func exportDigital(edit: PhotoEdit) async throws -> DigitalExport
+    func export(edits: [PhotoEdit], job: PrintJob, target: RenderTarget) async throws -> PhotoExport
+    /// One JPEG at the document's digital preset (pixels and, where stated, byte limits).
+    func exportDigital(edit: PhotoEdit, target: RenderTarget) async throws -> DigitalExport
     func discard(photoID: UUID) async
     func discard(exportID: UUID) async
 }
 
 extension PhotoProcessing {
-    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob) async throws -> PhotoExport {
-        try await export(edits: [PhotoEdit(photo: photo, adjustment: adjustment)], job: job)
+    func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob,
+                target: RenderTarget = .spainPrototype) async throws -> PhotoExport {
+        try await export(edits: [PhotoEdit(photo: photo, adjustment: adjustment)], job: job, target: target)
+    }
+    func export(edits: [PhotoEdit], job: PrintJob) async throws -> PhotoExport {
+        try await export(edits: edits, job: job, target: .spainPrototype)
+    }
+    func exportDigital(edit: PhotoEdit) async throws -> DigitalExport {
+        try await exportDigital(edit: edit, target: .spainPrototype)
     }
 }
 
@@ -187,7 +195,7 @@ actor PhotoPipeline: PhotoProcessing {
     }
 
     /// One digital JPEG per edit plus the print sheet (PDF and one JPEG per page) described by `job`.
-    func export(edits: [PhotoEdit], job: PrintJob) throws -> PhotoExport {
+    func export(edits: [PhotoEdit], job: PrintJob, target: RenderTarget) throws -> PhotoExport {
         let interval = signposter.beginInterval("Export")
         defer { signposter.endInterval("Export", interval) }
         guard !edits.isEmpty else { throw PhotoError.expired }
@@ -198,7 +206,7 @@ actor PhotoPipeline: PhotoProcessing {
             guard FileManager.default.fileExists(atPath: original.path) else { throw PhotoError.expired }
             sources[edit.photo.id] = try open(original)
         }
-        let format = PhotoFormat.spainPrototype
+        let format = target.format
         var rendered: [CGImage] = []
         for edit in edits {
             rendered.append(try render(sources[edit.photo.id]!, photo: edit.photo, adjustment: edit.adjustment, format: format, bleedMM: 0))
@@ -227,7 +235,7 @@ actor PhotoPipeline: PhotoProcessing {
         do {
             var jpegs: [URL] = []
             for (index, image) in rendered.enumerated() {
-                let name = rendered.count == 1 ? "Foto-carnet.jpg" : "Foto-carnet-\(index + 1).jpg"
+                let name = rendered.count == 1 ? "\(target.fileBaseName).jpg" : "\(target.fileBaseName)-\(index + 1).jpg"
                 let jpeg = directory.appendingPathComponent(name)
                 try writeJPEG(image, to: jpeg, pixelsPerInch: format.pixelsPerInch)
                 try Self.verifyJPEG(jpeg, expected: format.output)
@@ -235,13 +243,13 @@ actor PhotoPipeline: PhotoProcessing {
                 try Task.checkCancellation()
             }
             let pdfInterval = signposter.beginInterval("PDF")
-            let pdf = directory.appendingPathComponent("Foto-carnet-sheet.pdf")
+            let pdf = directory.appendingPathComponent("\(target.fileBaseName)-sheet.pdf")
             try SheetRenderer.writePDF(layout, rasters: rasters, to: pdf, calibrationLabel: label)
             try SheetRenderer.verifyPDF(pdf, layout: layout)
             signposter.endInterval("PDF", pdfInterval)
             try Task.checkCancellation()
             let pages = try SheetRenderer.writeJPEGPages(layout, rasters: rasters, in: directory,
-                                                         baseName: "Foto-carnet-sheet", calibrationLabel: label)
+                                                         baseName: "\(target.fileBaseName)-sheet", calibrationLabel: label)
             try SheetRenderer.verifyJPEGPages(pages, layout: layout)
             for url in jpegs + [pdf] + pages { try PhotoFiles.protect(url) }
             try Task.checkCancellation()
@@ -253,23 +261,24 @@ actor PhotoPipeline: PhotoProcessing {
     }
 
     /// A direct digital result does not solve a paper layout or render PDF/page files.
-    func exportDigital(edit: PhotoEdit) throws -> DigitalExport {
+    func exportDigital(edit: PhotoEdit, target: RenderTarget) throws -> DigitalExport {
         let interval = signposter.beginInterval("DigitalExport")
         defer { signposter.endInterval("DigitalExport", interval) }
         try Task.checkCancellation()
         let original = photoDirectory(edit.photo.id).appendingPathComponent("original")
         guard FileManager.default.fileExists(atPath: original.path) else { throw PhotoError.expired }
         let source = try open(original)
-        let format = PhotoFormat.spainPrototype
-        let image = try render(source, photo: edit.photo, adjustment: edit.adjustment, format: format, bleedMM: 0)
+        let format = target.digital.format(base: target.format)
+        let image = try render(source, photo: edit.photo, adjustment: target.digital.adjustment(for: edit.adjustment),
+                               format: format, bleedMM: 0)
         try Task.checkCancellation()
         let id = UUID()
         let directory = exportDirectory(id)
         try PhotoFiles.createPrivateDirectory(directory)
         do {
-            let jpeg = directory.appendingPathComponent("Foto-carnet.jpg")
-            try writeJPEG(image, to: jpeg, pixelsPerInch: format.pixelsPerInch)
-            try Self.verifyJPEG(jpeg, expected: format.output)
+            let jpeg = directory.appendingPathComponent("\(target.fileBaseName).jpg")
+            try writeJPEG(image, to: jpeg, pixelsPerInch: format.pixelsPerInch, maxBytes: target.digital.maxBytes)
+            try Self.verifyJPEG(jpeg, expected: format.output, minBytes: target.digital.minBytes, maxBytes: target.digital.maxBytes)
             try PhotoFiles.protect(jpeg)
             try Task.checkCancellation()
             return DigitalExport(id: id, photoID: edit.photo.id, jpeg: jpeg)
@@ -362,20 +371,34 @@ actor PhotoPipeline: PhotoProcessing {
         return result
     }
 
-    private func writeJPEG(_ image: CGImage, to url: URL, pixelsPerInch: Double) throws {
-        guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.jpeg.identifier as CFString, 1, nil)
-        else { throw PhotoError.renderFailed }
-        // New image + explicit metadata whitelist; never copy source dictionaries.
-        CGImageDestinationAddImage(destination, image, [
-            kCGImageDestinationLossyCompressionQuality: 0.95,
-            kCGImagePropertyOrientation: 1,
-            kCGImagePropertyDPIWidth: pixelsPerInch,
-            kCGImagePropertyDPIHeight: pixelsPerInch
-        ] as CFDictionary)
-        guard CGImageDestinationFinalize(destination) else { throw PhotoError.renderFailed }
+    /// Qualities tried in order when a document limits the file size (US visa: 240 KB).
+    static let jpegQualities: [Double] = [0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5]
+
+    private func writeJPEG(_ image: CGImage, to url: URL, pixelsPerInch: Double, maxBytes: Int? = nil) throws {
+        for quality in Self.jpegQualities {
+            guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.jpeg.identifier as CFString, 1, nil)
+            else { throw PhotoError.renderFailed }
+            // New image + explicit metadata whitelist; never copy source dictionaries.
+            CGImageDestinationAddImage(destination, image, [
+                kCGImageDestinationLossyCompressionQuality: quality,
+                kCGImagePropertyOrientation: 1,
+                kCGImagePropertyDPIWidth: pixelsPerInch,
+                kCGImagePropertyDPIHeight: pixelsPerInch
+            ] as CFDictionary)
+            guard CGImageDestinationFinalize(destination) else { throw PhotoError.renderFailed }
+            guard let maxBytes, Self.fileSize(url) > maxBytes else { return }
+        }
+        throw PhotoError.verificationFailed
     }
 
-    static func verifyJPEG(_ url: URL, expected: OutputPixels) throws {
+    static func fileSize(_ url: URL) -> Int {
+        ((try? FileManager.default.attributesOfItem(atPath: url.path))?[.size] as? NSNumber)?.intValue ?? 0
+    }
+
+    static func verifyJPEG(_ url: URL, expected: OutputPixels, minBytes: Int? = nil, maxBytes: Int? = nil) throws {
+        let size = fileSize(url)
+        if let minBytes, size < minBytes { throw PhotoError.verificationFailed }
+        if let maxBytes, size > maxBytes { throw PhotoError.verificationFailed }
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
               CGImageSourceGetType(source) as String? == UTType.jpeg.identifier,
               let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],

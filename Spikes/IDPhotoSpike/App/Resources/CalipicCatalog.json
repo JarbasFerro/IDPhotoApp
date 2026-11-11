@@ -1,0 +1,3031 @@
+{
+ "catalogVersion": "2026.11.0",
+ "customSizes": {
+  "options": {
+   "blackAndWhite": true
+  },
+  "schemaVersion": 1,
+  "shortcuts": [
+   {
+    "heightMm": 30,
+    "id": "25x30",
+    "localeNameKeys": {
+     "es-MX": "custom.25x30.name.es-MX"
+    },
+    "nameKey": "custom.25x30.name",
+    "widthMm": 25
+   },
+   {
+    "heightMm": 40,
+    "id": "30x40",
+    "localeNameKeys": {
+     "pt-BR": "custom.30x40.name.pt-BR"
+    },
+    "nameKey": "custom.30x40.name",
+    "widthMm": 30
+   },
+   {
+    "heightMm": 45,
+    "id": "35x45",
+    "localeNameKeys": {},
+    "nameKey": "custom.35x45.name",
+    "widthMm": 35
+   },
+   {
+    "heightMm": 50.8,
+    "id": "2x2in",
+    "localeNameKeys": {},
+    "nameKey": "custom.2x2in.name",
+    "widthMm": 50.8
+   }
+  ]
+ },
+ "profiles": [
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "manual",
+    "officialEditingRule": "discouraged",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "au-passports-photos"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "informational",
+     "id": "dye-sub-print",
+     "sourceIds": [
+      "au-passports-photos"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "au-passports-photos"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 36,
+     "minInclusive": 32,
+     "sourceIds": [
+      "au-passports-photos"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.au.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 75.6
+   },
+   "jurisdiction": {
+    "countryCode": "AU",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Allowed frame 35–40 × 45–50 mm; Calipic prints 35 × 45.",
+    "Dye-sublimation on glossy ≥ 200 gsm, professionally printed only; inkjet not accepted."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "noteKey": "output.note.dye-sub",
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "shop_only"
+    }
+   ],
+   "profileId": "au.passport.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Australian Passport Office",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "au-passports-photos",
+     "sourceType": "official",
+     "title": "Passport photos",
+     "url": "https://www.passports.gov.au/help/passport-photos"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Australian Passport Office",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "au-camera-guidelines",
+     "sourceType": "official",
+     "title": "Camera operator guidelines (2026)",
+     "url": "https://www.passports.gov.au/sites/default/files/documents/2026-06/Camera%20operator%20guidelines_0.pdf"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "manual",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "ca-ircc-trv-photo"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "ca-ircc-trv-photo"
+     ]
+    },
+    {
+     "capability": "informational",
+     "id": "photo-paper",
+     "sourceIds": [
+      "ca-ircc-trv-photo"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 36,
+     "minInclusive": 31,
+     "sourceIds": [
+      "ca-ircc-trv-photo"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.ca.visa.visitor.name",
+    "type": "visa",
+    "variant": "visitor"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.4
+   },
+   "jurisdiction": {
+    "countryCode": "CA",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Frame at least 35 × 45 mm.",
+    "Passport and permanent-resident photos need a commercial photographer; not this profile."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "ca.visa.visitor",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": null,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "IRCC",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "ca-ircc-trv-photo",
+     "sourceType": "official",
+     "title": "Temporary Resident Visa application photograph specifications",
+     "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/application/application-forms-guides/temporary-resident-visa-application-photograph-specifications.html"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "manual",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "ch-fedpol-criteria"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "ch-fedpol-criteria"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "ch-eda-identity"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-other-people",
+     "sourceIds": [
+      "ch-fedpol-criteria"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 34,
+     "minInclusive": 29,
+     "sourceIds": [
+      "ch-eda-identity"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": "Identitätskarte",
+    "nameKey": "profile.ch.national-id.no-chip.name",
+    "type": "national_id",
+    "variant": "no-chip"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 70.0
+   },
+   "jurisdiction": {
+    "countryCode": "CH",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Whether a brought photo is accepted depends on the canton or commune.",
+    "The biometric ID card (from 2 Nov 2026) is photographed at the centre and is not a Calipic profile."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "noteKey": "output.note.ask-commune",
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "ch.national-id.no-chip",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "fedpol",
+     "language": "de",
+     "retrieval": "search_summary",
+     "sourceId": "ch-fedpol-apply",
+     "sourceType": "official",
+     "title": "Beantragen",
+     "url": "https://www.fedpol.admin.ch/de/beantragen"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "fedpol",
+     "language": "de",
+     "retrieval": "search_summary",
+     "sourceId": "ch-fedpol-criteria",
+     "sourceType": "official",
+     "title": "Kriterien für die Annahme von Fotos für Pässe und Identitätskarten",
+     "url": "https://www.fedpol.admin.ch/dam/de/sd-web/ZA--3ny9zRWt/fotomustertafel.pdf"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Federal Department of Foreign Affairs",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "ch-eda-identity",
+     "sourceType": "official",
+     "title": "Passport and identity card",
+     "url": "https://www.eda.admin.ch/countries/usa/en/home/services/identity-documents.html"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "manual",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "de-mol-pm23"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "informational",
+     "id": "no-data-matrix-photo",
+     "sourceIds": [
+      "de-tuebingen"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "de-mol-pm23"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "Führerschein",
+    "nameKey": "profile.de.driving-licence.standard.name",
+    "type": "driving_licence",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "DE",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Printed biometric photo still required; the May 2025 digital-only rule covers passports and ID cards only.",
+    "Biometric geometry not encoded from another document (AGENTS.md §11); framing is an app default."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "de.driving-licence.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": null,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Landkreis Märkisch-Oderland",
+     "language": "de",
+     "retrieval": "search_summary",
+     "sourceId": "de-mol-pm23",
+     "sourceType": "delegated_authority",
+     "title": "Pressemitteilung 23/2025",
+     "url": "https://www.maerkisch-oderland.de/service-aktuelles/aktuelles/pressemitteilungen/pressemitteilung-23-2025"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Landratsamt Tübingen",
+     "language": "de",
+     "retrieval": "search_summary",
+     "sourceId": "de-tuebingen",
+     "sourceType": "delegated_authority",
+     "title": "Lichtbild für den Führerschein",
+     "url": "https://www.kreis-tuebingen.de/bauen_verkehr/verkehr/feb/lichtbild+fuer+den+fuehrerschein"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "es-dgt-permisos"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "es-dgt-permisos"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-dark-glasses",
+     "sourceIds": [
+      "es-dgt-permisos"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "Permiso de conducción",
+    "nameKey": "profile.es.driving-licence.standard.name",
+    "type": "driving_licence",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "ES",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Religious veil allowed if the face oval is visible from hairline to chin.",
+    "Since 6 Nov 2024 DGT reuses a valid photo it already holds."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 32,
+     "physicalWidthMm": 26,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "es.driving-licence.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": null,
+   "referenceFrameMm": {
+    "height": 32,
+    "width": 26
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Dirección General de Tráfico",
+     "language": "es",
+     "retrieval": "search_summary",
+     "sourceId": "es-dgt-permisos",
+     "sourceType": "official",
+     "title": "Sede Electrónica DGT — Permisos de conducir",
+     "url": "https://sede.dgt.gob.es/es/permisos-de-conducir/"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "es-interior-dni"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "es-interior-dni"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "face-visible",
+     "sourceIds": [
+      "es-interior-dni"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "es-interior-dni"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "DNI",
+    "nameKey": "profile.es.national-id.dni.name",
+    "type": "national_id",
+    "variant": "dni"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "ES",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Reference profile (doc 13). Head and eye bounds not stated; framing is an app default."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 32,
+     "physicalWidthMm": 26,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "es.national-id.dni",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": null,
+   "referenceFrameMm": {
+    "height": 32,
+    "width": 26
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministerio del Interior",
+     "language": "es",
+     "retrieval": "search_summary",
+     "sourceId": "es-interior-dni",
+     "sourceType": "official",
+     "title": "Documentación necesaria para la tramitación del DNI",
+     "url": "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/documentacion-necesaria-para-su-tramitacion/"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "es-inclusion-hoja041"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "face-visible",
+     "sourceIds": [
+      "es-policia-tie"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "TIE",
+    "nameKey": "profile.es.residence-permit.tie.name",
+    "type": "residence_permit",
+    "variant": "tie"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "ES",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Requirements of the DNI rules apply (Policía Nacional)."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 32,
+     "physicalWidthMm": 26,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "es.residence-permit.tie",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": null,
+   "referenceFrameMm": {
+    "height": 32,
+    "width": 26
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Policía Nacional",
+     "language": "es",
+     "retrieval": "search_summary",
+     "sourceId": "es-policia-tie",
+     "sourceType": "official",
+     "title": "Expedición de tarjeta de identidad de extranjero (TIE)",
+     "url": "https://www.policia.es/miscelanea/extranjeros/ciudadanos_venezolanos.pdf"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministerio de Inclusión",
+     "language": "es",
+     "retrieval": "search_summary",
+     "sourceId": "es-inclusion-hoja041",
+     "sourceType": "official",
+     "title": "Portal de Inmigración, hoja 41",
+     "url": "https://extranjeros.inclusion.gob.es/es/InformacionInteres/InformacionProcedimientos/Ciudadanosnocomunitarios/hoja041/index.html"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "light grey",
+     "cream"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "light",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "ni-dva-photo"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "ni-dva-photo"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "ni-dva-photo"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.gb.driving-licence.standard.name",
+    "type": "driving_licence",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "GB",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Online renewal reuses the UK passport photo or a digital upload; Calipic serves the postal (D1) print route.",
+    "Size rules come from Northern Ireland's DVA; Great Britain's are assumed equal."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "noteKey": "output.note.uk-home-print",
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "shop_only"
+    }
+   ],
+   "profileId": "gb.driving-licence.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 1,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "DVLA (GOV.UK)",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "gb-dvla-change-photo",
+     "sourceType": "official",
+     "title": "Change the photo on your driving licence",
+     "url": "https://www.gov.uk/renew-photo-driving-licence"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "DVA Northern Ireland (nidirect)",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "ni-dva-photo",
+     "sourceType": "official",
+     "title": "The photo for your driving licence",
+     "url": "https://www.nidirect.gov.uk/articles/photo-your-driving-licence"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "light grey",
+     "cream"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "light",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "uk-digital-photos",
+     "uk-how-to-take"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "uk-photo-standards"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "uk-photo-standards"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "uk-photo-standards"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-hands-or-toys",
+     "sourceIds": [
+      "uk-photo-standards"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "even-lighting",
+     "sourceIds": [
+      "uk-how-to-take"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 34,
+     "minInclusive": 29,
+     "sourceIds": [
+      "uk-photographers"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.gb.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 70.0
+   },
+   "jurisdiction": {
+    "countryCode": "GB",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Digital route is primary; the online service crops, so the digital output uses a loose frame.",
+    "Home-printed photos are generally not accepted; the print route goes through a shop.",
+    "File size: 10 MB on one page, 5 MB on another; 5 MB used."
+   ],
+   "outputs": [
+    {
+     "colorSpace": "srgb",
+     "composition": "loose",
+     "fileSizeBytes": {
+      "max": 5000000,
+      "min": 51200
+     },
+     "formats": [
+      "jpeg"
+     ],
+     "id": "online",
+     "kind": "digital",
+     "pixelHeight": 1500,
+     "pixelLimits": {
+      "minHeight": 750,
+      "minWidth": 600
+     },
+     "pixelWidth": 1200
+    },
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "noteKey": "output.note.uk-home-print",
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "shop_only"
+    }
+   ],
+   "profileId": "gb.passport.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 1,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "HM Passport Office (GOV.UK)",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "uk-digital-photos",
+     "sourceType": "official",
+     "title": "Get a passport photo: Digital photos",
+     "url": "https://www.gov.uk/photos-for-passports"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "HM Passport Office",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "uk-photo-rules",
+     "sourceType": "official",
+     "title": "Rules for digital passport photos",
+     "url": "https://www.passport.service.gov.uk/help/photo-rules"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "HM Passport Office",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "uk-how-to-take",
+     "sourceType": "official",
+     "title": "How to take a digital passport photo",
+     "url": "https://www.passport.service.gov.uk/photo/how-to-take-a-photo"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "HM Passport Office (GOV.UK)",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "uk-photographers",
+     "sourceType": "official",
+     "title": "Guidance for photographers",
+     "url": "https://www.gov.uk/government/publications/passport-photos-guide-for-photographers/guidance-for-photographers"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "HM Passport Office",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "uk-photo-standards",
+     "sourceType": "official",
+     "title": "Photo standards v51",
+     "url": "https://assets.publishing.service.gov.uk/media/69a831faa2495f2d259f1447/Photo_standards_v51.0.pdf"
+    }
+   ],
+   "specialCases": [
+    {
+     "condition": {
+      "type": "age_lt",
+      "years": 1
+     },
+     "id": "baby-eyes",
+     "overrides": [
+      {
+       "capability": "manual",
+       "target": "check:eyes-open"
+      }
+     ],
+     "sourceIds": [
+      "uk-photo-standards"
+     ]
+    },
+    {
+     "condition": {
+      "type": "age_lt",
+      "years": 6
+     },
+     "id": "young-child-expression",
+     "overrides": [
+      {
+       "capability": "manual",
+       "target": "check:neutral-expression"
+      },
+      {
+       "capability": "manual",
+       "target": "check:mouth-closed"
+      }
+     ],
+     "sourceIds": [
+      "uk-photo-standards",
+      "uk-photographers"
+     ]
+    }
+   ],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "light blue",
+     "beige",
+     "light brown",
+     "light grey",
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "specified_colors",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "it-cie-photo"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "it-cie-photo"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "it-cie-photo"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "bottom_edge",
+      "eye_line"
+     ],
+     "maxInclusive": 31,
+     "minInclusive": 23,
+     "sourceIds": [
+      "it-cie-photo"
+     ],
+     "unit": "mm"
+    },
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 35,
+     "minInclusive": 32,
+     "sourceIds": [
+      "it-cons-toronto"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": "Carta d'identità elettronica",
+    "nameKey": "profile.it.national-id.cie.name",
+    "type": "national_id",
+    "variant": "cie"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 60.0,
+    "headHeightPercent": 74.4
+   },
+   "jurisdiction": {
+    "countryCode": "IT",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "CIE portal: not cropped to exclude the background, not straightened, not retouched (reference; ADR-051)."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "it.national-id.cie",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministero dell'Interno",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "it-cie-photo",
+     "sourceType": "official",
+     "title": "Photo acquisition process (CIE)",
+     "url": "https://www.cartaidentita.interno.gov.it/en/request-cie/photo-acquisition-process/"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Consolato Generale d'Italia a Toronto",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "it-cons-toronto",
+     "sourceType": "delegated_authority",
+     "title": "Carte d'identità",
+     "url": "https://constoronto.esteri.it/en/servizi-consolari-e-visti/servizi-per-il-cittadino-italiano/carte-didentita/"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "it-polizia-passport"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "it-cons-rosario"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "it-cons-rosario"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "it-cons-rosario"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "Passaporto",
+    "nameKey": "profile.it.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "IT",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Rosario consulate: face 70–80 % of the height 'from chin to forehead'; landmark ambiguous, not encoded."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "it.passport.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Polizia di Stato",
+     "language": "it",
+     "retrieval": "search_summary",
+     "sourceId": "it-polizia-passport",
+     "sourceType": "official",
+     "title": "Il rilascio del passaporto",
+     "url": "https://www.poliziadistato.it/articolo/il-rilascio"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Consolato d'Italia a Rosario",
+     "language": "it",
+     "retrieval": "search_summary",
+     "sourceId": "it-cons-rosario",
+     "sourceType": "delegated_authority",
+     "title": "Qualità delle fotografie",
+     "url": "https://consrosario.esteri.it/it/servizi-consolari-e-visti/servizi-per-il-cittadino-italiano/passaporti-e-carte-didentita/documentazione-necessaria-per-il-rilascio-del-passaporto/qualita-delle-fotografie/"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "jp-npa-renewal"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "jp-npa-renewal"
+     ]
+    },
+    {
+     "capability": "informational",
+     "id": "chest-up-framing",
+     "sourceIds": [
+      "jp-npa-renewal"
+     ]
+    },
+    {
+     "capability": "informational",
+     "id": "photo-paper",
+     "sourceIds": [
+      "jp-tokyo-mpd-photo"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "運転免許証",
+    "nameKey": "profile.jp.driving-licence.standard.name",
+    "type": "driving_licence",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 65.0
+   },
+   "jurisdiction": {
+    "countryCode": "JP",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Write the name (and per the NPA, the date taken) on the back.",
+    "Chest-up framing: app default head height lowered to 65 %."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "noteKey": "output.note.photo-paper",
+     "physicalHeightMm": 30,
+     "physicalWidthMm": 24,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "jp.driving-licence.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 30,
+    "width": 24
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "National Police Agency",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-npa-renewal",
+     "sourceType": "official",
+     "title": "日本在住で日本の運転免許証をお持ちの方",
+     "url": "https://www.npa.go.jp/policies/application/license_renewal/japan.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Tokyo Metropolitan Police Department",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-tokyo-mpd-photo",
+     "sourceType": "delegated_authority",
+     "title": "申請用写真及び持参写真のご案内",
+     "url": "https://www.keishicho.metro.tokyo.lg.jp/menkyo/koshin/koshin/koshin02_2.html"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "machine_advisory",
+    "officialEditingRule": "discouraged",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "jp-jlis-checkpoints"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "jp-jlis-checkpoints"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "face-visible",
+     "sourceIds": [
+      "jp-jlis-checkpoints"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "マイナンバーカード",
+    "nameKey": "profile.jp.national-id.mynumber.name",
+    "type": "national_id",
+    "variant": "mynumber"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "JP",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "HEIC is not accepted online; JPEG only.",
+    "Black-and-white photos are allowed."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    },
+    {
+     "colorSpace": "srgb",
+     "composition": "profile",
+     "fileSizeBytes": {
+      "max": 7000000,
+      "min": 20480
+     },
+     "formats": [
+      "jpeg"
+     ],
+     "id": "online",
+     "kind": "digital",
+     "pixelHeight": 1350,
+     "pixelLimits": {
+      "maxHeight": 6000,
+      "maxWidth": 6000,
+      "minHeight": 480,
+      "minWidth": 480
+     },
+     "pixelWidth": 1050
+    }
+   ],
+   "profileId": "jp.national-id.mynumber",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "J-LIS",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-jlis-checkpoints",
+     "sourceType": "official",
+     "title": "顔写真のチェックポイント",
+     "url": "https://www.kojinbango-card.go.jp/apprec/apply/facephoto/"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "J-LIS",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-jlis-smartphone",
+     "sourceType": "official",
+     "title": "スマートフォンで撮った写真でも申請可能でしょうか？",
+     "url": "https://www.kojinbango-card.go.jp/faq_photo11/"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "J-LIS",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-jlis-filesize",
+     "sourceType": "official",
+     "title": "オンライン申請の写真データの大きさに制限はありますか？",
+     "url": "https://www.kojinbango-card.go.jp/faq_photo2/"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "J-LIS",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-jlis-form",
+     "sourceType": "official",
+     "title": "記入例",
+     "url": "https://www.kojinbango-card.go.jp/hpsv/wpmng/documents/kisairei.pdf"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white (recommended)"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "plain",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "jp-mofa-passport"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "face-visible",
+     "sourceIds": [
+      "jp-mofa-passport"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "jp-mofa-passport"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 36,
+     "minInclusive": 32,
+     "sourceIds": [
+      "jp-mofa-photo-pdf"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": "パスポート",
+    "nameKey": "profile.jp.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 75.6
+   },
+   "jurisdiction": {
+    "countryCode": "JP",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Diagram also lists margins (4 ± 2, 7 ± 2, 17 ± 2 mm); labels unconfirmed, not encoded.",
+    "If the crown is unclear, MOFA says to place it above the eyes at the eyes-to-chin distance."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "jp.passport.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministry of Foreign Affairs of Japan",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-mofa-photo-pdf",
+     "sourceType": "official",
+     "title": "Passport photo standard",
+     "url": "https://www.mofa.go.jp/mofaj/files/100171389.pdf"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministry of Foreign Affairs of Japan",
+     "language": "ja",
+     "retrieval": "search_summary",
+     "sourceId": "jp-mofa-passport",
+     "sourceType": "official",
+     "title": "パスポートの申請から受領まで",
+     "url": "https://www.mofa.go.jp/mofaj/toko/passport/pass_2.html"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "kr-mofa-xian"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "no-uniform",
+     "sourceIds": [
+      "kr-mofa-xian"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-white-clothing",
+     "sourceIds": [
+      "kr-mofa-xian"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "head-straight",
+     "sourceIds": [
+      "kr-mofa-xian"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-glasses",
+     "sourceIds": [
+      "kr-mofa-toronto"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 36,
+     "minInclusive": 32,
+     "sourceIds": [
+      "kr-mofa-xian",
+      "kr-mofa-toronto"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": "여권",
+    "nameKey": "profile.kr.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 75.6
+   },
+   "jurisdiction": {
+    "countryCode": "KR",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Official posts call self-taken digital photos unsuitable; kept by founder decision (2026-11-11)."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "kr.passport.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministry of Foreign Affairs (Korea)",
+     "language": "ko",
+     "retrieval": "search_summary",
+     "sourceId": "kr-mofa-xian",
+     "sourceType": "delegated_authority",
+     "title": "신규 여권사진 표준규격 안내",
+     "url": "https://www.mofa.go.kr/cn-xian-ko/brd/m_753/view.do?seq=1035220&page=1"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministry of Foreign Affairs (Korea)",
+     "language": "ko",
+     "retrieval": "search_summary",
+     "sourceId": "kr-mofa-toronto",
+     "sourceType": "delegated_authority",
+     "title": "여권사진 표준규격 안내",
+     "url": "https://www.mofa.go.kr/ca-toronto-ko/brd/m_5389/view.do?seq=1344544"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ministry of Foreign Affairs (Korea)",
+     "language": "ko",
+     "retrieval": "search_summary",
+     "sourceId": "kr-mofa-guatemala",
+     "sourceType": "delegated_authority",
+     "title": "여권사진 규정",
+     "url": "https://overseas.mofa.go.kr/gt-ko/brd/m_5678/view.do?seq=961614"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [],
+    "capability": "manual",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "light",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "nl-rdw-photographer"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "nl-rdw-photographer"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": "Rijbewijs",
+    "nameKey": "profile.nl.driving-licence.standard.name",
+    "type": "driving_licence",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "NL",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Print route at the municipality. The online route uses RDW-recognized photographers only (901 × 1158 px, ≤ 170 KB), not a Calipic output.",
+    "Passport geometry is not copied here (AGENTS.md §11); framing is an app default."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 400,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 400,
+     "route": "home"
+    }
+   ],
+   "profileId": "nl.driving-licence.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "RDW",
+     "language": "nl",
+     "retrieval": "search_summary",
+     "sourceId": "nl-rdw-photographer",
+     "sourceType": "official",
+     "title": "Fotograferen voor online verlenging rijbewijs",
+     "url": "https://www.rdw.nl/zakelijke-partners/erkende-bedrijven/fotograferen-voor-rijbewijzen/fotograferen-voor-rijbewijs"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "light grey",
+     "light blue",
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "specified_colors",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "nl-rijksoverheid"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "nl-rijksoverheid"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "nl-rijksoverheid"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "head-straight",
+     "sourceIds": [
+      "nl-rijksoverheid"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "ear_base",
+      "ear_base"
+     ],
+     "maxInclusive": 20,
+     "minInclusive": 16,
+     "sourceIds": [
+      "nl-rvig-fotomatrix"
+     ],
+     "unit": "mm"
+    },
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 30,
+     "minInclusive": 26,
+     "sourceIds": [
+      "nl-rvig-fotomatrix"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": "Identiteitskaart",
+    "nameKey": "profile.nl.national-id.standard.name",
+    "type": "national_id",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 62.2
+   },
+   "jurisdiction": {
+    "countryCode": "NL",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Print on smooth high-quality photo paper at ≥ 400 dpi."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 400,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 400,
+     "route": "home"
+    }
+   ],
+   "profileId": "nl.national-id.standard",
+   "profileQuestions": [
+    "age_lte_10"
+   ],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Rijksoverheid",
+     "language": "nl",
+     "retrieval": "search_summary",
+     "sourceId": "nl-rijksoverheid",
+     "sourceType": "official",
+     "title": "Eisen aan de pasfoto voor paspoort of ID-kaart",
+     "url": "https://www.rijksoverheid.nl/themas/migratie-en-reizen/paspoort-en-identiteitskaart/eisen-pasfoto-paspoort-id-kaart"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "RvIG",
+     "language": "nl",
+     "retrieval": "search_summary",
+     "sourceId": "nl-rvig-fotomatrix",
+     "sourceType": "official",
+     "title": "Fotomatrix model 2020",
+     "url": "https://www.rvig.nl/sites/default/files/2023-02/Fotomatrix%202020.pdf"
+    }
+   ],
+   "specialCases": [
+    {
+     "condition": {
+      "type": "age_lte",
+      "years": 10
+     },
+     "id": "child-head",
+     "overrides": [
+      {
+       "maxInclusive": 30,
+       "minInclusive": 19,
+       "target": "composition.headHeight"
+      }
+     ],
+     "sourceIds": [
+      "nl-rvig-fotomatrix"
+     ]
+    }
+   ],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "light grey",
+     "light blue",
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#E6E6E6",
+    "requiredAppearance": "specified_colors",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "nl-rijksoverheid"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "nl-rijksoverheid"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "nl-rijksoverheid"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "head-straight",
+     "sourceIds": [
+      "nl-rijksoverheid"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "ear_base",
+      "ear_base"
+     ],
+     "maxInclusive": 20,
+     "minInclusive": 16,
+     "sourceIds": [
+      "nl-rvig-fotomatrix"
+     ],
+     "unit": "mm"
+    },
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 30,
+     "minInclusive": 26,
+     "sourceIds": [
+      "nl-rvig-fotomatrix"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": "Paspoort",
+    "nameKey": "profile.nl.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 62.2
+   },
+   "jurisdiction": {
+    "countryCode": "NL",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Print on smooth high-quality photo paper at ≥ 400 dpi."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 400,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 400,
+     "route": "home"
+    }
+   ],
+   "profileId": "nl.passport.standard",
+   "profileQuestions": [
+    "age_lte_10"
+   ],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Rijksoverheid",
+     "language": "nl",
+     "retrieval": "search_summary",
+     "sourceId": "nl-rijksoverheid",
+     "sourceType": "official",
+     "title": "Eisen aan de pasfoto voor paspoort of ID-kaart",
+     "url": "https://www.rijksoverheid.nl/themas/migratie-en-reizen/paspoort-en-identiteitskaart/eisen-pasfoto-paspoort-id-kaart"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "RvIG",
+     "language": "nl",
+     "retrieval": "search_summary",
+     "sourceId": "nl-rvig-fotomatrix",
+     "sourceType": "official",
+     "title": "Fotomatrix model 2020",
+     "url": "https://www.rvig.nl/sites/default/files/2023-02/Fotomatrix%202020.pdf"
+    }
+   ],
+   "specialCases": [
+    {
+     "condition": {
+      "type": "age_lte",
+      "years": 10
+     },
+     "id": "child-head",
+     "overrides": [
+      {
+       "maxInclusive": 30,
+       "minInclusive": 19,
+       "target": "composition.headHeight"
+      }
+     ],
+     "sourceIds": [
+      "nl-rvig-fotomatrix"
+     ]
+    }
+   ],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "sa-ajel-resident-photo",
+     "sa-absher-services"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "no-glasses",
+     "sourceIds": [
+      "sa-absher-services"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-head-covering",
+     "sourceIds": [
+      "sa-ajel-resident-photo"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "face-visible",
+     "sourceIds": [
+      "sa-ajel-resident-photo"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": null
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.sa.residence-permit.photo-update.name",
+    "type": "residence_permit",
+    "variant": "photo-update"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "app_default",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 74.0
+   },
+   "jurisdiction": {
+    "countryCode": "SA",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Digital only, 2:3; file rules taken from the national-ID photo page and assumed to apply.",
+    "Men bareheaded; AI-checked upload."
+   ],
+   "outputs": [
+    {
+     "colorSpace": "srgb",
+     "composition": "profile",
+     "fileSizeBytes": {
+      "max": 1000000,
+      "min": null
+     },
+     "formats": [
+      "jpeg"
+     ],
+     "id": "absher",
+     "kind": "digital",
+     "pixelHeight": 1200,
+     "pixelWidth": 800
+    }
+   ],
+   "profileId": "sa.residence-permit.photo-update",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": null,
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Absher",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "sa-absher-services",
+     "sourceType": "official",
+     "title": "Absher Services",
+     "url": "https://www.absher.sa/wps/portal/individuals/static/NewServices/!ut/p/z0/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziDQ1dLDyM3A18_F093QwCzYOCDX383Q3dTcz0g1Pz9AuyHRUBY0dtkA!!/"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "Ajel (citing the General Directorate of Passports)",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "sa-ajel-resident-photo",
+     "sourceType": "authoritative_secondary",
+     "title": "Steps to Update Resident Photo on Absher",
+     "url": "https://english.ajel.sa/news/oh5i5jjk6"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "unknown",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "eeas-schengen-guide"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "eu-icao-guide"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "eu-icao-guide"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": null,
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "crown",
+      "chin"
+     ],
+     "maxInclusive": 80,
+     "minInclusive": 70,
+     "sourceIds": [
+      "eu-icao-guide"
+     ],
+     "unit": "percent_output_height"
+    }
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.schengen.visa.standard.name",
+    "type": "visa",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 58.0,
+    "headHeightPercent": 75.0
+   },
+   "jurisdiction": {
+    "countryCode": null,
+    "regionCode": "SCHENGEN"
+   },
+   "kind": "official",
+   "notes": [
+    "ICAO Doc 9303 applies; consulates may add details or take a live photo at the appointment."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 45,
+     "physicalWidthMm": 35,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "schengen.visa.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 45,
+    "width": 35
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "European Commission",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "eu-visa-handbook",
+     "sourceType": "official",
+     "title": "Visa Code handbook, C(2024) 4319 annex",
+     "url": "https://home-affairs.ec.europa.eu/document/download/1d79f44d-49ba-4847-951e-129f924b1051_en"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "European Commission",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "eu-icao-guide",
+     "sourceType": "official",
+     "title": "ICAO photograph guidelines",
+     "url": "https://home-affairs.ec.europa.eu/document/download/5bb16566-c8c2-4afb-b038-530f488cb72a_en?filename=icao_photograph_guidelines_en.pdf"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "EEAS",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "eeas-schengen-guide",
+     "sourceType": "official",
+     "title": "Schengen Visa Guide",
+     "url": "https://www.eeas.europa.eu/sites/default/files/2026/documents/Schengen%20Visa%20Guide%20EN.pdf"
+    }
+   ],
+   "specialCases": [],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white",
+     "off-white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white_or_off_white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "us-dos-passport-photos"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-glasses",
+     "sourceIds": [
+      "us-dos-eyeglasses"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-other-people",
+     "sourceIds": [
+      "us-dos-photo-faq"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "even-lighting",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "bottom_edge",
+      "eye_line"
+     ],
+     "maxInclusive": 69,
+     "minInclusive": 56,
+     "note": "Stated for visa photos; used as advisory for the passport.",
+     "sourceIds": [
+      "us-dos-visa-template"
+     ],
+     "unit": "percent_output_height"
+    },
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "top_of_hair",
+      "chin"
+     ],
+     "maxInclusive": 34.925,
+     "minInclusive": 25.4,
+     "sourceIds": [
+      "us-dos-passport-photos",
+      "us-dos-photo-faq"
+     ],
+     "unit": "mm"
+    }
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.us.passport.standard.name",
+    "type": "passport",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 62.5,
+    "headHeightPercent": 59.4
+   },
+   "jurisdiction": {
+    "countryCode": "US",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "Official wording forbids software, app, filter, or AI changes; Calipic offers editing anyway (ADR-051).",
+    "Online renewal: JPG/PNG/HEIC/HEIF, 54 KB–10 MB; pixel size not stated. 1200 × 1200 is a Calipic choice."
+   ],
+   "outputs": [
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 50.8,
+     "physicalWidthMm": 50.8,
+     "preferredPpi": 300,
+     "route": "home"
+    },
+    {
+     "colorSpace": "srgb",
+     "composition": "profile",
+     "fileSizeBytes": {
+      "max": 10000000,
+      "min": 55296
+     },
+     "formats": [
+      "jpeg"
+     ],
+     "id": "online-renewal",
+     "kind": "digital",
+     "pixelHeight": 1200,
+     "pixelWidth": 1200
+    }
+   ],
+   "profileId": "us.passport.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 50.8,
+    "width": 50.8
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-passport-photos",
+     "sourceType": "official",
+     "title": "Passport Photos",
+     "url": "https://travel.state.gov/en/passports/apply/help/photos.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-online-renewal-photo",
+     "sourceType": "official",
+     "title": "Uploading a Digital Photo",
+     "url": "https://travel.state.gov/content/travel/en/passports/how-apply/online-renewal-photo.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-visa-template",
+     "sourceType": "official",
+     "title": "Photo Composition Template",
+     "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos/photo-composition-template.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-photo-faq",
+     "sourceType": "official",
+     "title": "Photo Frequently Asked Questions",
+     "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos/frequently-asked-questions.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-eyeglasses",
+     "sourceType": "official",
+     "title": "New Eyeglasses Policy for Visa and Passport Photographs",
+     "url": "https://travel.state.gov/content/dam/visas/policy_updates/16-STATE-106142.pdf"
+    }
+   ],
+   "specialCases": [
+    {
+     "condition": {
+      "type": "age_lt",
+      "years": 1
+     },
+     "id": "baby-eyes",
+     "overrides": [
+      {
+       "capability": "manual",
+       "target": "check:eyes-open"
+      }
+     ],
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    }
+   ],
+   "status": "active",
+   "wave": "A"
+  },
+  {
+   "background": {
+    "allowedColors": [
+     "white",
+     "off-white"
+    ],
+    "capability": "machine_advisory",
+    "officialEditingRule": "disallowed",
+    "replacementColor": "#FFFFFF",
+    "requiredAppearance": "white_or_off_white",
+    "shadows": "forbidden",
+    "sourceIds": [
+     "us-dos-passport-photos"
+    ],
+    "uniformity": "required"
+   },
+   "checks": [
+    {
+     "capability": "machine_advisory",
+     "id": "eyes-open",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "neutral-expression",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "mouth-closed",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-glasses",
+     "sourceIds": [
+      "us-dos-eyeglasses"
+     ]
+    },
+    {
+     "capability": "manual",
+     "id": "no-other-people",
+     "sourceIds": [
+      "us-dos-photo-faq"
+     ]
+    },
+    {
+     "capability": "machine_advisory",
+     "id": "even-lighting",
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    }
+   ],
+   "composition": {
+    "eyeLine": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "bottom_edge",
+      "eye_line"
+     ],
+     "maxInclusive": 69,
+     "minInclusive": 56,
+     "sourceIds": [
+      "us-dos-visa-template"
+     ],
+     "unit": "percent_output_height"
+    },
+    "faceWidth": null,
+    "headHeight": {
+     "capability": "machine_advisory",
+     "landmarks": [
+      "top_of_hair",
+      "chin"
+     ],
+     "maxInclusive": 69,
+     "minInclusive": 50,
+     "sourceIds": [
+      "us-dos-visa-template"
+     ],
+     "unit": "percent_output_height"
+    }
+   },
+   "document": {
+    "localName": null,
+    "nameKey": "profile.us.visa.standard.name",
+    "type": "visa",
+    "variant": "standard"
+   },
+   "effective": {
+    "from": null,
+    "lastReviewed": "2026-11-11",
+    "to": null
+   },
+   "framingTarget": {
+    "basis": "official_midpoint",
+    "eyeLineFromBottomPercent": 62.5,
+    "headHeightPercent": 59.5
+   },
+   "jurisdiction": {
+    "countryCode": "US",
+    "regionCode": null
+   },
+   "kind": "official",
+   "notes": [
+    "≤ 240 KB and exactly 600 × 600 come from the Diversity Visa instructions and the Photo Tool; the template allows 600–1200 px square.",
+    "Print 2 × 2 in only when a post asks for one."
+   ],
+   "outputs": [
+    {
+     "colorSpace": "srgb",
+     "composition": "profile",
+     "fileSizeBytes": {
+      "max": 240000,
+      "min": null
+     },
+     "formats": [
+      "jpeg"
+     ],
+     "id": "ds-160",
+     "kind": "digital",
+     "pixelHeight": 600,
+     "pixelLimits": {
+      "maxHeight": 1200,
+      "maxWidth": 1200,
+      "minHeight": 600,
+      "minWidth": 600,
+      "square": true
+     },
+     "pixelWidth": 600
+    },
+    {
+     "id": "print",
+     "kind": "print",
+     "minPpi": 300,
+     "physicalHeightMm": 50.8,
+     "physicalWidthMm": 50.8,
+     "preferredPpi": 300,
+     "route": "home"
+    }
+   ],
+   "profileId": "us.visa.standard",
+   "profileQuestions": [],
+   "profileVersion": "1.0.0",
+   "recencyMonths": 6,
+   "referenceFrameMm": {
+    "height": 50.8,
+    "width": 50.8
+   },
+   "schemaVersion": 1,
+   "sources": [
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-passport-photos",
+     "sourceType": "official",
+     "title": "Passport Photos",
+     "url": "https://travel.state.gov/en/passports/apply/help/photos.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-online-renewal-photo",
+     "sourceType": "official",
+     "title": "Uploading a Digital Photo",
+     "url": "https://travel.state.gov/content/travel/en/passports/how-apply/online-renewal-photo.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-visa-template",
+     "sourceType": "official",
+     "title": "Photo Composition Template",
+     "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos/photo-composition-template.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-photo-faq",
+     "sourceType": "official",
+     "title": "Photo Frequently Asked Questions",
+     "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/photos/frequently-asked-questions.html"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-eyeglasses",
+     "sourceType": "official",
+     "title": "New Eyeglasses Policy for Visa and Passport Photographs",
+     "url": "https://travel.state.gov/content/dam/visas/policy_updates/16-STATE-106142.pdf"
+    },
+    {
+     "accessedDate": "2026-11-11",
+     "authorityName": "U.S. Department of State",
+     "language": "en",
+     "retrieval": "search_summary",
+     "sourceId": "us-dos-dv2026",
+     "sourceType": "official",
+     "title": "Instructions for the 2026 Diversity Immigrant Visa Program",
+     "url": "https://travel.state.gov/content/dam/visas/Diversity-Visa/DV-Instructions-Translations/DV-2026-Instructions-Translations/DV%202026%20Plain%20Language%20Instructions%20and%20FAQs.pdf"
+    }
+   ],
+   "specialCases": [
+    {
+     "condition": {
+      "type": "age_lt",
+      "years": 1
+     },
+     "id": "baby-eyes",
+     "overrides": [
+      {
+       "capability": "manual",
+       "target": "check:eyes-open"
+      }
+     ],
+     "sourceIds": [
+      "us-dos-passport-photos"
+     ]
+    }
+   ],
+   "status": "active",
+   "wave": "A"
+  }
+ ],
+ "schemaVersion": 1
+}

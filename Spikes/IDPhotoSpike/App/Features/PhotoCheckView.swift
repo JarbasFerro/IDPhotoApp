@@ -67,7 +67,7 @@ struct PhotoCheckView: View {
             }
         } message: { Text("The original in your photo library is kept.") }
         .sheet(isPresented: $showAdjust) { AdjustSheet(model: model, photoID: photoID) }
-        .sheet(isPresented: $showRequirements) { RequirementsView() }
+        .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
         .task(id: photoID) {
             // Landing: show the uncropped photo first, wait for the push to settle and the check to finish, then frame it.
@@ -86,7 +86,7 @@ struct PhotoCheckView: View {
         let checking = entry.isAnalyzing || !landed
         let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 280 : 250)
         return VStack(spacing: Design.Spacing.caption) {
-            PortraitView(entry: entry, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
+            PortraitView(entry: entry, format: model.renderTarget.format, showsOriginal: comparing || !landed, label: comparing ? "Original photo" : "Framed photo",
                          animated: !reduceMotion)
                 .frame(maxWidth: width)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
@@ -188,6 +188,7 @@ struct PhotoCheckView: View {
 /// Non-interactive rendering of an entry's crop with its background and tone, or the untouched original.
 struct PortraitView: View {
     let entry: PhotoEntry
+    let format: PhotoFormat
     var showsOriginal = false
     /// Without a label the portrait is decorative and hidden from assistive technologies.
     var label: LocalizedStringResource? = nil
@@ -197,7 +198,7 @@ struct PortraitView: View {
     var body: some View {
         GeometryReader { geometry in
             let adjustment = showsOriginal ? CropAdjustment() : entry.adjustment
-            let crop = adjustment.crop(in: entry.photo.pixels)
+            let crop = adjustment.crop(in: entry.photo.pixels, format: format)
             let hasPreview = !showsOriginal && entry.backgroundPreview != nil
             // Both layers stay mounted and move together; only their opacity crossfades. Inserting the white
             // layer on demand made it appear at its final geometry while the other layer was still animating.
@@ -214,7 +215,7 @@ struct PortraitView: View {
             .animation(Design.Motion.backgroundFade.resolved(animated: animated), value: hasPreview)
             .animation(Design.Motion.reframe.resolved(animated: animated), value: adjustment)
         }
-        .aspectRatio(PhotoFormat.spainPrototype.aspectRatio, contentMode: .fit)
+        .aspectRatio(format.aspectRatio, contentMode: .fit)
         .environment(\.layoutDirection, .leftToRight)
         .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))

@@ -48,7 +48,7 @@ struct RootView: View {
         }
         .sheet(item: $pendingAcquisition, onDismiss: startApprovedAcquisition) {
             pending in
-            PreparationView(source: pending.source, onContinue: { selectedSource in
+            PreparationView(source: pending.source, document: model.document, onContinue: { selectedSource in
                 approvedAcquisition = PendingAcquisition(source: selectedSource, mode: pending.mode)
                 pendingAcquisition = nil
             })

@@ -1,691 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Before your photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antes de la foto"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antes da foto"
-          }
-        }
-      }
-    },
-    "Calipic frames the result. Check expression, glasses and any headwear requirements by eye." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Calipic encuadra el resultado. Comprueba visualmente la expresión y los requisitos sobre gafas y prendas de cabeza."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O Calipic enquadra o resultado. Confira visualmente a expressão e os requisitos para óculos e coberturas de cabeça."
-          }
-        }
-      }
-    },
-    "Check by eye" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comprobar visualmente"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confira visualmente"
-          }
-        }
-      }
-    },
-    "Check expression, eyes and glasses by eye. Calipic does not decide whether an office accepts the photo." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comprueba visualmente la expresión, los ojos y las gafas. Calipic no decide si una oficina acepta la foto."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confira visualmente a expressão, os olhos e os óculos. O Calipic não decide se um órgão aceita a foto."
-          }
-        }
-      }
-    },
-    "Choose result" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elegir resultado"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolher resultado"
-          }
-        }
-      }
-    },
-    "Choose your result" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige el resultado"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha o resultado"
-          }
-        }
-      }
-    },
-    "Digital Photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto digital"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto digital"
-          }
-        }
-      }
-    },
-    "Digital photo ready to share" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto digital lista para compartir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto digital pronta para compartilhar"
-          }
-        }
-      }
-    },
-    "Face the camera with your eyes open" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mira a la cámara con los ojos abiertos"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Olhe para a câmera com os olhos abertos"
-          }
-        }
-      }
-    },
-    "Full requirements" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos los requisitos"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos os requisitos"
-          }
-        }
-      }
-    },
-    "Got it" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entendido"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entendi"
-          }
-        }
-      }
-    },
-    "JPEG · %lld × %lld pixels" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG · %1$lld × %2$lld píxeles"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG · %1$lld × %2$lld pixels"
-          }
-        }
-      }
-    },
-    "Keep your full head and shoulders in the photo" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Incluye toda la cabeza y los hombros en la foto"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inclua toda a cabeça e os ombros na foto"
-          }
-        }
-      }
-    },
-    "Move Down" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover hacia abajo"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover para baixo"
-          }
-        }
-      }
-    },
-    "Move Left" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover a la izquierda"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover para a esquerda"
-          }
-        }
-      }
-    },
-    "Move Right" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover a la derecha"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover para a direita"
-          }
-        }
-      }
-    },
-    "Move Up" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover hacia arriba"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover para cima"
-          }
-        }
-      }
-    },
-    "Move and zoom" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover y ampliar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mover e ampliar"
-          }
-        }
-      }
-    },
-    "One JPEG for online forms, ready to share." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un JPEG para formularios en línea, listo para compartir."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um JPEG para formulários on-line, pronto para compartilhar."
-          }
-        }
-      }
-    },
-    "Open Camera" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir cámara"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir câmera"
-          }
-        }
-      }
-    },
-    "Opens buttons to move or zoom without gestures." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre botones para mover o ampliar sin gestos."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abre botões para mover ou ampliar sem gestos."
-          }
-        }
-      }
-    },
-    "Photo not ready" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La foto no está lista"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A foto não está pronta"
-          }
-        }
-      }
-    },
-    "Prepared photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto preparada"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto preparada"
-          }
-        }
-      }
-    },
-    "Preparing your photo…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preparando la foto…"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preparando a foto…"
-          }
-        }
-      }
-    },
-    "Print Sheet" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hoja para imprimir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folha para impressão"
-          }
-        }
-      }
-    },
-    "Print at Actual Size (100 %), not Fit to Page. Measure a photo before use." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imprime a tamaño real (100 %), sin ajustar a la página. Mide una foto antes de usarla."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imprima no tamanho real (100 %), sem ajustar à página. Meça uma foto antes de usá-la."
-          }
-        }
-      }
-    },
-    "Remove headphones; check headwear and glasses exceptions below" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quítate los auriculares; consulta abajo las excepciones sobre prendas de cabeza y gafas"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retire os fones de ouvido; confira abaixo as exceções para coberturas de cabeça e óculos"
-          }
-        }
-      }
-    },
-    "Requirements" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requisitos"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requisitos"
-          }
-        }
-      }
-    },
-    "Reset Position" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restablecer posición"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redefinir posição"
-          }
-        }
-      }
-    },
-    "Review expression, eyes and glasses by eye before using the photo. The receiving office decides acceptance." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antes de usar la foto, comprueba visualmente la expresión, los ojos y las gafas. La oficina receptora decide si la acepta."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antes de usar a foto, confira visualmente a expressão, os olhos e os óculos. O órgão responsável decide se a aceita."
-          }
-        }
-      }
-    },
-    "Set paper and copies for one or more people." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Configura el papel y las copias para una o varias personas."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Defina o papel e as cópias para uma ou mais pessoas."
-          }
-        }
-      }
-    },
-    "Spain · DNI photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "España · foto para DNI"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Espanha · foto para DNI"
-          }
-        }
-      }
-    },
-    "Take Photo Instead" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hacer una foto en su lugar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tirar foto em vez disso"
-          }
-        }
-      }
-    },
-    "Take it or choose one. The app frames it for Spain's DNI. Save a digital photo or prepare a print sheet. Everything stays on your iPhone." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz una foto o elige una. La app la encuadra para el DNI español. Guarda una foto digital o prepara una hoja para imprimir. Todo permanece en tu iPhone."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tire uma foto ou escolha uma. O app a enquadra para o DNI espanhol. Salve uma foto digital ou prepare uma folha para impressão. Tudo fica no seu iPhone."
-          }
-        }
-      }
-    },
-    "The photo could not be prepared. Try again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo preparar la foto. Inténtalo de nuevo."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não foi possível preparar a foto. Tente novamente."
-          }
-        }
-      }
-    },
-    "The ring checks framing, head position, light and distance." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El anillo comprueba el encuadre, la posición de la cabeza, la luz y la distancia."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O anel verifica o enquadramento, a posição da cabeça, a luz e a distância."
-          }
-        }
-      }
-    },
-    "Try the camera again or choose an existing photo." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prueba la cámara de nuevo o elige una foto existente."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tente usar a câmera novamente ou escolha uma foto existente."
-          }
-        }
-      }
-    },
-    "Use even light and a plain, light background" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usa luz uniforme y un fondo liso y claro"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use luz uniforme e um fundo liso e claro"
-          }
-        }
-      }
-    },
-    "Your digital photo is ready." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu foto digital está lista."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sua foto digital está pronta."
-          }
-        }
-      }
-    },
-    "Your framing and adjustments are saved for both choices." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El encuadre y los ajustes se conservan para ambas opciones."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O enquadramento e os ajustes são mantidos para as duas opções."
-          }
-        }
-      }
-    },
-    "Zoom In" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ampliar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ampliar"
-          }
-        }
-      }
-    },
-    "Zoom Out" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reducir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reduzir"
-          }
-        }
-      }
-    },
     "" : {
 
     },
@@ -2186,6 +1501,23 @@
         }
       }
     },
+    "Automatic capture when camera checks clear" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captura automática cuando las comprobaciones de cámara estén bien"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captura automática quando as verificações da câmera estiverem boas"
+          }
+        }
+      }
+    },
     "Automatic capture when ready" : {
       "comment" : "A toggle that allows the user to enable or disable automatic capture of photos when the camera is ready.",
       "extractionState" : "stale",
@@ -2290,6 +1622,22 @@
         }
       }
     },
+    "Before your photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes de la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes da foto"
+          }
+        }
+      }
+    },
     "Better to retake" : {
       "localizations" : {
         "es" : {
@@ -2319,6 +1667,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Com luz suficiente e sem luz por trás."
+          }
+        }
+      }
+    },
+    "Bring the phone closer" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca el teléfono"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aproxime o telefone"
+          }
+        }
+      }
+    },
+    "Calipic frames the result. Check expression, glasses and any headwear requirements by eye." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic encuadra el resultado. Comprueba visualmente la expresión y los requisitos sobre gafas y prendas de cabeza."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic enquadra o resultado. Confira visualmente a expressão e os requisitos para óculos e coberturas de cabeça."
           }
         }
       }
@@ -2370,6 +1751,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Câmera na altura dos olhos"
+          }
+        }
+      }
+    },
+    "Camera checks clear" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobaciones de cámara correctas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificações da câmera concluídas"
+          }
+        }
+      }
+    },
+    "Camera checks clear. Check background and remove headphones." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las comprobaciones de cámara están bien. Revisa el fondo y quítate los auriculares."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As verificações da câmera estão boas. Confira o fundo e tire os fones de ouvido."
+          }
+        }
+      }
+    },
+    "Camera checks look good" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las comprobaciones de la cámara son favorables"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As verificações da câmera estão boas"
+          }
+        }
+      }
+    },
+    "Camera Help" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda de la cámara"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda da câmera"
           }
         }
       }
@@ -2452,9 +1899,25 @@
         }
       }
     },
+    "Centre your face in the guide" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centra la cara en la guía"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centralize o rosto na guia"
+          }
+        }
+      }
+    },
     "Centre your face in the oval" : {
       "comment" : "A hint to the user to keep their face in the center of the camera view.",
-      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -2509,6 +1972,71 @@
         }
       }
     },
+    "Check by eye" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobar visualmente"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira visualmente"
+          }
+        }
+      }
+    },
+    "Check each photo by eye before use." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa cada foto visualmente antes de usarla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira cada foto visualmente antes de usá-la."
+          }
+        }
+      }
+    },
+    "Check expression, eyes and glasses by eye. Calipic does not decide whether an office accepts the photo." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba visualmente la expresión, los ojos y las gafas. Calipic no decide si una oficina acepta la foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira visualmente a expressão, os olhos e os óculos. O Calipic não decide se um órgão aceita a foto."
+          }
+        }
+      }
+    },
+    "Check the photo by eye before use. The receiving office decides acceptance." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa la foto visualmente antes de usarla. La oficina receptora decide si la acepta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira a foto visualmente antes de usá-la. O órgão destinatário decide se a aceita."
+          }
+        }
+      }
+    },
     "Checking your photo…" : {
       "localizations" : {
         "es" : {
@@ -2539,6 +2067,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escolha uma foto existente."
+          }
+        }
+      }
+    },
+    "Choose Another Photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir otra foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher outra foto"
           }
         }
       }
@@ -2579,6 +2123,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escolher uma foto"
+          }
+        }
+      }
+    },
+    "Choose result" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir resultado"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher resultado"
+          }
+        }
+      }
+    },
+    "Choose your result" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el resultado"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha o resultado"
           }
         }
       }
@@ -2791,6 +2368,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foto digital"
+          }
+        }
+      }
+    },
+    "Digital Photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto digital"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto digital"
+          }
+        }
+      }
+    },
+    "Digital photo ready to share" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto digital lista para compartir"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto digital pronta para compartilhar"
           }
         }
       }
@@ -3203,6 +2812,22 @@
         }
       }
     },
+    "Face forward with your eyes open" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira de frente con los ojos abiertos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olhe para a frente com os olhos abertos"
+          }
+        }
+      }
+    },
     "Face is off-centre" : {
       "comment" : "Text describing the alignment of a face that is not centred in the photo.",
       "isCommentAutoGenerated" : true,
@@ -3217,6 +2842,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O rosto está fora do centro"
+          }
+        }
+      }
+    },
+    "Face the camera with your eyes open" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira a la cámara con los ojos abiertos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olhe para a câmera com os olhos abertos"
           }
         }
       }
@@ -3352,6 +2994,22 @@
         }
       }
     },
+    "Fix these issues or continue after checking by eye." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corrige estos problemas o continúa después de revisar la foto visualmente."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corrija estes problemas ou continue após conferir a foto visualmente."
+          }
+        }
+      }
+    },
     "Framed photo" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3433,6 +3091,22 @@
         }
       }
     },
+    "Frames the photo to 26 × 32 mm, levels the eyes, and prepares a print sheet. It can replace the background with white and even out light and colour when the photo allows. It does not retouch your face or decide acceptance." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuadra la foto a 26 × 32 mm, nivela los ojos y prepara una hoja para imprimir. Puede dejar el fondo blanco y equilibrar la luz y el color cuando la foto lo permite. No retoca tu rostro ni decide si la foto será aceptada."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadra a foto em 26 × 32 mm, nivela os olhos e prepara uma folha para impressão. Pode deixar o fundo branco e equilibrar a luz e a cor quando a foto permite. Não retoca seu rosto nem decide se a foto será aceita."
+          }
+        }
+      }
+    },
     "Frames the photo to 26 × 32 mm, levels the eyes, replaces the background with white, corrects exposure and colour, and prepares a print sheet. It does not retouch your face and does not decide acceptance." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3480,6 +3154,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enquadrando…"
+          }
+        }
+      }
+    },
+    "Full requirements" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los requisitos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos os requisitos"
+          }
+        }
+      }
+    },
+    "Got it" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendido"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entendi"
           }
         }
       }
@@ -3694,6 +3401,22 @@
         }
       }
     },
+    "Help" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajuda"
+          }
+        }
+      }
+    },
     "Hold still" : {
       "comment" : "A label that instructs the user to hold still.",
       "isCommentAutoGenerated" : true,
@@ -3730,6 +3453,22 @@
         }
       }
     },
+    "Hold the phone upright" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén el teléfono vertical"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenha o telefone na vertical"
+          }
+        }
+      }
+    },
     "Hold to compare with the original" : {
       "localizations" : {
         "es" : {
@@ -3742,6 +3481,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mantenha pressionado para comparar com a original"
+          }
+        }
+      }
+    },
+    "How will you use it?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cómo vas a usarla?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Como você vai usar a foto?"
           }
         }
       }
@@ -3759,6 +3514,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Instruções"
+          }
+        }
+      }
+    },
+    "JPEG · %lld × %lld pixels" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG · %1$lld × %2$lld píxeles"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG · %1$lld × %2$lld pixels"
           }
         }
       }
@@ -3801,6 +3572,39 @@
         }
       }
     },
+    "Keep your face inside the oval" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca la cara dentro del óvalo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posicione o rosto dentro do oval"
+          }
+        }
+      }
+    },
+    "Keep your full head and shoulders in the photo" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluye toda la cabeza y los hombros en la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclua toda a cabeça e os ombros na foto"
+          }
+        }
+      }
+    },
     "Keep your head level" : {
       "comment" : "A hint to the user to keep their head level.",
       "isCommentAutoGenerated" : true,
@@ -3833,6 +3637,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Horizontal"
+          }
+        }
+      }
+    },
+    "Leave room around your head and shoulders. You can adjust the framing later." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deja espacio alrededor de la cabeza y los hombros. Podrás ajustar el encuadre después."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deixe espaço ao redor da cabeça e dos ombros. Você poderá ajustar o enquadramento depois."
           }
         }
       }
@@ -3973,6 +3793,22 @@
         }
       }
     },
+    "Look straight at the lens and hold still" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira de frente a la lente y mantente quieto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olhe diretamente para a lente e fique imóvel"
+          }
+        }
+      }
+    },
     "Looks good" : {
       "localizations" : {
         "es" : {
@@ -3985,6 +3821,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Está boa"
+          }
+        }
+      }
+    },
+    "Lower the phone" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baja el teléfono"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abaixe o telefone"
+          }
+        }
+      }
+    },
+    "Lower the phone to eye level" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baja el teléfono a la altura de los ojos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abaixe o telefone até a altura dos olhos"
+          }
+        }
+      }
+    },
+    "Make an ID photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz una foto de carnet"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faça uma foto para documento"
           }
         }
       }
@@ -4039,6 +3923,7 @@
     },
     "Move a little closer" : {
       "comment" : "A hint to the user to move closer to the camera.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -4057,6 +3942,7 @@
     },
     "Move a little farther away" : {
       "comment" : "A hint to the user to move their face further away from the camera.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -4069,6 +3955,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afaste-se um pouco"
+          }
+        }
+      }
+    },
+    "Move and zoom" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover y ampliar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover e ampliar"
           }
         }
       }
@@ -4087,6 +3989,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Afaste-se da luz forte atrás de você"
+          }
+        }
+      }
+    },
+    "Move Down" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover hacia abajo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover para baixo"
+          }
+        }
+      }
+    },
+    "Move Left" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a la izquierda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover para a esquerda"
+          }
+        }
+      }
+    },
+    "Move Right" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a la derecha"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover para a direita"
+          }
+        }
+      }
+    },
+    "Move the phone farther away" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aleja el teléfono"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afaste o telefone"
+          }
+        }
+      }
+    },
+    "Move the phone left" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve el teléfono a la izquierda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o telefone para a esquerda"
+          }
+        }
+      }
+    },
+    "Move the phone right" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve el teléfono a la derecha"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o telefone para a direita"
+          }
+        }
+      }
+    },
+    "Move Up" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover hacia arriba"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover para cima"
+          }
+        }
+      }
+    },
+    "Move your face slightly down" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco hacia abajo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para baixo"
+          }
+        }
+      }
+    },
+    "Move your face slightly left" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco a la izquierda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para a esquerda"
+          }
+        }
+      }
+    },
+    "Move your face slightly right" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco a la derecha"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para a direita"
+          }
+        }
+      }
+    },
+    "Move your face slightly up" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mueve la cara un poco hacia arriba"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mova o rosto um pouco para cima"
           }
         }
       }
@@ -4387,6 +4469,23 @@
         }
       }
     },
+    "One face, big enough and centred in the guide." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una cara, lo bastante grande y centrada en la guía."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um rosto, grande o bastante e centralizado na guia."
+          }
+        }
+      }
+    },
     "One face, big enough and centred in the oval." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4400,6 +4499,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Um rosto, grande o bastante e centralizado no oval."
+          }
+        }
+      }
+    },
+    "One JPEG for online forms, ready to share." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un JPEG para formularios en línea, listo para compartir."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um JPEG para formulários on-line, pronto para compartilhar."
+          }
+        }
+      }
+    },
+    "One JPEG to share or upload" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un JPEG para compartir o subir"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um JPEG para compartilhar ou enviar"
           }
         }
       }
@@ -4436,6 +4568,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Só uma pessoa na imagem"
+          }
+        }
+      }
+    },
+    "Open Camera" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir cámara"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir câmera"
           }
         }
       }
@@ -4493,6 +4641,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abrindo a foto…"
+          }
+        }
+      }
+    },
+    "Opens a single digital photo ready to share." : {
+      "comment" : "A hint for the \"Digital Photo\" button.",
+      "isCommentAutoGenerated" : true
+    },
+    "Opens buttons to move or zoom without gestures." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre botones para mover o ampliar sin gestos."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre botões para mover ou ampliar sem gestos."
           }
         }
       }
@@ -4699,6 +4867,34 @@
         }
       }
     },
+    "Page 1 of %lld: %lld photos" : {
+      "comment" : "A label displaying the page number and the number of photos on that page. The first argument is the page number. The second argument is the total number of pages. The third argument is the number of photos on that page.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Page 1 of %1$lld: %2$lld photos"
+          }
+        }
+      }
+    },
+    "Page JPEG" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG de la hoja"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JPEG da folha"
+          }
+        }
+      }
+    },
     "Paper" : {
       "comment" : "A section of the print sheet settings that deals with paper.",
       "isCommentAutoGenerated" : true,
@@ -4895,6 +5091,22 @@
         }
       }
     },
+    "Photo not ready" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La foto no está lista"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A foto não está pronta"
+          }
+        }
+      }
+    },
     "Photo requirements" : {
       "localizations" : {
         "en" : {
@@ -4950,6 +5162,22 @@
         }
       }
     },
+    "Plain, uniform white background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo blanco liso y uniforme"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fundo branco liso e uniforme"
+          }
+        }
+      }
+    },
     "Portrait" : {
       "comment" : "A label for portrait orientation.",
       "isCommentAutoGenerated" : true,
@@ -4964,6 +5192,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vertical"
+          }
+        }
+      }
+    },
+    "Position your face inside the guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca la cara dentro de la guía"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posicione o rosto dentro da guia"
+          }
+        }
+      }
+    },
+    "Prepared photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto preparada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto preparada"
           }
         }
       }
@@ -4990,6 +5250,22 @@
         }
       }
     },
+    "Preparing private photo storage…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando almacenamiento privado de fotos…"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando armazenamento privado de fotos…"
+          }
+        }
+      }
+    },
     "Preparing your files…" : {
       "localizations" : {
         "es" : {
@@ -5002,6 +5278,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Preparando seus arquivos…"
+          }
+        }
+      }
+    },
+    "Preparing your photo…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando la foto…"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando a foto…"
           }
         }
       }
@@ -5036,6 +5328,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imprimir"
+          }
+        }
+      }
+    },
+    "Print at Actual Size (100 %), not Fit to Page. Measure a photo before use." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprime a tamaño real (100 %), sin ajustar a la página. Mide una foto antes de usarla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprima no tamanho real (100 %), sem ajustar à página. Meça uma foto antes de usá-la."
           }
         }
       }
@@ -5078,6 +5386,22 @@
         }
       }
     },
+    "Print Sheet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoja para imprimir"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folha para impressão"
+          }
+        }
+      }
+    },
     "Print the sheet or share the photos." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5113,6 +5437,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Não foi possível preparar o armazenamento privado das fotos. Abra o app de novo para tentar outra vez."
+          }
+        }
+      }
+    },
+    "Raise the phone" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sube el teléfono"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levante o telefone"
+          }
+        }
+      }
+    },
+    "Raise the phone to eye level" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sube el teléfono a la altura de los ojos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levante o telefone até a altura dos olhos"
+          }
+        }
+      }
+    },
+    "Ready to take photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo para hacer la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronto para tirar a foto"
           }
         }
       }
@@ -5166,6 +5538,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remover"
+          }
+        }
+      }
+    },
+    "Remove headphones; check headwear and glasses" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quítate los auriculares; revisa las prendas de cabeza y las gafas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retire os fones de ouvido; confira coberturas de cabeça e óculos"
+          }
+        }
+      }
+    },
+    "Remove headphones; check headwear and glasses exceptions below" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quítate los auriculares; consulta abajo las excepciones sobre prendas de cabeza y gafas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retire os fones de ouvido; confira abaixo as exceções para coberturas de cabeça e óculos"
+          }
+        }
+      }
+    },
+    "Remove headphones. Check headwear, glasses, eyes and expression before use. The receiving office decides acceptance." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quítate los auriculares. Revisa las prendas de cabeza, las gafas, los ojos y la expresión antes de usarla. La oficina receptora decide si la acepta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão antes de usar a foto. O órgão destinatário decide se a aceita."
+          }
+        }
+      }
+    },
+    "Remove headphones. Check headwear, glasses, eyes and expression." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quítate los auriculares. Revisa las prendas de cabeza, las gafas, los ojos y la expresión."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão."
           }
         }
       }
@@ -5240,6 +5676,22 @@
         }
       }
     },
+    "Requirements" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requisitos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requisitos"
+          }
+        }
+      }
+    },
     "Reset" : {
       "localizations" : {
         "en" : {
@@ -5258,6 +5710,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Redefinir"
+          }
+        }
+      }
+    },
+    "Reset Position" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer posición"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redefinir posição"
           }
         }
       }
@@ -5290,6 +5758,55 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tirar outra"
+          }
+        }
+      }
+    },
+    "Review expression, eyes and glasses by eye before using the photo. The receiving office decides acceptance." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes de usar la foto, comprueba visualmente la expresión, los ojos y las gafas. La oficina receptora decide si la acepta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antes de usar a foto, confira visualmente a expressão, os olhos e os óculos. O órgão responsável decide se a aceita."
+          }
+        }
+      }
+    },
+    "Review the details below before using this photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa los detalles siguientes antes de usar esta foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revise os detalhes abaixo antes de usar esta foto."
+          }
+        }
+      }
+    },
+    "Review your photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa tu foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revise sua foto"
           }
         }
       }
@@ -5340,6 +5857,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Separando o fundo…"
+          }
+        }
+      }
+    },
+    "Set paper and copies for one or more people." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configura el papel y las copias para una o varias personas."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defina o papel e as cópias para uma ou mais pessoas."
+          }
+        }
+      }
+    },
+    "Set paper size and copies" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el papel y el número de copias"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha o papel e o número de cópias"
           }
         }
       }
@@ -5414,6 +5964,23 @@
         }
       }
     },
+    "Share page JPEG" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir JPEG de la hoja"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartilhar JPEG da folha"
+          }
+        }
+      }
+    },
     "Share PDF" : {
       "localizations" : {
         "en" : {
@@ -5432,6 +5999,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compartilhar PDF"
+          }
+        }
+      }
+    },
+    "Share print sheet as JPEG" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir hoja de impresión como JPEG"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartilhar folha de impressão como JPEG"
           }
         }
       }
@@ -5592,6 +6175,22 @@
         }
       }
     },
+    "Spain · DNI photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "España · foto para DNI"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espanha · foto para DNI"
+          }
+        }
+      }
+    },
     "Spanish Ministry of the Interior" : {
       "comment" : "A link to the Spanish Ministry of the Interior.",
       "isCommentAutoGenerated" : true,
@@ -5645,6 +6244,7 @@
     },
     "Straighten the phone; it is leaning" : {
       "comment" : "A hint to keep the camera at a straight angle.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -5675,6 +6275,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trocar de câmera"
+          }
+        }
+      }
+    },
+    "Take a photo or choose one for Spain's DNI. Save a JPEG or print a sheet." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz una foto o elige una para el DNI español. Guarda un JPEG o imprime una hoja."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tire ou escolha uma foto para o DNI espanhol. Salve um JPEG ou imprima uma folha."
+          }
+        }
+      }
+    },
+    "Take it or choose one. The app frames it for Spain's DNI. Save a digital photo or prepare a print sheet. Everything stays on your iPhone." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz una foto o elige una. La app la encuadra para el DNI español. Guarda una foto digital o prepara una hoja para imprimir. Todo permanece en tu iPhone."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tire uma foto ou escolha uma. O app a enquadra para o DNI espanhol. Salve uma foto digital ou prepare uma folha para impressão. Tudo fica no seu iPhone."
           }
         }
       }
@@ -5710,6 +6343,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tirar foto"
+          }
+        }
+      }
+    },
+    "Take Photo Instead" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer una foto en su lugar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tirar foto em vez disso"
+          }
+        }
+      }
+    },
+    "Taking your photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al hacer la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao tirar a foto"
           }
         }
       }
@@ -5963,6 +6628,22 @@
         }
       }
     },
+    "The guide helps you frame the source photo. Review the result after capture." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La guía te ayuda a encuadrar la foto original. Revisa el resultado después de hacerla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A guia ajuda a enquadrar a foto original. Revise o resultado após a captura."
+          }
+        }
+      }
+    },
     "The head cannot be framed to the official size. Retake a little farther away." : {
       "localizations" : {
         "es" : {
@@ -6063,6 +6744,22 @@
         }
       }
     },
+    "The photo could not be prepared. Try again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo preparar la foto. Inténtalo de nuevo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível preparar a foto. Tente novamente."
+          }
+        }
+      }
+    },
     "The photo could not be taken. Try again." : {
       "comment" : "Error message when taking a photo fails.",
       "isCommentAutoGenerated" : true,
@@ -6126,6 +6823,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O anel ao redor do obturador verifica quatro coisas, uma após a outra. A mensagem no alto diz o que fazer."
+          }
+        }
+      }
+    },
+    "The ring around the shutter checks framing, head position, light and distance. The message above the shutter tells you what to do." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El anillo del disparador comprueba el encuadre, la posición de la cabeza, la luz y la distancia. El mensaje sobre el disparador te dice qué hacer."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O anel ao redor do botão de captura verifica enquadramento, posição da cabeça, luz e distância. A mensagem acima do botão diz o que fazer."
+          }
+        }
+      }
+    },
+    "The ring checks framing, head position, light and distance." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El anillo comprueba el encuadre, la posición de la cabeza, la luz y la distancia."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O anel verifica o enquadramento, a posição da cabeça, a luz e a distância."
+          }
+        }
+      }
+    },
+    "The ring shows framing, pose, light and distance." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El anillo muestra el encuadre, la posición de la cabeza, la luz y la distancia."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O anel mostra o enquadramento, a posição da cabeça, a luz e a distância."
           }
         }
       }
@@ -6316,6 +7064,38 @@
         }
       }
     },
+    "Tilt the phone down" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclina el teléfono hacia abajo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incline o telefone para baixo"
+          }
+        }
+      }
+    },
+    "Tilt the phone up" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclina el teléfono hacia arriba"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incline o telefone para cima"
+          }
+        }
+      }
+    },
     "Tip: turn slightly to your left, towards the light" : {
       "localizations" : {
         "es" : {
@@ -6350,6 +7130,7 @@
     },
     "Too close: move back, or ask someone to take it" : {
       "comment" : "A hint to the user to move back from the camera.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "es" : {
@@ -6472,6 +7253,22 @@
         }
       }
     },
+    "Try the camera again or choose an existing photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba la cámara de nuevo o elige una foto existente."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tente usar a câmera novamente ou escolha uma foto existente."
+          }
+        }
+      }
+    },
     "Unable to complete" : {
       "localizations" : {
         "en" : {
@@ -6576,6 +7373,55 @@
         }
       }
     },
+    "Use even light and a plain white background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa luz uniforme y un fondo blanco liso"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use luz uniforme e um fundo branco liso"
+          }
+        }
+      }
+    },
+    "Use even light and a plain, light background" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa luz uniforme y un fondo liso y claro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use luz uniforme e um fundo liso e claro"
+          }
+        }
+      }
+    },
+    "Use even light and remove headphones" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca una luz uniforme y quítate los auriculares"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use luz uniforme e retire os fones de ouvido"
+          }
+        }
+      }
+    },
     "Use the zoom and position controls below to adjust the crop." : {
       "localizations" : {
         "en" : {
@@ -6650,6 +7496,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O que o app faz"
+          }
+        }
+      }
+    },
+    "When camera checks settle, a three-second countdown starts. You can also press the shutter yourself." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando las comprobaciones de la cámara se estabilizan, comienza una cuenta atrás de tres segundos. También puedes pulsar el obturador."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando as verificações da câmera se estabilizam, começa uma contagem regressiva de três segundos. Você também pode tocar no obturador."
           }
         }
       }
@@ -6742,6 +7604,38 @@
         }
       }
     },
+    "Your digital photo is ready." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu foto digital está lista."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua foto digital está pronta."
+          }
+        }
+      }
+    },
+    "Your edits are saved for either option." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus ajustes se conservan en ambas opciones."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seus ajustes são mantidos nas duas opções."
+          }
+        }
+      }
+    },
     "Your files are ready." : {
       "localizations" : {
         "es" : {
@@ -6754,6 +7648,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seus arquivos estão prontos."
+          }
+        }
+      }
+    },
+    "Your framing and adjustments are saved for both choices." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El encuadre y los ajustes se conservan para ambas opciones."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O enquadramento e os ajustes são mantidos para as duas opções."
           }
         }
       }
@@ -6882,937 +7793,1625 @@
         }
       }
     },
-    "Choose Another Photo" : {
+    "Zoom In" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elegir otra foto"
+            "value" : "Ampliar"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escolher outra foto"
+            "value" : "Ampliar"
           }
         }
       }
     },
-    "Preparing private photo storage…" : {
+    "Zoom Out" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preparando almacenamiento privado de fotos…"
+            "value" : "Reducir"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Preparando armazenamento privado de fotos…"
+            "value" : "Reduzir"
           }
         }
       }
     },
-    "Plain, uniform white background" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fondo blanco liso y uniforme"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fundo branco liso e uniforme"
-          }
-        }
-      }
-    },
-    "Frames the photo to 26 × 32 mm, levels the eyes, and prepares a print sheet. It can replace the background with white and even out light and colour when the photo allows. It does not retouch your face or decide acceptance." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encuadra la foto a 26 × 32 mm, nivela los ojos y prepara una hoja para imprimir. Puede dejar el fondo blanco y equilibrar la luz y el color cuando la foto lo permite. No retoca tu rostro ni decide si la foto será aceptada."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enquadra a foto em 26 × 32 mm, nivela os olhos e prepara uma folha para impressão. Pode deixar o fundo branco e equilibrar a luz e a cor quando a foto permite. Não retoca seu rosto nem decide se a foto será aceita."
-          }
-        }
-      }
-    },
-    "Help" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayuda"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajuda"
-          }
-        }
-      }
-    },
-    "The ring shows framing, pose, light and distance." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El anillo muestra el encuadre, la posición de la cabeza, la luz y la distancia."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O anel mostra o enquadramento, a posição da cabeça, a luz e a distância."
-          }
-        }
-      }
-    },
-    "Position your face inside the guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coloca la cara dentro de la guía"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Posicione o rosto dentro da guia"
-          }
-        }
-      }
-    },
-    "Centre your face in the guide" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Centra la cara en la guía"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Centralize o rosto na guia"
-          }
-        }
-      }
-    },
-    "Camera checks clear. Check background and remove headphones." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las comprobaciones de cámara están bien. Revisa el fondo y quítate los auriculares."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As verificações da câmera estão boas. Confira o fundo e tire os fones de ouvido."
-          }
-        }
-      }
-    },
-    "One face, big enough and centred in the guide." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Una cara, lo bastante grande y centrada en la guía."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um rosto, grande o bastante e centralizado na guia."
-          }
-        }
-      }
-    },
-    "The ring around the shutter checks framing, head position, light and distance. The message above the shutter tells you what to do." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El anillo del disparador comprueba el encuadre, la posición de la cabeza, la luz y la distancia. El mensaje sobre el disparador te dice qué hacer."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O anel ao redor do botão de captura verifica enquadramento, posição da cabeça, luz e distância. A mensagem acima do botão diz o que fazer."
-          }
-        }
-      }
-    },
-    "Camera checks clear" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comprobaciones de cámara correctas"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verificações da câmera concluídas"
-          }
-        }
-      }
-    },
-    "Automatic capture when camera checks clear" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Captura automática cuando las comprobaciones de cámara estén bien"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Captura automática quando as verificações da câmera estiverem boas"
-          }
-        }
-      }
-    },
-    "Camera checks look good" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las comprobaciones de la cámara son favorables"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As verificações da câmera estão boas"
-          }
-        }
-      }
-    },
-    "Check each photo by eye before use." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa cada foto visualmente antes de usarla."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confira cada foto visualmente antes de usá-la."
-          }
-        }
-      }
-    },
-    "Check the photo by eye before use. The receiving office decides acceptance." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa la foto visualmente antes de usarla. La oficina receptora decide si la acepta."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confira a foto visualmente antes de usá-la. O órgão destinatário decide se a aceita."
-          }
-        }
-      }
-    },
-    "Face forward with your eyes open" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mira de frente con los ojos abiertos"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Olhe para a frente com os olhos abertos"
-          }
-        }
-      }
-    },
-    "Fix these issues or continue after checking by eye." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corrige estos problemas o continúa después de revisar la foto visualmente."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corrija estes problemas ou continue após conferir a foto visualmente."
-          }
-        }
-      }
-    },
-    "How will you use it?" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Cómo vas a usarla?"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Como você vai usar a foto?"
-          }
-        }
-      }
-    },
-    "Leave room around your head and shoulders. You can adjust the framing later." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deja espacio alrededor de la cabeza y los hombros. Podrás ajustar el encuadre después."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deixe espaço ao redor da cabeça e dos ombros. Você poderá ajustar o enquadramento depois."
-          }
-        }
-      }
-    },
-    "Make an ID photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz una foto de carnet"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Faça uma foto para documento"
-          }
-        }
-      }
-    },
-    "One JPEG to share or upload" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un JPEG para compartir o subir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um JPEG para compartilhar ou enviar"
-          }
-        }
-      }
-    },
-    "Remove headphones. Check headwear, glasses, eyes and expression." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quítate los auriculares. Revisa las prendas de cabeza, las gafas, los ojos y la expresión."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão."
-          }
-        }
-      }
-    },
-    "Remove headphones; check headwear and glasses" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quítate los auriculares; revisa las prendas de cabeza y las gafas"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retire os fones de ouvido; confira coberturas de cabeça e óculos"
-          }
-        }
-      }
-    },
-    "Review the details below before using this photo." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa los detalles siguientes antes de usar esta foto."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revise os detalhes abaixo antes de usar esta foto."
-          }
-        }
-      }
-    },
-    "Review your photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa tu foto"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revise sua foto"
-          }
-        }
-      }
-    },
-    "Set paper size and copies" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige el papel y el número de copias"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha o papel e o número de cópias"
-          }
-        }
-      }
-    },
-    "Share page JPEG" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir JPEG de la hoja"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartilhar JPEG da folha"
-          }
-        }
-      }
-    },
-    "Take a photo or choose one for Spain's DNI. Save a JPEG or print a sheet." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz una foto o elige una para el DNI español. Guarda un JPEG o imprime una hoja."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tire ou escolha uma foto para o DNI espanhol. Salve um JPEG ou imprima uma folha."
-          }
-        }
-      }
-    },
-    "Use even light and a plain white background" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usa luz uniforme y un fondo blanco liso"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use luz uniforme e um fundo branco liso"
-          }
-        }
-      }
-    },
-    "Your edits are saved for either option." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tus ajustes se conservan en ambas opciones."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seus ajustes são mantidos nas duas opções."
-          }
-        }
-      }
-    },
-    "Page JPEG" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG de la hoja"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG da folha"
-          }
-        }
-      }
-    },
-    "Share print sheet as JPEG" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir hoja de impresión como JPEG"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartilhar folha de impressão como JPEG"
-          }
-        }
-      }
-    },
-    "Remove headphones. Check headwear, glasses, eyes and expression before use. The receiving office decides acceptance." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quítate los auriculares. Revisa las prendas de cabeza, las gafas, los ojos y la expresión antes de usarla. La oficina receptora decide si la acepta."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão antes de usar a foto. O órgão destinatário decide se a aceita."
-          }
-        }
-      }
-    },
-    "Camera Help" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayuda de la cámara"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajuda da câmera"
-          }
-        }
-      }
-    },
-    "Keep your face inside the oval" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coloca la cara dentro del óvalo"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Posicione o rosto dentro do oval"
-          }
-        }
-      }
-    },
-    "Look straight at the lens and hold still" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mira de frente a la lente y mantente quieto"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Olhe diretamente para a lente e fique imóvel"
-          }
-        }
-      }
-    },
-    "Opens a single digital photo ready to share." : {
-      "comment" : "A hint for the \"Digital Photo\" button.",
-      "isCommentAutoGenerated" : true
-    },
-    "Page 1 of %lld: %lld photos" : {
-      "comment" : "A label displaying the page number and the number of photos on that page. The first argument is the page number. The second argument is the total number of pages. The third argument is the number of photos on that page.",
-      "isCommentAutoGenerated" : true,
+    "profile.us.passport.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Page 1 of %1$lld: %2$lld photos"
+            "state" : "translated",
+            "value" : "United States · Passport"
           }
-        }
-      }
-    },
-    "Ready to take photo" : {
-      "localizations" : {
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Listo para hacer la foto"
+            "value" : "Estados Unidos · Pasaporte"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pronto para tirar a foto"
+            "value" : "Estados Unidos · Passaporte"
           }
         }
       }
     },
-    "Taking your photo" : {
+    "profile.us.visa.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "United States · Visa"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Al hacer la foto"
+            "value" : "Estados Unidos · Visado"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ao tirar a foto"
+            "value" : "Estados Unidos · Visto"
           }
         }
       }
     },
-    "The guide helps you frame the source photo. Review the result after capture." : {
+    "profile.gb.passport.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "United Kingdom · Passport"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La guía te ayuda a encuadrar la foto original. Revisa el resultado después de hacerla."
+            "value" : "Reino Unido · Pasaporte"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A guia ajuda a enquadrar a foto original. Revise o resultado após a captura."
+            "value" : "Reino Unido · Passaporte"
           }
         }
       }
     },
-    "Use even light and remove headphones" : {
+    "profile.gb.driving-licence.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "United Kingdom · Driving licence"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Busca una luz uniforme y quítate los auriculares"
+            "value" : "Reino Unido · Permiso de conducir"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use luz uniforme e retire os fones de ouvido"
+            "value" : "Reino Unido · Carteira de motorista"
           }
         }
       }
     },
-    "When camera checks settle, a three-second countdown starts. You can also press the shutter yourself." : {
+    "profile.jp.passport.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japan · Passport"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando las comprobaciones de la cámara se estabilizan, comienza una cuenta atrás de tres segundos. También puedes pulsar el obturador."
+            "value" : "Japón · Pasaporte"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quando as verificações da câmera se estabilizam, começa uma contagem regressiva de três segundos. Você também pode tocar no obturador."
+            "value" : "Japão · Passaporte"
           }
         }
       }
     },
-    "Move your face slightly down" : {
+    "profile.jp.national-id.mynumber.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japan · My Number card"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mueve la cara un poco hacia abajo"
+            "value" : "Japón · Tarjeta My Number"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mova o rosto um pouco para baixo"
+            "value" : "Japão · Cartão My Number"
           }
         }
       }
     },
-    "Move your face slightly left" : {
+    "profile.jp.driving-licence.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Japan · Driving licence"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mueve la cara un poco a la izquierda"
+            "value" : "Japón · Permiso de conducir"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mova o rosto um pouco para a esquerda"
+            "value" : "Japão · Carteira de motorista"
           }
         }
       }
     },
-    "Move your face slightly right" : {
+    "profile.it.passport.standard.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italy · Passport"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mueve la cara un poco a la derecha"
+            "value" : "Italia · Pasaporte"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mova o rosto um pouco para a direita"
+            "value" : "Itália · Passaporte"
           }
         }
       }
     },
-    "Move your face slightly up" : {
+    "profile.it.national-id.cie.name" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italy · Electronic ID card (CIE)"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mueve la cara un poco hacia arriba"
+            "value" : "Italia · Documento de identidad electrónico (CIE)"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mova o rosto um pouco para cima"
+            "value" : "Itália · Carteira de identidade eletrônica (CIE)"
           }
         }
       }
     },
-    "Bring the phone closer" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acerca el teléfono"
+    "profile.es.national-id.dni.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spain · DNI"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aproxime o telefone"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "España · DNI"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espanha · DNI"
           }
         }
       }
     },
-    "Move the phone farther away" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aleja el teléfono"
+    "profile.es.residence-permit.tie.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spain · Foreigner identity card (TIE)"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afaste o telefone"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "España · Tarjeta de identidad de extranjero (TIE)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espanha · Cartão de identidade de estrangeiro (TIE)"
           }
         }
       }
     },
-    "Move the phone left" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mueve el teléfono a la izquierda"
+    "profile.es.driving-licence.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spain · Driving licence"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mova o telefone para a esquerda"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "España · Permiso de conducción"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espanha · Carteira de motorista"
           }
         }
       }
     },
-    "Move the phone right" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mueve el teléfono a la derecha"
+    "profile.nl.passport.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Netherlands · Passport"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mova o telefone para a direita"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Países Bajos · Pasaporte"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Países Baixos · Passaporte"
           }
         }
       }
     },
-    "Raise the phone" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sube el teléfono"
+    "profile.nl.national-id.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Netherlands · ID card"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Levante o telefone"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Países Bajos · Documento de identidad"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Países Baixos · Carteira de identidade"
           }
         }
       }
     },
-    "Lower the phone" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Baja el teléfono"
+    "profile.nl.driving-licence.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Netherlands · Driving licence"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abaixe o telefone"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Países Bajos · Permiso de conducir"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Países Baixos · Carteira de motorista"
           }
         }
       }
     },
-    "Tilt the phone up" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inclina el teléfono hacia arriba"
+    "profile.kr.passport.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "South Korea · Passport"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Incline o telefone para cima"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corea del Sur · Pasaporte"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coreia do Sul · Passaporte"
           }
         }
       }
     },
-    "Tilt the phone down" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inclina el teléfono hacia abajo"
+    "profile.schengen.visa.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schengen visa"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Incline o telefone para baixo"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visado Schengen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visto Schengen"
           }
         }
       }
     },
-    "Hold the phone upright" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mantén el teléfono vertical"
+    "profile.au.passport.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Australia · Passport"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mantenha o telefone na vertical"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Australia · Pasaporte"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Austrália · Passaporte"
           }
         }
       }
     },
-    "Raise the phone to eye level" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sube el teléfono a la altura de los ojos"
+    "profile.de.driving-licence.standard.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Germany · Driving licence"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Levante o telefone até a altura dos olhos"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alemania · Permiso de conducir"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alemanha · Carteira de motorista"
           }
         }
       }
     },
-    "Lower the phone to eye level" : {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Baja el teléfono a la altura de los ojos"
+    "profile.ch.national-id.no-chip.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switzerland · ID card (from your commune)"
           }
         },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abaixe o telefone até a altura dos olhos"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suiza · Documento de identidad (en tu municipio)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suíça · Carteira de identidade (no seu município)"
+          }
+        }
+      }
+    },
+    "profile.sa.residence-permit.photo-update.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saudi Arabia · Resident photo (Absher)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arabia Saudí · Foto de residente (Absher)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arábia Saudita · Foto de residente (Absher)"
+          }
+        }
+      }
+    },
+    "profile.ca.visa.visitor.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canada · Visitor visa"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canadá · Visado de visitante"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canadá · Visto de visitante"
+          }
+        }
+      }
+    },
+    "check.eyes-open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eyes open"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ojos abiertos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olhos abertos"
+          }
+        }
+      }
+    },
+    "check.neutral-expression" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutral expression"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expresión neutra"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expressão neutra"
+          }
+        }
+      }
+    },
+    "check.mouth-closed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mouth closed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boca cerrada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Boca fechada"
+          }
+        }
+      }
+    },
+    "check.no-glasses" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No glasses"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin gafas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem óculos"
+          }
+        }
+      }
+    },
+    "check.no-dark-glasses" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No dark glasses"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin gafas oscuras"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem óculos escuros"
+          }
+        }
+      }
+    },
+    "check.no-other-people" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No one else in the photo, not even a supporting hand"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadie más en la foto, ni siquiera una mano que sujete"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguém mais na foto, nem mesmo uma mão de apoio"
+          }
+        }
+      }
+    },
+    "check.no-hands-or-toys" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hands, toys, or dummies in the photo"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin manos, juguetes ni chupetes en la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem mãos, brinquedos ou chupetas na foto"
+          }
+        }
+      }
+    },
+    "check.even-lighting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Even light on the face"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luz uniforme en la cara"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Luz uniforme no rosto"
+          }
+        }
+      }
+    },
+    "check.face-visible" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whole face visible"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cara completamente visible"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosto totalmente visível"
+          }
+        }
+      }
+    },
+    "check.no-head-covering" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No head covering, except for religious or medical reasons"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin prendas en la cabeza, salvo por motivos religiosos o médicos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem cobertura na cabeça, exceto por motivos religiosos ou médicos"
+          }
+        }
+      }
+    },
+    "check.chest-up-framing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chest-up framing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuadre desde el pecho"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadramento a partir do peito"
+          }
+        }
+      }
+    },
+    "check.photo-paper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print on photo paper"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprime en papel fotográfico"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprima em papel fotográfico"
+          }
+        }
+      }
+    },
+    "check.head-straight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Head straight, eyes level"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cabeza recta, ojos a la misma altura"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cabeça reta, olhos nivelados"
+          }
+        }
+      }
+    },
+    "check.no-uniform" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No uniform"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin uniforme"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem uniforme"
+          }
+        }
+      }
+    },
+    "check.no-white-clothing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No white clothing"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin ropa blanca"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem roupa branca"
+          }
+        }
+      }
+    },
+    "check.dye-sub-print" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print at a shop on a dye-sublimation printer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprime en una tienda con impresora de sublimación"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprima em uma loja com impressora de sublimação"
+          }
+        }
+      }
+    },
+    "check.no-data-matrix-photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use a normal printed photo, not one with a Data-Matrix code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa una foto impresa normal, no una con código Data-Matrix"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use uma foto impressa normal, não uma com código Data-Matrix"
+          }
+        }
+      }
+    },
+    "output.note.uk-home-print" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home prints are usually not accepted. Print at a shop."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las impresiones caseras no suelen aceptarse. Imprime en una tienda."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impressões caseiras geralmente não são aceitas. Imprima em uma loja."
+          }
+        }
+      }
+    },
+    "output.note.dye-sub" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inkjet prints are not accepted. Print at a shop with a dye-sublimation printer."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se aceptan impresiones de inyección de tinta. Imprime en una tienda con impresora de sublimación."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impressões jato de tinta não são aceitas. Imprima em uma loja com impressora de sublimação."
+          }
+        }
+      }
+    },
+    "output.note.photo-paper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Print on photo paper."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprime en papel fotográfico."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprima em papel fotográfico."
+          }
+        }
+      }
+    },
+    "output.note.ask-commune" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask your commune whether you may bring your own photo."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pregunta en tu municipio si puedes llevar tu propia foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pergunte no seu município se pode levar sua própria foto."
+          }
+        }
+      }
+    },
+    "custom.25x30.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25 × 30 mm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25 × 30 mm"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "25 × 30 mm"
+          }
+        }
+      }
+    },
+    "custom.25x30.name.es-MX" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño infantil (2.5 × 3 cm)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño infantil (2.5 × 3 cm)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño infantil (2.5 × 3 cm)"
+          }
+        }
+      }
+    },
+    "custom.30x40.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 × 40 mm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 × 40 mm"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 × 40 mm"
+          }
+        }
+      }
+    },
+    "custom.30x40.name.pt-BR" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 × 4 cm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 × 4 cm"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 × 4 cm"
+          }
+        }
+      }
+    },
+    "custom.35x45.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "35 × 45 mm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "35 × 45 mm"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "35 × 45 mm"
+          }
+        }
+      }
+    },
+    "custom.2x2in.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 × 2 in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 × 2 in"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 × 2 pol."
+          }
+        }
+      }
+    },
+    "Take a photo or choose one for your document. Save a JPEG or print a sheet." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz una foto o elige una para tu documento. Guarda un JPEG o imprime una hoja."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tire uma foto ou escolha uma para o seu documento. Salve um JPEG ou imprima uma folha."
+          }
+        }
+      }
+    },
+    "Change" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alterar"
+          }
+        }
+      }
+    },
+    "Chooses the country and document, or a custom size." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el país y el documento, o un tamaño personalizado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolhe o país e o documento, ou um tamanho personalizado."
+          }
+        }
+      }
+    },
+    "Plain, uniform light background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo liso, uniforme y claro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fundo liso, uniforme e claro"
+          }
+        }
+      }
+    },
+    "Plain, uniform background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondo liso y uniforme"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fundo liso e uniforme"
+          }
+        }
+      }
+    },
+    "Official sources" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuentes oficiales"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fontes oficiais"
+          }
+        }
+      }
+    },
+    "Custom size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño personalizado"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamanho personalizado"
+          }
+        }
+      }
+    },
+    "Sources reviewed %@. Requirements can change, and the receiving office decides acceptance." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuentes revisadas el %@. Los requisitos pueden cambiar y la oficina que recibe la foto decide si la acepta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fontes revisadas em %@. Os requisitos podem mudar, e o órgão que recebe a foto decide se a aceita."
+          }
+        }
+      }
+    },
+    "Frames the photo to %@, levels the eyes, and prepares the files. It can replace the background and even out light and colour. It does not retouch your face or decide acceptance." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuadra la foto a %@, nivela los ojos y prepara los archivos. Puede sustituir el fondo y equilibrar la luz y el color. No retoca tu cara ni decide si la foto se acepta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadra a foto em %@, nivela os olhos e prepara os arquivos. Pode trocar o fundo e equilibrar luz e cor. Não retoca seu rosto nem decide se a foto é aceita."
+          }
+        }
+      }
+    },
+    "No official rules apply. Use the size your school or organisation asked for." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se aplican normas oficiales. Usa el tamaño que pidió tu colegio u organización."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma regra oficial se aplica. Use o tamanho que sua escola ou organização pediu."
+          }
+        }
+      }
+    },
+    "Use even light and a plain background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa luz uniforme y un fondo liso"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use luz uniforme e um fundo liso"
+          }
+        }
+      }
+    },
+    "%lld × %lld px" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld × %2$lld px"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld × %2$lld px"
+          }
+        }
+      }
+    },
+    "%@ × %@ in" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ × %2$@ pulg."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ × %2$@ pol."
+          }
+        }
+      }
+    },
+    "%@ · no official rules" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · sin normas oficiales"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · sem regras oficiais"
+          }
+        }
+      }
+    },
+    "white background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fondo blanco"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fundo branco"
+          }
+        }
+      }
+    },
+    "white or off-white background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fondo blanco o blanquecino"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fundo branco ou quase branco"
+          }
+        }
+      }
+    },
+    "light background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fondo claro"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fundo claro"
+          }
+        }
+      }
+    },
+    "plain background" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fondo liso"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fundo liso"
+          }
+        }
+      }
+    },
+    "Schengen area" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espacio Schengen"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espaço Schengen"
+          }
+        }
+      }
+    },
+    "Any size, for school, work, or a club. No official rules." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cualquier tamaño, para el colegio, el trabajo o un club. Sin normas oficiales."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualquer tamanho, para escola, trabalho ou um clube. Sem regras oficiais."
+          }
+        }
+      }
+    },
+    "Country or document" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "País o documento"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "País ou documento"
+          }
+        }
+      }
+    },
+    "Choose document" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir documento"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher documento"
+          }
+        }
+      }
+    },
+    "Unit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidad"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidade"
+          }
+        }
+      }
+    },
+    "mm" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mm"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mm"
+          }
+        }
+      }
+    },
+    "in" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pulg."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pol."
+          }
+        }
+      }
+    },
+    "Use the size your school or organisation asked for. Each side between 10 and 100 mm." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa el tamaño que pidió tu colegio u organización. Cada lado entre 10 y 100 mm."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use o tamanho que sua escola ou organização pediu. Cada lado entre 10 e 100 mm."
+          }
+        }
+      }
+    },
+    "Common sizes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaños habituales"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamanhos comuns"
+          }
+        }
+      }
+    },
+    "Calipic frames the photo and checks sharpness, eyes, and light. It doesn't check any official rules for a custom size." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic encuadra la foto y comprueba la nitidez, los ojos y la luz. No comprueba normas oficiales para un tamaño personalizado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic enquadra a foto e verifica nitidez, olhos e luz. Não verifica regras oficiais para um tamanho personalizado."
+          }
+        }
+      }
+    },
+    "Use This Size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar este tamaño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar este tamanho"
           }
         }
       }

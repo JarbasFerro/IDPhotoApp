@@ -3,6 +3,7 @@ import SwiftUI
 /// A short, sourced reminder before either acquisition path. No permission is requested here.
 struct PreparationView: View {
     let source: AcquisitionSource
+    let document: DocumentChoice
     let onContinue: (AcquisitionSource) -> Void
     @Environment(\.dismiss) private var dismiss
 
@@ -12,15 +13,15 @@ struct PreparationView: View {
                 Section {
                     Label("Face forward with your eyes open", systemImage: "person.crop.rectangle")
                     Label("Remove headphones; check headwear and glasses", systemImage: "headphones")
-                    Label("Use even light and a plain white background", systemImage: "sun.max")
+                    Label(RequirementsContent.lightLine(document), systemImage: "sun.max")
                 } header: {
-                    Text("Spain · DNI photo")
+                    Text(DocumentPresentation.name(document))
                 } footer: {
                     Text("Leave room around your head and shoulders. You can adjust the framing later.")
                 }
                 Section {
                     NavigationLink("Full requirements") {
-                        RequirementsContent()
+                        RequirementsContent(document: document)
                             .navigationTitle("Photo requirements")
                             .navigationBarTitleDisplayMode(.inline)
                     }

@@ -61,7 +61,7 @@ struct CropAdjustment: Sendable, Hashable {
     var vertical: Double = 0.5
     /// Counter-clockwise rotation of the source around the crop centre, used to level the eyes.
     var rotationDegrees: Double = 0
-    /// Original background, or a replacement colour from the document profile (Spain: white).
+    /// Original background, or the replacement colour from the document profile.
     var background: BackgroundChoice = .original
     /// Feather width for the replaced background edge, 0...1.
     var edgeSoftness: Double = 0.5
@@ -86,11 +86,12 @@ struct CropAdjustment: Sendable, Hashable {
                               y: (1 - height) * edit.vertical, width: width, height: height)
     }
 
-    func translated(x: Double, y: Double, previewWidth: Double, source: SourcePixels) -> Self {
+    func translated(x: Double, y: Double, previewWidth: Double, source: SourcePixels,
+                    format: PhotoFormat = .spainPrototype) -> Self {
         guard previewWidth > 0 else { return self }
-        let rect = crop(in: source)
+        let rect = crop(in: source, format: format)
         let imageWidth = previewWidth / rect.width
-        let previewHeight = previewWidth / PhotoFormat.spainPrototype.aspectRatio
+        let previewHeight = previewWidth / format.aspectRatio
         let imageHeight = previewHeight / rect.height
         var result = self
         if imageWidth - previewWidth > 0.01 {

@@ -51,9 +51,20 @@ The validator implements doc 05 §12. Among other things it checks:
 
 CI runs both on every change (`.github/workflows/rules.yml`).
 
+## In the app
+
+The spike app bundles one generated file, `Spikes/IDPhotoSpike/App/Resources/CalipicCatalog.json`. After changing `Rules/`, rebuild it:
+
+```sh
+python3 scripts/rules/build_app_catalog.py
+```
+
+CI fails if the bundled copy is stale. The app decodes it in `DocumentProfile.swift`. `DocumentChoice.swift` turns a profile or custom size into a `RenderTarget`: trim format, composition bands and framing target, digital preset, and background colour. Names and check labels are String Catalog keys, translated into Spanish and Portuguese (Brazil).
+
 ## Changing a profile
 
 1. Update the research document in `docs/profiles/`.
 2. Edit the JSON and bump `profileVersion`: patch for wording, minor for a changed value, major for a changed meaning.
 3. Bump `catalogVersion` in `catalog.json`.
 4. Run the validator and tests.
+5. Rebuild the app catalog (`build_app_catalog.py`), and add String Catalog entries for any new name or check key.

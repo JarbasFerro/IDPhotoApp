@@ -40,12 +40,12 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertTrue(version.exists)
         // The accessibility label reads "Version 0.9.0 (52)".
         XCTAssertTrue(version.label.range(of: #"\d+\.\d+\.\d+ \(\d+\)$"#, options: .regularExpression) != nil, version.label)
-        app.buttons["documentCard"].tap()
-        XCTAssertTrue(app.staticTexts["Before you take the photo"].waitForExistence(timeout: 5))
+        app.buttons["requirementsLink"].tap()
+        XCTAssertTrue(app.staticTexts["Official sources"].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
         XCTAssertTrue(app.buttons["choosePhoto"].exists)
         app.buttons["choosePhoto"].tap()
-        XCTAssertTrue(app.staticTexts["Spain · DNI photo"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Spain · DNI"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["preparationContinue"].exists)
         let preparationScreenshot = XCTAttachment(screenshot: app.screenshot())
         preparationScreenshot.name = "Preparation"
@@ -53,6 +53,44 @@ final class IDPhotoSpikeUITests: XCTestCase {
         add(preparationScreenshot)
         app.buttons["Cancel"].tap()
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 5))
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+    }
+
+    /// Choose an official profile from the catalog, then a custom size from a shortcut (ADR-047, ADR-018).
+    @MainActor
+    func testDocumentPickerAndCustomSize() throws {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["documentCard"].waitForExistence(timeout: 10))
+        app.buttons["documentCard"].tap()
+        // Lists only create rows on screen; search the way a person would.
+        let search = app.searchFields.firstMatch
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("United States")
+        let usPassport = app.buttons["profile-us.passport.standard"]
+        XCTAssertTrue(usPassport.waitForExistence(timeout: 5))
+        let pickerScreenshot = XCTAttachment(screenshot: app.screenshot())
+        pickerScreenshot.name = "Document picker"
+        pickerScreenshot.lifetime = .keepAlways
+        add(pickerScreenshot)
+        usPassport.tap()
+        let card = app.buttons["documentCard"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        XCTAssertTrue(card.label.contains("United States · Passport"), card.label)
+
+        app.buttons["documentCard"].tap()
+        XCTAssertTrue(app.buttons["customSizeRow"].waitForExistence(timeout: 5))
+        app.buttons["customSizeRow"].tap()
+        XCTAssertTrue(app.buttons["shortcut-35x45"].waitForExistence(timeout: 5))
+        app.buttons["shortcut-35x45"].tap()
+        let customScreenshot = XCTAttachment(screenshot: app.screenshot())
+        customScreenshot.name = "Custom size"
+        customScreenshot.lifetime = .keepAlways
+        add(customScreenshot)
+        app.buttons["useCustomSize"].tap()
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        XCTAssertTrue(card.label.contains("Custom size"), card.label)
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 

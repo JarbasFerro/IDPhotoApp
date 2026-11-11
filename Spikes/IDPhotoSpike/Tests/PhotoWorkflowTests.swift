@@ -153,11 +153,11 @@ private actor DelayedPipeline: PhotoProcessing {
         ToneMetrics(faceMeanLuminance: 0.5, faceClippedDark: 0, faceClippedBright: 0, backgroundCast: 0)
     }
     func thumbnail(photo: PreparedPhoto, adjustment: CropAdjustment, format: PhotoFormat) async -> CGImage? { nil }
-    func export(edits: [PhotoEdit], job: PrintJob) async throws -> PhotoExport {
+    func export(edits: [PhotoEdit], job: PrintJob, target: RenderTarget) async throws -> PhotoExport {
         exportedEdits.append(edits.map(\.photo.id))
         return try await withCheckedThrowingContinuation { pendingExport = $0 }
     }
-    func exportDigital(edit: PhotoEdit) async throws -> DigitalExport {
+    func exportDigital(edit: PhotoEdit, target: RenderTarget) async throws -> DigitalExport {
         digitalExportedIDs.append(edit.photo.id)
         return try await withCheckedThrowingContinuation { pendingDigitalExport = $0 }
     }

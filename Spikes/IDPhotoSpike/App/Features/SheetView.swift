@@ -46,7 +46,7 @@ struct SheetView: View {
                     .accessibilityIdentifier("addSize-\(index + 1)")
                 } header: {
                     HStack(spacing: Design.Spacing.row) {
-                        PortraitView(entry: entry).frame(width: 28)
+                        PortraitView(entry: entry, format: model.renderTarget.format).frame(width: 28)
                         Text(model.entries.count > 1 ? LocalizedStringKey("Photo \(index + 1)") : LocalizedStringKey("Your photo"))
                         Spacer()
                         Button { path.append(.check(entry.id)) } label: {
@@ -135,7 +135,7 @@ struct SheetView: View {
         }
         .confirmationDialog("Add a size", isPresented: Binding(get: { addingSizeFor != nil }, set: { if !$0 { addingSizeFor = nil } }),
                             titleVisibility: .visible, presenting: addingSizeFor) { photoID in
-            ForEach(PhotoFormat.presets) { format in
+            ForEach(sizeChoices) { format in
                 Button(formatName(format)) { model.addPrintItem(format: format, photoID: photoID) }
             }
         } message: { _ in
@@ -187,14 +187,18 @@ struct SheetView: View {
         return String(AttributedString(localized: "\(paper) · ^[\(pages) page](inflect: true) · \(layout.placedCount) of \(model.printJob.requestedCopies) copies placed").characters)
     }
 
+    /// The document's own size first, then the other engineering presets.
+    private var sizeChoices: [PhotoFormat] {
+        let current = model.renderTarget.format
+        return [current] + PhotoFormat.presets.filter { abs($0.widthMM - current.widthMM) > 0.001 || abs($0.heightMM - current.heightMM) > 0.001 }
+    }
+
     private func formatName(_ item: PrintItem) -> String {
         formatName(PhotoFormat.format(widthMM: item.trimWidthMM, heightMM: item.trimHeightMM))
     }
 
     private func formatName(_ format: PhotoFormat) -> String {
-        let width = format.widthMM.formatted(.number.precision(.fractionLength(0...1)))
-        let height = format.heightMM.formatted(.number.precision(.fractionLength(0...1)))
-        return String(localized: "\(width) × \(height) mm")
+        DocumentPresentation.size(widthMM: format.widthMM, heightMM: format.heightMM)
     }
 }
 

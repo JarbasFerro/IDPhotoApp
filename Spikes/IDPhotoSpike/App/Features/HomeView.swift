@@ -6,6 +6,7 @@ struct HomeView: View {
     @Binding var path: [Route]
     let acquire: Acquire
     @State private var showRequirements = false
+    @State private var showDocuments = false
     @State private var showAppIcons = false
     @State private var appIcon = AppIconController()
     @ScaledMetric(relativeTo: .footnote) private var appIconRowSide: CGFloat = Design.Size.settingsIcon
@@ -17,7 +18,7 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: Design.Spacing.text) {
                     Text("Make an ID photo")
                         .font(Design.Typography.screenTitle)
-                    Text("Take a photo or choose one for Spain's DNI. Save a JPEG or print a sheet.")
+                    Text("Take a photo or choose one for your document. Save a JPEG or print a sheet.")
                         .foregroundStyle(.secondary)
                 }
                 .accessibilityElement(children: .combine)
@@ -69,7 +70,8 @@ struct HomeView: View {
             .padding()
         }
         .navigationTitle(Text(verbatim: "Calipic"))
-        .sheet(isPresented: $showRequirements) { RequirementsView() }
+        .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
+        .sheet(isPresented: $showDocuments) { DocumentPickerView(model: model) }
         .sheet(isPresented: $showAppIcons) { AppIconPickerView(controller: appIcon) }
     }
 
@@ -108,28 +110,44 @@ struct HomeView: View {
     }
 
     private var documentCard: some View {
-        Button { showRequirements = true } label: {
-            HStack(spacing: Design.Spacing.cardContent) {
-                Image(systemName: "person.text.rectangle")
-                    .font(Design.Typography.titleGlyph)
-                    .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
-                    .background(.fill.secondary, in: RoundedRectangle(cornerRadius: Design.Radius.tile))
-                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    Text("Spain · DNI photo").font(Design.Typography.cardTitle)
-                    Text("26 × 32 mm · white background").font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: Design.Spacing.control) {
+            Button { showDocuments = true } label: {
+                HStack(spacing: Design.Spacing.cardContent) {
+                    Image(systemName: model.document.isCustom ? "ruler" : "person.text.rectangle")
+                        .font(Design.Typography.titleGlyph)
+                        .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
+                        .background(.fill.secondary, in: RoundedRectangle(cornerRadius: Design.Radius.tile))
+                    VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                        Text(DocumentPresentation.name(model.document)).font(Design.Typography.cardTitle)
+                        Text(DocumentPresentation.detail(model.document)).font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Text("Change").font(Design.Typography.cardDetail).foregroundStyle(Color.brandAccent)
                 }
-                Spacer()
-                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                .padding()
+                .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+                .contentShape(Rectangle())
             }
-            .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint("Chooses the country and document, or a custom size.")
+            .accessibilityIdentifier("documentCard")
+            Button { showRequirements = true } label: {
+                HStack(spacing: Design.Spacing.row) {
+                    Label("Photo requirements", systemImage: "list.bullet.rectangle")
+                    Spacer()
+                    Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                }
+                .font(Design.Typography.note)
+                .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityIdentifier("requirementsLink")
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityHint("Shows the photo requirements.")
-        .accessibilityIdentifier("documentCard")
     }
 
     /// Quiet entry to choose-your-icon (BD-038). It lives here, outside the capture → check → print path.
@@ -177,10 +195,11 @@ struct HomeView: View {
 }
 
 struct RequirementsView: View {
+    let document: DocumentChoice
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         NavigationStack {
-            RequirementsContent()
+            RequirementsContent(document: document)
             .navigationTitle("Photo requirements")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
@@ -188,26 +207,76 @@ struct RequirementsView: View {
     }
 }
 
+/// Requirements for the chosen document, built from its catalog profile and sources; never literal rule text.
 struct RequirementsContent: View {
+    let document: DocumentChoice
+
     var body: some View {
         List {
-                Section("Before you take the photo") {
-                    Label("Recent colour photo, facing forward", systemImage: "person.crop.rectangle")
-                    Label("Plain, uniform white background", systemImage: "rectangle")
-                    Label("Face and eyes clearly visible, neutral expression", systemImage: "eye")
-                    Label("Remove headphones; check headwear and glasses exceptions below", systemImage: "headphones")
-                    Label("Even light from the front, no strong shadows", systemImage: "sun.max")
+            Section {
+                Label("Recent colour photo, facing forward", systemImage: "person.crop.rectangle")
+                Label(Self.backgroundLine(document), systemImage: "rectangle")
+                Label("Face and eyes clearly visible, neutral expression", systemImage: "eye")
+                Label("Even light from the front, no strong shadows", systemImage: "sun.max")
+            } header: {
+                Text(DocumentPresentation.name(document))
+            } footer: {
+                Text(DocumentPresentation.detail(document))
+            }
+            if let profile = document.profile {
+                if !profile.checks.isEmpty {
+                    Section("Check by eye") {
+                        ForEach(profile.checks, id: \.id) { check in
+                            Label(DocumentPresentation.check(check.id), systemImage: "checkmark.circle")
+                        }
+                    }
                 }
-                Section("Official guidance") {
-                    Text("The DNI guidance includes medical and religious exceptions for head coverings and glasses. Review the source for your situation.")
-                    Link("Spanish Ministry of the Interior", destination: URL(string:
-                        "https://www.interior.gob.es/opencms/es/servicios-al-ciudadano/tramites-y-gestiones/dni/documentacion-necesaria-para-su-tramitacion/")!)
-                    Text("Source reviewed September 15, 2026. Other document types may have different requirements.")
+                Section("Official sources") {
+                    ForEach(profile.sources, id: \.sourceId) { source in
+                        if let url = URL(string: source.url) {
+                            Link(destination: url) {
+                                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                                    Text(verbatim: source.authorityName)
+                                    Text(verbatim: source.title).font(.footnote).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    Text("Sources reviewed \(Self.reviewed(profile)). Requirements can change, and the receiving office decides acceptance.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("What the app does") {
-                    Text("Frames the photo to 26 × 32 mm, levels the eyes, and prepares a print sheet. It can replace the background with white and even out light and colour when the photo allows. It does not retouch your face or decide acceptance.")
+                    Text("Frames the photo to \(DocumentPresentation.size(document)), levels the eyes, and prepares the files. It can replace the background and even out light and colour. It does not retouch your face or decide acceptance.")
                 }
+            } else {
+                Section("Custom size") {
+                    Text("No official rules apply. Use the size your school or organisation asked for.")
+                }
+            }
         }
+    }
+
+    static func backgroundLine(_ document: DocumentChoice) -> LocalizedStringKey {
+        switch document.profile?.background.requiredAppearance {
+        case "white", "white_or_off_white": "Plain, uniform white background"
+        case "light", "specified_colors": "Plain, uniform light background"
+        default: "Plain, uniform background"
+        }
+    }
+
+    static func lightLine(_ document: DocumentChoice) -> LocalizedStringKey {
+        switch document.profile?.background.requiredAppearance {
+        case "white", "white_or_off_white": "Use even light and a plain white background"
+        case "light", "specified_colors": "Use even light and a plain, light background"
+        default: "Use even light and a plain background"
+        }
+    }
+
+    static func reviewed(_ profile: DocumentProfile) -> String {
+        let parser = DateFormatter()
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.dateFormat = "yyyy-MM-dd"
+        guard let date = parser.date(from: profile.effective.lastReviewed) else { return profile.effective.lastReviewed }
+        return date.formatted(date: .long, time: .omitted)
     }
 }

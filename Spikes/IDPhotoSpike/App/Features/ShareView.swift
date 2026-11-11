@@ -72,6 +72,11 @@ struct ShareView: View {
                          ? "Print at Actual Size (100 %), not Fit to Page. Then measure the 50 mm bar before cutting."
                          : "Print at Actual Size (100 %), not Fit to Page. Measure a photo before use.")
                         .font(Design.Typography.note).foregroundStyle(.secondary)
+                    if let note = model.document.printNoteKey {
+                        Label(String(localized: String.LocalizationValue(note)), systemImage: "storefront")
+                            .font(Design.Typography.note)
+                            .accessibilityIdentifier("printRouteNote")
+                    }
                 }
             }
             if PrintController.isAvailable {

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CropPreview: View {
     let photo: PreparedPhoto
+    let format: PhotoFormat
     /// Preview with the selected background applied; defaults to the plain preview.
     var image: CGImage?
     @Binding var adjustment: CropAdjustment
@@ -10,7 +11,7 @@ struct CropPreview: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let crop = adjustment.crop(in: photo.pixels)
+            let crop = adjustment.crop(in: photo.pixels, format: format)
             Image(decorative: image ?? photo.preview, scale: 1)
                 .resizable()
                 .frame(width: geometry.size.width / crop.width, height: geometry.size.height / crop.height)
@@ -26,7 +27,7 @@ struct CropPreview: View {
                     if dragStart == nil { dragStart = adjustment }
                     adjustment = (dragStart ?? adjustment).translated(
                         x: value.translation.width, y: value.translation.height,
-                        previewWidth: geometry.size.width, source: photo.pixels)
+                        previewWidth: geometry.size.width, source: photo.pixels, format: format)
                 }.onEnded { _ in dragStart = nil })
                 .simultaneousGesture(MagnifyGesture().onChanged { value in
                     if pinchStart == nil { pinchStart = adjustment }
@@ -35,14 +36,14 @@ struct CropPreview: View {
                     adjustment = next.clamped()
                 }.onEnded { _ in pinchStart = nil })
         }
-        .aspectRatio(PhotoFormat.spainPrototype.aspectRatio, contentMode: .fit)
+        .aspectRatio(format.aspectRatio, contentMode: .fit)
         // Photo pixel axes remain physical left/right even in an RTL interface.
         .environment(\.layoutDirection, .leftToRight)
         .background(.white)
         .overlay { Rectangle().strokeBorder(.primary.opacity(0.25), lineWidth: 1) }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Photo crop preview")
-        .accessibilityValue("26 millimeters wide, 32 millimeters high")
+        .accessibilityValue(Text(DocumentPresentation.size(widthMM: format.widthMM, heightMM: format.heightMM)))
         .accessibilityHint("Use the zoom and position controls below to adjust the crop.")
         .accessibilityIdentifier("cropPreview")
     }

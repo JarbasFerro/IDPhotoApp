@@ -12,7 +12,7 @@ struct OutputChoiceView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 if let entry {
-                    PortraitView(entry: entry, label: "Prepared photo")
+                    PortraitView(entry: entry, format: model.renderTarget.format, label: "Prepared photo")
                         .frame(width: 160)
                         .frame(maxWidth: .infinity)
                     VStack(alignment: .leading, spacing: Design.Spacing.text) {
@@ -30,11 +30,13 @@ struct OutputChoiceView: View {
                     .accessibilityHint("Opens a single digital photo ready to share.")
                     .accessibilityIdentifier("digitalChoice")
 
-                    Button { path.append(.sheet) } label: {
-                        choice(title: "Print Sheet", detail: "Set paper size and copies", symbol: "printer")
+                    if model.document.supportsPrint {
+                        Button { path.append(.sheet) } label: {
+                            choice(title: "Print Sheet", detail: "Set paper size and copies", symbol: "printer")
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("printChoice")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("printChoice")
 
                     Text("Check the photo by eye before use. The receiving office decides acceptance.")
                         .font(Design.Typography.note)
@@ -92,9 +94,9 @@ struct DigitalShareView: View {
                         Text("Your digital photo is ready.")
                             .font(Design.Typography.screenTitle)
                     }
-                    PortraitView(entry: entry, label: "Digital photo ready to share")
+                    PortraitView(entry: entry, format: model.renderTarget.format, label: "Digital photo ready to share")
                         .frame(maxWidth: 240)
-                    Text("JPEG · \(PhotoFormat.spainPrototype.output.width) × \(PhotoFormat.spainPrototype.output.height) pixels")
+                    Text("JPEG · \(model.renderTarget.digital.pixels.width) × \(model.renderTarget.digital.pixels.height) pixels")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
                     Text("Remove headphones. Check headwear, glasses, eyes and expression before use. The receiving office decides acceptance.")
