@@ -1,6 +1,6 @@
 # 24 — Launch country ranking (L19-010, part 1)
 
-**Status:** Research result; the country list is a **proposal** for founder confirmation (decision D-8). Feeds ADR-047.
+**Status:** Research result. The 35-country list was **confirmed by the founder on 2026-11-11** (D-8). Feeds ADR-047. Documents per country and the China check: [25](25-wave-a-document-types.md).
 **Date:** 2026-11-11
 **Question:** Which ~20 % of App Store countries give ~80 % of Calipic's market?
 **Data:** [`docs/market/country-ranking-2026-11.csv`](market/country-ranking-2026-11.csv), produced by [`scripts/market/rank_countries.py`](../scripts/market/rank_countries.py).
@@ -77,6 +77,8 @@ Every other country can still use the app at 1.0 with generic and custom sizes (
 | **Taiwan** | Top 10 by total app revenue in AppMagic (games included); #15 by our value proxy | Traditional Chinese needed | Wave B; first candidate to move up if research capacity allows |
 
 ## 5. What this means for languages (D-7)
+
+> **Founder decision (2026-11-11):** Wave A launches with English only. The analysis below remains as reference for later language work.
 
 Wave A, in one language each:
 

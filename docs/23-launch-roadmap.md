@@ -12,7 +12,7 @@
 | Milestone | Late **M1** (feasibility). The UX work of M5 has been explored early inside the spike (docs 15–17). **M2 has not started**: there is no production project. |
 | Evidence missing for M1 exit | Physical print measurements; directional camera calibration on both cameras; on-device Vision and segmentation benchmarks across skin tones and hair types; performance, memory, and thermal baselines on an older iPhone; iOS 27 runtime checks; ADR-024 (minimum iOS). |
 | Decisions taken (2026-11-11) | Worldwide launch with a tiered profile catalog (ADR-047); first photo free, then USD 0.99 per photo with an unlock confirmation (ADR-048); drafts with a locked export gate (ADR-049); accessibility reduced to a native baseline (ADR-050); children use the adult flow (ADR-017); measurement with known beta testers (ADR-020). |
-| Decisions open | D-7 languages, D-8 confirm the 35-country list ([24](24-launch-country-ranking.md)) and custom size, D-10 China ([20 §8.2](20-product-blueprint.md)). D-9 decided: block captures of locked previews. |
+| Decisions open | D-10 China (recommendation: exclude), D-11 Wave A profile list and custom size, D-12 keep es and pt-BR in 1.0 ([20 §8.2](20-product-blueprint.md)). Decided: 35 countries (D-8), Wave A in English only (D-7), capture protection (D-9). |
 | Not built for launch | Versioned rule catalog and profile picker; Tier 1 profiles; profile background colours; digital presets; StoreKit credits and unlock confirmation; drafts and export gate; Settings & About; Help; Print check; Cutting guide; helper mode; setup coaching; edge refinement; App Intents; App Store assets. |
 
 ## 2. Phases to launch
@@ -43,9 +43,9 @@ With a worldwide launch, **profile research and validation** (L19-013) is the lo
 
 ## 4. Next three work batches
 
-1. **Documents per Wave A country (P0, L19-010 part 2).** The country ranking is done ([24](24-launch-country-ranking.md)). For each of the 15 Wave A countries, list the documents for which people supply their own photo, plus the main visa photos. Founder confirms the 35-country list (D-8) and decides D-7 (six more languages for Wave A) and D-10 (China check).
+1. **Founder decisions (P0).** L19-010 is done ([24](24-launch-country-ranking.md), [25](25-wave-a-document-types.md)). Decide D-10 (China), D-11 (the 13 first profiles in [25 §3](25-wave-a-document-types.md)), and D-12 (es and pt-BR).
 2. **Physical evidence round (P1).** On the iPhone 15 Pro Max and one older supported iPhone: camera direction calibration on front and back cameras; first-frame and shutter latency; 48 MP import memory; capture-protection spike (L19-017); three printers × two papers measured at Actual Size against tolerances written down first; record results in the spike reports.
-3. **Start profile research (P3 ∥).** One sourced profile document per Tier 1 profile, starting with the largest markets, including background colour, alteration policy, children's rules, and digital submission limits.
+3. **Start profile research (P3 ∥).** One sourced profile document per profile, in the order of [25 §3](25-wave-a-document-types.md). **Answer the alteration question first** (are background replacement and tone allowed?), because it decides the experience for that profile. Then: background colour, children's rules, and digital submission limits. In parallel, verify the P2 list (Australia inkjet, driving licences, Saudi Absher, Brazil 3 × 4, Mexico).
 
 ## 5. What does not change
 

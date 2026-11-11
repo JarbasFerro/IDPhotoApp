@@ -172,7 +172,7 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 
 **Status:** Accepted  
 **Decision:** Initial language target is **English, Spanish, Portuguese (Brazil)**.  
-**Open (2026-11-11):** worldwide availability (ADR-047) raises whether to add the languages of Tier 1 countries (decision D-7 in [doc 20](../20-product-blueprint.md)).
+**Update (founder, 2026-11-11):** Wave A launches with English only (D-7). Whether Spanish and Portuguese (Brazil) stay in 1.0 is D-12 in [doc 20](../20-product-blueprint.md).
 
 ## BD-032 — Launch-market priority
 

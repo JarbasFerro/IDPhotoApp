@@ -130,7 +130,7 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | F-54 | Help: taking a good photo at home, printing, cutting, using a shop | Self-service support | Launch | L19-002, L19-004, L19-005 |
 | F-55 | Choose your app icon (33 characters) | Personal delight outside the task | Shipped (spike) | BD-038 |
 | F-56 | App Intents and App Shortcut "Take an ID photo"; Spotlight for profiles | Start from Siri or the Action button | Launch (P1) | ADR-031, AI13-001–AI13-005 |
-| F-57 | Localization: English, Spanish, Portuguese (Brazil); more languages for Tier 1 countries | Effortless in your language | Shipped (spike) for three languages; more **Decision D-7** | BD-031, ADR-047 |
+| F-57 | Localization: English for Wave A (D-7); Spanish and Portuguese (Brazil) exist in the spike | Effortless in your language | English Launch; es and pt-BR **Decision D-12** | BD-031, ADR-047 |
 | F-58 | Rating request at a calm moment after a confirmed good print, never in the task | Ratings drive the App Store rank behind "#1" | Launch | L19-009, [22 §6](22-quality-and-delight-bar.md) |
 
 ### 4.7 Not in the product
@@ -231,15 +231,17 @@ Known testers tend to be kind. So measure what they **do** (time, retakes, the m
 | D-4 | Persistence | **Drafts** saved without spending credits. A locked draft can never leave the app (one export gate). 30-day retention is the proposed default. | ADR-049 |
 | D-5 | Measurement | **Beta testers the founder knows.** TestFlight and observed sessions; no analytics SDK. | ADR-020 |
 | D-6 | Accessibility | **Not a priority for 1.0.** A native baseline is kept, and BD-034 stands. | ADR-050 |
+| D-7 | Languages | **Wave A launches with English only.** No new languages for Wave A. | ADR-047, [25 §6](25-wave-a-document-types.md) |
+| D-8 | Launch countries | **35 countries confirmed:** Wave A (15) at 1.0, Wave B (20) after ([24](24-launch-country-ranking.md)). | ADR-047 |
 | D-9 | Locked-preview protection | **Block screenshots and screen recording of locked previews** (as banking apps do). Device spike first, with a public-API fallback; no watermark. | ADR-049 |
 
 ### 8.2 Still open
 
 | ID | Decision | Why it matters | Recommendation |
 |---|---|---|---|
-| D-7 | Languages beyond en, es, pt-BR | A German or Japanese user given English requirement text loses the "effortless" pillar | At least localize profile names, requirement text, and App Store metadata for every Tier 1 country. Ideally localize the full UI for the Tier 1 languages, with native review. |
-| D-8 | Confirm the launch countries and custom size | Sets the scope of profile research, the longest task | **Proposed from data ([24](24-launch-country-ranking.md)):** 35 countries (about 20 % of storefronts) = 81 % of iPhone users and 89 % of spending power. Wave A at 1.0 (15 countries, 82 % of spending power), Wave B after. Ship the custom size (ADR-018). |
-| D-10 | China mainland | 25 % of the world's iPhone users, but ICP and app-filing rules may apply to foreign developers | Run a compliance check before deciding; not in Wave A |
+| D-10 | China mainland | 25 % of the world's iPhone users, but a paid app needs an ICP filing that a foreign developer generally cannot get without a Chinese partner, and possibly a commercial licence | **Exclude the mainland China storefront** at 1.0 and in Wave B; revisit only with a Chinese partner and legal advice ([25 §5](25-wave-a-document-types.md)) |
+| D-11 | Wave A profiles and custom size | Sets the P3 research load | Research the 13 profiles in [25 §3](25-wave-a-document-types.md) first, then verify the P2 list; ship the custom size (ADR-018) |
+| D-12 | Spanish and Portuguese (Brazil) in 1.0 | Already translated in the spike, but every new string then needs two translations and native review | Keep them if their markets (Spain, Mexico, Brazil) matter at launch; otherwise ship English only and add them with Wave B |
 
 ## 9. Documentation map and source of truth
 
@@ -252,6 +254,7 @@ When documents disagree, the order is: accepted ADRs and brand decisions → [AG
 | What "great photo", "beautiful", and "wow" mean, and how they are tested | [22 — Quality and delight bar](22-quality-and-delight-bar.md) |
 | What happens next until launch | [23 — Launch roadmap](23-launch-roadmap.md) |
 | Which countries, and why | [24 — Launch country ranking](24-launch-country-ranking.md) |
+| Which documents per country; China | [25 — Wave A document types](25-wave-a-document-types.md) |
 | Product principles, MVP rationale, risks | [01](01-product-definition.md) |
 | Functional requirements (FR-xxx) | [02](02-requirements.md) |
 | Architecture | [03](03-architecture.md) |

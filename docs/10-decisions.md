@@ -762,12 +762,13 @@ ADR-016 made Spain DNI 26 × 32 mm the first format, and the spike delivers it e
    - rank countries by App Store relevance (iPhone users and App Store spending), from a named, dated data source;
    - within each country, include the documents for which people supply their own photo (passport, national ID card, residence permit, driving licence where self-supplied); skip documents whose photo is taken at the office;
    - add the most-requested cross-border documents: visa photos for the most-visited destinations (for example the United States visa and the Schengen visa).
-3. **Tiers (data in [24](24-launch-country-ranking.md); proposed, awaiting confirmation as D-8). Wave A is Tier 1 and Wave B is Tier 2:**
+3. **Tiers (data in [24](24-launch-country-ranking.md); list confirmed by the founder 2026-11-11, D-8). Wave A is Tier 1 and Wave B is Tier 2:**
    - **Wave A at 1.0:** the 15 countries holding 82 % of spending power. United States, Japan, United Kingdom, Germany, Canada, Australia, France, Italy, South Korea, Switzerland, Spain, Saudi Arabia, Mexico, Netherlands, Brazil.
    - **Wave B in the first updates:** 20 more countries that take reach to 80 % of iPhone users.
    - Together: 35 countries, about 20 % of storefronts.
    - **Russia** is excluded: there have been no App Store payments there since April 2026.
-   - **China mainland** is decision D-10 (ICP and app-filing compliance check).
+   - **China mainland** is decision D-10. The check in [25 §5](25-wave-a-document-types.md) recommends not offering the app on the mainland China storefront.
+   - **Documents per Wave A country:** [25](25-wave-a-document-types.md). Several main documents no longer accept home-made photos (for example the German and French passports and ID cards, and the Canadian passport); Calipic never offers profiles for those.
 4. **Release gate unchanged:** every profile needs its own sourced research document (like [13](13-spain-foto-carnet.md)), alteration policy, background colour (ADR-037), digital preset where one exists, and last-reviewed date. A profile not validated in time moves to Tier 2; it never ships with weaker provenance. Never copy a profile from another country because the sizes match (AGENTS.md §11).
 5. **Countries without a profile:** generic print sizes stay available on the sheet. A custom size (ADR-018), clearly marked as unofficial, is recommended so the app is useful in every territory.
 6. **App Store lens:** the United States stays the lens for English screenshots, keywords, and pricing tests (BD-032). Spain DNI stays the engineering reference profile.
@@ -785,7 +786,8 @@ Founder decision 2026-11-11; BD-032; [brand 04](brand/04-market-prioritization.m
 
 - Profile research becomes the longest item on the critical path ([23](23-launch-roadmap.md) P3). It starts as soon as the country list is fixed.
 - Background colour as profile data (ADR-037) becomes P0: several countries do not use pure white.
-- Localization: BD-031 ships English, Spanish, and Portuguese (Brazil). Profiles for Germany, France, Italy, Japan, or Korea raise decision D-7 (more languages). At minimum, profile names, requirement text, and App Store metadata must be readable in the country's language.
+- Localization (D-7, founder 2026-11-11): Wave A launches with **English only**; no new languages are added for Wave A. Profile names may show the official local name next to the English one ([25 §6](25-wave-a-document-types.md)).
+- Alteration policy decides the experience in the biggest market: the US online-renewal rules forbid changes by apps, filters, or AI, so background replacement and Document Tone may be off for some profiles ([25 §4](25-wave-a-document-types.md)).
 - The fixture set must cover a global user base ([22 §2](22-quality-and-delight-bar.md)).
 
 ### Revisit trigger
@@ -909,13 +911,13 @@ Immediate M1 decisions:
 6. performance/memory budgets derived from device measurements.
 7. ADR-036 to ADR-042 — print composer, background colour policy, Document Tone, alignment estimator, revision pinning, iterative segmentation, Foundation Models boundary (from [the priority feature plan](14-priority-feature-plan.md)).
 
-Product decisions taken by the founder on 2026-11-11: ADR-017 (children), ADR-020 (measurement), ADR-047 (worldwide launch), ADR-048 (pricing), ADR-049 (drafts), ADR-050 (accessibility scope).
+Product decisions taken by the founder on 2026-11-11: ADR-017 (children), ADR-020 (measurement), ADR-047 (worldwide launch; 35-country list confirmed; Wave A in English only), ADR-048 (pricing), ADR-049 (drafts and capture protection), ADR-050 (accessibility scope).
 
 Product decisions still open (see [the product blueprint §8](20-product-blueprint.md)):
 
-1. D-7 — languages beyond English, Spanish, and Portuguese (Brazil) for a worldwide launch (BD-031).
-2. D-8 — confirm Wave A and Wave B from [24](24-launch-country-ranking.md); then the document list per country (L19-010 part 2); ADR-018 custom size at 1.0.
-3. D-10 — China mainland: ICP and app-filing compliance check before deciding ([24 §4](24-launch-country-ranking.md)).
+1. D-10 — China mainland: recommendation is to exclude the mainland China storefront ([25 §5](25-wave-a-document-types.md)); awaiting founder confirmation.
+2. Wave A profile list in [25 §3](25-wave-a-document-types.md), and ADR-018 custom size at 1.0.
+3. Whether the existing Spanish and Portuguese (Brazil) translations stay in 1.0 alongside English.
 4. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
 
 # Decision template
