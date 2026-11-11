@@ -1,5 +1,7 @@
 # 20 — Product outcome review and proposed launch contract
 
+> **Review record (2026-11-11).** Kept as written. The founder's decisions taken after this review (ADR-017, ADR-020, ADR-047 to ADR-050) override it where they differ, and [the product blueprint §10](20-product-blueprint.md) lists which of its points were adopted.
+
 **Reviewed:** 2026-11-11
 **Status:** Proposal for documentation and delivery changes; not an accepted ADR or evidence of release readiness.
 **Objective:** Make Calipic the preferred iPhone app for taking excellent document photos at home and producing usable physical copies, through ease, trustworthy assistance, satisfying results, and visual quality.

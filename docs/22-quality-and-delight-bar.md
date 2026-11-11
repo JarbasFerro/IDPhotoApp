@@ -42,10 +42,10 @@ These are **app quality targets**, not official requirements. Official numbers o
 
 The strongest proof of "best app" is a blind comparison:
 
-- **Set:** at least 30 consenting adults and, where consented by a guardian, children, covering the Monk Skin Tone scale, hair types (curly, afro, straight, bald, long), glasses, and religious headwear. No personal photos enter the public repository (ADR-027).
+- **Set:** the founder's beta testers and people they recruit (aim for 20 or more), consenting adults and, where a guardian consents, children, covering the Monk Skin Tone scale, hair types (curly, afro, straight, bald, long), glasses, and religious headwear. No personal photos enter the public repository (ADR-027).
 - **Pairs:** for each person, a Calipic photo taken at home by a non-expert vs. a photo-shop or booth ID photo of the same person.
 - **Judges:** people who did not take the photos rate "Which would you rather have on your ID?" and "Which looks more professional?".
-- **Target:** Calipic preferred or equal in ≥ 70 % of pairs; no skin-tone group below 60 %.
+- **Target:** Calipic preferred or equal in most pairs; report each skin-tone group separately; a group where Calipic loses most pairs is a blocker. With a small set the result is directional; report counts, not percentages.
 - **Use:** results guide tuning; only honest aggregate claims may appear in marketing (BD-026).
 
 ### 2.4 Where quality actually comes from at home
@@ -76,7 +76,7 @@ Every screen passes these before release, checked against named screenshots in [
 | Alignment and rhythm | Spacing comes from `DesignTokens.swift` and native layout; no ad hoc offsets. |
 | Real photo legibility | Text and controls stay readable over real photos in bright, dim, and backlit scenes. |
 | Both appearances | Light and Dark screenshots reviewed side by side; nothing looks like an afterthought in either. |
-| Large text | AX sizes reflow without clipping; the portrait keeps its true aspect. |
+| Large text | Default and larger standard sizes reflow without clipping; the portrait keeps its true aspect. Accessibility sizes after 1.0 (ADR-050). |
 | Apple side-by-side | Placed next to a comparable Apple app screen (Camera, Wallet, Photos edit), it looks like it belongs. |
 
 ### 3.3 Known aesthetic gaps in 0.12.x (from current screenshots)
@@ -102,7 +102,7 @@ A wow moment here is a **visible cause-and-effect that makes the person feel the
 | W4 | **Hold to compare** | Photo Check, Adjust | Press and hold shows the original; release shows the improvement. | Shipped (spike) | Discovered by ≥ 50 % of testers via the caption or a single tip. |
 | W5 | **The sheet fills** | Your sheet | Copies glide into place; adding a person re-flows the page. | Shipped (spike) | Animation keyed by person and copy; no fade-swap; 60/120 fps on device. |
 | W6 | **Your files are ready** | Print & Share, Digital Photo | One quiet tick and a success haptic, only after files are verified. | Shipped (spike) | Never shown before verification passes. |
-| W7 | **It came out right** | Print check (New) | After printing, confirming the 50 mm bar ends with *Your photos are the right size*. | New (L19-003) | ≥ 95 % first-print success on the printer test set; the No path fixes the cause in one reprint. |
+| W7 | **It came out right** | Print check (New) | After printing, confirming the 50 mm bar ends with *Your photos are the right size*. | New (L19-003) | Bar 50 ± 0.5 mm on every test printer ([20 §7](20-product-blueprint.md)); the No path fixes the cause in one reprint. |
 | W8 | **Finished** | Cutting guide (New) → Home | The cut guide matches the person's own sheet; Done leaves them with a calm summary. | New (L19-004) | Testers cut a sheet correctly on the first attempt. |
 
 **Invisible wows** (felt, not seen; they need performance budgets, not animation): the camera opens instantly (273 ms measured on iPhone 15 Pro Max; budget to be set on an older device), the shutter never lags, nothing asks for an account, nothing is uploaded, and there are no ads.
@@ -113,10 +113,11 @@ A wow moment here is a **visible cause-and-effect that makes the person feel the
 
 | Killer | Rule |
 |---|---|
-| Paying after the work is done, or a surprise watermark | Price visible before capture; payment asked at Choose result, before files are made; never a watermark (ADR-048 proposed, FR-098). |
+| Paying after the work is done, or a surprise watermark | Price known before capture; editing free; the credit is spent only at the first output, after a confirmation that shows the price and says edits become final; reprints free; never a watermark on outputs (ADR-048, FR-098). |
 | Wrong print size | Calibration bar, Actual Size instruction, bordered-paper preference, print check (F-45, F-47). |
 | A warning without a fix | Every warn/fail row ends with a feasible action (rule 8). |
-| Losing work | Edits survive Back, purchase cancellation, retake of another person, and app restarts (D-4). |
+| Losing work | Edits survive Back, purchase cancellation, retake of another person, and app restarts (drafts, ADR-049). |
+| Regret after paying | The point of no return is stated before the credit is spent and again before **Edit photo** on an unlocked person (ADR-048 §4–5). |
 | A review prompt or upsell after success | Never on the same screen as W6–W8; a rating request only on a later, calm Home visit after a confirmed good print (L19-009). |
 | Jargon | No pixels, DPI, mask, segmentation, ICAO, or bleed in the fast path ([15 §2](15-experience-plan.md)). |
 | Rejection by the office | Narrow, sourced claims; manual checks always visible; never "guaranteed". |
@@ -125,9 +126,11 @@ A wow moment here is a **visible cause-and-effect that makes the person feel the
 
 | Instrument | When | Target (proposed) |
 |---|---|---|
-| Moderated first-use task test, 8–12 people per round, recruited from the three audiences | Before each beta and before launch | Task success ≥ 90 %; SEQ median ≥ 6/7 |
+| Observed first-use session with the founder's beta testers, 8–12 per round, including people who have never seen the app (ADR-020) | Before each beta round and before launch | ≥ 8 of 10 complete unaided; SEQ median ≥ 6/7 |
+| Short questionnaire after the session: ease and satisfaction (1–5), what a credit bought, what *Ready* means | Same session | ≥ 8 of 10 rate 4–5 and explain the credit correctly; every tester understands *Ready* is not a guarantee |
 | "Which moment did you like most?" (open question after the task) | Same session | W3 or W7 named most often; nobody names a frustration as their strongest memory |
-| Physical print round | Each print-related change | First-print success ≥ 95 % |
+| Physical print round | Each print-related change | Bar 50 ± 0.5 mm on every test printer at Actual Size |
+| Crash-free sessions | Beta (TestFlight, Xcode Organizer) | ≥ 99.5 % |
 | TestFlight feedback prompt (opt-in, in Settings, never in the task) | Beta | Qualitative themes tracked |
 | App Store rating and reviews | Post-launch | ≥ 4.7; one-star themes reviewed weekly for the first 90 days |
 | Rating request policy | Post-launch | Shown at most once per version via `RequestReviewAction`, only on a later Home visit after the person has confirmed a correct print or shared a digital photo |
@@ -137,6 +140,6 @@ A wow moment here is a **visible cause-and-effect that makes the person feel the
 A feature that touches capture, Photo Check, outputs, or Home is ready for release when it:
 
 1. meets its rows in §2.2 (photo quality) on the fixture corpus;
-2. passes §3.2 (aesthetic review) with named screenshots in Light, Dark, and an AX text size;
+2. passes §3.2 (aesthetic review) with named screenshots in Light and Dark (accessibility text sizes after 1.0, ADR-050);
 3. keeps or improves its wow moment in §4, with Reduce Motion verified;
 4. introduces none of the killers in §5.

@@ -4,6 +4,8 @@
 
 Identity photos are sensitive personal data. The product is designed so the normal workflow does not need to transmit or permanently retain them.
 
+> **Drafts (ADR-049, 2026-11-11):** in-progress and unlocked photos are now kept on the device as drafts: complete file protection, excluded from backups, never in the Files app, deleted after 30 days without use or on request. Nothing is transmitted. In-app privacy text must say this plainly.
+
 Default posture:
 
 - on-device processing;

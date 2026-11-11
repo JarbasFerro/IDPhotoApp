@@ -160,7 +160,8 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 
 **Status:** Accepted as product direction  
 **Decision:** Credit model: tutorial/onboarding result free, an initial free credit, then inexpensive purchased credits. No subscription is required in the intended baseline model.  
-**Implementation dependency:** StoreKit product design, credit accounting, restoration rules, pricing, and legal/App Store review require separate product decisions.
+**Implementation dependency:** StoreKit product design, credit accounting, restoration rules, pricing, and legal/App Store review require separate product decisions.  
+**Update (founder, 2026-11-11):** one free credit in total (the first photo), then USD 0.99 per photo; editing is free until an explicit point-of-no-return confirmation. Details in ADR-048 and ADR-049.
 
 ## BD-030 — “No ads” messaging
 
@@ -170,12 +171,14 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 ## BD-031 — Launch languages
 
 **Status:** Accepted  
-**Decision:** Initial language target is **English, Spanish, Portuguese (Brazil)**.
+**Decision:** Initial language target is **English, Spanish, Portuguese (Brazil)**.  
+**Open (2026-11-11):** worldwide availability (ADR-047) raises whether to add the languages of Tier 1 countries (decision D-7 in [doc 20](../20-product-blueprint.md)).
 
 ## BD-032 — Launch-market priority
 
 **Status:** Research in progress  
-**Decision:** Market sequence will be evidence-led rather than based on founder location. Current evidence makes the United States the leading candidate, but the sequence is not yet locked.
+**Decision:** Market sequence will be evidence-led rather than based on founder location. Current evidence makes the United States the leading candidate, but the sequence is not yet locked.  
+**Update (founder, 2026-11-11):** Calipic launches worldwide; profile coverage follows App Store relevance (ADR-047). The United States stays the commercial and creative lens.
 
 ## BD-033 — Color
 
@@ -188,7 +191,8 @@ This file records accepted, rejected, working, and deferred brand decisions. It 
 ## BD-034 — Design-conflict hierarchy
 
 **Status:** Accepted  
-**Decision:** When otherwise-good design goals conflict, prioritize: **1) native iOS familiarity, 2) beauty, 3) accessibility**. Product correctness/privacy remain non-negotiable constraints rather than ranked preferences.
+**Decision:** When otherwise-good design goals conflict, prioritize: **1) native iOS familiarity, 2) beauty, 3) accessibility**. Product correctness/privacy remain non-negotiable constraints rather than ranked preferences.  
+**Confirmed (founder, 2026-11-11):** stays as written. Accessibility is not a priority for 1.0; the baseline that is kept is in ADR-050.
 
 ## BD-035 — Brand references
 

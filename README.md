@@ -1,22 +1,40 @@
-# ID Photo App
+# Calipic — ID photos at home
 
-A privacy-first **native iOS application** for creating standards-compliant identity photos for passports, visas, ID cards, driving licences, residence permits, CVs, and other official or professional uses.
+**Goal:** the #1 iPhone app for taking document photos at home and printing them yourself. It should be the easiest to use, give a studio-quality result thanks to its guidance and on-device image processing, print at the exact size the first time, and feel beautiful and satisfying to finish.
 
-> Project status: **M1 — native feasibility prototypes**. The first [SwiftUI import/crop/export prototype](Spikes/IDPhotoSpike/README.md) is implemented. Production code begins only after the native iOS technical spikes establish image quality, performance, accessibility, and export fidelity.
+> **Project status (2026-11-11):** late **M1**. The spike app [`Spikes/IDPhotoSpike`](Spikes/IDPhotoSpike/README.md) (0.12.7) runs the complete Spain DNI flow on an iPhone: guided camera with review, import, automatic framing, white background, Document Tone, Photo Check, Adjust, digital JPEG, multi-person print sheets with AirPrint, and English, Spanish, and Portuguese (Brazil). The production project (M2) has not started. The remaining physical evidence and the path to 1.0 are in [the launch roadmap](docs/23-launch-roadmap.md).
 
-## Run the first prototype
+## Start here
 
-Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone simulator. It supports photo import, a 26 × 32 mm portrait crop, JPEG sharing, and an A6 PDF with six copies. See [setup and tests](Spikes/IDPhotoSpike/README.md) and [validation evidence](docs/spikes/01-import-crop-export.md).
+| Read | For |
+|---|---|
+| [20 — Product blueprint](docs/20-product-blueprint.md) | Every function and screen at launch, success targets, open decisions |
+| [21 — User journeys](docs/21-user-journeys.md) | Personas and step-by-step journeys, from setup to a cut print |
+| [22 — Quality and delight bar](docs/22-quality-and-delight-bar.md) | What "great photo", "beautiful", and "wow" mean, and how they are tested |
+| [23 — Launch roadmap](docs/23-launch-roadmap.md) | Phases P0–P9 from the spike to App Store 1.0 |
+| [16 — Screen experience spec](docs/16-screen-experience-spec.md) | Current screen contract |
+| [10 — Decisions](docs/10-decisions.md) | ADRs, including the founder decisions below |
 
-## Product outcome review
+External reviews of 2026-11-11, kept as records: [ChatGPT](docs/20-product-outcome-and-launch-review-ChatGPT.md) and [Gemini](docs/20-product-outcome-and-launch-review-Gemini.md). What was adopted from each is in [the blueprint §10](docs/20-product-blueprint.md).
 
-The [2026-11-11 review and proposed launch contract](docs/20-product-outcome-and-launch-review-ChatGPT.md) maps the complete home-photo-to-print journey, app functions and screens, satisfaction criteria, documentation gaps, and remaining launch work. It is a proposal; accepted ADRs and brand decisions remain authoritative.
+**Founder decisions (2026-11-11):**
+
+- **Worldwide launch:** the most-used photo documents of the most relevant App Store countries, in tiers (ADR-047).
+- **Pricing:** first photo free, then USD 0.99 per photo, with free editing until an explicit point of no return (ADR-048).
+- **Drafts:** saved free of charge; a locked draft can never leave the app (ADR-049).
+- **Accessibility:** a native baseline for 1.0 (ADR-050).
+- **Children:** use the same flow as adults (ADR-017).
+- **Measurement:** success is measured with known beta testers (ADR-020).
+
+## Run the spike app
+
+Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone or simulator. See [setup and tests](Spikes/IDPhotoSpike/README.md) and the [spike reports](docs/spikes/).
 
 ## Product ambition
 
 This project is now deliberately iOS-only.
 
-The quality bar is not “a good cross-platform utility.” The target is an app that feels as if it were designed by an experienced Apple platform team: native interaction patterns, excellent accessibility, privacy-preserving on-device intelligence, careful motion and haptics, precise typography, fast camera behavior, deterministic output, and deep integration with the capabilities of iPhone.
+The quality bar is not “a good cross-platform utility.” The target is an app that feels as if it were designed by an experienced Apple platform team: native interaction patterns, privacy-preserving on-device intelligence, careful motion and haptics, precise typography, fast camera behavior, deterministic output, and deep integration with the capabilities of iPhone.
 
 The reference question for every feature is:
 
@@ -60,7 +78,7 @@ The app should make the complete ID-photo workflow fast and understandable:
 7. Let the user make manual corrections without losing the original.
 8. Export a digital file and/or a print-ready sheet using native share, save, and print experiences.
 
-The product should be useful without advertising interruptions. Monetization, if introduced, must not compromise the core workflow, user privacy, or exported-photo quality.
+The product is useful without advertising interruptions. The first photo is free; each further photo costs one USD 0.99 credit, spent only after an explicit confirmation (ADR-048). Pricing never compromises the core workflow, privacy, or output quality.
 
 ## Guiding principles
 
@@ -72,7 +90,7 @@ The product should be useful without advertising interruptions. Monetization, if
 - **Non-destructive editing:** preserve the original image throughout the workflow.
 - **Fast path first:** a good source photo should reach export in very few steps.
 - **Explain failures:** every rejection or warning tells the user what to change.
-- **Accessible by default:** VoiceOver, Voice Control, Dynamic Type, Reduce Motion, Differentiate Without Color, sufficient contrast, large targets, and non-gesture alternatives are part of the feature definition.
+- **Accessible baseline:** system controls, labelled buttons, status never by colour alone, and Reduce Motion for 1.0; full VoiceOver and Voice Control journeys after 1.0 (ADR-050).
 - **International by design:** no architecture decision assumes one country, one document type, one language, or one unit system.
 - **Intelligence with boundaries:** generative AI may explain or assist, but deterministic rules and measurable computer-vision results remain authoritative for official output.
 - **No novelty tax:** do not add widgets, Live Activities, AI, custom glass, or animation merely because an API exists.
@@ -95,24 +113,20 @@ The application should exploit iPhone capabilities where they improve the task:
 - String Catalogs for localization;
 - on-device processing and explicit privacy manifests.
 
-## Initial repository map
+## Repository map
 
 ```text
 .
-├── README.md
-├── .gitignore
+├── AGENTS.md                 # implementation contract for every contributor
+├── Spikes/IDPhotoSpike/      # disposable feasibility app (current: 0.12.7)
+├── scripts/                  # version bump, brand asset generation
 └── docs/
-    ├── 01-product-definition.md
-    ├── 02-requirements.md
-    ├── 03-architecture.md
-    ├── 04-ux-ui.md
-    ├── 05-rules-engine.md
-    ├── 06-delivery-plan.md
-    ├── 07-test-strategy.md
-    ├── 08-privacy-security.md
-    ├── 09-backlog.md
-    ├── 10-decisions.md
-    └── 11-ios-excellence-strategy.md
+    ├── 01–11                 # product, requirements, architecture, UX, rules, delivery, tests, privacy, backlog, decisions, iOS strategy
+    ├── 12–19                 # kickoff, Spain research, feature plan, experience plans and research (12, 15, 17–19 are historical)
+    ├── 20–23                 # blueprint, journeys, quality bar, launch roadmap (current)
+    ├── brand/                # Calipic brand system and decisions log
+    ├── spikes/               # spike evidence reports
+    └── ui/                   # screen states and evidence
 ```
 
 ## MVP definition
@@ -132,8 +146,9 @@ MVP must include:
 - print-sheet generation for common paper sizes;
 - a clear distinction between automatic checks, warnings, and requirements that require human judgement;
 - source/provenance metadata for every published document rule;
-- English plus String Catalog/localization architecture ready for additional languages;
-- complete VoiceOver and Dynamic Type support for the core flow;
+- English, Spanish, and Portuguese (Brazil) through String Catalogs; more languages for a worldwide launch are decision D-7;
+- the 1.0 accessibility baseline (ADR-050);
+- first photo free, then per-photo credits through StoreKit, with drafts and a locked export gate (ADR-048, ADR-049);
 - no account requirement for the core workflow;
 - no cloud upload required for the core workflow;
 - no third-party analytics/ads SDK unless separately justified;
@@ -170,7 +185,7 @@ A feature is not done when it renders in one simulator. It is done when:
 - error, empty, permission, loading, interruption, and cancellation states are covered;
 - privacy/data flow is reviewed;
 - unit/integration/UI tests exist at the appropriate level;
-- VoiceOver, Voice Control, Dynamic Type, Reduce Motion, and contrast behavior have been checked as applicable;
+- the accessibility baseline (ADR-050) holds;
 - localization does not break the layout;
 - light/dark appearance and increased-contrast behavior are verified;
 - relevant documentation is updated;
@@ -179,15 +194,4 @@ A feature is not done when it renders in one simulator. It is done when:
 
 ## Immediate next action
 
-Continue the **M1 native-iOS spike program** before final production UI work. See the [first spike report](docs/spikes/01-import-crop-export.md) for implemented behavior and outstanding evidence. M1 must validate:
-
-1. responsive AVFoundation capture and PhotosPicker import;
-2. Vision face geometry;
-3. Vision segmentation and iOS 27 refinement APIs;
-4. Core Image high-resolution composition without unnecessary copies;
-5. exact digital/PDF export geometry;
-6. SwiftUI editor gestures plus VoiceOver/Voice Control alternatives;
-7. performance, memory, thermal behavior, and cancellation;
-8. the minimum deployment target and availability strategy.
-
-Only after these results should the production Xcode project structure be frozen.
+Follow [the launch roadmap §4](docs/23-launch-roadmap.md): fix the Tier 1 country list from market data, run the physical evidence round on device and printers, and start profile research. The production Xcode project is created only after the M1 evidence is complete.

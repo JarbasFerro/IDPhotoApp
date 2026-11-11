@@ -62,23 +62,19 @@ Third-party packages require an ADR or dependency review explaining why Apple AP
 - The photo/content remains visually primary.
 - Use system typography, Dynamic Type, semantic colors/materials, and SF Symbols by default.
 - Motion and haptics must communicate state or cause/effect; avoid decorative motion/haptic noise.
-- Respect Reduce Motion, Reduce Transparency, Increase Contrast, Differentiate Without Color, light/dark appearance, and accessibility text sizes.
+- Respect light/dark appearance and Reduce Motion. Other accessibility settings follow the 1.0 baseline in section 6.
 
-## 6. Accessibility is part of implementation
+## 6. Accessibility baseline (1.0 scope, ADR-050)
 
-A critical feature is incomplete if it only works through sight or precision gestures.
+For 1.0, accessibility is a baseline rather than a release gate (founder decision, ADR-050). Keep:
 
-For relevant UI:
+- system controls, text styles, and SF Symbols, so Dynamic Type and system settings work where the layout allows;
+- an accessibility label on every icon-only control;
+- pass/warn/fail/manual state shown with a word or symbol, never by colour alone;
+- Reduce Motion respected by every custom animation;
+- accessibility features that already exist (Move/Zoom buttons, spoken camera guidance, accessibility actions): do not remove them.
 
-- provide useful VoiceOver labels, values, traits, focus behavior, and announcements;
-- provide Voice Control-friendly names;
-- support Dynamic Type around the photo/editor;
-- provide non-gesture move/zoom controls for crop adjustment;
-- never encode pass/warn/fail/manual state using color alone;
-- test Reduce Motion and contrast/transparency settings;
-- keep interactive targets forgiving and consistent with current HIG guidance.
-
-Do not defer the accessibility implementation to release hardening.
+Deferred until after 1.0: full VoiceOver/Voice Control journeys, accessibility audits as a release gate, layouts tuned for accessibility text sizes, and non-gesture equivalents for new features. Never declare accessibility support in App Store metadata that has not been checked.
 
 ## 7. Camera and import
 
@@ -150,6 +146,8 @@ Do not pass anonymous geometry across layers without knowing its coordinate spac
 - Include and maintain `PrivacyInfo.xcprivacy`.
 - Required-reason API declarations must match actual approved use.
 - Use private/protected storage for temporary sensitive files and delete them when no longer needed.
+- Drafts (ADR-049) use complete file protection, are excluded from backups, and are deleted after their retention period or on request.
+- Every output path goes through the single export gate; a locked (unpaid) photo never leaves the app as a file, print, copy, or share (ADR-048, ADR-049).
 - Strip GPS/unnecessary sensitive metadata from normal exports.
 - Never log or transmit photos, thumbnails, face embeddings, landmark arrays, sensitive local paths, or document/person identifiers.
 - Personal/family face photos must never be committed to the public repository.
@@ -226,7 +224,7 @@ Before considering work complete, ask:
 1. Could a standard Apple API/control replace custom code?
 2. Does this remain correct offline?
 3. Can stale async work overwrite newer state?
-4. Does VoiceOver/Voice Control have equivalent functionality?
+4. Does it keep the accessibility baseline in section 6 (ADR-050)?
 5. What happens with large 48 MP input?
 6. What happens under cancellation/interruption?
 7. Are privacy/logging/data-retention implications correct?

@@ -195,7 +195,7 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-015 — Monetization
 
-**Status:** Deferred; direction set by brand decision BD-029 (credits, no subscription). Implementation details proposed in ADR-048.  
+**Status:** Superseded by ADR-048 (accepted 2026-11-11). The constraints below still apply.  
 **Decision needed:** free, one-time purchase, freemium, subscription for advanced/frequent users, or hybrid.
 
 **Accepted constraints:**
@@ -210,7 +210,7 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-016 — Initial launch jurisdictions
 
-**Status:** Accepted for initial country and format; launch profile set beyond Spain proposed in ADR-047
+**Status:** Accepted for the reference format (Spain DNI stays the engineering reference profile). Launch scope superseded by ADR-047 (worldwide, accepted 2026-11-11).
 **Date:** 2026-09-15
 
 **Decision:** Start with Spain and the user-requested “foto carnet”, 32 × 26 mm in portrait orientation: width 26 mm, height 32 mm. Use DNI as the first official research reference; exact document-compliance claims require a validated, sourced profile.
@@ -223,14 +223,14 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-017 — Child/baby support
 
-**Status:** Proposed  
-**Decision:** architecture supports age-related profile exceptions from the start; launch coverage is decided per profile based on official rules and test evidence.
+**Status:** Accepted (founder, 2026-11-11)  
+**Decision:** Children use the same flow, profiles, and checks as adults; there is no child mode at 1.0. Helper mode (someone else holds the phone, back camera) is the recommended way to photograph a child. Checks that some countries relax for babies (for example eyes open or neutral expression) show as warnings or manual checks and never block output. Baby support is not advertised at launch. The architecture keeps age-related profile exceptions possible; adding them as profile data is post-launch work, per profile and only from official sources.
 
 ---
 
 ## ADR-018 — Generic/custom photo sizes
 
-**Status:** Proposed  
+**Status:** Proposed; recommended for 1.0 by ADR-047 §5 so the app is useful in countries without a profile (decision D-8 in [20 §8](20-product-blueprint.md)).  
 **Decision:** may use the same deterministic renderer but must be visually distinguished from sourced official profiles and make no compliance claim.
 
 ---
@@ -246,7 +246,7 @@ If enabled later: signatures, integrity validation, atomic activation, schema/se
 
 ## ADR-020 — Analytics / crash reporting
 
-**Status:** Deferred  
+**Status:** Accepted for 1.0 (founder, 2026-11-11): no analytics or crash-reporting SDK and no in-app telemetry. Success is measured with beta testers the founder knows: TestFlight feedback and crash reports, observed first-use sessions, and a short questionnaire ([22 §6](22-quality-and-delight-bar.md)). After launch: App Store Connect and Xcode Organizer. MetricKit stays an option.  
 **Decision shape:** begin with Apple-native logging/development diagnostics. Evaluate MetricKit. Add a third-party SDK only if value materially exceeds privacy/dependency cost.
 
 Never include:
@@ -262,7 +262,7 @@ Never include:
 
 ## ADR-021 — Photo/job history
 
-**Status:** Proposed  
+**Status:** Superseded by ADR-049 (drafts, accepted 2026-11-11). Recent and favourite profiles remain a post-launch idea (U10-013).  
 **Decision:** MVP stores recent/favorite document profiles, not a permanent face-photo gallery by default.
 
 ---
@@ -401,7 +401,7 @@ Apple’s own guidance says standard SwiftUI/UIKit controls adopt current Liquid
 
 ## ADR-030 — Accessibility baseline
 
-**Status:** Accepted  
+**Status:** Accepted; scope for 1.0 narrowed by ADR-050 (founder, 2026-11-11). The full baseline below returns after 1.0.  
 **Date:** 2026-09-05
 
 ### Decision
@@ -746,74 +746,142 @@ Physical-device review finds the bloom distracting, or capture-to-review latency
 
 ---
 
-## ADR-047 — Launch market and launch profile set
+## ADR-047 — Worldwide launch and the launch profile catalog
 
-**Status:** Proposed
+**Status:** Accepted (founder, 2026-11-11). Supersedes ADR-016's launch scope and the earlier three-profile proposal.
 **Date:** 2026-11-11
 
 ### Context
 
-ADR-016 makes Spain DNI 26 × 32 mm the first format and the spike delivers it end to end. BD-032 and [brand 04](brand/04-market-prioritization.md) name the United States as the primary commercial launch lens, and BD-031 makes Portuguese (Brazil) a launch language. A US-led App Store launch without a US profile, or a pt-BR app without a Brazil profile, would undercut the goal of being the #1 at-home ID-photo app ([20 §1](20-product-blueprint.md)).
+ADR-016 made Spain DNI 26 × 32 mm the first format, and the spike delivers it end to end. BD-032 names the United States as the commercial lens. The goal is to be the #1 at-home ID-photo app ([20 §1](20-product-blueprint.md)), and the founder wants that goal worldwide rather than in one market.
 
-### Decision (proposed)
+### Decision
 
-1. Launch 1.0 with three sourced, validated profiles: **Spain · DNI (26 × 32 mm)**, **United States · passport (2 × 2 in)**, and **Brazil · 3 × 4 cm document photo**, each with its own profile research document, alteration policy, and digital submission preset where one exists.
-2. Use the United States as the App Store lens for English screenshots, keywords, and pricing; ship Spanish and Brazilian Portuguese as first-class localizations with their native profiles.
-3. A profile not validated in time is dropped from 1.0 rather than shipped with weaker provenance. Spain stays the reference profile.
-4. Generic sizes (26 × 32, 35 × 45, 51 × 51) remain available on the print sheet, marked as sizes and not compliance claims (ADR-018).
+1. **Availability:** Calipic 1.0 is offered in every App Store territory where it can legally be distributed. Territories with extra requirements are checked one by one before submission (for example, China mainland requires an ICP filing number in App Store Connect; verify the current rule).
+2. **Profile catalog:** 1.0 supports the most-used photo documents of the countries that matter most on the App Store. The ranking method, recorded in L19-010:
+   - rank countries by App Store relevance (iPhone users and App Store spending), from a named, dated data source;
+   - within each country, include the documents for which people supply their own photo (passport, national ID card, residence permit, driving licence where self-supplied); skip documents whose photo is taken at the office;
+   - add the most-requested cross-border documents: visa photos for the most-visited destinations (for example the United States visa and the Schengen visa).
+3. **Tiers:** Tier 1 ships at 1.0; Tier 2 follows in updates. **Candidate** Tier 1 countries, to confirm with L19-010 data (not yet a commitment): United States, United Kingdom, Canada, Australia, Germany, France, Italy, Spain, Japan, South Korea, Brazil, Mexico, India. China mainland is a separate decision because of distribution requirements and localization.
+4. **Release gate unchanged:** every profile needs its own sourced research document (like [13](13-spain-foto-carnet.md)), alteration policy, background colour (ADR-037), digital preset where one exists, and last-reviewed date. A profile not validated in time moves to Tier 2; it never ships with weaker provenance. Never copy a profile from another country because the sizes match (AGENTS.md §11).
+5. **Countries without a profile:** generic print sizes stay available on the sheet. A custom size (ADR-018), clearly marked as unofficial, is recommended so the app is useful in every territory.
+6. **App Store lens:** the United States stays the lens for English screenshots, keywords, and pricing tests (BD-032). Spain DNI stays the engineering reference profile.
 
 ### Evidence
 
-ADR-016, BD-031, BD-032, brand 04 §10; spike 02 already lays out 51 × 51 mm copies; [14 §5.5](14-priority-feature-plan.md) lists US digital constraints to verify.
+Founder decision 2026-11-11; BD-032; [brand 04](brand/04-market-prioritization.md) §3, §7, §9. Many profiles share a geometry family (35 × 45 mm, 2 × 2 in, 3 × 4 cm), so the engineering cost per profile is mostly data. Research and validation costs are not shared.
 
 ### Alternatives considered
 
-- Spain only at 1.0, US in 1.1: lowest risk, weakest commercial launch.
-- US first, Spain later: discards the most mature profile.
-- Many countries at launch: conflicts with the release gate in [01 §15](01-product-definition.md).
+- Spain only, or Spain + US + Brazil: lower risk; rejected by the founder in favour of a worldwide goal.
+- A generic "ICAO 35 × 45" profile: rejected. Profiles are per country and document; a shared size is not a shared rule set.
 
 ### Consequences
 
-P3 in [the launch roadmap](23-launch-roadmap.md) needs two more profile research documents, rule data, and fixtures. US passport rules (for example glasses and alteration policy) must come from official sources before the background-replacement option is offered for that profile.
+- Profile research becomes the longest item on the critical path ([23](23-launch-roadmap.md) P3). It starts as soon as the country list is fixed.
+- Background colour as profile data (ADR-037) becomes P0: several countries do not use pure white.
+- Localization: BD-031 ships English, Spanish, and Portuguese (Brazil). Profiles for Germany, France, Italy, Japan, or Korea raise decision D-7 (more languages). At minimum, profile names, requirement text, and App Store metadata must be readable in the country's language.
+- The fixture set must cover a global user base ([22 §2](22-quality-and-delight-bar.md)).
 
 ### Revisit trigger
 
-ASO research (L19-010) shows a different market order, or a profile's official source does not allow at-home preparation.
+L19-010 data changes the country order; an official source forbids at-home preparation or editing; research capacity cannot validate Tier 1 in time (cut Tier 1 rather than lowering the gate).
 
 ---
 
-## ADR-048 — Pricing placement and credit semantics
+## ADR-048 — Pricing: one free photo, then one credit per photo
 
-**Status:** Proposed
+**Status:** Accepted (founder, 2026-11-11). Resolves ADR-015 and amends BD-029: one free credit in total, not a free result plus a free credit.
 **Date:** 2026-11-11
 
 ### Context
 
-BD-029 sets the direction: first result free, an initial free credit, then inexpensive credits, no subscription. ADR-015 constraints forbid surprise watermarks and paywalls before explaining a problem. When and how payment is asked decides whether the end of the journey feels satisfying ([22 §5](22-quality-and-delight-bar.md)).
+BD-029 set the direction: credits, no subscription. ADR-015's constraints forbid surprise watermarks, paywalls before a photo problem is explained, and dark patterns. The founder set the price and asked that people can edit as much as they need, with a clear warning at the point of no return.
 
-### Decision (proposed)
+### Decision
 
-1. **What a credit buys:** one finished person, meaning their digital photo and any print sheets containing them, re-exportable and reprintable without a further charge for as long as the session keeps that person.
-2. **Free:** the first finished person is free, plus one free credit (BD-029). No account; credits are StoreKit consumables. Consumables are not restorable by default, so keeping a balance across reinstalls and devices needs a design spike: finished-consumable transaction history (`SKIncludeConsumableInAppPurchaseHistory`, iOS 18+) and/or an iCloud key-value balance, with no Calipic account or backend.
-3. **When the price is shown:** once, plainly, in the preflight of the first capture after the free result is used; and in Settings. Never a countdown or "limited offer".
-4. **When payment is asked:** at **Choose result**, before any output file is generated, after Photo Check has shown every warning. Never after files are made; never a watermark.
-5. **Never charged:** retakes, adjustments, Photo Check, layout changes, reprints of a paid person, and failed exports.
+1. **Price:** the first photo is free (one free credit). Each further photo costs one credit at **USD 0.99**: a StoreKit consumable whose local prices follow Apple's equalization for that price point. No subscription, no ads.
+2. **What a credit unlocks:** one person's finished photo for one document profile: its digital file and any number of print copies and sheets, at every print size of that person on the sheet. Sharing or printing an unlocked photo again is always free.
+3. **When it is spent:** at the person's first output of any kind (digital file, sheet PDF, page JPEG, or print). Before that, everything is free: capture, retakes, import, Photo Check, Adjust, sheet layout, and drafts (ADR-049).
+4. **Point of no return:** before spending, a confirmation sheet shows the photo, any open warnings or manual checks, and the cost (the free photo, one credit from the balance, or USD 0.99 per person still locked, with a total when several people are on the sheet). It states: *After this, the photo's framing and edits are final. Changing them later uses a new credit. Printing or sharing it again is free.* Actions: **Unlock and continue** and **Keep editing**.
+5. **After unlocking:** the photo's render recipe (source, crop, background, tone) is frozen. Output choices stay free: digital or print, paper, copies, sizes on the sheet. **Edit photo** on an unlocked person creates a new draft that needs its own credit when output; the app says so before opening it.
+6. **Integrity:** the credit is reserved on confirmation, committed only after the first output file is verified (FR-096), and released if generation fails or is cancelled. A crash or relaunch never charges twice and never loses a paid photo; the ledger is idempotent per unlock ID. Pending purchases and Ask to Buy leave the draft locked and intact. Spending a credit works offline; buying one needs the App Store.
+7. **Free credit and restore:** one free credit per Apple ID where possible. "Free credit used" and the paid balance are mirrored in the iCloud key-value store and reconciled with StoreKit transaction history (`SKIncludeConsumableInAppPurchaseHistory`); no Calipic account, no backend. With iCloud off, a reinstall may grant the free credit again; that leak is accepted. Design spike before P6.
+8. **Where the price is visible:** the App Store listing ("First photo free, then USD 0.99 per photo"); once in preflight after the free credit is used; the confirmation sheet; Settings. Never a countdown, "limited offer", or upsell after success.
 
 ### Evidence
 
-BD-029, ADR-014, ADR-015, FR-098, constitution rule 11, [21 §3](21-user-journeys.md).
+Founder decision 2026-11-11; BD-029, ADR-014, ADR-015, FR-096, FR-098, constitution rule 11, [21 §3](21-user-journeys.md).
 
 ### Alternatives considered
 
-Charge per sheet (penalizes families, J2); charge per export (punishes retries); subscription (rejected by BD-029); watermark preview (rejected by FR-098).
+Credit per sheet (penalizes families); free edits after unlocking (a bypass: unlock once, then swap the person); credit packs (deferred, see revisit trigger); subscription (rejected by BD-029).
 
 ### Consequences
 
-Needs a StoreKit credit ledger, a Pricing sheet (S-18), restore in Settings, and App Review notes explaining the free result. Session persistence (D-4) affects how long a paid person stays reprintable.
+Needs: a StoreKit consumable, a credit ledger with reserve, commit, and release, the confirmation sheet (S-18), restore in Settings, the export gate (ADR-049), and App Review notes explaining the free photo. A six-person sheet costs six credits (USD 5.94, or USD 4.95 when one is the free photo); the total appears before anything is spent (J2). Screenshot protection of locked previews is decision D-9.
 
 ### Revisit trigger
 
-Beta testers find the per-person credit confusing, or price testing shows a pack structure converts better without harming satisfaction.
+Beta testers misunderstand what a credit covers or regret the point of no return; families find the per-person price too high (test a pack, for example 5 photos).
+
+---
+
+## ADR-049 — Drafts and locked export
+
+**Status:** Accepted (founder, 2026-11-11); preview protection open as D-9. Supersedes ADR-021.
+**Date:** 2026-11-11
+
+### Context
+
+People come back to finish later, add a family member, or print more copies. The founder decided drafts are saved without spending credits, and a draft must not become a usable file without a credit, with no bypass.
+
+### Decision
+
+1. **Drafts:** every person in progress is saved automatically on the device: source photo, edit recipe, profile, and lock state, plus the sheet that contains them. Home shows **Continue** with open drafts and unlocked photos. There is no photo gallery.
+2. **Storage and retention:** app-private storage with complete file protection, excluded from device and iCloud backups, never visible in the Files app. Deleted after **30 days without use** (proposed default), or immediately with **Delete** on a draft or **Delete all** in Settings. Unlocked photos follow the same rules; free reprints last as long as the draft exists.
+3. **One export gate:** every path that can take a photo out of the app goes through one export service: digital JPEG, sheet PDF, page JPEG, AirPrint, share sheet, Save to Photos, copy, drag and drop, context-menu actions, App Intents or Shortcuts results, and Quick Look. The service refuses to render a locked person. An unlock is bound to the draft ID and a hash of its render recipe, so changing the photo invalidates it (ADR-048 §5). Views hide output actions for locked people, but enforcement lives in the export service, not in views.
+4. **Locked previews:** rendered at display resolution only; no copy, drag, share, or context-menu save. Drafts store the source and recipe, never a finished full-resolution output.
+5. **Tests:** an export-gate test enumerates every output path and proves a locked person cannot leave the app through any of them (L19-012).
+
+### Known limit
+
+iOS does not let an app block screenshots or screen recording. A screenshot of a locked preview is a residual leak: not at print scale, no sheet, wrong pixel size for digital forms. D-9 decides whether that is acceptable or whether locked previews carry a disclosed "Preview" mark (FR-098 allows a watermark only when it is disclosed before the person invests effort).
+
+### Consequences
+
+Doc 08 and the in-app privacy text must say that face photos stay on this iPhone as drafts until deleted or after 30 days without use. App Store privacy answers do not change: nothing is collected. Relaunch, low storage, and locked-device file protection need tests. Resolves D-4.
+
+### Revisit trigger
+
+Testers expect drafts on a new phone (backups), or want a different retention period.
+
+---
+
+## ADR-050 — Accessibility scope for 1.0
+
+**Status:** Accepted (founder, 2026-11-11). Narrows ADR-030 and AGENTS.md §6 for 1.0; BD-034 stands as written.
+**Date:** 2026-11-11
+
+### Context
+
+ADR-030 and AGENTS.md §6 made full accessibility part of every feature's acceptance. The founder decided accessibility is not a priority before launch.
+
+### Decision
+
+1. **Kept for 1.0** (mostly free with native SwiftUI, and clearer for everyone): system controls and text styles; a name on every icon-only button; status shown with a word or symbol, never colour alone; Reduce Motion respected by custom animations; existing accessible features stay (Move/Zoom buttons, spoken camera guidance, accessibility actions already built).
+2. **Deferred until after 1.0:** VoiceOver and Voice Control end-to-end journeys (J8), accessibility audits as a release gate (Epic 15), layouts tuned for accessibility text sizes, recruiting assistive-technology users, and non-gesture equivalents for new features (for example S-11 *Fix the edges*).
+3. Accessibility no longer blocks a phase gate in [23](23-launch-roadmap.md). A regression of a kept item is still a defect.
+
+### Consequences
+
+- App Store accessibility declarations list only what has actually been checked.
+- The European Accessibility Act can apply to in-app sales as an e-commerce service; micro-enterprises are exempt from its service requirements. Confirm Calipic's status before EU launch.
+- Persona Daniel (J8) and the accessibility audience in [20 §3](20-product-blueprint.md) move to post-launch.
+
+### Revisit trigger
+
+After 1.0; App Review or legal requirements; reviews or support contacts from people who cannot complete the task.
 
 ---
 
@@ -829,15 +897,14 @@ Immediate M1 decisions:
 6. performance/memory budgets derived from device measurements.
 7. ADR-036 to ADR-042 — print composer, background colour policy, Document Tone, alignment estimator, revision pinning, iterative segmentation, Foundation Models boundary (from [the priority feature plan](14-priority-feature-plan.md)).
 
-Product decisions that can proceed in parallel (the launch-blocking ones are D-1 to D-5 in [the product blueprint §8](20-product-blueprint.md)):
+Product decisions taken by the founder on 2026-11-11: ADR-017 (children), ADR-020 (measurement), ADR-047 (worldwide launch), ADR-048 (pricing), ADR-049 (drafts), ADR-050 (accessibility scope).
 
-1. ADR-015 / ADR-048 — monetization direction (BD-029) and its pricing placement and credit semantics.
-2. ADR-016 / ADR-047 — Spain accepted as the first format; launch profile set and market proposed. Complete source validation for each launch profile before publication.
-3. ADR-017 — child/baby launch coverage.
-4. ADR-018 — generic/custom size in MVP.
-5. ADR-020 — diagnostics/analytics.
-6. ADR-021 — session persistence across restarts.
-7. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
+Product decisions still open (see [the product blueprint §8](20-product-blueprint.md)):
+
+1. D-7 — languages beyond English, Spanish, and Portuguese (Brazil) for a worldwide launch (BD-031).
+2. D-8 — the confirmed Tier 1 country and document list (from L19-010), and ADR-018 custom size at 1.0.
+3. D-9 — locked-preview protection: accept the screenshot limit or add a disclosed "Preview" mark (ADR-049).
+4. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
 
 # Decision template
 

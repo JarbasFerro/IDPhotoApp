@@ -662,6 +662,8 @@ Generative output never creates official rule results.
 
 # EPIC 15 — Accessibility excellence
 
+**Deferred until after 1.0** (ADR-050, founder decision 2026-11-11). The 1.0 baseline in AGENTS.md §6 still applies; the audits below return as the first post-launch accessibility release.
+
 ## AX15-001 — VoiceOver core-flow audit — P0 / L
 
 ## AX15-002 — Voice Control audit — P0 / M
@@ -748,15 +750,15 @@ Added 2026-11-11 from [the product blueprint](20-product-blueprint.md), [user jo
 
 ## L19-001 — Helper mode: guidance for the person holding the phone — P0 / L
 
-Preflight asks **Who is taking the photo?** (Me / Someone helping). Helper mode defaults to the back camera and words every instruction for the photographer; spoken guidance stays rate-limited. Recommended automatically for child profiles. Acceptance: physical-device task test with a helper on both cameras; direction words correct for lens facing and mirroring (ADR-044); VoiceOver parity. Journey J3, function F-15.
+Preflight asks **Who is taking the photo?** (Me / Someone helping). Helper mode defaults to the back camera and words every instruction for the photographer; spoken guidance stays rate-limited. The recommended way to photograph a child (ADR-017). Acceptance: physical-device task test with a helper on both cameras; direction words correct for lens facing and mirroring (ADR-044). Journey J3, function F-15.
 
 ## L19-002 — Find a good spot: home setup coaching — P0 / M
 
-A short, illustrated section in preflight and Help: face a window, plain light wall about an arm's length behind, no strong light behind you, phone at eye level. Live camera keeps "Find more light" and backlight cues. Acceptance: testers can name the setup advice after one read; no more than four tips; no stock-photo faces. Function F-16.
+A short, illustrated section in preflight and Help: face a window, plain light wall about 0.5–1 m behind you (so your shadow falls out of frame), no strong light behind you, phone at eye level. Live camera keeps "Find more light" and backlight cues. Acceptance: testers can name the setup advice after one read; no more than four tips; no stock-photo faces. Function F-16.
 
 ## L19-003 — Print check after printing — P0 / M
 
-After Print, offer **Check your print**: did the 50 mm bar measure 50 mm? Yes ends with the W7 confirmation. No asks for the measured value (Stepper, accessible) and diagnoses the likely cause (fit-to-page scaling, borderless paper, wrong paper size), then offers a reprint with corrected settings. Never infer a correct print from the print controller's completion callback; only the person's answer counts, and it is feedback, not certification. Hidden when the check bar was turned off. Acceptance: diagnosis table tested against the printer round; ≥ 95 % first-print success target in [22 §4](22-quality-and-delight-bar.md). Screen S-16, function F-47. Post-launch: read the bar with the camera.
+After Print, offer **Check your print**: did the 50 mm bar measure 50 mm? Yes ends with the W7 confirmation. No asks for the measured value (Stepper) and diagnoses the likely cause (fit-to-page scaling, borderless paper, wrong paper size), then offers a reprint with corrected settings. Never infer a correct print from the print controller's completion callback; only the person's answer counts, and it is feedback, not certification. Hidden when the check bar was turned off. Acceptance: diagnosis table tested against the printer round; the first-print target in [20 §7](20-product-blueprint.md). Screen S-16, function F-47. Post-launch: read the bar with the camera.
 
 ## L19-004 — Cutting guide — P1 / S
 
@@ -766,9 +768,9 @@ Three-step guide drawn from the person's actual layout (cut order: rows, then co
 
 In Print & Share, a **Print at a shop** path shares the existing 300 ppi lab JPEG (P12-009) with short instructions: order a standard print of that paper size, no cropping or fit, measure the bar. Acceptance: one round of real lab or kiosk prints measured in a launch market. Journey J5, function F-46.
 
-## L19-006 — Credits, pricing sheet, and restore — P0 / L
+## L19-006 — Credits, unlock confirmation, and restore — P0 / L
 
-Implement ADR-048 once accepted: StoreKit consumable credits, the free first person and free credit, pricing shown before capture, payment at Choose result before file generation, balance persistence design (consumable history and/or iCloud key-value), restore in Settings, App Review notes. Acceptance: sandbox and TestFlight tests for purchase, cancel, interruption, Ask to Buy, reinstall; no path loses edits. Screen S-18, functions F-51, F-52. Supersedes the conditional wording in AS18-006.
+Implement ADR-048: a StoreKit consumable at USD 0.99; one free credit in total; a credit ledger with reserve, commit after the first verified output, and release on failure, idempotent per unlock ID; the unlock confirmation (S-18) with open checks, cost or total, and the point-of-no-return sentence; frozen render recipe after unlocking; **Edit photo** creating a new draft with a warning; price in preflight once after the free credit is used and in Settings; a design spike first for balance and free-credit persistence (StoreKit consumable history and the iCloud key-value store); restore in Settings; App Review notes. Acceptance: sandbox and TestFlight tests for purchase, cancel, interruption, pending, Ask to Buy, crash between reserve and commit, reinstall with and without iCloud; no double charge; no path loses edits or a paid photo. Screen S-18, functions F-51, F-52, F-59. Supersedes the conditional wording in AS18-006.
 
 ## L19-007 — Blind quality study against photo-shop photos — P0 / L
 
@@ -776,19 +778,39 @@ Run the study in [22 §2.3](22-quality-and-delight-bar.md) twice: once in P4 to 
 
 ## L19-008 — Home fresh-install visual and Settings & About — P1 / M
 
-Show what the person will get on first launch (sample result in the 26:32 frame); move App Icon, privacy details, restore, and help into a Settings & About screen (S-19). The `marketing version (build)` line stays on Home as the last, tertiary element (AGENTS.md §17). Acceptance: [22 §3.2](22-quality-and-delight-bar.md) review in Light, Dark, and AX sizes.
+Show what the person will get on first launch (sample result in the 26:32 frame); move App Icon, privacy details, restore, and help into a Settings & About screen (S-19). The `marketing version (build)` line stays on Home as the last, tertiary element (AGENTS.md §17). Acceptance: [22 §3.2](22-quality-and-delight-bar.md) review in Light and Dark.
 
 ## L19-009 — Rating request policy — P1 / S
 
 Use `RequestReviewAction` at most once per version, only on a later Home visit after the person confirmed a correct print or shared a digital photo; never on a result, print, or purchase screen. Acceptance: unit-tested eligibility logic; no prompt in the task flow.
 
-## L19-010 — ASO and market evidence — P0 / M
+## L19-010 — Market ranking, Tier 1 list, and ASO evidence — P0 / M (first)
 
-Complete the research listed in [brand 04 §9](brand/04-market-prioritization.md): competitor ranking per launch country, keyword volumes ("passport photo", "ID photo", "foto carnet", "foto 3x4"), competitor pricing and paywalls, review mining for unmet needs. Output informs ADR-047, App Store subtitle and keywords, and screenshots. Acceptance: a dated research document with sources.
+First, rank App Store countries by relevance (iPhone users and App Store spending, from a named and dated source) and list, per country, the documents for which people supply their own photo, plus the most-requested visa photos (ADR-047). Output: the Tier 1 list for founder confirmation (D-8). Then complete the research listed in [brand 04 §9](brand/04-market-prioritization.md): competitor ranking per launch country, keyword volumes ("passport photo", "ID photo", "foto carnet", "foto 3x4"), competitor pricing and paywalls, review mining for unmet needs. Output informs ADR-047, the profile research order (L19-013), App Store subtitle and keywords, and screenshots. Acceptance: a dated research document with sources.
 
 ## L19-011 — Best-frame burst — P2 / L
 
 Capture a short burst and choose the sharpest frame with open eyes using `DetectFaceCaptureQualityRequest` for ranking only ([14 §5.7](14-priority-feature-plan.md)). Post-launch candidate. Function F-17.
+
+## L19-012 — Drafts and the export gate — P0 / L
+
+Implement ADR-049: automatic drafts (source, recipe, profile, lock state, sheet) in app-private storage with complete file protection, excluded from backups; **Continue** on Home; Delete and Delete all; 30-day retention; one export service for every output path, bound to draft ID and recipe hash; locked previews at display resolution without copy, drag, share, or save. Acceptance: an export-gate test enumerating every output path (digital JPEG, PDF, page JPEG, AirPrint, share sheet, Save to Photos, copy, drag and drop, context menus, App Intents, Quick Look) proves a locked person cannot leave the app; relaunch, low-storage, and locked-device tests; privacy text updated (doc 08). Functions F-60, F-61.
+
+## L19-013 — Tier 1 profile research and validation — P0 / XL
+
+For each Tier 1 country and document from L19-010: one sourced profile document like [13](13-spain-foto-carnet.md) (dimensions, head and eye geometry, background colour, alteration policy, digital submission limits, children's rules, sources, last-reviewed date), rule data, fixtures, and the [01 §15](01-product-definition.md) release gate. Profiles that miss the gate move to Tier 2. Acceptance: per profile, a reviewed research document and passing rule tests. Function F-04.
+
+## L19-014 — Shadow and side-light advisory — P1 / M
+
+Detect a background shadow next to the head and uneven light across the face, in live guidance and Photo Check. Advisory only (warn or manual check) until calibration proves reliability (AGENTS.md §9). Acceptance: calibrated on a consented fixture set across skin tones; no false fail.
+
+## L19-015 — Glasses glare advisory — P1 / M
+
+Flag likely reflections on glasses and suggest tilting the glasses or moving the light; respect each profile's glasses rule. Advisory only. Acceptance: calibrated on consented fixtures with and without glasses.
+
+## L19-016 — Quick sheet presets — P2 / S
+
+One-tap starting layouts on Your sheet ("One person, most copies", "Family", "ID + passport sizes"). Acceptance: each preset produces a valid layout on every catalog paper.
 
 ---
 
@@ -821,9 +843,7 @@ A feature is done only when relevant items are true:
 
 - acceptance criteria tested;
 - current HIG/native control review completed;
-- VoiceOver/Voice Control semantics present;
-- Dynamic Type considered;
-- Reduce Motion/contrast considered;
+- accessibility baseline kept (AGENTS.md §6, ADR-050);
 - no unnecessary permission;
 - privacy/logging reviewed;
 - async cancellation/stale state handled;
