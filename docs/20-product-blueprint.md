@@ -269,6 +269,7 @@ When documents disagree, the order is: accepted ADRs and brand decisions → [AG
 | Decisions | [10](10-decisions.md), [brand log](brand/99-brand-decisions-log.md) |
 | Platform capability map | [11](11-ios-excellence-strategy.md) |
 | Feature research: print, alignment, background, tone | [14](14-priority-feature-plan.md), [spikes](spikes/) |
+| Official profile research | [profiles/](profiles/README.md) |
 | Current screen contract | [16](16-screen-experience-spec.md), [screen states](ui/screen-states.md), [evidence](ui/screen-evidence.md) |
 | Brand, voice, tokens | [brand/](brand/README.md) |
 | External reviews of 2026-11-11 (records; see §10) | [ChatGPT](20-product-outcome-and-launch-review-ChatGPT.md), [Gemini](20-product-outcome-and-launch-review-Gemini.md) |
