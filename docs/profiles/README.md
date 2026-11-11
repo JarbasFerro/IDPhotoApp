@@ -15,14 +15,28 @@ One document per official profile (L19-013). Each profile must pass the release 
 | Italy · passport, CIE | [italy-passport-and-cie](italy-passport-and-cie.md) | Researched | Print 35 × 45 | CIE: not cropped, straightened, or retouched | Not stated |
 | Spain · TIE, driving licence | [spain-tie-and-driving-licence](spain-tie-and-driving-licence.md) | Researched | Print 32 × 26 | Not stated | Not stated |
 | Netherlands · passport, ID card, driving licence | [netherlands-passport-id-driving-licence](netherlands-passport-id-driving-licence.md) | Researched | Print 35 × 45 at **≥ 400 dpi** | Not stated | Allowed (self-made accepted) |
-| South Korea · passport | [south-korea-passport](south-korea-passport.md) | Researched; **flag** | Print 3.5 × 4.5 | No edited or composited backgrounds | **Self-taken digital photos unsuitable** |
+| South Korea · passport | [south-korea-passport](south-korea-passport.md) | Researched; kept by the founder | Print 3.5 × 4.5 | No edited or composited backgrounds | Officially "unsuitable"; kept anyway |
 | Schengen visa | [schengen-visa](schengen-visa.md) | Researched | Print 35 × 45 | ICAO | Not stated |
+| *Proposed:* Australia · passport | [wave-a-second-group](wave-a-second-group.md) | Researched | Print 35–40 × 45–50 | Filters and retouching cause problems | **No**: dye-sub shop print only |
+| *Proposed:* UK · driving licence | [wave-a-second-group](wave-a-second-group.md) | Researched | Digital + print 35 × 45 | As UK passport | Shop print |
+| *Proposed:* Japan · driving licence | [wave-a-second-group](wave-a-second-group.md) | Researched | Print 24 × 30 | Not stated | Photo paper only |
+| *Proposed:* Germany · driving licence | [wave-a-second-group](wave-a-second-group.md) | Researched | Print 35 × 45 | Not stated | Yes (biometric print) |
+| *Proposed:* Switzerland · ID card (commune) | [wave-a-second-group](wave-a-second-group.md) | Researched | Print 35 × 45 | Not stated | Depends on the commune |
+| *Proposed:* Saudi Arabia · resident photo (Absher) | [wave-a-second-group](wave-a-second-group.md) | Researched | Digital 2:3, ≤ 1 MB | Not modified by programs | — |
+| *Proposed:* Canada · visitor visa | [wave-a-second-group](wave-a-second-group.md) | Researched | Print ≥ 35 × 45 | Digital must not be altered | Quality photo paper |
 
-All 13 approved profiles are researched. Open points:
+All 13 approved profiles are researched, and the verification list too ([wave-a-second-group](wave-a-second-group.md)).
 
-- **South Korea:** official pages say self-taken digital photos are unsuitable. The founder decides whether to keep this profile.
-- **Netherlands:** prints need **400 dpi** (L19-020), and the head size depends on age, so the profile asks whether the person is 10 or younger.
-- **Next:** verify the P2 list in [25 §3](../25-wave-a-document-types.md): Australia, the UK, Japanese, and German driving licences, the Swiss ID card, Saudi Absher, Brazil 3 × 4, the Canadian visitor visa, and Mexico.
+**Proposed** (founder confirmation):
+
+- 7 more profiles (above), making **20 Wave A profiles**;
+- Brazil and Mexico served by custom-size shortcuts: **3 × 4 cm** and **2.5 × 3 cm (tamaño infantil)**;
+- a **black-and-white** custom-size option.
+
+**Open technical points:**
+
+- **Netherlands:** prints need 400 dpi, and the head size depends on age (L19-020).
+- **Australia and the UK:** the print route goes through a shop (L19-005).
 
 ## Editing
 
