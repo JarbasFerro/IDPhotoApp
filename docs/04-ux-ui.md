@@ -1,5 +1,7 @@
 # 04 — iOS UX / UI
 
+> **2026-11-11 note:** This document holds the UX principles (UXP-01 to UXP-10) and the original production screen ideas. The current screen behavior is in [16](16-screen-experience-spec.md) (ADR-043 to ADR-046 supersede parts of §7). The launch screen catalog, including the profile picker, pricing, print check, and Settings, is in [the product blueprint §5](20-product-blueprint.md), and the end-to-end journeys are in [21](21-user-journeys.md).
+
 ## 1. UX objective
 
 The interface should feel materially simpler than the underlying problem. A person should not need to understand biometric-photo geometry, pixels, DPI, segmentation, or image formats to produce the correct output.

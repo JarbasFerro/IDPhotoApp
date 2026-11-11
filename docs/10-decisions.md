@@ -195,7 +195,7 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-015 — Monetization
 
-**Status:** Deferred  
+**Status:** Deferred; direction set by brand decision BD-029 (credits, no subscription). Implementation details proposed in ADR-048.  
 **Decision needed:** free, one-time purchase, freemium, subscription for advanced/frequent users, or hybrid.
 
 **Accepted constraints:**
@@ -210,7 +210,7 @@ Moving image processing to a server for convenience is not a sufficient reason.
 
 ## ADR-016 — Initial launch jurisdictions
 
-**Status:** Accepted for initial country and format
+**Status:** Accepted for initial country and format; launch profile set beyond Spain proposed in ADR-047
 **Date:** 2026-09-15
 
 **Decision:** Start with Spain and the user-requested “foto carnet”, 32 × 26 mm in portrait orientation: width 26 mm, height 32 mm. Use DNI as the first official research reference; exact document-compliance claims require a validated, sourced profile.
@@ -746,6 +746,77 @@ Physical-device review finds the bloom distracting, or capture-to-review latency
 
 ---
 
+## ADR-047 — Launch market and launch profile set
+
+**Status:** Proposed
+**Date:** 2026-11-11
+
+### Context
+
+ADR-016 makes Spain DNI 26 × 32 mm the first format and the spike delivers it end to end. BD-032 and [brand 04](brand/04-market-prioritization.md) name the United States as the primary commercial launch lens, and BD-031 makes Portuguese (Brazil) a launch language. A US-led App Store launch without a US profile, or a pt-BR app without a Brazil profile, would undercut the goal of being the #1 at-home ID-photo app ([20 §1](20-product-blueprint.md)).
+
+### Decision (proposed)
+
+1. Launch 1.0 with three sourced, validated profiles: **Spain · DNI (26 × 32 mm)**, **United States · passport (2 × 2 in)**, and **Brazil · 3 × 4 cm document photo**, each with its own profile research document, alteration policy, and digital submission preset where one exists.
+2. Use the United States as the App Store lens for English screenshots, keywords, and pricing; ship Spanish and Brazilian Portuguese as first-class localizations with their native profiles.
+3. A profile not validated in time is dropped from 1.0 rather than shipped with weaker provenance. Spain stays the reference profile.
+4. Generic sizes (26 × 32, 35 × 45, 51 × 51) remain available on the print sheet, marked as sizes and not compliance claims (ADR-018).
+
+### Evidence
+
+ADR-016, BD-031, BD-032, brand 04 §10; spike 02 already lays out 51 × 51 mm copies; [14 §5.5](14-priority-feature-plan.md) lists US digital constraints to verify.
+
+### Alternatives considered
+
+- Spain only at 1.0, US in 1.1: lowest risk, weakest commercial launch.
+- US first, Spain later: discards the most mature profile.
+- Many countries at launch: conflicts with the release gate in [01 §15](01-product-definition.md).
+
+### Consequences
+
+P3 in [the launch roadmap](23-launch-roadmap.md) needs two more profile research documents, rule data, and fixtures. US passport rules (for example glasses and alteration policy) must come from official sources before the background-replacement option is offered for that profile.
+
+### Revisit trigger
+
+ASO research (L19-010) shows a different market order, or a profile's official source does not allow at-home preparation.
+
+---
+
+## ADR-048 — Pricing placement and credit semantics
+
+**Status:** Proposed
+**Date:** 2026-11-11
+
+### Context
+
+BD-029 sets the direction: first result free, an initial free credit, then inexpensive credits, no subscription. ADR-015 constraints forbid surprise watermarks and paywalls before explaining a problem. When and how payment is asked decides whether the end of the journey feels satisfying ([22 §5](22-quality-and-delight-bar.md)).
+
+### Decision (proposed)
+
+1. **What a credit buys:** one finished person, meaning their digital photo and any print sheets containing them, re-exportable and reprintable without a further charge for as long as the session keeps that person.
+2. **Free:** the first finished person is free, plus one free credit (BD-029). No account; credits are StoreKit consumables. Consumables are not restorable by default, so keeping a balance across reinstalls and devices needs a design spike: finished-consumable transaction history (`SKIncludeConsumableInAppPurchaseHistory`, iOS 18+) and/or an iCloud key-value balance, with no Calipic account or backend.
+3. **When the price is shown:** once, plainly, in the preflight of the first capture after the free result is used; and in Settings. Never a countdown or "limited offer".
+4. **When payment is asked:** at **Choose result**, before any output file is generated, after Photo Check has shown every warning. Never after files are made; never a watermark.
+5. **Never charged:** retakes, adjustments, Photo Check, layout changes, reprints of a paid person, and failed exports.
+
+### Evidence
+
+BD-029, ADR-014, ADR-015, FR-098, constitution rule 11, [21 §3](21-user-journeys.md).
+
+### Alternatives considered
+
+Charge per sheet (penalizes families, J2); charge per export (punishes retries); subscription (rejected by BD-029); watermark preview (rejected by FR-098).
+
+### Consequences
+
+Needs a StoreKit credit ledger, a Pricing sheet (S-18), restore in Settings, and App Review notes explaining the free result. Session persistence (D-4) affects how long a paid person stays reprintable.
+
+### Revisit trigger
+
+Beta testers find the per-person credit confusing, or price testing shows a pack structure converts better without harming satisfaction.
+
+---
+
 # Open decisions before production implementation
 
 Immediate M1 decisions:
@@ -758,14 +829,15 @@ Immediate M1 decisions:
 6. performance/memory budgets derived from device measurements.
 7. ADR-036 to ADR-042 — print composer, background colour policy, Document Tone, alignment estimator, revision pinning, iterative segmentation, Foundation Models boundary (from [the priority feature plan](14-priority-feature-plan.md)).
 
-Product decisions that can proceed in parallel:
+Product decisions that can proceed in parallel (the launch-blocking ones are D-1 to D-5 in [the product blueprint §8](20-product-blueprint.md)):
 
-1. ADR-015 — monetization.
-2. ADR-016 — country/format accepted; complete Spain profile source validation before publication.
+1. ADR-015 / ADR-048 — monetization direction (BD-029) and its pricing placement and credit semantics.
+2. ADR-016 / ADR-047 — Spain accepted as the first format; launch profile set and market proposed. Complete source validation for each launch profile before publication.
 3. ADR-017 — child/baby launch coverage.
 4. ADR-018 — generic/custom size in MVP.
 5. ADR-020 — diagnostics/analytics.
-6. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
+6. ADR-021 — session persistence across restarts.
+7. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
 
 # Decision template
 

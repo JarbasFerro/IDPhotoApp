@@ -11,14 +11,14 @@ This is the target description of **what each current screen should show and how
 The current product is a Spain 26 × 32 mm DNI photo spike with a shared print session. The target path is:
 
 ```text
-Home → Before your photo → Guided camera ─┐
-                         → PhotosPicker ───┴→ Photo Check → Choose result ─┬→ Digital Photo → Share JPEG
-                                        │                 │                └→ Your Sheet → Print/Share
-               Home → Requirements       └→ optional Camera Help
-               Home → App Icon                             └→ Adjust
+Home → Before your photo → Guided camera → Captured photo review ─┐
+                         → PhotosPicker ───────────────────────────┴→ Photo Check → Choose result ─┬→ Digital Photo → Share JPEG
+                              │                                          │                         └→ Your Sheet → Print/Share
+               Home → Requirements   └→ optional Camera Help             └→ Adjust
+               Home → App Icon
 ```
 
-There is no profile picker, general Settings, or background-refinement screen in the current app. Camera Help is available from the camera. Section 15 describes later destinations without creating placeholder navigation.
+There is no profile picker, general Settings, or background-refinement screen in the current app. Camera Help is available from the camera. Section 15 describes later destinations without creating placeholder navigation. The full launch screen catalog, including screens not yet specified here, is in [the product blueprint §5](20-product-blueprint.md); each new screen gets a contract in this document before implementation.
 
 ### 1.1 Current-to-target ledger
 
@@ -283,7 +283,7 @@ For every variant, inspect safe areas, one dominant action, localized copy, Voic
 
 ## 15. Future destinations already proposed in planning
 
-These are **not current spike screens**. When the product grows beyond one sourced profile, add a searchable country/document picker between Home and acquisition, with recent/favorite profiles, localized names, exact size, and source/review status. Requirements then reflect the chosen versioned profile. Reuse the camera, Check, Adjust, and output surfaces while deriving all copy/options from that profile.
+These are **not current spike screens**. The launch list (S-02, S-11, S-16 to S-20) is in [the product blueprint §5](20-product-blueprint.md) and the journeys that use them in [21](21-user-journeys.md). When the product grows beyond one sourced profile, add a searchable country/document picker between Home and acquisition, with recent/favorite profiles, localized names, exact size, and source/review status. Requirements then reflect the chosen versioned profile. Reuse the camera, Check, Adjust, and output surfaces while deriving all copy/options from that profile.
 
 If background refinement becomes available, reveal it only when mask quality needs help, with a non-freehand accessible alternative and an iOS 26 fallback. Help/Settings should contain real durable needs, not act as filler navigation. These additions require their own screen-level amendment before implementation.
 

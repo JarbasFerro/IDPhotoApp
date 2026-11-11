@@ -1,5 +1,7 @@
 # 01 — Product definition
 
+> **Ambition (2026-11-11):** Calipic aims to be the #1 iPhone app for making ID photos at home and printing them yourself: the easiest to use, the best-looking result, exact prints, and a satisfying finish. How that is measured, the full function and screen inventory, and the open launch decisions are in [the product blueprint](20-product-blueprint.md). This document keeps the product principles, MVP rationale, and risks.
+
 ## 1. Purpose
 
 ID Photo App is a native iPhone application that helps a person create an identity photo matching the measurable requirements of a selected country and document type, while making the limits of automated validation explicit.
@@ -130,6 +132,8 @@ The intended fast path is:
 10. Native save/share/print flow completes the task.
 
 Target: a valid source photo should require only a few deliberate actions after document selection.
+
+*Update:* ADR-043 to ADR-045 refine this path: a short requirements preflight before capture or import, a captured-photo review (Retake / Use Photo), and a choice between **Digital Photo** and **Print Sheet** after Photo Check. The complete journeys, including printing, checking the print, and cutting, are in [21-user-journeys.md](21-user-journeys.md).
 
 ## 8. MVP scope
 
@@ -297,6 +301,8 @@ The original product motivation includes frustration with intrusive advertising.
 - pricing, if any, is clear before paid-only output is generated;
 - StoreKit is the default monetization technology;
 - monetization decisions remain separated from the correctness engine.
+
+The accepted direction is a credit model with a free first result and no subscription (BD-029). Credit semantics and where payment is asked are proposed in ADR-048.
 
 ## 14. Key product risks
 

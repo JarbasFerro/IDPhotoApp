@@ -738,6 +738,6 @@ Do not quietly work around architectural discoveries.
 
 ## 16. Immediate next development step
 
-Create the **M1 native iOS spike Xcode project**, not the final home screen.
+*Updated 2026-11-11.* The M1 spike project exists (`Spikes/IDPhotoSpike`, version 0.12.7) and covers the full Spain DNI flow. M1 is not yet exited because physical-device and physical-print evidence is incomplete. The current position, the phases P0–P9 mapped onto M0–M8, their exit gates, and the next three work batches are in [the launch roadmap](23-launch-roadmap.md).
 
 The first production-looking artifact should emerge only after we have measured the camera, Vision, image pipeline, editor accessibility, and exact export behavior on real iPhones.

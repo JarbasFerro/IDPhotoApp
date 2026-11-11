@@ -1,7 +1,7 @@
 # 12 — Implementation kickoff
 
 **Date:** 2026-09-15  
-**Status:** M1 implementation started on 2026-09-16. Spain foto carnet scope and first physical test device confirmed; Xcode 27 verified. See [the first spike report](spikes/01-import-crop-export.md).
+**Status:** Historical record of the M1 start. For current status and next steps, see [the launch roadmap](23-launch-roadmap.md) (2026-11-11). M1 implementation started on 2026-09-16. Spain foto carnet scope and first physical test device confirmed; Xcode 27 verified. See [the first spike report](spikes/01-import-crop-export.md).
 
 ## 1. Starting point
 

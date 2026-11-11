@@ -742,6 +742,56 @@ Use App Store-accepted non-beta Xcode toolchain.
 
 ---
 
+# EPIC 19 — Launch differentiators and satisfaction
+
+Added 2026-11-11 from [the product blueprint](20-product-blueprint.md), [user journeys](21-user-journeys.md), and [quality and delight bar](22-quality-and-delight-bar.md). These items close the gap between a correct workflow and the "#1 at-home ID photo and print" goal. Each new screen needs a contract in [doc 16](16-screen-experience-spec.md) before implementation.
+
+## L19-001 — Helper mode: guidance for the person holding the phone — P0 / L
+
+Preflight asks **Who is taking the photo?** (Me / Someone helping). Helper mode defaults to the back camera and words every instruction for the photographer; spoken guidance stays rate-limited. Recommended automatically for child profiles. Acceptance: physical-device task test with a helper on both cameras; direction words correct for lens facing and mirroring (ADR-044); VoiceOver parity. Journey J3, function F-15.
+
+## L19-002 — Find a good spot: home setup coaching — P0 / M
+
+A short, illustrated section in preflight and Help: face a window, plain light wall about an arm's length behind, no strong light behind you, phone at eye level. Live camera keeps "Find more light" and backlight cues. Acceptance: testers can name the setup advice after one read; no more than four tips; no stock-photo faces. Function F-16.
+
+## L19-003 — Print check after printing — P0 / M
+
+After Print, offer **Check your print**: did the 50 mm bar measure 50 mm? Yes ends with the W7 confirmation. No asks for the measured value (Stepper, accessible) and diagnoses the likely cause (fit-to-page scaling, borderless paper, wrong paper size), then offers a reprint with corrected settings. Never infer a correct print from the print controller's completion callback; only the person's answer counts, and it is feedback, not certification. Hidden when the check bar was turned off. Acceptance: diagnosis table tested against the printer round; ≥ 95 % first-print success target in [22 §4](22-quality-and-delight-bar.md). Screen S-16, function F-47. Post-launch: read the bar with the camera.
+
+## L19-004 — Cutting guide — P1 / S
+
+Three-step guide drawn from the person's actual layout (cut order: rows, then columns; use the tick marks; scissors or trimmer tips). Acceptance: testers cut a sheet correctly on the first attempt. Screen S-17, function F-48.
+
+## L19-005 — Print at a shop — P1 / S
+
+In Print & Share, a **Print at a shop** path shares the existing 300 ppi lab JPEG (P12-009) with short instructions: order a standard print of that paper size, no cropping or fit, measure the bar. Acceptance: one round of real lab or kiosk prints measured in a launch market. Journey J5, function F-46.
+
+## L19-006 — Credits, pricing sheet, and restore — P0 / L
+
+Implement ADR-048 once accepted: StoreKit consumable credits, the free first person and free credit, pricing shown before capture, payment at Choose result before file generation, balance persistence design (consumable history and/or iCloud key-value), restore in Settings, App Review notes. Acceptance: sandbox and TestFlight tests for purchase, cancel, interruption, Ask to Buy, reinstall; no path loses edits. Screen S-18, functions F-51, F-52. Supersedes the conditional wording in AS18-006.
+
+## L19-007 — Blind quality study against photo-shop photos — P0 / L
+
+Run the study in [22 §2.3](22-quality-and-delight-bar.md) twice: once in P4 to guide tuning, once in beta. Consent, storage, and deletion follow ADR-027 and [08](08-privacy-security.md); no photos enter the repository. Acceptance: report with preference rates per skin-tone group and the actions taken.
+
+## L19-008 — Home fresh-install visual and Settings & About — P1 / M
+
+Show what the person will get on first launch (sample result in the 26:32 frame); move App Icon, privacy details, restore, and help into a Settings & About screen (S-19). The `marketing version (build)` line stays on Home as the last, tertiary element (AGENTS.md §17). Acceptance: [22 §3.2](22-quality-and-delight-bar.md) review in Light, Dark, and AX sizes.
+
+## L19-009 — Rating request policy — P1 / S
+
+Use `RequestReviewAction` at most once per version, only on a later Home visit after the person confirmed a correct print or shared a digital photo; never on a result, print, or purchase screen. Acceptance: unit-tested eligibility logic; no prompt in the task flow.
+
+## L19-010 — ASO and market evidence — P0 / M
+
+Complete the research listed in [brand 04 §9](brand/04-market-prioritization.md): competitor ranking per launch country, keyword volumes ("passport photo", "ID photo", "foto carnet", "foto 3x4"), competitor pricing and paywalls, review mining for unmet needs. Output informs ADR-047, App Store subtitle and keywords, and screenshots. Acceptance: a dated research document with sources.
+
+## L19-011 — Best-frame burst — P2 / L
+
+Capture a short burst and choose the sharpest frame with open eyes using `DetectFaceCaptureQualityRequest` for ranking only ([14 §5.7](14-priority-feature-plan.md)). Post-launch candidate. Function F-17.
+
+---
+
 # 2. Critical path
 
 ```text
@@ -762,6 +812,8 @@ P0-001
 ```
 
 App Intents can progress after the navigation/domain model stabilizes. Optional Foundation Models work is deliberately outside the critical path.
+
+As of 2026-11-11 the spike has explored much of U10, X11, and P12 ahead of this order. The current phase plan and the place of Epic 19 in it are in [the launch roadmap](23-launch-roadmap.md).
 
 # 3. Definition of done for every iOS feature
 
