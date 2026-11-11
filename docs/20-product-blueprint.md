@@ -256,6 +256,7 @@ When documents disagree, the order is: accepted ADRs and brand decisions → [AG
 | Who uses it and how, step by step | [21 — User journeys](21-user-journeys.md) |
 | What "great photo", "beautiful", and "wow" mean, and how they are tested | [22 — Quality and delight bar](22-quality-and-delight-bar.md) |
 | What happens next until launch | [23 — Launch roadmap](23-launch-roadmap.md) |
+| Where the UX and docs fall short, and ranked ideas | [26 — UX and design challenge](26-ux-design-challenge.md) |
 | Which countries, and why | [24 — Launch country ranking](24-launch-country-ranking.md) |
 | Which documents per country; China | [25 — Wave A document types](25-wave-a-document-types.md) |
 | Product principles, MVP rationale, risks | [01](01-product-definition.md) |
