@@ -821,7 +821,8 @@ Flag likely reflections on glasses and suggest tilting the glasses or moving the
 
 - `CaptureProtected` (App/Features/CaptureProtection.swift) wraps the Photo Check portrait while developer details are on (long press on the version line).
 - A caption reports whether the secure canvas exists on this iOS.
-- **Device result pending:** take a screenshot and a screen recording on Photo Check and confirm the portrait is blank.
+- **Device result (founder, 2026-11-11): works.** On an iPhone 15 Pro Max with iOS 27.2 (24B119), screenshots and screen recordings show the protected portrait blank.
+- **Still to check:** iOS 26, the minimum version. The technique cannot be tested in the simulator.
 
 Implement ADR-049 D-9. A device spike on iOS 26 and 27 tests the secure-layer technique on every locked preview: Photo Check, Adjust, the sheet, and the confirmation. Fallback: hide locked previews while `sceneCaptureState` is active, and explain after a screenshot. Acceptance: screenshots and recordings on physical devices show the locked photo blank; unlocked photos are unaffected; no layout, gesture, animation, or performance regression in the W3 landing; App Review notes prepared. Keep the technique behind one small view so it can be replaced if iOS changes.
 

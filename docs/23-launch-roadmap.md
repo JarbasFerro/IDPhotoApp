@@ -45,7 +45,7 @@ With a worldwide launch, **profile research and validation** (L19-013) is the lo
 
 1. **Rules in the app (P2/P3).**
    - **0.13:** the 22-profile catalog: document picker, custom size, profile-driven framing, outputs, and requirements.
-   - **0.14:** custom-size framing, background colour, and black and white; 400 ppi pages for the Netherlands; the capture-protection spike (device result pending).
+   - **0.14:** custom-size framing, background colour, and black and white; 400 ppi pages for the Netherlands; the capture-protection spike (works on iOS 27.2; iOS 26 still to check).
    - **Next:** the founder's device feedback, then drafts and the export gate (L19-012).
 2. **Physical evidence round (P1).** On the iPhone 15 Pro Max and one older supported iPhone: camera direction calibration on front and back cameras; first-frame and shutter latency; 48 MP import memory; capture-protection spike (L19-017); three printers × two papers measured at Actual Size against tolerances written down first; record results in the spike reports.
 3. **Start profile research (P3 ∥).** One sourced profile document per profile, in the order of [25 §3](25-wave-a-document-types.md). **Answer the alteration question first** (are background replacement and tone allowed?), because it decides the experience for that profile. Then: background colour, children's rules, and digital submission limits. In parallel, verify the P2 list (Australia inkjet, driving licences, Saudi Absher, Brazil 3 × 4, Mexico).

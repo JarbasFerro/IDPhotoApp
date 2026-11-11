@@ -867,7 +867,7 @@ People come back to finish later, add a family member, or print more copies. The
 
 Locked previews are protected from screenshots and screen recording, the way banking and private-messaging apps protect their content. iOS has no public API for this. The common technique hosts the content inside the layer of a secure text-entry field, which the system leaves blank in captures. It is undocumented, reported unstable in an iOS 17 beta ([Apple forum](https://developer.apple.com/forums/thread/736112)), and App Review guideline 2.5.1 asks that APIs be used for their intended purpose ([Apple forum](https://developer.apple.com/forums/thread/792624)). Therefore:
 
-1. **Device spike first** (L19-017), on iOS 26 and 27, on physical devices. The technique does not work in Simulator.
+1. **Device spike first** (L19-017), on iOS 26 and 27, on physical devices. The technique does not work in Simulator. **Result 2026-11-11:** works on iOS 27.2 (iPhone 15 Pro Max); iOS 26 still to check.
 2. **Fallback that uses public API:** hide locked previews while the scene reports it is being captured (`UITraitCollection.sceneCaptureState`, `UIScreen.isCaptured`): recording, mirroring, AirPlay. Screenshots can only be detected after the fact (`userDidTakeScreenshotNotification`); use that to explain calmly, never to blame.
 3. **Unlocked photos are not protected.** The person paid, and App Store marketing screenshots use unlocked photos.
 4. **Residual leak, accepted:** a photo of the screen taken with another camera.
