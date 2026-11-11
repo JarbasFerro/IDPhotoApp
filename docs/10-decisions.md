@@ -543,6 +543,7 @@ Apple adds custom AirPrint paper support or documented scaling control.
 ## ADR-037 — Background replacement colour is profile data
 
 **Status:** Proposed  
+**Update 2026-11-11:** the US profiles ([profiles/us-passport-and-visa.md](profiles/us-passport-and-visa.md)) show that `alterationPolicy` must be per operation: crop, background, tone, rotation. Unknown means off. The US disallows background and tone changes.  
 **Date:** 2026-09-16
 
 ### Decision

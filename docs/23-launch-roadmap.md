@@ -43,7 +43,7 @@ With a worldwide launch, **profile research and validation** (L19-013) is the lo
 
 ## 4. Next three work batches
 
-1. **First profile research (P3 ∥, starts now).** US passport and US visa first ([25 §3](25-wave-a-document-types.md)): official sources, alteration policy, dimensions and head geometry, background, digital presets, children's rules.
+1. **Profile research (P3 ∥, under way).** US passport and US visa are drafted ([profiles/us-passport-and-visa.md](profiles/us-passport-and-visa.md)): framing only, with no background or tone changes. They need browser confirmation of the official pages. Next: UK passport (digital and print), then Japan passport and My Number card.
 2. **Physical evidence round (P1).** On the iPhone 15 Pro Max and one older supported iPhone: camera direction calibration on front and back cameras; first-frame and shutter latency; 48 MP import memory; capture-protection spike (L19-017); three printers × two papers measured at Actual Size against tolerances written down first; record results in the spike reports.
 3. **Start profile research (P3 ∥).** One sourced profile document per profile, in the order of [25 §3](25-wave-a-document-types.md). **Answer the alteration question first** (are background replacement and tone allowed?), because it decides the experience for that profile. Then: background colour, children's rules, and digital submission limits. In parallel, verify the P2 list (Australia inkjet, driving licences, Saudi Absher, Brazil 3 × 4, Mexico).
 

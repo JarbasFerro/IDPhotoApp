@@ -38,7 +38,7 @@
 | Country | Document | Size | Output | At home? | Level | Notes |
 |---|---|---|---|---|---|---|
 | United States | Passport (mail or in person) | 2 × 2 in (51 × 51 mm) | Print | Yes | S | Large volume |
-| United States | Passport online renewal | Digital upload: JPG/PNG/HEIC/HEIF, 54 KB–10 MB, color, < 6 months; no scans of prints | Digital | Yes (not excluded) | **O** (travel.state.gov) | **No filters, apps, or AI changes** → background replacement and tone likely not allowed (§4) |
+| United States | Passport online renewal | Digital upload: JPG/PNG/HEIC/HEIF, 54 KB–10 MB, color, < 6 months; no scans of prints | Digital | Yes (not excluded) | **O** (travel.state.gov) | **No filters, apps, or AI changes** → background replacement and tone **not allowed**; framing only ([profile](profiles/us-passport-and-visa.md)) |
 | United States | US visa (DS-160) | Square JPEG 600–1200 px, ≤ 240 KB; some posts also want a 2 × 2 in print | Digital + print | Generally yes; the consulate decides | S | Cross-border: applicants in every country |
 | United Kingdom | Passport (online) | Digital, at least 600 × 750 px; the service crops | Digital | **Yes, explicitly**: taken on your own device with someone's help | S (citing GOV.UK) | Background **light grey or cream, not white**; booth photos "more likely approved" |
 | United Kingdom | Passport (paper) and driving licence (paper) | 35 × 45 mm | Print | Yes | S | |
