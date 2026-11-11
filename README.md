@@ -8,6 +8,10 @@ A privacy-first **native iOS application** for creating standards-compliant iden
 
 Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone simulator. It supports photo import, a 26 × 32 mm portrait crop, JPEG sharing, and an A6 PDF with six copies. See [setup and tests](Spikes/IDPhotoSpike/README.md) and [validation evidence](docs/spikes/01-import-crop-export.md).
 
+## Product outcome review
+
+The [2026-11-11 review and proposed launch contract](docs/20-product-outcome-and-launch-review-ChatGPT.md) maps the complete home-photo-to-print journey, app functions and screens, satisfaction criteria, documentation gaps, and remaining launch work. It is a proposal; accepted ADRs and brand decisions remain authoritative.
+
 ## Product ambition
 
 This project is now deliberately iOS-only.
