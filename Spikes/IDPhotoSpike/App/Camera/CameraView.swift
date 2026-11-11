@@ -178,6 +178,8 @@ struct CameraView: View {
                     .ignoresSafeArea()
                     .accessibilityHidden(true)
                 if showingCapturedReview, let capturedImage {
+                    // An opaque backdrop: the live preview keeps running for Retake, but must not show around the still.
+                    Color.black.ignoresSafeArea().accessibilityHidden(true)
                     Image(decorative: capturedImage, scale: 1, orientation: .up)
                         .resizable().scaledToFit()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
