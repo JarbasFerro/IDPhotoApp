@@ -61,7 +61,7 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | F-01 | Current profile: Spain · DNI photo, 26 × 32 mm, white background | Correct format without research | Shipped (spike); copy is literal UI text | [13](13-spain-foto-carnet.md), [16 §3](16-screen-experience-spec.md) |
 | F-02 | Versioned, sourced profile catalog with review dates | Rules stay current and traceable | Launch | [05](05-rules-engine.md), FR-110–FR-116, R7-001–R7-018 |
 | F-03 | Country and document picker with search, recents, and favourites | Find "my" document in seconds | Launch (picker); recents and favourites Post-launch | [04 §Screen 2](04-ux-ui.md), FR-010–FR-016, U10-002, U10-013 |
-| F-04 | Worldwide launch catalog: most-used photo documents of the most relevant App Store countries, Tier 1 at 1.0 | Serve people wherever they are | Launch; Tier 1 list **Decision D-8** | [ADR-047](10-decisions.md), L19-010, L19-013 |
+| F-04 | Worldwide launch catalog: most-used photo documents of the most relevant App Store countries, Wave A at 1.0 | Serve people wherever they are | Launch; country list proposed in [24](24-launch-country-ranking.md), **Decision D-8** | [ADR-047](10-decisions.md), L19-010, L19-013 |
 | F-05 | Short requirements preflight before every capture or import | Avoid an unusable photo before it is taken | Shipped (spike) | [16 §7](16-screen-experience-spec.md), ADR-043 |
 | F-06 | Full requirements with source link and review date | Trust and exceptions (glasses, headwear) | Shipped (spike); must move to profile data | [16 §4](16-screen-experience-spec.md) |
 | F-07 | Per-profile alteration policy (background replacement and tone allowed or not) | Never sell an output the office cannot use | Partial: policy gate exists, policy data missing | ADR-037, ADR-038, FR-151, R7-016 |
@@ -231,14 +231,15 @@ Known testers tend to be kind. So measure what they **do** (time, retakes, the m
 | D-4 | Persistence | **Drafts** saved without spending credits. A locked draft can never leave the app (one export gate). 30-day retention is the proposed default. | ADR-049 |
 | D-5 | Measurement | **Beta testers the founder knows.** TestFlight and observed sessions; no analytics SDK. | ADR-020 |
 | D-6 | Accessibility | **Not a priority for 1.0.** A native baseline is kept, and BD-034 stands. | ADR-050 |
+| D-9 | Locked-preview protection | **Block screenshots and screen recording of locked previews** (as banking apps do). Device spike first, with a public-API fallback; no watermark. | ADR-049 |
 
 ### 8.2 Still open
 
 | ID | Decision | Why it matters | Recommendation |
 |---|---|---|---|
 | D-7 | Languages beyond en, es, pt-BR | A German or Japanese user given English requirement text loses the "effortless" pillar | At least localize profile names, requirement text, and App Store metadata for every Tier 1 country. Ideally localize the full UI for the Tier 1 languages, with native review. |
-| D-8 | Confirm the Tier 1 list and custom size | Sets the scope of profile research, the longest task | Run L19-010 first, then cap Tier 1 at what research can validate by P3. Ship the custom size (ADR-018) so every country gets value. |
-| D-9 | Locked-preview protection | iOS cannot block screenshots | Accept the limit, with no mark on previews: a screenshot is not at print scale and is the wrong pixel size for forms, and a mark across the face spoils the W3 moment. Alternative: a disclosed "Preview" mark on locked previews (allowed by FR-098). |
+| D-8 | Confirm the launch countries and custom size | Sets the scope of profile research, the longest task | **Proposed from data ([24](24-launch-country-ranking.md)):** 35 countries (about 20 % of storefronts) = 81 % of iPhone users and 89 % of spending power. Wave A at 1.0 (15 countries, 82 % of spending power), Wave B after. Ship the custom size (ADR-018). |
+| D-10 | China mainland | 25 % of the world's iPhone users, but ICP and app-filing rules may apply to foreign developers | Run a compliance check before deciding; not in Wave A |
 
 ## 9. Documentation map and source of truth
 
@@ -250,6 +251,7 @@ When documents disagree, the order is: accepted ADRs and brand decisions → [AG
 | Who uses it and how, step by step | [21 — User journeys](21-user-journeys.md) |
 | What "great photo", "beautiful", and "wow" mean, and how they are tested | [22 — Quality and delight bar](22-quality-and-delight-bar.md) |
 | What happens next until launch | [23 — Launch roadmap](23-launch-roadmap.md) |
+| Which countries, and why | [24 — Launch country ranking](24-launch-country-ranking.md) |
 | Product principles, MVP rationale, risks | [01](01-product-definition.md) |
 | Functional requirements (FR-xxx) | [02](02-requirements.md) |
 | Architecture | [03](03-architecture.md) |

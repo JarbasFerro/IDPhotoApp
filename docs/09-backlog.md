@@ -786,6 +786,8 @@ Use `RequestReviewAction` at most once per version, only on a later Home visit a
 
 ## L19-010 — Market ranking, Tier 1 list, and ASO evidence — P0 / M (first)
 
+**Part 1 done 2026-11-11:** [24 — Launch country ranking](24-launch-country-ranking.md). Next: part 2, documents per Wave A country.
+
 First, rank App Store countries by relevance (iPhone users and App Store spending, from a named and dated source) and list, per country, the documents for which people supply their own photo, plus the most-requested visa photos (ADR-047). Output: the Tier 1 list for founder confirmation (D-8). Then complete the research listed in [brand 04 §9](brand/04-market-prioritization.md): competitor ranking per launch country, keyword volumes ("passport photo", "ID photo", "foto carnet", "foto 3x4"), competitor pricing and paywalls, review mining for unmet needs. Output informs ADR-047, the profile research order (L19-013), App Store subtitle and keywords, and screenshots. Acceptance: a dated research document with sources.
 
 ## L19-011 — Best-frame burst — P2 / L
@@ -807,6 +809,10 @@ Detect a background shadow next to the head and uneven light across the face, in
 ## L19-015 — Glasses glare advisory — P1 / M
 
 Flag likely reflections on glasses and suggest tilting the glasses or moving the light; respect each profile's glasses rule. Advisory only. Acceptance: calibrated on consented fixtures with and without glasses.
+
+## L19-017 — Capture protection for locked previews — P0 / M
+
+Implement ADR-049 D-9. A device spike on iOS 26 and 27 tests the secure-layer technique on every locked preview: Photo Check, Adjust, the sheet, and the confirmation. Fallback: hide locked previews while `sceneCaptureState` is active, and explain after a screenshot. Acceptance: screenshots and recordings on physical devices show the locked photo blank; unlocked photos are unaffected; no layout, gesture, animation, or performance regression in the W3 landing; App Review notes prepared. Keep the technique behind one small view so it can be replaced if iOS changes.
 
 ## L19-016 — Quick sheet presets — P2 / S
 

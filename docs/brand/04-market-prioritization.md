@@ -249,3 +249,5 @@ Do not pretend macro mobile revenue is equivalent to Calipic demand.
 > **Design Calipic as a global product, but use the United States as the primary commercial launch lens; validate the same brand in Canada/UK/Australia, and use Spain/Brazil as first-class Spanish/Portuguese launch and cultural-validation markets.**
 
 This recommendation should be revisited after category-specific App Store/ASO research.
+
+**Update 2026-11-11:** the founder chose a worldwide launch (ADR-047). [Doc 24](../24-launch-country-ranking.md) ranks countries from public data: 35 countries (about 20 % of storefronts) hold 81 % of iPhone users and 89 % of spending power, excluding China and Russia. The United States alone is about 46 % of spending power, so it stays the primary lens.

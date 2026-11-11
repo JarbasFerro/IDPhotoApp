@@ -12,6 +12,7 @@
 | [21 — User journeys](docs/21-user-journeys.md) | Personas and step-by-step journeys, from setup to a cut print |
 | [22 — Quality and delight bar](docs/22-quality-and-delight-bar.md) | What "great photo", "beautiful", and "wow" mean, and how they are tested |
 | [23 — Launch roadmap](docs/23-launch-roadmap.md) | Phases P0–P9 from the spike to App Store 1.0 |
+| [24 — Launch country ranking](docs/24-launch-country-ranking.md) | The 35 countries (about 20 %) that give about 80 % of the market |
 | [16 — Screen experience spec](docs/16-screen-experience-spec.md) | Current screen contract |
 | [10 — Decisions](docs/10-decisions.md) | ADRs, including the founder decisions below |
 
@@ -194,4 +195,4 @@ A feature is not done when it renders in one simulator. It is done when:
 
 ## Immediate next action
 
-Follow [the launch roadmap §4](docs/23-launch-roadmap.md): fix the Tier 1 country list from market data, run the physical evidence round on device and printers, and start profile research. The production Xcode project is created only after the M1 evidence is complete.
+Follow [the launch roadmap §4](docs/23-launch-roadmap.md): list the photo documents of the 15 Wave A countries ([24](docs/24-launch-country-ranking.md)), run the physical evidence round on device and printers, and start profile research. The production Xcode project is created only after the M1 evidence is complete.

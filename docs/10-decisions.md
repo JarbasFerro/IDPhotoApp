@@ -762,7 +762,12 @@ ADR-016 made Spain DNI 26 × 32 mm the first format, and the spike delivers it e
    - rank countries by App Store relevance (iPhone users and App Store spending), from a named, dated data source;
    - within each country, include the documents for which people supply their own photo (passport, national ID card, residence permit, driving licence where self-supplied); skip documents whose photo is taken at the office;
    - add the most-requested cross-border documents: visa photos for the most-visited destinations (for example the United States visa and the Schengen visa).
-3. **Tiers:** Tier 1 ships at 1.0; Tier 2 follows in updates. **Candidate** Tier 1 countries, to confirm with L19-010 data (not yet a commitment): United States, United Kingdom, Canada, Australia, Germany, France, Italy, Spain, Japan, South Korea, Brazil, Mexico, India. China mainland is a separate decision because of distribution requirements and localization.
+3. **Tiers (data in [24](24-launch-country-ranking.md); proposed, awaiting confirmation as D-8). Wave A is Tier 1 and Wave B is Tier 2:**
+   - **Wave A at 1.0:** the 15 countries holding 82 % of spending power. United States, Japan, United Kingdom, Germany, Canada, Australia, France, Italy, South Korea, Switzerland, Spain, Saudi Arabia, Mexico, Netherlands, Brazil.
+   - **Wave B in the first updates:** 20 more countries that take reach to 80 % of iPhone users.
+   - Together: 35 countries, about 20 % of storefronts.
+   - **Russia** is excluded: there have been no App Store payments there since April 2026.
+   - **China mainland** is decision D-10 (ICP and app-filing compliance check).
 4. **Release gate unchanged:** every profile needs its own sourced research document (like [13](13-spain-foto-carnet.md)), alteration policy, background colour (ADR-037), digital preset where one exists, and last-reviewed date. A profile not validated in time moves to Tier 2; it never ships with weaker provenance. Never copy a profile from another country because the sizes match (AGENTS.md §11).
 5. **Countries without a profile:** generic print sizes stay available on the sheet. A custom size (ADR-018), clearly marked as unofficial, is recommended so the app is useful in every territory.
 6. **App Store lens:** the United States stays the lens for English screenshots, keywords, and pricing tests (BD-032). Spain DNI stays the engineering reference profile.
@@ -829,7 +834,7 @@ Beta testers misunderstand what a credit covers or regret the point of no return
 
 ## ADR-049 — Drafts and locked export
 
-**Status:** Accepted (founder, 2026-11-11); preview protection open as D-9. Supersedes ADR-021.
+**Status:** Accepted (founder, 2026-11-11), including capture protection of locked previews (D-9). Supersedes ADR-021.
 **Date:** 2026-11-11
 
 ### Context
@@ -844,9 +849,16 @@ People come back to finish later, add a family member, or print more copies. The
 4. **Locked previews:** rendered at display resolution only; no copy, drag, share, or context-menu save. Drafts store the source and recipe, never a finished full-resolution output.
 5. **Tests:** an export-gate test enumerates every output path and proves a locked person cannot leave the app through any of them (L19-012).
 
-### Known limit
+### Capture protection (D-9, founder, 2026-11-11)
 
-iOS does not let an app block screenshots or screen recording. A screenshot of a locked preview is a residual leak: not at print scale, no sheet, wrong pixel size for digital forms. D-9 decides whether that is acceptable or whether locked previews carry a disclosed "Preview" mark (FR-098 allows a watermark only when it is disclosed before the person invests effort).
+Locked previews are protected from screenshots and screen recording, the way banking and private-messaging apps protect their content. iOS has no public API for this. The common technique hosts the content inside the layer of a secure text-entry field, which the system leaves blank in captures. It is undocumented, reported unstable in an iOS 17 beta ([Apple forum](https://developer.apple.com/forums/thread/736112)), and App Review guideline 2.5.1 asks that APIs be used for their intended purpose ([Apple forum](https://developer.apple.com/forums/thread/792624)). Therefore:
+
+1. **Device spike first** (L19-017), on iOS 26 and 27, on physical devices. The technique does not work in Simulator.
+2. **Fallback that uses public API:** hide locked previews while the scene reports it is being captured (`UITraitCollection.sceneCaptureState`, `UIScreen.isCaptured`): recording, mirroring, AirPlay. Screenshots can only be detected after the fact (`userDidTakeScreenshotNotification`); use that to explain calmly, never to blame.
+3. **Unlocked photos are not protected.** The person paid, and App Store marketing screenshots use unlocked photos.
+4. **Residual leak, accepted:** a photo of the screen taken with another camera.
+
+No watermark is needed (FR-098).
 
 ### Consequences
 
@@ -902,8 +914,8 @@ Product decisions taken by the founder on 2026-11-11: ADR-017 (children), ADR-02
 Product decisions still open (see [the product blueprint §8](20-product-blueprint.md)):
 
 1. D-7 — languages beyond English, Spanish, and Portuguese (Brazil) for a worldwide launch (BD-031).
-2. D-8 — the confirmed Tier 1 country and document list (from L19-010), and ADR-018 custom size at 1.0.
-3. D-9 — locked-preview protection: accept the screenshot limit or add a disclosed "Preview" mark (ADR-049).
+2. D-8 — confirm Wave A and Wave B from [24](24-launch-country-ranking.md); then the document list per country (L19-010 part 2); ADR-018 custom size at 1.0.
+3. D-10 — China mainland: ICP and app-filing compliance check before deciding ([24 §4](24-launch-country-ranking.md)).
 4. ADR-032 — whether optional Foundation Models capability earns a place in MVP/P1.
 
 # Decision template
