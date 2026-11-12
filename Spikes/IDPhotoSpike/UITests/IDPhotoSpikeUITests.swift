@@ -556,6 +556,73 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertTrue(any(app, "unlockedNote").waitForNonExistence(timeout: 5))
     }
 
+    /// Reaches Print with the photos unlocked and the files ready.
+    @MainActor
+    private func launchToUnlockedPrint() -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
+        app.launch()
+        XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        reveal(app.buttons["continueFromCheck"], in: app)
+        app.buttons["continueFromCheck"].tap()
+        app.buttons["printChoice"].tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
+        app.buttons["continueToShare"].tap()
+        XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
+        app.buttons["unlockAndPrint"].tap()
+        waitUntilEnabled(app.buttons["moreFormats"])
+        return app
+    }
+
+    /// After printing, the person compares the print with the screen: a wrong size leads to the fix, a right size to Finished.
+    @MainActor
+    func testPrintCheckLeadsToTheFixOrToFinished() throws {
+        let app = launchToUnlockedPrint()
+        let check = app.buttons["checkPrintButton"]
+        XCTAssertTrue(check.waitForExistence(timeout: 5))
+        reveal(check, in: app)
+        attach(app, "Print, unlocked")
+        check.tap()
+        XCTAssertTrue(any(app, "trueSizeReference").waitForExistence(timeout: 5))
+        attachBothAppearances(app, "Check your print")
+        app.buttons["checkNoMatch"].tap()
+        XCTAssertTrue(app.buttons["checkSmaller"].waitForExistence(timeout: 5))
+        app.buttons["checkSmaller"].tap()
+        XCTAssertTrue(any(app, "diagnosisTitle").waitForExistence(timeout: 5))
+        attach(app, "Print check, smaller")
+        app.buttons["diagnosisClose"].tap()
+        XCTAssertTrue(app.buttons["diagnosisClose"].waitForNonExistence(timeout: 5))
+        XCTAssertTrue(check.waitForExistence(timeout: 5))
+        reveal(check, in: app)
+        check.tap()
+        XCTAssertTrue(app.buttons["checkMatches"].waitForExistence(timeout: 5))
+        app.buttons["checkMatches"].tap()
+        XCTAssertTrue(any(app, "finishedScreen").waitForExistence(timeout: 5))
+        attachBothAppearances(app, "Finished")
+        app.buttons["finishedDone"].tap()
+        XCTAssertTrue(app.buttons["yourSheet"].waitForExistence(timeout: 5))
+    }
+
+    /// The shop route offers the same check, but cannot print again from the app.
+    @MainActor
+    func testShopPrintOffersTheCheck() throws {
+        let app = launchToUnlockedPrint()
+        let shop = app.buttons["printAtShop"]
+        reveal(shop, in: app)
+        shop.tap()
+        XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 5))
+        XCTAssertTrue(any(app, "checkShopPrint").exists)
+        any(app, "checkShopPrint").tap()
+        XCTAssertTrue(any(app, "trueSizeReference").waitForExistence(timeout: 5))
+        app.buttons["checkNoMatch"].tap()
+        XCTAssertTrue(app.buttons["checkNotSure"].waitForExistence(timeout: 5))
+        app.buttons["checkNotSure"].tap()
+        XCTAssertTrue(any(app, "diagnosisTitle").waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["printAgain"].exists)
+        attach(app, "Shop print check")
+    }
+
     @MainActor
     func testCreditsFromHome() throws {
         let app = XCUIApplication()

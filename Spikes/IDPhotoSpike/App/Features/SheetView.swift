@@ -8,7 +8,10 @@ struct SheetView: View {
     let acquire: Acquire
     @State private var selectedPerson: UUID?
     @State private var showOptions = false
+    /// Counts the person's own taps on the copies stepper, so switching person does not tick it.
+    @State private var copiesTick = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var person: PhotoEntry? { model.entries.first { $0.id == selectedPerson } ?? model.entries.first }
 
@@ -55,6 +58,8 @@ struct SheetView: View {
             SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, pageBox: box)
             Text(summary(layout))
                 .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                .contentTransition(.numericText())
+                .animation(reduceMotion ? nil : .default, value: summary(layout))
                 .accessibilityIdentifier("layoutSummary")
         }
     }
@@ -78,10 +83,12 @@ struct SheetView: View {
                 if let person, let copies = copiesBinding(for: person) {
                     Stepper("Copies", value: copies, in: 0...50)
                         .labelsHidden()
+                        .sensoryFeedback(.selection, trigger: copiesTick)
                         .accessibilityIdentifier("copiesStepper")
                 }
             }
             paperChips
+                .sensoryFeedback(.selection, trigger: model.printJob.paper.id)
             if !layout.isComplete {
                 StatusLabel(text: "\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.", state: .warn)
                     .font(.subheadline)
@@ -108,6 +115,8 @@ struct SheetView: View {
                 Text("\(sizes) · ^[\(copies) copy](inflect: true)")
                     .font(Design.Typography.note).foregroundStyle(.secondary)
             }
+            .contentTransition(.numericText())
+            .animation(reduceMotion ? nil : .default, value: copies)
             .accessibilityElement(children: .combine)
             Spacer()
             Button { path.append(.check(person.id)) } label: {
@@ -137,9 +146,12 @@ struct SheetView: View {
                         .frame(minWidth: 22, minHeight: 22)
                         .background(Color.brandAccentFill, in: Capsule())
                         .offset(x: 6, y: -6)
+                        .contentTransition(.numericText())
+                        .animation(reduceMotion ? nil : .default, value: copies)
                 }
         }
         .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: selectedPerson) { old, new in new == entry.id && old != new }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Photo \(index + 1): ^[\(copies) copy](inflect: true)"))
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
@@ -197,7 +209,10 @@ struct SheetView: View {
         guard let id = model.printItems(for: person.id).first?.id else { return nil }
         return Binding(get: { model.printJob.items.first { $0.id == id }?.copies ?? 0 },
                        set: { value in
-                           if let index = model.printJob.items.firstIndex(where: { $0.id == id }) { model.printJob.items[index].copies = value }
+                           if let index = model.printJob.items.firstIndex(where: { $0.id == id }), model.printJob.items[index].copies != value {
+                               model.printJob.items[index].copies = value
+                               copiesTick += 1
+                           }
                        })
     }
 

@@ -16,6 +16,8 @@ struct PhotoCheckView: View {
     @State private var confirmEdit = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
     @State private var landed = false
+    /// Bumped once when a verdict appears or changes; drives the symbol bounce.
+    @State private var verdictBounce = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Developer details (long press on the version line) also switch on the L19-017 capture-protection test.
@@ -123,7 +125,6 @@ struct PhotoCheckView: View {
                 .frame(maxWidth: width)
                 .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
                 .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
-                .sensoryFeedback(.impact(weight: .light), trigger: landed) { old, new in !old && new }
                 .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
                     withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { comparing = pressing }
                 }
@@ -168,6 +169,23 @@ struct PhotoCheckView: View {
             }
         }
         .animation(.default, value: summary)
+        // Only when the analysis finishes or the verdict changes; a photo that is already checked stays quiet.
+        .sensoryFeedback(trigger: summary.headline) { old, new in
+            guard old != new else { return nil }
+            switch new {
+            case .checking: return nil
+            case .good: return .success
+            case .review, .retake: return .warning
+            }
+        }
+        .onChange(of: summary.headline) { _, new in
+            guard new != .checking, !reduceMotion else { return }
+            // The symbol may be inserted by this very change; bounce once it is on screen.
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(80))
+                verdictBounce += 1
+            }
+        }
     }
 
     /// One large answer. Facts and advisory checks sit behind it (docs/03-design.md §4: only facts say a thing is done).
@@ -179,6 +197,7 @@ struct PhotoCheckView: View {
                 Image(systemName: CheckPresentation.verdictSymbol(for: summary.headline))
                     .font(.largeTitle)
                     .foregroundStyle(StatusStyle.color(for: summary.headline))
+                    .symbolEffect(.bounce, options: .nonRepeating, value: verdictBounce)
                     .accessibilityHidden(true)
             }
             Text(CheckPresentation.title(for: summary.headline))

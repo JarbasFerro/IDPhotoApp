@@ -9,6 +9,7 @@ struct PrintView: View {
     @State private var showShop = false
     @State private var showFormats = false
     @State private var showCredits = false
+    @State private var showCheck = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     enum Action { case home, shop, formats }
@@ -23,6 +24,7 @@ struct PrintView: View {
             VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 header
                 steps
+                if locked == 0 { checkRow }
                 if dynamicTypeSize.isAccessibilitySize { actions }
             }
             .padding(.horizontal)
@@ -47,7 +49,18 @@ struct PrintView: View {
                 }
             }
         }
-        .sheet(isPresented: $showShop) { if let result = model.exported { ShopPrintView(model: model, result: result) } }
+        .sheet(isPresented: $showShop) {
+            if let result = model.exported {
+                ShopPrintView(model: model, result: result) { showShop = false; path.removeAll() }
+            }
+        }
+        .sheet(isPresented: $showCheck) {
+            NavigationStack {
+                PrintCheckView(model: model, route: .home,
+                               onPrintAgain: canPrintAtHome ? { printAgain() } : nil,
+                               onFinished: { showCheck = false; path.removeAll() })
+            }
+        }
         .sheet(isPresented: $showFormats) { if let result = model.exported { FormatsView(result: result) } }
         .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
         .task { model.refreshSheetThumbnails() }
@@ -130,6 +143,40 @@ struct PrintView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// After printing, compare the print with the screen (U1). Shown once the photos are unlocked.
+    private var checkRow: some View {
+        Button { showCheck = true } label: {
+            HStack(spacing: Design.Spacing.control) {
+                Image(systemName: "ruler")
+                    .font(.body.weight(.semibold)).foregroundStyle(Color.brandAccent)
+                    .frame(width: 28)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                    Text("Check Your Print").foregroundStyle(.primary)
+                    Text("Lay it on the screen to see it is the right size")
+                        .font(Design.Typography.note).foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal).padding(.vertical, Design.Spacing.control)
+            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("checkPrintButton")
+    }
+
+    /// Closes the check, then opens the print panel once the sheet has gone.
+    private func printAgain() {
+        showCheck = false
+        Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            run(.home)
+        }
+    }
+
     // MARK: - Actions
 
     @ViewBuilder private var actions: some View {
@@ -204,7 +251,10 @@ struct PrintView: View {
         case .home:
             // UI tests cannot drive the system print panel; everything up to it is covered.
             guard !PrintController.isSuppressedForUITests else { return }
-            PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Calipic sheet"))
+            PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Calipic sheet")) { sent in
+                // A finished job leads straight to the check; a cancelled panel leaves Print as it was.
+                if sent { showCheck = true }
+            }
         case .shop: showShop = true
         case .formats: showFormats = true
         }
@@ -215,6 +265,8 @@ struct PrintView: View {
 struct ShopPrintView: View {
     @Bindable var model: PhotoWorkflow
     let result: PhotoExport
+    /// Leaves the printing flow after the check (Finished → Done).
+    let onFinished: () -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -236,6 +288,16 @@ struct ShopPrintView: View {
                         Label(result.pages.count == 1 ? "Share Print Image" : "Share Print Images", systemImage: "square.and.arrow.up")
                     }
                     .accessibilityIdentifier("sharePages")
+                }
+                Section {
+                    NavigationLink {
+                        PrintCheckView(model: model, route: .shop, onFinished: onFinished)
+                    } label: {
+                        Label("Check Your Print", systemImage: "ruler")
+                    }
+                    .accessibilityIdentifier("checkShopPrint")
+                } footer: {
+                    Text("When the prints are back, lay one on the screen to see it is the right size.")
                 }
             }
             .navigationTitle("Print at a shop")

@@ -1,6 +1,7 @@
 import CoreGraphics
 import Foundation
 import Observation
+import OSLog
 
 /// One person's photo in the session with everything the editor knows about it.
 struct PhotoEntry: Identifiable {
@@ -68,6 +69,7 @@ final class PhotoWorkflow {
     @ObservationIgnored private var thumbnailTask: Task<Void, Never>?
     @ObservationIgnored private var revision = UUID()
     @ObservationIgnored private var exportLease: UUID?
+    @ObservationIgnored private let signposter = OSSignposter(subsystem: "com.jarbasferro.IDPhotoSpike", category: "Workflow")
 
     /// The person's credits. One credit unlocks one photo (ADR-048).
     let credits: CreditStore
@@ -170,10 +172,11 @@ final class PhotoWorkflow {
         update(photo.id) { $0.analysis = nil; $0.analysisUnavailable = false; $0.isAnalyzing = true
                             $0.segmentation = nil; $0.backgroundPreview = nil; $0.isSegmenting = true }
         analysisTasks[photo.id] = Task {
+            let verdictInterval = signposter.beginInterval("Verdict", id: signposter.makeSignpostID())
             let measured = try? await pipeline.analyze(photo: photo)
-            guard !Task.isCancelled, index(of: photo.id) != nil else { return }
+            guard !Task.isCancelled, index(of: photo.id) != nil else { signposter.endInterval("Verdict", verdictInterval); return }
             // Solve for the document chosen now, not when the analysis started (it may have changed meanwhile).
-            guard let entry = entries.first(where: { $0.id == photo.id }) else { return }
+            guard let entry = entries.first(where: { $0.id == photo.id }) else { signposter.endInterval("Verdict", verdictInterval); return }
             let result = measured.map { Self.resolved($0, for: target(for: entry)) }
             update(photo.id) {
                 $0.isAnalyzing = false
@@ -181,6 +184,7 @@ final class PhotoWorkflow {
                 $0.analysisUnavailable = result == nil
                 if let solution = result?.solution, result?.faceCount == 1 { $0.adjustment = solution.adjustment }
             }
+            signposter.endInterval("Verdict", verdictInterval)
             let geometry = result?.geometry
             let segmented = await pipeline.segment(photo: photo, faceBox: geometry?.faceBox, faceCenter: geometry?.eyeMidpoint)
             guard !Task.isCancelled, index(of: photo.id) != nil else { return }
@@ -371,17 +375,21 @@ final class PhotoWorkflow {
         errorMessage = nil
         errorActivity = nil
         task = Task {
+            let filesInterval = signposter.beginInterval("FilesReady", id: signposter.makeSignpostID())
             do {
                 let result = try await pipeline.export(edits: edits, job: job, target: target)
                 guard revision == currentRevision, !Task.isCancelled else {
+                    signposter.endInterval("FilesReady", filesInterval)
                     await pipeline.discard(exportID: result.id)
                     return
                 }
                 exportLease = result.id
                 exported = result
+                signposter.endInterval("FilesReady", filesInterval)
                 digitalExport = nil
                 activity = nil
             } catch {
+                signposter.endInterval("FilesReady", filesInterval)
                 handle(error, revision: currentRevision)
             }
         }

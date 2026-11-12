@@ -14,7 +14,8 @@ final class PrintController: NSObject, UIPrintInteractionControllerDelegate {
     /// UI tests cannot drive the system print panel, so it is not presented under their launch flag.
     static var isSuppressedForUITests: Bool { ProcessInfo.processInfo.arguments.contains("--uitesting-fresh") }
 
-    func present(pdf: URL, jobName: String) {
+    /// `onFinish` runs on the main actor with true when the job was sent to the printer.
+    func present(pdf: URL, jobName: String, onFinish: @escaping @MainActor (Bool) -> Void = { _ in }) {
         guard let document = CGPDFDocument(pdf as CFURL), let page = document.page(at: 1) else { return }
         pageSize = page.getBoxRect(.mediaBox).size
         let info = UIPrintInfo.printInfo()
@@ -30,6 +31,7 @@ final class PrintController: NSObject, UIPrintInteractionControllerDelegate {
         controller.present(animated: true) { [weak self] _, completed, error in
             if let error { self?.logger.error("Print failed: \(error.localizedDescription, privacy: .public)") }
             self?.logger.info("Print sheet dismissed, completed: \(completed, privacy: .public)")
+            MainActor.assumeIsolated { onFinish(completed && error == nil) }
         }
     }
 

@@ -2,7 +2,7 @@
 
 For whoever continues this project, human or model. Read this page, then [AGENTS.md](../AGENTS.md) (the rules), then [02-roadmap.md](02-roadmap.md) (what to do next).
 
-**State:** tag `v0.16.0`, build 116, 2026-11-12. All tests pass. The app runs on the founder's iPhone.
+**State:** tag `v0.17.0`, 2026-11-12. All tests pass on the iOS 27 simulator. The app runs on the founder's iPhone.
 
 ## 1. What this is
 
@@ -72,7 +72,7 @@ Launching fails while the iPhone is locked; the install still succeeds.
 - **Plain words are enforced:** `check_copy.py` fails on JPEG, PDF, pixel, DPI, and similar. Its allow-list may shrink, never grow quietly.
 - **UI tests** launch with `--uitesting-fresh` (Spain DNI, nothing saved, one credit, print panel suppressed). An accessibility identifier on a container hides its children's identifiers: put identifiers on leaf elements.
 - **A disabled button accepts a tap silently in UI tests.** Wait for `isEnabled` first.
-- **Appearance changes in UI tests are asynchronous.** Wait about 1.5 seconds before the Dark screenshot.
+- **Appearance in UI tests:** `XCUIDevice.shared.appearance` has no effect on the iOS 27 simulator. For Dark screenshots set the simulator itself: `xcrun simctl ui <id> appearance dark`, run the test, then set it back to `light`.
 - **The simulator has no camera and cannot run some Vision models.** Camera screens use a synthetic subject there; one private-portrait test is a known issue.
 - **Rules changes** need the validator, then `build_app_catalog.py`, then String Catalog entries for new names or checks.
 - **Catalog and paper IDs are data:** paper chips are `paper-<id>` (`photo-4x6`, `a4`, …), profiles are `<country>.<document>.<variant>`.
@@ -82,11 +82,11 @@ Launching fails while the iPhone is locked; the install still succeeds.
 - **Purchases.** A pack adds credits without payment; the Credits screen says so.
 - **Persistence.** Photos, edits, and unlocks are lost when the app closes. Credits already spent stay spent.
 - **Evidence.** No print has been measured against tolerances, no speed or memory baseline exists, and no check is calibrated on real faces. Every machine check is advisory.
-- **iOS 27 minimum** was decided on 2026-11-12, but the project still targets 26.0. Changing it is step 0 of 0.17; the test simulator must then run iOS 27.
-- **Known gaps in 0.16.0:** changing the document relocks photos without a warning; the unlock card does not repeat open warnings from Photo Check; the print check is not built.
+- **iOS 27 is the minimum** (deployment target 27.0 since 0.17). Run tests on the iOS 27 simulator "IDPhoto iPhone 15 Pro Max iOS 27" (id A1489838-4226-40EF-9FA3-F37A0CEEC1EE); the older iOS 26.5 simulator can no longer run the app.
+- **Known gaps in 0.16.0:** changing the document relocks photos without a warning; the unlock card does not repeat open warnings from Photo Check; the true-size check has not yet been measured with a ruler on a real iPhone.
 
 ## 7. First things to do
 
 1. Read [03-design.md](03-design.md) Part B and [02-roadmap.md §3](02-roadmap.md).
 2. Read the founder's answers D-1 to D-8 at the end of [05-decisions.md](05-decisions.md); they shape the next batches.
-3. Build **0.17 — The ending**: the print check with true size on screen, the finished moment, the feedback map, and the performance baseline.
+3. Build **0.18 — Shorter and measured** ([roadmap §3](02-roadmap.md)). 0.17 is done.

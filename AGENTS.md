@@ -7,7 +7,7 @@ This file defines the engineering conventions for human and AI contributors. Sta
 - iPhone / iOS only.
 - Native Swift + SwiftUI.
 - Build against the newest approved Apple SDK available for the current development/release stage.
-- Minimum iOS 27 (ADR-024, decided 2026-11-12). The project moves its deployment target from 26.0 to 27.0 in version 0.17.
+- Minimum iOS 27 (ADR-024, decided 2026-11-12). The deployment target is 27.0.
 - Do not introduce Android, Flutter, React Native, web, or other portability layers without a new accepted ADR.
 
 ## 2. Native-first rule

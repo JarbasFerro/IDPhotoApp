@@ -2907,22 +2907,6 @@
         }
       }
     },
-    "Frames the photo to 26 × 32 mm, levels the eyes, and prepares a print sheet. It can replace the background with white and even out light and colour when the photo allows. It does not retouch your face or decide acceptance." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encuadra la foto a 26 × 32 mm, nivela los ojos y prepara una hoja para imprimir. Puede dejar el fondo blanco y equilibrar la luz y el color cuando la foto lo permite. No retoca tu rostro ni decide si la foto será aceptada."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enquadra a foto em 26 × 32 mm, nivela os olhos e prepara uma folha para impressão. Pode deixar o fundo branco e equilibrar a luz e a cor quando a foto permite. Não retoca seu rosto nem decide se a foto será aceita."
-          }
-        }
-      }
-    },
     "Frames the photo to 26 × 32 mm, levels the eyes, replaces the background with white, corrects exposure and colour, and prepares a print sheet. It does not retouch your face and does not decide acceptance." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10139,6 +10123,790 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "^[%lld foto](inflect: true)"
+          }
+        }
+      }
+    },
+    "Finished" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pronto"
+          }
+        }
+      }
+    },
+    "Your photos are the right size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus fotos tienen el tamaño correcto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suas fotos estão no tamanho certo"
+          }
+        }
+      }
+    },
+    "Cut them out and they are ready to use." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recórtalas y ya están listas para usar."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recorte-as e elas estarão prontas para usar."
+          }
+        }
+      }
+    },
+    "Page with %lld cuts, in order" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página con %lld cortes, en orden"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Página com %lld cortes, em ordem"
+          }
+        }
+      }
+    },
+    "Every page is cut the same way." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las páginas se cortan igual."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas as páginas são cortadas da mesma forma."
+          }
+        }
+      }
+    },
+    "Page 1 shown." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se muestra la página 1."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrando a página 1."
+          }
+        }
+      }
+    },
+    "Cut the rows apart first" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corta primero las filas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corte primeiro as fileiras"
+          }
+        }
+      }
+    },
+    "Follow the marks at the corners, not the edge of the photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sigue las marcas de las esquinas, no el borde de la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siga as marcas dos cantos, não a borda da foto"
+          }
+        }
+      }
+    },
+    "Then cut each photo out" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Después recorta cada foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depois recorte cada foto"
+          }
+        }
+      }
+    },
+    "A paper trimmer gives the straightest edges; scissors work too" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una guillotina de papel da los bordes más rectos; las tijeras también sirven"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um cortador de papel deixa as bordas mais retas; a tesoura também serve"
+          }
+        }
+      }
+    },
+    "Keep the spare copies flat" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda las copias sobrantes planas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarde as cópias extras planas"
+          }
+        }
+      }
+    },
+    "In an envelope, away from light" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En un sobre, lejos de la luz"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em um envelope, longe da luz"
+          }
+        }
+      }
+    },
+    "Check Your Print" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba tu impresión"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira sua impressão"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechar"
+          }
+        }
+      }
+    },
+    "Set Up Screen Size Again" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a configurar la pantalla"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar a tela de novo"
+          }
+        }
+      }
+    },
+    "Lay the printed page on the screen so the line at its bottom sits on this line." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca la página impresa sobre la pantalla para que la línea de abajo quede sobre esta línea."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque a página impressa sobre a tela para que a linha de baixo fique sobre esta linha."
+          }
+        }
+      }
+    },
+    "Lay one printed photo on the screen, over this outline." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloca una foto impresa sobre la pantalla, encima de este contorno."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque uma foto impressa sobre a tela, em cima deste contorno."
+          }
+        }
+      }
+    },
+    "Are the two lines the same length?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Las dos líneas miden lo mismo?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As duas linhas têm o mesmo comprimento?"
+          }
+        }
+      }
+    },
+    "Is the photo the same size as the outline?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿La foto tiene el mismo tamaño que el contorno?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A foto tem o mesmo tamanho do contorno?"
+          }
+        }
+      }
+    },
+    "Or set up this screen once with a bank card or ID card, and compare the print on the screen." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O configura esta pantalla una vez con una tarjeta bancaria o de identidad y compara la impresión sobre ella."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ou configure esta tela uma vez com um cartão bancário ou documento de identidade e compare a impressão sobre ela."
+          }
+        }
+      }
+    },
+    "Set Up Screen Size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar tamaño de pantalla"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurar tamanho da tela"
+          }
+        }
+      }
+    },
+    "Measure the line at the bottom of your page with a ruler. Is it %lld mm?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mide con una regla la línea de la parte inferior de tu página. ¿Mide %lld mm?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meça com uma régua a linha na parte de baixo da sua página. Ela mede %lld mm?"
+          }
+        }
+      }
+    },
+    "Measure one photo with a ruler. Is it %@?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mide una foto con una regla. ¿Mide %@?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meça uma foto com uma régua. Ela mede %@?"
+          }
+        }
+      }
+    },
+    "Is the print smaller or larger?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿La impresión es más pequeña o más grande?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A impressão ficou menor ou maior?"
+          }
+        }
+      }
+    },
+    "This tells us which printer setting changed the size." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Así sabremos qué ajuste de la impresora ha cambiado el tamaño."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assim saberemos qual configuração da impressora mudou o tamanho."
+          }
+        }
+      }
+    },
+    "Your photos are unlocked, so printing again is free." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus fotos están desbloqueadas, así que volver a imprimir es gratis."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suas fotos estão desbloqueadas, então imprimir de novo é grátis."
+          }
+        }
+      }
+    },
+    "Your photos are unlocked, so sharing them again is free." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus fotos están desbloqueadas, así que volver a compartirlas es gratis."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suas fotos estão desbloqueadas, então compartilhá-las de novo é grátis."
+          }
+        }
+      }
+    },
+    "The print was resized" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La impresión cambió de tamaño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A impressão mudou de tamanho"
+          }
+        }
+      }
+    },
+    "The printer shrank the page" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La impresora redujo la página"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A impressora reduziu a página"
+          }
+        }
+      }
+    },
+    "The printer enlarged the page" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La impresora amplió la página"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A impressora ampliou a página"
+          }
+        }
+      }
+    },
+    "The printer changed the size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La impresora cambió el tamaño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A impressora mudou o tamanho"
+          }
+        }
+      }
+    },
+    "Ask the shop to print the image at its original size: no cropping, no Fit to Page, and no borderless printing." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pide en la tienda que impriman la imagen a su tamaño original: sin recortarla, sin Ajustar a la página y con la opción Sin bordes desactivada."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peça na loja para imprimir a imagem no tamanho original: sem cortar, sem Ajustar à página e com a opção Sem bordas desativada."
+          }
+        }
+      }
+    },
+    "In the print options, choose Actual Size or 100 %, and turn off Fit to Page." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En las opciones de impresión, elige Tamaño real o 100 %, y desactiva Ajustar a la página."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nas opções de impressão, escolha Tamanho real ou 100 %, e desative Ajustar à página."
+          }
+        }
+      }
+    },
+    "Turn off Borderless and Fit to Page, and choose the paper size you loaded." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactiva Sin bordes y Ajustar a la página, y elige el tamaño de papel que has cargado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desative Sem bordas e Ajustar à página, e escolha o tamanho do papel que você colocou."
+          }
+        }
+      }
+    },
+    "Choose Actual Size or 100 %, turn off Fit to Page and Borderless, and choose the paper size you loaded." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige Tamaño real o 100 %, desactiva Ajustar a la página y Sin bordes, y elige el tamaño de papel que has cargado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha Tamanho real ou 100 %, desative Ajustar à página e Sem bordas, e escolha o tamanho do papel que você colocou."
+          }
+        }
+      }
+    },
+    "Not Sure" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No lo sé"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não sei"
+          }
+        }
+      }
+    },
+    "Print Again" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir de nuevo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir de novo"
+          }
+        }
+      }
+    },
+    "Smaller" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más pequeña"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menor"
+          }
+        }
+      }
+    },
+    "Larger" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más grande"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maior"
+          }
+        }
+      }
+    },
+    "Yes, Same Size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sí, mismo tamaño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sim, mesmo tamanho"
+          }
+        }
+      }
+    },
+    "No" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não"
+          }
+        }
+      }
+    },
+    "%@ mm" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ mm"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ mm"
+          }
+        }
+      }
+    },
+    "Real-size guide, %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guía de tamaño real, %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guia de tamanho real, %@"
+          }
+        }
+      }
+    },
+    "Screen Size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño de pantalla"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamanho da tela"
+          }
+        }
+      }
+    },
+    "Hold a bank card or ID card upright against the screen. Change the size until the outline matches the card's width." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pon una tarjeta bancaria o de identidad en vertical sobre la pantalla. Cambia el tamaño hasta que el contorno tenga el mismo ancho que la tarjeta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque um cartão bancário ou documento de identidade na vertical sobre a tela. Mude o tamanho até o contorno ter a mesma largura do cartão."
+          }
+        }
+      }
+    },
+    "Outline size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño del contorno"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamanho do contorno"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvar"
+          }
+        }
+      }
+    },
+    "Lay it on the screen to see it is the right size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponla sobre la pantalla para comprobar su tamaño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque-a sobre a tela para conferir o tamanho"
+          }
+        }
+      }
+    },
+    "When the prints are back, lay one on the screen to see it is the right size." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando tengas las copias, pon una sobre la pantalla para comprobar su tamaño."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quando as cópias chegarem, coloque uma sobre a tela para conferir o tamanho."
           }
         }
       }

@@ -28,7 +28,7 @@ scripts/                          version bump, test runner, rules validator and
 
 | Layer | Key files | Owns | Must not |
 |---|---|---|---|
-| **Domain** | `PhotoGeometry`, `FaceGeometry` (crop solver), `PrintLayout` (paper catalog, layout solver), `DocumentProfile`, `DocumentChoice` (→ `RenderTarget`), `DocumentStore`, `Credits`, `Background`, `Tone` | Units, coordinate conversion, crop solving, rule interpretation, layout, credit arithmetic. Deterministic and unit-tested | Import SwiftUI, Vision, or AVFoundation; read the clock or the locale for results |
+| **Domain** | `PhotoGeometry`, `FaceGeometry` (crop solver), `PrintLayout` (paper catalog, layout solver), `DocumentProfile`, `DocumentChoice` (→ `RenderTarget`), `DocumentStore`, `Credits`, `ScreenSize` (true size on the display), `CutPlan` (cutting order), `Background`, `Tone` | Units, coordinate conversion, crop solving, rule interpretation, layout, credit arithmetic. Deterministic and unit-tested | Import SwiftUI, Vision, or AVFoundation; read the clock or the locale for results |
 | **Imaging** | `PhotoPipeline` (actor), `FaceAnalyzer`, `BackgroundSegmenter`, `ToneAdjuster`, `SheetRenderer`, `PhotoFiles` | Ingest, analysis, masks, previews, final rendering, file writing and verification | Touch UI state |
 | **Camera** | `CameraController`, `FrameAnalyzer`, `CaptureGuidance`, `CameraFramingGuide`, `CameraView` | Capture session, bounded live analysis, the guidance state machine | Decide compliance |
 | **Features** | `PhotoWorkflow` (the one `@Observable` model), `AppFlow` (navigation), one file per screen, `CheckPresentation` and other presentation helpers | State, navigation, words | Do geometry or image math |
@@ -102,7 +102,7 @@ Simulators cannot prove camera behaviour, memory, heat, speed, or print size. Th
 
 ## 10. Performance: what is known
 
-Signposts exist for: camera start, capture, ingest, face analysis, segmentation, tone, composite, render, layout, PDF, export, digital export. Subsystem `com.jarbasferro.IDPhotoSpike`.
+Signposts exist for: camera start, capture, ingest, face analysis, segmentation, tone, composite, render, layout, PDF, export, digital export, and (since 0.17) `HomeAppeared`, `Verdict` (analysis to verdict on screen), and `FilesReady` (unlock to files ready). Subsystem `com.jarbasferro.IDPhotoSpike`.
 
 **There is no full baseline.** The only device numbers are old: on an iPhone 15 Pro Max with iOS 26.6.2 (version 0.5.2, September 2026), camera start took 273 ms and shutter to staged photo 506 ms. On a Mac, face analysis took 50–120 ms per portrait after a model load of about 2 s. Until a proper baseline exists, nothing is a budget. The measuring plan and the ideas for speed are in [roadmap track P](02-roadmap.md).
 

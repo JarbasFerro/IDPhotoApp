@@ -49,6 +49,16 @@ struct AdjustSheet: View {
             .onDisappear { model.showsOriginal = false }
         }
         .presentationDetents([.large])
+        // A rigid tick when Straighten passes level, or when zoom and position return exactly to the automatic framing.
+        .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: model.adjustment) { old, new in
+            let crossedLevel = old.rotationDegrees != 0
+                && (new.rotationDegrees == 0 || old.rotationDegrees * new.rotationDegrees < 0)
+            let auto = model.automaticAdjustment
+            func atAuto(_ a: CropAdjustment) -> Bool {
+                a.zoom == auto.zoom && a.horizontal == auto.horizontal && a.vertical == auto.vertical
+            }
+            return crossedLevel || (atAuto(new) && !atAuto(old))
+        }
     }
 
     private var positionControls: some View {

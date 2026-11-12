@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 
 /// Step 0 (design 1b): the printed result as the hero, one promise, the document, and one dominant action.
@@ -15,6 +16,7 @@ struct HomeView: View {
     @AppStorage(DocumentStore.promptShownKey) private var documentPromptShown = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    private static let signposter = OSSignposter(subsystem: "com.jarbasferro.IDPhotoSpike", category: "App")
 
     private var isBusy: Bool { !model.isInitialized || model.activity != nil || !model.canAddPhoto }
 
@@ -72,6 +74,7 @@ struct HomeView: View {
             documentPromptShown = true
             showDocuments = true
         }
+        .onAppear { Self.signposter.emitEvent("HomeAppeared") }
     }
 
     // MARK: - Hero

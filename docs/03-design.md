@@ -46,7 +46,9 @@ Buttons: one prominent button per screen (`brandProminentButtonStyle()`, large),
 | 8 | **Choose result** | Digital Photo or Print Sheet | `OutputChoiceView.swift` |
 | 9 | **Digital Photo** | Locked: the unlock card and **Unlock and Save**. Ready: the photo, **Share Photo**, **Done** | `OutputChoiceView.swift` |
 | 10 | **Your sheet** | The page as hero with "N copies · M pages". A tray with the person line and **Check**, face circles with copy badges, add-person menu, a copies stepper, paper chips, **More** (Sheet options: sizes per person, any paper, cutting options), **Continue** | `SheetView.swift` |
-| 11 | **Print** | Page thumbnail and "Your sheet is ready"; *Before you print* in three steps (load paper, Actual Size, measure the line). Locked: the unlock card, **Unlock and Print**, **Keep Editing**, or **Get Credits**. Unlocked: **Print at Home**, **Print at a Shop**, **More Formats** | `PrintView.swift` |
+| 11 | **Print** | Page thumbnail and "Your sheet is ready"; *Before you print* in three steps (load paper, Actual Size, measure the line). Locked: the unlock card, **Unlock and Print**, **Keep Editing**, or **Get Credits**. Unlocked: a **Check Your Print** row under the steps, then **Print at Home**, **Print at a Shop**, **More Formats**. A finished print job opens the check by itself | `PrintView.swift` |
+| 11a | **Check Your Print** | The 50 mm line (or one photo's outline when the page has no line) drawn at true size: lay the print on the screen. **Yes, Same Size** → Finished. **No** → *smaller or larger?* → the specific fix (Actual Size, Fit to Page, Borderless, paper) and **Print Again**. The shop route asks the shop to print at original size. Unknown iPhone model: measure with a ruler, or set up the screen once with a bank or ID card (**Screen Size**) | `PrintCheckView.swift`, `Domain/ScreenSize.swift` |
+| 11b | **Finished** | "Your photos are the right size", the person's own page with the cuts drawn in order (rows, then photos, then trims), three cutting tips, **Done** to Home | `FinishedView.swift`, `Domain/CutPlan.swift` |
 | 12 | **Credits** | Balance, what a credit covers, three packs with prices. The only place that shows money | `CreditsView.swift` |
 | 13 | **Settings** and **App Icon** | Credits, app icon picker (33 characters), privacy sentence, version | `HomeView.swift`, `AppIconPickerView.swift` |
 
@@ -99,7 +101,7 @@ Six principles for every new screen:
 
 Each has an ID used by the roadmap. Effort: S under a day, M a few days, L a week or more. The founder's answers on these are recorded as D-1 to D-8 in [05-decisions.md](05-decisions.md).
 
-### U1 — Finish the journey: print check, true size, finished (L)
+### U1 — Finish the journey: print check, true size, finished (L) · Built in 0.17
 
 The highest-value missing piece (pillar 3 and the end of the journey).
 
@@ -151,7 +153,7 @@ One design round (three options, judged with real portraits in Light and Dark), 
 - **Depth.** One shadow recipe for paper (contact shadow plus soft ambient) used everywhere a photo or page appears.
 - **Symbols.** One weight and scale per role; symbol effects only on state change (U6).
 
-### U6 — Every touch answers (S–M)
+### U6 — Every touch answers (S–M) · Built in 0.17 (copies, paper and person selection, verdict, straighten and Auto; Print and Credits keep their own)
 
 A feedback map, implemented once and reused:
 
