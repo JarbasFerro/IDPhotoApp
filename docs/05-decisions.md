@@ -20,13 +20,13 @@ The decisions that are in force, one short entry each. ADR numbers are kept beca
 | 019 | Rules ship with app updates. Remote catalog updates are deferred and would need signing and rollback | Deferred |
 | 020 | No analytics or crash-reporting SDK. Success is measured with known beta testers, TestFlight, and App Store Connect | Accepted (F) |
 | 022 | JPEG for digital photos; a document with exact page boxes (PDF) for print sheets | Accepted in practice |
-| 024 | **Minimum iOS 26**, built with the newest SDK; iOS 27-only features are availability-gated | Proposed; confirm after device tests on iOS 26 |
+| 024 | **Minimum iOS 27**, built with the newest SDK. No iOS 26 fallbacks: the newest Vision, SwiftUI, and segmentation APIs can be used directly | Accepted (F), 2026-11-12. Supersedes the iOS 26 proposal. The project still says 26.0 until roadmap 0.17 step 0 |
 | 031 | App Intents ("Take an ID photo", open a document) are wanted for 1.0 and must go through the export gate. No face photos in Spotlight | Accepted for architecture; not built |
 | 032, 042 | On-device language models may explain or coach. They never decide dimensions, crop, or pass/fail. No Private Cloud Compute for identity photos | Accepted boundary; not built |
 | 047 | **Worldwide launch.** Wave A (15 countries) at 1.0, Wave B (20) in the first updates; mainland China and Russia excluded. Never offer a profile for a document closed to home photos. Details: [06](06-markets-and-documents.md) | Accepted (F) |
 | 048 | **Pricing in credits.** 1 free credit; 1 credit unlocks one person's photo for all outputs and reprints; packs 1 / 5 / 10 for USD 0.99 / 3.99 / 6.99; the app shows credits, not money; unlock happens in place on Print and Digital Photo; edits are final after unlocking and editing relocks. No subscription. The word "unlock" is accepted for this action | Accepted (F), amended 2026-11-12 |
 | 048 (integrity, not built) | Reserve the credit on unlock, commit after the first verified output, release on failure; never charge twice; balance and "free credit used" mirrored in iCloud key-value storage and reconciled with StoreKit history; spending works offline | Accepted; to build |
-| 049 | **Drafts and one export gate.** Every person in progress is saved on the device (source, edit recipe, document, lock state) with complete file protection, excluded from backups, deleted after 30 days unused or on request. Every path out of the app goes through one export service that refuses locked photos. Locked previews are display resolution only and capture-protected | Accepted (F); gate exists for print and digital files, drafts not built |
+| 049 | **Drafts and one export gate.** Every person in progress is saved on the device (source, edit recipe, document, lock state) with complete file protection, and excluded from backups. **Retention (F, 2026-11-12):** an unlocked (paid) photo stays until the person deletes it, so reprints stay free; a locked draft is deleted after 30 days unused; Delete and Delete all are always available. Every path out of the app goes through one export service that refuses locked photos. Locked previews are display resolution only and capture-protected | Accepted (F); gate exists for print and digital files, drafts not built |
 | 050 | **Accessibility is a native baseline for 1.0:** system controls and text styles, a label on every icon-only control, status never by colour alone, Reduce Motion respected, existing accessible features kept. Full VoiceOver journeys, audits as a gate, and layouts tuned for accessibility sizes come after 1.0 | Accepted (F) |
 | 051 | **Editing on every profile.** Background replacement and Document Tone are offered even where official rules ask for an unedited photo; the app says so honestly and offers the original in one tap. The background is replaced only when the real wall fails the check. Official pages found through search count as sources | Accepted (F) |
 
@@ -36,7 +36,7 @@ The decisions that are in force, one short entry each. ADR numbers are kept beca
 |---|---|---|
 | 002 | All image processing happens on the device | Accepted |
 | 003, 040 | Apple Vision for face analysis; landmark and rectangle requests pinned to revision 3 until a calibrated move to revision 4 | Accepted in practice |
-| 004, 041 | Apple Vision for segmentation. On iOS 27, iterative segmentation is the planned repair tool; iOS 26 falls back to edge softness, original background, or retake | Accepted in practice; repair not built |
+| 004, 041 | Apple Vision for segmentation. Iterative segmentation (iOS 27) is the planned repair tool; when it cannot help, the fallback is edge softness, original background, or retake | Accepted in practice; repair not built |
 | 006, 025 | Rules are versioned data with provenance and a last-reviewed date. Source preference: issuing authority, official delegate, adopted standard, marked secondary source | Accepted |
 | 007 | Check states are `pass`, `warn`, `fail`, `manual_check`. A measurement is a hard check only after calibration for that exact rule; today every machine check is advisory | Accepted |
 | 008 | The original source photo is never modified | Accepted |
@@ -75,19 +75,24 @@ The decisions that are in force, one short entry each. ADR numbers are kept beca
 - **Type in the product:** system fonts with Dynamic Type. The wordmark's letterforms are a logo only.
 - **Voice:** calm, direct, plain. No AI or scanning words, no "guaranteed" or "approved", no pressure to buy. Details in [03-design.md](03-design.md) §4.
 - **Never:** beautification, ads, purple or multi-hue gradients, "AI" styling, Face ID or surveillance cues.
-- **Still open:** final icon finish and dark/tinted variants; a layered icon for Liquid Glass; teal checked on device against real portraits; British or American English spelling (the catalog mixes both).
+- **Still open:** final icon finish and dark/tinted variants; a layered icon for Liquid Glass; teal checked on device against real portraits.
+- **English:** American spelling (color, center, gray, license), decided 2026-11-12 (F). A British variant can be added later as its own localisation.
+## Decided on 2026-11-12 (founder)
+
+The open questions left by the documentation cleanup, answered one by one.
+
+| # | Question | Decision |
+|---|---|---|
+| D-1 | The *Choose result* screen | **Remove it.** Photo Check's main button goes to the document's main output; the other output is a second button (roadmap U2) |
+| D-2 | Measurements on the photo | **Lines that settle:** head, eye, and chin lines with millimetre labels appear when the photo lands, then fold into a *Measured* chip that brings them back (U3). Replaces the old brand rejection of calliper drawings, because these are real numbers, not decoration |
+| D-3 | Stage colour and paper in Dark | **Design round first:** two or three surface options with softened paper in Dark, judged with real portraits in Light and Dark (U5) |
+| D-4 | Controls in pull-up sheets over a full-height photo or page | **Prototype both** behind a switch, compare on the iPhone, keep the better one (U7, U8). ADR-043's "controls below" stands until then |
+| D-5 | When the spike becomes the production app | **After 0.17 and 0.18**, in 0.19 (E1) |
+| D-6 | Minimum iOS | **iOS 27 only** (ADR-024 above). Not the recommendation (iOS 26): simpler code and the newest APIs were preferred over reach to iPhones that have not updated |
+| D-7 | Draft retention | **Paid photos kept until deleted; locked drafts 30 days unused** (ADR-049 above). Not the recommendation (30 days for all): a paid photo must never be lost |
+| D-8 | British or American English | **American** |
 
 ## Open decisions for the founder
 
-These come from the proposals in the roadmap. Nothing here is decided.
+None at the moment. Add new ones here as they come up.
 
-| # | Question | Recommendation |
-|---|---|---|
-| O-1 | Remove the *Choose result* screen and let Photo Check offer the outputs directly? | Yes |
-| O-2 | Show the measurements on the photo (lines and millimetres)? An older brand note rejected callipers as decoration; this would be functional, not decorative | Yes, as a prototype judged on device |
-| O-3 | Allow a warm neutral "stage" colour behind photos instead of system grey, and a slightly dimmed paper white in Dark? | Yes, test both in one design round |
-| O-4 | Put the Your sheet tray and the Adjust controls in native sheets with detents over a full-height photo or page? (ADR-043 chose controls below the photo) | Prototype behind a flag, then decide |
-| O-5 | When to turn the spike into the production app (rename, bundle ID, CI for Swift tests) | After the next two UI batches; see roadmap E1 |
-| O-6 | Final minimum iOS (ADR-024) | Keep iOS 26 if the device check passes |
-| O-7 | Draft retention: 30 days unused (proposed default) | Keep |
-| O-8 | British or American English | American for the US-first store lens |

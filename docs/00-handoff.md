@@ -82,11 +82,11 @@ Launching fails while the iPhone is locked; the install still succeeds.
 - **Purchases.** A pack adds credits without payment; the Credits screen says so.
 - **Persistence.** Photos, edits, and unlocks are lost when the app closes. Credits already spent stay spent.
 - **Evidence.** No print has been measured against tolerances, no speed or memory baseline exists, and no check is calibrated on real faces. Every machine check is advisory.
-- **iOS 26.** The minimum is iOS 26 by proposal. Early versions ran on the iPhone with iOS 26.6; everything since 0.13 was tried only on iOS 27.2.
+- **iOS 27 minimum** was decided on 2026-11-12, but the project still targets 26.0. Changing it is step 0 of 0.17; the test simulator must then run iOS 27.
 - **Known gaps in 0.16.0:** changing the document relocks photos without a warning; the unlock card does not repeat open warnings from Photo Check; the print check is not built.
 
 ## 7. First things to do
 
 1. Read [03-design.md](03-design.md) Part B and [02-roadmap.md §3](02-roadmap.md).
-2. Ask the founder the open decisions O-1 and O-2 in [05-decisions.md](05-decisions.md); they shape the next two batches.
+2. Read the founder's answers D-1 to D-8 at the end of [05-decisions.md](05-decisions.md); they shape the next batches.
 3. Build **0.17 — The ending**: the print check with true size on screen, the finished moment, the feedback map, and the performance baseline.

@@ -23,7 +23,7 @@ Take the photo with a guided camera, let the app frame it to the document's rule
 
 ## Run it
 
-Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone or a simulator with iOS 26 or later. The simulator has no camera; use **Choose from Library** there.
+Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone or a simulator (iOS 27 is the minimum from version 0.17; the project still targets 26.0 until then). The simulator has no camera; use **Choose from Library** there.
 
 ```sh
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer

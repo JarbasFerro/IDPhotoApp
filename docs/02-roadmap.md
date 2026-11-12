@@ -34,6 +34,7 @@ Work that needs devices and people (track V) runs in parallel from now and feeds
 
 ### 0.17 — The ending
 
+0. **iOS 27 minimum (D-6).** Set the deployment target to 27.0, remove fallbacks written for iOS 26, and run the tests on an iOS 27 simulator (the current test simulator runs iOS 26.5 and can no longer host the app). Update AGENTS.md §1 and §9 in the same commit.
 1. **U1 Print check with true size.** Per-model display density table, the points-per-millimetre formula, unit tests. *Check your print* after the print panel and from Print. *No* gives the specific fix and **Print Again**.
 2. **U1 Finished.** Cut order drawn on the person's own page, three tips, **Done**. Shop route gets the same check.
 3. **U6 Feedback map.** Haptics and numeric transitions on the stepper, chips, verdict, and unlock, through one small helper.
@@ -43,8 +44,8 @@ Done when: on the founder's iPhone and printer, a print can be checked against t
 
 ### 0.18 — Shorter and measured
 
-1. **U2** Remove *Choose result*; Photo Check offers the outputs. Show *Before your photo* in full once per document. **Use Photo** flows into the Photo Check landing. Add the Photo · Check · Print marker. *(needs decision O-1)*
-2. **U3** Measured lines and millimetre labels on the photo, the **Measured** chip, checks arriving one by one, the **Actual size** toggle. *(needs decision O-2)*
+1. **U2** Remove *Choose result*; Photo Check offers the outputs. Show *Before your photo* in full once per document. **Use Photo** flows into the Photo Check landing. Add the Photo · Check · Print marker.
+2. **U3** Measured lines and millimetre labels on the photo, the **Measured** chip, checks arriving one by one, the **Actual size** toggle.
 3. **P2** Start analysing the captured still while the review is on screen, and cancel on Retake. Warm up Vision and Core Image when Home is idle.
 4. **U15** A script that exports the gallery from the UI tests in Light and Dark.
 
@@ -57,7 +58,7 @@ Done when: a first-time tester goes from launch to a shared digital photo in und
 3. Remove spike-only switches that are settled (the brand colour candidates), keeping developer details behind the long press.
 4. Update [04-architecture.md](04-architecture.md) and every path in the docs.
 
-Done when: the same tests pass under the new names and a fresh clone builds with the commands in the handoff document. *(timing is decision O-5)*
+Done when: the same tests pass under the new names and a fresh clone builds with the commands in the handoff document.
 
 ## 4. Tracks
 
@@ -108,7 +109,7 @@ Proposed feel thresholds: any touch answers within 100 ms; anything longer than 
 | ID | Item |
 |---|---|
 | Q1 | Calibrate the checks on the private portrait set: head-size error, background, light, sharpness. Decide which, if any, earn a hard pass or fail |
-| Q2 | Hair-edge repair: tap to fix on iOS 27, with the iOS 26 fallback |
+| Q2 | Hair-edge repair: tap to fix with iterative segmentation |
 | Q3 | Glare on glasses and shadow advice, as warnings |
 | Q4 | Digital presets tested against the real upload forms (US passport renewal, US visa, UK passport, Saudi Absher, South Korea) |
 | Q5 | Blind comparison against shop photos, twice: once to guide tuning, once in beta |
@@ -119,11 +120,11 @@ Proposed feel thresholds: any touch answers within 100 ms; anything longer than 
 | ID | Item | Notes |
 |---|---|---|
 | E1 | The spike becomes the production app | §3, 0.19 |
-| E2 | **Drafts and the full export gate** (ADR-049): save source, edit recipe, document, and lock state per person; Continue on Home; delete one or all; 30-day retention; unlock bound to the recipe so a changed photo relocks; a test that lists every way out of the app and proves a locked photo cannot use it; capture protection checked on iOS 26 | The largest engineering item. Design the storage format first and write it down |
+| E2 | **Drafts and the full export gate** (ADR-049): save source, edit recipe, document, and lock state per person; Continue on Home; delete one or all; paid photos kept until deleted, locked drafts deleted after 30 days unused (D-7); unlock bound to the recipe so a changed photo relocks; a test that lists every way out of the app and proves a locked photo cannot use it; capture protection checked on iOS 26 | The largest engineering item. Design the storage format first and write it down |
 | E3 | **StoreKit** (ADR-048): three consumables; reserve on unlock, commit after the first verified file, release on failure; restore; balance mirrored in iCloud key-value storage; tests for cancel, pending, Ask to Buy, interruption, crash between reserve and commit, reinstall | No path may charge twice or lose a paid photo |
 | E4 | Settings and Help complete: restore, delete all, help for photo, print, cut, and shop, legal text | |
 | E5 | App Intents: "Take an ID photo", open a document; through the export gate | |
-| E6 | Language review by native speakers; decide British or American spelling (O-8); languages after 1.0 | |
+| E6 | Language review by native speakers; convert the English text to American spelling (D-8); languages after 1.0 | |
 | E7 | Wave B research (needs no code; can start any time) | [06](06-markets-and-documents.md) |
 
 ### V — Evidence that needs devices and people
@@ -133,7 +134,7 @@ These cannot be done by a model alone. The founder runs them; the results go int
 | ID | Item |
 |---|---|
 | V1 | **Printer round:** three printers (inkjet, laser, photo) × two papers, tolerances written before measuring, the 50 mm line and one photo measured |
-| V2 | **Older iPhone:** the full journey on the oldest supported model; iOS 26 behaviour, capture protection included |
+| V2 | **Older iPhone:** the full journey on the oldest iPhone that runs iOS 27, capture protection included |
 | V3 | **Camera calibration** on front and back cameras: do the direction cues match reality |
 | V4 | **Real portraits:** the private set for U10 and Q1 |
 | V5 | **First-use sessions** with testers who have never seen the app, timed |

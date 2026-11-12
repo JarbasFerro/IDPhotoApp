@@ -7,7 +7,7 @@ This file defines the engineering conventions for human and AI contributors. Sta
 - iPhone / iOS only.
 - Native Swift + SwiftUI.
 - Build against the newest approved Apple SDK available for the current development/release stage.
-- Current deployment proposal: iOS 26 minimum, with iOS 27-only features availability-gated until ADR-024 is finalized.
+- Minimum iOS 27 (ADR-024, decided 2026-11-12). The project moves its deployment target from 26.0 to 27.0 in version 0.17.
 - Do not introduce Android, Flutter, React Native, web, or other portability layers without a new accepted ADR.
 
 ## 2. Native-first rule
@@ -103,7 +103,7 @@ Deferred until after 1.0: full VoiceOver/Voice Control journeys, accessibility a
 - Vision observations must be converted to domain-neutral normalized geometry immediately.
 - A computer-vision measurement becomes a hard compliance check only after calibration demonstrates adequate reliability for that exact rule semantics.
 - Low-confidence/subjective checks become `warn` or `manual_check`, not invented certainty.
-- iOS 27 segmentation-refinement APIs may be used where they materially improve mask correction and have an iOS 26 fallback.
+- iOS 27 segmentation-refinement APIs may be used where they materially improve mask correction; when they cannot help, fall back to edge softness, the original background, or a retake.
 - Foundation Models/Core AI are optional assistance layers only. They may explain or coach; they may not determine official dimensions, crop geometry, or authoritative pass/fail results.
 
 ## 10. Deterministic domain core
@@ -229,7 +229,7 @@ Before considering work complete, ask:
 6. What happens under cancellation/interruption?
 7. Are privacy/logging/data-retention implications correct?
 8. Is the behavior tested at rule/geometry boundaries?
-9. Does iOS 26 fallback safely when an iOS 27 feature is unavailable?
+9. Does it behave well on the oldest iPhone that runs iOS 27?
 10. Does this feature make the ID-photo task better, or is it merely showcasing an API?
 
 When the answer changes a foundational decision, update `docs/05-decisions.md` before quietly implementing a workaround.

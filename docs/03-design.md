@@ -97,7 +97,7 @@ Six principles for every new screen:
 
 ## 7. Proposals
 
-Each has an ID used by the roadmap. Effort: S under a day, M a few days, L a week or more. "Decision" means the founder should confirm before it ships ([05-decisions.md](05-decisions.md), open decisions).
+Each has an ID used by the roadmap. Effort: S under a day, M a few days, L a week or more. The founder's answers on these are recorded as D-1 to D-8 in [05-decisions.md](05-decisions.md).
 
 ### U1 — Finish the journey: print check, true size, finished (L)
 
@@ -111,7 +111,7 @@ The highest-value missing piece (pillar 3 and the end of the journey).
 
 Done when: a first-time tester with a home printer reaches Finished and can say whether the print is the right size.
 
-### U2 — A shorter path with a visible thread (M) · Decision O-1
+### U2 — A shorter path with a visible thread (M) · Decided (D-1)
 
 - **Remove *Choose result*.** Photo Check's main button becomes the document's main output (**Print** or **Digital Photo**) and the other output is the secondary button. Digital-only and shop-only documents show what they support.
 - **Before your photo** in full only the first time for a document; after that the camera opens directly and the tips live in Camera Help.
@@ -120,7 +120,7 @@ Done when: a first-time tester with a home printer reaches Finished and can say 
 
 Result: Home → Camera → Photo Check → Your sheet → Print (five screens instead of eight).
 
-### U3 — Show the measuring (M) · Decision O-2
+### U3 — Show the measuring (M) · Decided (D-2)
 
 The signature Calipic moment, built from data the app already has (the face analysis and the profile's composition bands).
 
@@ -141,7 +141,7 @@ Done when: testers, asked what the app did, mention that it measured the photo.
 - Unlock: the page lifts slightly and the unlock card folds away; one success haptic.
 - Reduce Motion: cross-fades. All of it interruptible: a back swipe mid-transition must work.
 
-### U5 — The look: stage, paper, type, numbers (M) · Decision O-3
+### U5 — The look: stage, paper, type, numbers (M) · Design round decided (D-3)
 
 One design round (three options, judged with real portraits in Light and Dark), then tokens.
 
@@ -167,7 +167,7 @@ A feedback map, implemented once and reused:
 
 No sounds beyond the system shutter. Nothing repeats or loops.
 
-### U7 — Adjust as a tool (L) · Decision O-4
+### U7 — Adjust as a tool (L) · Prototype both (D-4)
 
 - The photo fills the screen; controls sit in a native sheet with detents (system glass), so the photo stays large.
 - **Straighten** becomes a ruler dial under the photo, with a tick at zero and at the automatic value.
@@ -183,7 +183,7 @@ No sounds beyond the system shutter. Nothing repeats or loops.
 - New copies travel from the face circle to their place on the page.
 - Paper chips carry a small paper-shaped glyph in true proportion and how many copies fit ("A4 · up to 30"), so choosing paper is an informed choice.
 - A **cut lines** toggle previews where to cut.
-- Consider the tray as a native sheet with detents so the page can use the full height (O-4).
+- Consider the tray as a native sheet with detents so the page can use the full height (D-4: prototype both).
 
 ### U9 — Home as the studio table (M)
 

@@ -5,7 +5,7 @@ This folder is the app. It started as a feasibility spike and kept the name; it 
 ## Run
 
 1. Open `IDPhotoSpike.xcodeproj` in Xcode 27 and select the shared `IDPhotoSpike` scheme.
-2. Choose an iPhone simulator with iOS 26 or later, or a connected iPhone, and run.
+2. Choose an iPhone simulator or a connected iPhone (iOS 27 is the minimum from version 0.17), and run.
 3. On a simulator there is no camera: use **Choose from Library**.
 
 For an iPhone: select a development team under Signing & Capabilities, pair the phone, and enable Developer Mode. No signing identity is in the repository.
