@@ -62,7 +62,7 @@ Done when: a first-time tester goes from launch to a shared digital photo in und
 
 Done when: the same tests pass under the new names and a fresh clone builds with the commands in the handoff document.
 
-Result: the app is `Calipic/` (target, scheme, module, and folders renamed with `git mv`), bundle identifier `com.jarbasferro.calipic`. The Swift Testing suite runs in CI on `macos-26` with Xcode 27; UI tests stay a local gate (`scripts/test.sh auto`). The colour test systems A–D, their switch, and their evidence test are gone; teal is the only brand colour. The step marker keeps the word of past steps on Photo Check (founder feedback on 0.18).
+Result: the app is `Calipic/` (target, scheme, module, and folders renamed with `git mv`), bundle identifier `com.jarbasferro.calipic`. A Swift Testing job is in CI, but GitHub's `macos-26` image has no Xcode 27 yet, so it skips with a warning and the gate is local (`scripts/test.sh auto`); the job starts testing by itself when Xcode 27 arrives. The colour test systems A–D, their switch, and their evidence test are gone; teal is the only brand colour. The step marker keeps the word of past steps on Photo Check (founder feedback on 0.18).
 
 ## 4. Tracks
 

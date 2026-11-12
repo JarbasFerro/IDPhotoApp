@@ -5,6 +5,7 @@ on:
     paths: ["Calipic/**", "scripts/test.sh", ".github/workflows/swift-tests.yml"]
   pull_request:
     paths: ["Calipic/**", "scripts/test.sh", ".github/workflows/swift-tests.yml"]
+  workflow_dispatch:
 
 jobs:
   unit:
@@ -12,13 +13,23 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      # The app needs the iOS 27 SDK. Until GitHub's image carries Xcode 27 (in November 2026 macos-26 had 26.0-26.3),
+      # the job warns and skips, and the local gate in docs/00-handoff.md applies. It starts testing by itself once
+      # Xcode 27 appears.
       - name: Select Xcode 27
+        id: xcode
         run: |
           ls -d /Applications/Xcode*.app
           xcode=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1 || true)
-          if [ -z "$xcode" ]; then echo "::error::This runner has no Xcode 27; run scripts/test.sh locally."; exit 1; fi
+          if [ -z "$xcode" ]; then
+            echo "::warning::This runner has no Xcode 27, so the Swift tests were skipped. Run scripts/test.sh auto locally."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           echo "DEVELOPER_DIR=$xcode/Contents/Developer" >> "$GITHUB_ENV"
+          echo "available=true" >> "$GITHUB_OUTPUT"
       - name: Unit tests
+        if: steps.xcode.outputs.available == 'true'
         run: |
           xcodebuild -version
           scripts/test.sh --unit auto

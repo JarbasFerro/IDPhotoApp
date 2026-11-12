@@ -97,7 +97,7 @@ State at 0.19.0: 180 tests (161 Swift Testing, 19 UI), 177 pass, 3 skipped (evid
 
 UI tests launch with flags: `--uitesting-fresh` (Spain DNI, nothing saved, one in-memory credit, print panel suppressed), `--uitesting-fixture`, `--uitesting-fixture-2`, `--uitesting-custom-size`.
 
-CI on GitHub runs the Python checks (rules and wording) and, for any change under `Calipic/`, the Swift Testing suite on a macOS runner with Xcode 27 (`.github/workflows/swift-tests.yml`). UI tests are not in CI: they take about five minutes and need a fixed simulator; run them locally before every commit that touches the app.
+CI on GitHub runs the Python checks (rules and wording) and has a Swift Testing job for any change under `Calipic/` (`.github/workflows/swift-tests.yml`). **GitHub's macOS runner has no Xcode 27 yet** (November 2026: Xcode 26.0 to 26.3), so the job warns and skips; it starts testing by itself when Xcode 27 arrives. Until then the gate is local: `scripts/test.sh auto` (all tests, about five minutes) before every commit that touches the app. UI tests stay local even then.
 
 Simulators cannot prove camera behaviour, memory, heat, speed, or print size. Those need a physical iPhone and real prints.
 
