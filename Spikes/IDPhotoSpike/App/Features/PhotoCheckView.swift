@@ -16,6 +16,8 @@ struct PhotoCheckView: View {
     @State private var confirmEdit = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
     @State private var landed = false
+    /// The measuring lines (D-2): drawn when the photo lands, folded into the chip after a moment.
+    @State private var showsMeasureLines = false
     /// Bumped once when a verdict appears or changes; drives the symbol bounce.
     @State private var verdictBounce = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -58,6 +60,7 @@ struct PhotoCheckView: View {
         .navigationTitle(position.map { $0.1 > 1 ? String(localized: "Photo \($0.0) of \($0.1)") : String(localized: "Photo Check") } ?? String(localized: "Photo Check"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .principal) { StepMarker(current: .check, output: model.document.primaryOutput, compact: true) }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button { acquire(.camera, .replace) } label: { Label("Take Photo", systemImage: "camera") }
@@ -102,12 +105,26 @@ struct PhotoCheckView: View {
             while (entry?.isAnalyzing ?? false), !Task.isCancelled { try? await Task.sleep(for: .milliseconds(50)) }
             guard !Task.isCancelled else { return }
             withAnimation(Design.Motion.landing.resolved(reduceMotion: reduceMotion)) { landed = true }
+            // Show the measuring once, then fold it into the chip.
+            guard measurement(for: entry) != nil else { return }
+            try? await Task.sleep(for: .milliseconds(reduceMotion ? 0 : 600))
+            showsMeasureLines = true
+            try? await Task.sleep(for: .seconds(2.6))
+            guard !Task.isCancelled else { return }
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.35)) { showsMeasureLines = false }
         }
     }
 
     /// The final look. While the photo is being checked it sits wide and uncropped; when the face is found the
     /// crop animates into the official frame and the white background fades in: "we found you and framed you".
     /// Press and hold to see the original.
+    /// Where the head and eyes fall for the current framing; nil without exactly one measured face.
+    private func measurement(for entry: PhotoEntry?) -> PhotoMeasurement? {
+        guard let entry, let geometry = entry.analysis?.geometry else { return nil }
+        let target = model.target(for: entry)
+        return PhotoMeasurement.measure(geometry: geometry, adjustment: entry.adjustment, format: target.format, spec: target.spec)
+    }
+
     private func portrait(_ entry: PhotoEntry) -> some View {
         let checking = entry.isAnalyzing || !landed
         let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 200 : (checking ? 250 : 210)
@@ -131,11 +148,20 @@ struct PhotoCheckView: View {
                 .accessibilityHint("Press and hold to compare with the original.")
                 .accessibilityAction(named: Text("Compare with original")) { comparing.toggle() }
                 .accessibilityIdentifier("portrait")
+                .overlay {
+                    if let measurement = measurement(for: entry), landed, !comparing, !entry.isAnalyzing {
+                        MeasurementOverlay(measurement: measurement, showsRange: model.document.statesHeadHeight,
+                                           visible: showsMeasureLines)
+                    }
+                }
             Text(comparing ? "Original" : entry.isAnalyzing ? "Finding your face…" : !landed ? "Framing…" : "Hold to compare with the original")
                 .font(Design.Typography.caption).foregroundStyle(.secondary)
                 .animation(nil, value: checking)
                 // Leaf element that marks the screen for UI tests; identifiers on containers hide their children.
                 .accessibilityIdentifier("photoCheck")
+            if let measurement = measurement(for: entry), landed, !entry.isAnalyzing {
+                MeasurementChip(measurement: measurement, showsRange: model.document.statesHeadHeight, showsLines: $showsMeasureLines)
+            }
             if developerMode {
                 Text(verbatim: CaptureProtection.isAvailable
                      ? "Capture protection test: on. Take a screenshot to check."
@@ -320,24 +346,39 @@ struct PhotoCheckView: View {
     }
 
     private var actions: some View {
-        VStack(spacing: Design.Spacing.control) {
-            Button { path.append(.outputChoice(photoID)) } label: {
-                Text("Continue").frame(maxWidth: .infinity)
+        let outputs = model.document.availableOutputs
+        return VStack(spacing: Design.Spacing.control) {
+            ForEach(Array(outputs.enumerated()), id: \.element) { index, output in
+                if index == 0 {
+                    outputButton(output).brandProminentButtonStyle()
+                } else {
+                    outputButton(output).buttonStyle(.bordered)
+                }
             }
-            .brandProminentButtonStyle()
-            .controlSize(.large)
-            .disabled(model.activity != nil)
-            .accessibilityIdentifier("continueFromCheck")
             Button {
                 // An unlocked photo is final (ADR-048 §5): warn before it is locked again.
                 if model.entries.first(where: { $0.id == photoID })?.isUnlocked == true { confirmEdit = true } else { showAdjust = true }
             } label: {
                 Text("Adjust").frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.brandAccent)
             .controlSize(.large)
+            .frame(minHeight: Design.Size.minimumTarget)
             .accessibilityIdentifier("adjust")
         }
+    }
+
+    private func outputButton(_ output: Output) -> some View {
+        Button {
+            path.append(output == .print ? .sheet : .digital(photoID))
+        } label: {
+            Label(output == .print ? "Print" : "Digital Photo", systemImage: output == .print ? "printer" : "photo")
+                .frame(maxWidth: .infinity)
+        }
+        .controlSize(.large)
+        .disabled(model.activity != nil)
+        .accessibilityIdentifier(output == .print ? "outputPrint" : "outputDigital")
     }
 }
 

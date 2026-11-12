@@ -51,6 +51,8 @@ struct DigitalExport: Sendable, Identifiable {
 protocol PhotoProcessing: Sendable {
     func ingest(_ staged: StagedPhoto) async throws -> PreparedPhoto
     func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis
+    /// Loads the face model before the first real photo, so the first verdict is not slowed by it (roadmap P2).
+    func warmUp() async
     func segment(photo: PreparedPhoto, faceBox: NormalizedCrop?, faceCenter: ImagePoint?) async -> SegmentationResult?
     func previewImage(photo: PreparedPhoto, adjustment: CropAdjustment) async -> CGImage
     func toneMetrics(photo: PreparedPhoto, adjustment: CropAdjustment, faceBox: NormalizedCrop?) async -> ToneMetrics
@@ -65,6 +67,7 @@ protocol PhotoProcessing: Sendable {
 }
 
 extension PhotoProcessing {
+    func warmUp() async {}
     func export(photo: PreparedPhoto, adjustment: CropAdjustment, job: PrintJob,
                 target: RenderTarget = .spainPrototype) async throws -> PhotoExport {
         try await export(edits: [PhotoEdit(photo: photo, adjustment: adjustment)], job: job, target: target)
@@ -139,6 +142,22 @@ actor PhotoPipeline: PhotoProcessing {
     /// Face geometry and the automatic crop, from the bounded preview; never touches the original file.
     func analyze(photo: PreparedPhoto) async throws -> FaceAnalysis {
         try await FaceAnalyzer.analyze(preview: photo.preview, source: photo.pixels)
+    }
+
+    private var isWarm = false
+
+    /// One face request on a tiny blank image: Vision loads its model now, while the person frames the photo.
+    /// Nothing is found and nothing is kept.
+    func warmUp() async {
+        guard !isWarm else { return }
+        isWarm = true
+        let side = 64
+        guard let context = CGContext(data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: 0,
+                                      space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue) else { return }
+        context.setFillColor(gray: 0.5, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: side, height: side))
+        guard let image = context.makeImage() else { return }
+        _ = try? await FaceAnalyzer.analyze(preview: image, source: SourcePixels(width: side, height: side))
     }
 
     /// Foreground mask for background replacement, kept in memory for this photo.

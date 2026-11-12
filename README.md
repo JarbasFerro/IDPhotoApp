@@ -6,7 +6,7 @@ Take the photo with a guided camera, let the app frame it to the document's rule
 
 **Status (2026-11-12):** version 0.16.0. The whole journey works on an iPhone for 22 official documents and custom sizes, in English, Spanish, and Portuguese (Brazil). Purchases, saved drafts, and device evidence are not done yet.
 
-<img src="docs/ui/gallery/01-home.png" alt="Home" width="190"> <img src="docs/ui/gallery/08-photo-check.png" alt="Photo Check" width="190"> <img src="docs/ui/gallery/12-your-sheet.png" alt="Your sheet" width="190"> <img src="docs/ui/gallery/16-print.png" alt="Print" width="190">
+<img src="docs/ui/gallery/home.png" alt="Home" width="190"> <img src="docs/ui/gallery/photo-check-measuring.png" alt="Photo Check" width="190"> <img src="docs/ui/gallery/your-sheet.png" alt="Your sheet" width="190"> <img src="docs/ui/gallery/finished.png" alt="Finished" width="190">
 
 ## Start here
 

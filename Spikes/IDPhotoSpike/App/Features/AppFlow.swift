@@ -1,10 +1,9 @@
 import PhotosUI
 import SwiftUI
 
-/// Home → preparation → acquisition → Photo Check → output choice → digital result or print sheet.
+/// Home → preparation → acquisition → Photo Check → output buttons on Photo Check → digital result or print sheet.
 enum Route: Hashable {
     case check(UUID)
-    case outputChoice(UUID)
     case digital(UUID)
     case sheet
     case share
@@ -28,6 +27,8 @@ struct RootView: View {
     @State private var choosePhotoAfterCamera = false
     @State private var selection: PhotosPickerItem?
     @State private var importMode: PhotoWorkflow.ImportMode = .replace
+    /// Comma-separated ids of documents whose "Before your photo" sheet was shown (D-1: in full once per document).
+    @AppStorage("preflightSeenDocuments") private var preflightSeen = ""
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -36,8 +37,6 @@ struct RootView: View {
                     switch route {
                     case .check(let id):
                         PhotoCheckView(model: model, photoID: id, path: $path, acquire: acquire)
-                    case .outputChoice(let id):
-                        OutputChoiceView(model: model, photoID: id, path: $path)
                     case .digital(let id):
                         DigitalShareView(model: model, photoID: id, path: $path)
                     case .sheet:
@@ -50,19 +49,27 @@ struct RootView: View {
         .sheet(item: $pendingAcquisition, onDismiss: startApprovedAcquisition) {
             pending in
             PreparationView(source: pending.source, document: model.document, onContinue: { selectedSource in
+                markPreflightSeen()
                 approvedAcquisition = PendingAcquisition(source: selectedSource, mode: pending.mode)
                 pendingAcquisition = nil
             })
         }
         .photosPicker(isPresented: $showPicker, selection: $selection, matching: .images, preferredItemEncoding: .current)
         .fullScreenCover(isPresented: $showCamera, onDismiss: {
+            // A still prepared during its review but never used (Cancel) is thrown away.
+            model.discardAhead()
             if choosePhotoAfterCamera { choosePhotoAfterCamera = false; showPicker = true }
         }) {
             CameraView(onCapture: { staged, metrics in
                 showCamera = false
                 model.lastCameraMetrics = metrics
-                model.importPhoto(mode: importMode) { staged }
-            }, onChoosePhoto: { choosePhotoAfterCamera = true; showCamera = false })
+                model.useCapture(staged, mode: importMode)
+            }, onChoosePhoto: { choosePhotoAfterCamera = true; showCamera = false },
+               onReviewChange: { staged in
+                // Analyse the still while the person looks at it, so Photo Check is ready on Use Photo (P2).
+                if let staged { model.prepareAhead(staged) } else { model.discardAhead() }
+            })
+            .onAppear { model.warmUp() }
         }
         .onChange(of: selection) { _, item in
             guard let item else { return }
@@ -90,7 +97,25 @@ struct RootView: View {
     }
 
     private func acquire(_ source: AcquisitionSource, mode: PhotoWorkflow.ImportMode) {
-        pendingAcquisition = PendingAcquisition(source: source, mode: mode)
+        if preflightWasSeen {
+            approvedAcquisition = PendingAcquisition(source: source, mode: mode)
+            startApprovedAcquisition()
+        } else {
+            pendingAcquisition = PendingAcquisition(source: source, mode: mode)
+        }
+    }
+
+    /// UI tests ("--uitesting-fresh") never read or write the stored value: the preflight always shows.
+    private var persistsPreflight: Bool { !ProcessInfo.processInfo.arguments.contains("--uitesting-fresh") }
+    /// Custom sizes count as one document.
+    private var preflightID: String { model.document.isCustom ? "custom" : model.document.id }
+    private var preflightWasSeen: Bool {
+        persistsPreflight && preflightSeen.split(separator: ",").contains { $0 == preflightID }
+    }
+
+    private func markPreflightSeen() {
+        guard persistsPreflight, !preflightWasSeen else { return }
+        preflightSeen = preflightSeen.isEmpty ? preflightID : preflightSeen + "," + preflightID
     }
 
     private func startApprovedAcquisition() {

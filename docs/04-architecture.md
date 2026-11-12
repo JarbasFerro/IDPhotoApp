@@ -28,7 +28,7 @@ scripts/                          version bump, test runner, rules validator and
 
 | Layer | Key files | Owns | Must not |
 |---|---|---|---|
-| **Domain** | `PhotoGeometry`, `FaceGeometry` (crop solver), `PrintLayout` (paper catalog, layout solver), `DocumentProfile`, `DocumentChoice` (→ `RenderTarget`), `DocumentStore`, `Credits`, `ScreenSize` (true size on the display), `CutPlan` (cutting order), `Background`, `Tone` | Units, coordinate conversion, crop solving, rule interpretation, layout, credit arithmetic. Deterministic and unit-tested | Import SwiftUI, Vision, or AVFoundation; read the clock or the locale for results |
+| **Domain** | `PhotoGeometry`, `FaceGeometry` (crop solver), `PrintLayout` (paper catalog, layout solver), `DocumentProfile`, `DocumentChoice` (→ `RenderTarget`), `DocumentStore`, `Credits`, `ScreenSize` (true size on the display), `CutPlan` (cutting order), `PhotoMeasurement` (head and eye lines for the current framing), `Background`, `Tone` | Units, coordinate conversion, crop solving, rule interpretation, layout, credit arithmetic. Deterministic and unit-tested | Import SwiftUI, Vision, or AVFoundation; read the clock or the locale for results |
 | **Imaging** | `PhotoPipeline` (actor), `FaceAnalyzer`, `BackgroundSegmenter`, `ToneAdjuster`, `SheetRenderer`, `PhotoFiles` | Ingest, analysis, masks, previews, final rendering, file writing and verification | Touch UI state |
 | **Camera** | `CameraController`, `FrameAnalyzer`, `CaptureGuidance`, `CameraFramingGuide`, `CameraView` | Capture session, bounded live analysis, the guidance state machine | Decide compliance |
 | **Features** | `PhotoWorkflow` (the one `@Observable` model), `AppFlow` (navigation), one file per screen, `CheckPresentation` and other presentation helpers | State, navigation, words | Do geometry or image math |
@@ -37,7 +37,7 @@ Views describe UI. They call `PhotoWorkflow`; the workflow calls the pipeline th
 
 ## 3. The life of a photo
 
-1. **Acquire.** Camera still or `PhotosPicker` item is copied into a private incoming folder (`StagedPhoto`). Limits: 150 MB, 80 megapixels.
+1. **Acquire.** Camera still or `PhotosPicker` item is copied into a private incoming folder (`StagedPhoto`). Limits: 150 MB, 80 megapixels. A camera still is copied, ingested, and analysed **while the person reviews it** (`PhotoWorkflow.prepareAhead`); **Use Photo** installs it with its analysis done (`useCapture`), **Retake** or **Cancel** deletes it (`discardAhead`). The face model is warmed up when the camera opens (`warmUp`).
 2. **Ingest** (`PhotoPipeline.ingest`). Read size and orientation with ImageIO, make a **1,600 px preview**, copy the original into the photo's private folder. The original is never changed.
 3. **Analyse** on the preview only. Vision face landmarks → `FaceGeometry` in normalized image space → `CropSolver.solve` for the current `RenderTarget` → a `CropAdjustment`.
 4. **Segment** the person, score the mask and the real background, and build the tone reference. The document's background colour is applied by default only when the mask is trustworthy and the real wall is not already plain.

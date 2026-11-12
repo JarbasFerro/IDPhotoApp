@@ -141,8 +141,102 @@ final class PhotoWorkflow {
         }
     }
 
+    // MARK: - A camera still prepared during its review (roadmap P2)
+
+    /// The still the person is looking at, ingested and analysed from a private copy while they decide.
+    /// It joins the session only on Use Photo; Retake or Cancel throws it away.
+    private struct Ahead {
+        let key: URL
+        let task: Task<(photo: PreparedPhoto, measured: FaceAnalysis?)?, Never>
+    }
+    @ObservationIgnored private var ahead: Ahead?
+
+    #if DEBUG
+    /// UI tests on a simulator, where Vision cannot run: "--uitesting-measured" gives every photo this synthetic face
+    /// so the measuring lines and the framed result can be reviewed in screenshots. Never used in release builds.
+    var debugSyntheticFace = false
+
+    static func syntheticAnalysis(for source: SourcePixels) -> FaceAnalysis {
+        let w = Double(source.width), h = Double(source.height)
+        let iedPx = 0.16 * w, eyeToChin = 1.25 * iedPx
+        let frame = HeadFrame(center: ImagePoint(x: 0.5 * w, y: 0.42 * h), angleRadians: 0)
+        let left = frame.toImage(ImagePoint(x: iedPx / 2, y: 0)), right = frame.toImage(ImagePoint(x: -iedPx / 2, y: 0))
+        let chin = frame.toImage(ImagePoint(x: 0, y: eyeToChin))
+        let crown = CrownEstimator.estimate(eyeToChin: eyeToChin, maskAboveEyes: 0.8 * eyeToChin, interEyeDistancePixels: iedPx)
+        let geometry = FaceGeometry(source: source, faceCount: 1,
+                                    faceBox: NormalizedCrop(x: 0.34, y: 0.3, width: 0.32, height: 0.3),
+                                    leftEye: ImagePoint(x: left.x / w, y: left.y / h), rightEye: ImagePoint(x: right.x / w, y: right.y / h),
+                                    chin: ImagePoint(x: chin.x / w, y: chin.y / h), crown: crown, eyeToChinPixels: eyeToChin,
+                                    yawDegrees: 0, pitchDegrees: 0)
+        return FaceAnalysis(faceCount: 1, geometry: geometry, solution: nil, visionRollDegrees: 0)
+    }
+    #endif
+
+    /// Loads the face model early; call when the camera opens.
+    func warmUp() {
+        let pipeline = self.pipeline
+        Task { await pipeline.warmUp() }
+    }
+
+    /// Starts on a copy of the still, so the camera's own file stays valid for Use Photo or a normal import.
+    func prepareAhead(_ staged: StagedPhoto) {
+        discardAhead()
+        let pipeline = self.pipeline
+        let source = staged.url
+        let task = Task { () -> (photo: PreparedPhoto, measured: FaceAnalysis?)? in
+            guard let copy = try? await StagedPhoto.stage(source) else { return nil }
+            guard let photo = try? await pipeline.ingest(copy) else { return nil }
+            guard !Task.isCancelled else { await pipeline.discard(photoID: photo.id); return nil }
+            let measured = try? await pipeline.analyze(photo: photo)
+            guard !Task.isCancelled else { await pipeline.discard(photoID: photo.id); return nil }
+            return (photo, measured)
+        }
+        ahead = Ahead(key: staged.directory, task: task)
+    }
+
+    /// Retake, Cancel, or the camera closing: the prepared copy is deleted.
+    func discardAhead() {
+        guard let pending = ahead else { return }
+        ahead = nil
+        pending.task.cancel()
+        let pipeline = self.pipeline
+        Task { if let result = await pending.task.value { await pipeline.discard(photoID: result.photo.id) } }
+    }
+
+    /// Use Photo. When the still was prepared during the review, its analysis is reused; otherwise a normal import.
+    func useCapture(_ staged: StagedPhoto, mode: ImportMode) {
+        guard let pending = ahead, pending.key == staged.directory else {
+            discardAhead()
+            importPhoto(mode: mode) { staged }
+            return
+        }
+        ahead = nil
+        cancelWork()
+        let currentRevision = revision
+        activity = .importing
+        errorMessage = nil
+        errorActivity = nil
+        task = Task {
+            guard let result = await pending.task.value else {
+                // The early work failed (or was cancelled): fall back to the ordinary path with the camera's file.
+                guard revision == currentRevision else { try? FileManager.default.removeItem(at: staged.directory); return }
+                activity = nil
+                importPhoto(mode: mode) { staged }
+                return
+            }
+            try? FileManager.default.removeItem(at: staged.directory)
+            guard revision == currentRevision, !Task.isCancelled else {
+                await pipeline.discard(photoID: result.photo.id)
+                return
+            }
+            activity = nil
+            install(result.photo, mode: mode, measured: .some(result.measured))
+        }
+    }
+
     /// Adds `photo` to the session (or replaces the selected one), selects it, and starts its analysis.
-    func install(_ photo: PreparedPhoto, mode: ImportMode) {
+    /// `measured` carries an analysis already done during the camera review (`.some(nil)` means it found nothing).
+    func install(_ photo: PreparedPhoto, mode: ImportMode, measured: FaceAnalysis?? = nil) {
         let entry = PhotoEntry(photo: photo)
         if mode == .add, canAddPhoto || selectedIndex == nil {
             entries.append(entry)
@@ -163,17 +257,21 @@ final class PhotoWorkflow {
         selectedID = photo.id
         showsOriginal = false
         lastInstalled = InstallEvent(id: photo.id, sequence: (lastInstalled?.sequence ?? 0) + 1)
-        analyze(photo)
+        analyze(photo, measured: measured)
     }
 
     /// Runs Vision on the bounded preview and applies the automatic composition once per photo.
-    private func analyze(_ photo: PreparedPhoto) {
+    private func analyze(_ photo: PreparedPhoto, measured premeasured: FaceAnalysis?? = nil) {
         analysisTasks[photo.id]?.cancel()
         update(photo.id) { $0.analysis = nil; $0.analysisUnavailable = false; $0.isAnalyzing = true
                             $0.segmentation = nil; $0.backgroundPreview = nil; $0.isSegmenting = true }
         analysisTasks[photo.id] = Task {
             let verdictInterval = signposter.beginInterval("Verdict", id: signposter.makeSignpostID())
-            let measured = try? await pipeline.analyze(photo: photo)
+            var measured: FaceAnalysis?
+            if let premeasured { measured = premeasured } else { measured = try? await pipeline.analyze(photo: photo) }
+            #if DEBUG
+            if debugSyntheticFace { measured = Self.syntheticAnalysis(for: photo.pixels) }
+            #endif
             guard !Task.isCancelled, index(of: photo.id) != nil else { signposter.endInterval("Verdict", verdictInterval); return }
             // Solve for the document chosen now, not when the analysis started (it may have changed meanwhile).
             guard let entry = entries.first(where: { $0.id == photo.id }) else { signposter.endInterval("Verdict", verdictInterval); return }

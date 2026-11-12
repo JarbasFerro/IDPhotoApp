@@ -2,7 +2,7 @@
 
 For whoever continues this project, human or model. Read this page, then [AGENTS.md](../AGENTS.md) (the rules), then [02-roadmap.md](02-roadmap.md) (what to do next).
 
-**State:** tag `v0.17.0`, 2026-11-12. All tests pass on the iOS 27 simulator. The app runs on the founder's iPhone.
+**State:** tag `v0.18.0`, 2026-11-12. All tests pass on the iOS 27 simulator. The app runs on the founder's iPhone.
 
 ## 1. What this is
 
@@ -70,6 +70,7 @@ Launching fails while the iPhone is locked; the install still succeeds.
 - **Strings:** every user-facing string needs Spanish and Portuguese (Brazil) in `App/Resources/Localizable.xcstrings`. `xcodebuild` does not update the catalog; add entries by editing the JSON (keep Xcode's formatting: two-space indent, `" : "` separators) and remove keys that are no longer used. A build writes `.stringsdata` files that list the keys the code uses; compare them with the catalog to find what is missing or dead.
 - **A localisation key built by interpolation looks up the wrong key.** Build the key as a `String` first, then `String(localized: String.LocalizationValue(key))`.
 - **Plain words are enforced:** `check_copy.py` fails on JPEG, PDF, pixel, DPI, and similar. Its allow-list may shrink, never grow quietly.
+- **The simulator cannot run Vision.** `--uitesting-measured` (Debug only) gives the test photo a synthetic face so Photo Check's measuring can be screenshot.
 - **UI tests** launch with `--uitesting-fresh` (Spain DNI, nothing saved, one credit, print panel suppressed). An accessibility identifier on a container hides its children's identifiers: put identifiers on leaf elements.
 - **A disabled button accepts a tap silently in UI tests.** Wait for `isEnabled` first.
 - **Appearance in UI tests:** `XCUIDevice.shared.appearance` has no effect on the iOS 27 simulator. For Dark screenshots set the simulator itself: `xcrun simctl ui <id> appearance dark`, run the test, then set it back to `light`.
@@ -89,4 +90,4 @@ Launching fails while the iPhone is locked; the install still succeeds.
 
 1. Read [03-design.md](03-design.md) Part B and [02-roadmap.md §3](02-roadmap.md).
 2. Read the founder's answers D-1 to D-8 at the end of [05-decisions.md](05-decisions.md); they shape the next batches.
-3. Build **0.18 — Shorter and measured** ([roadmap §3](02-roadmap.md)). 0.17 is done.
+3. Build **0.19 — the production app** ([roadmap §3](02-roadmap.md)). 0.17 and 0.18 are done.

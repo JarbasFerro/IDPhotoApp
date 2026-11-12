@@ -322,7 +322,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         add(checkDark)
         XCUIDevice.shared.appearance = .light
         // Scroll the row clear of the bottom action bar before tapping it.
-        let continueButton = app.buttons["continueFromCheck"]
+        XCTAssertTrue(any(app, "stepMarker").exists)
+        let continueButton = app.buttons["outputPrint"]
         for _ in 0..<6 where byEye.frame.maxY > continueButton.frame.minY - 8 {
             app.scrollViews.firstMatch.swipeUp()
         }
@@ -358,10 +359,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
         if !adjustDone.waitForNonExistence(timeout: 3) { adjustDone.tap() }
         XCTAssertTrue(adjustDone.waitForNonExistence(timeout: 5))
         // Sheet.
-        reveal(app.buttons["continueFromCheck"], in: app)
-        app.buttons["continueFromCheck"].tap()
-        XCTAssertTrue(app.buttons["printChoice"].waitForExistence(timeout: 5))
-        app.buttons["printChoice"].tap()
+        reveal(app.buttons["outputPrint"], in: app)
+        XCTAssertTrue(app.buttons["outputPrint"].waitForExistence(timeout: 5))
+        app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.steppers["copiesStepper"].exists)
@@ -404,14 +404,9 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["continueFromCheck"], in: app)
-        app.buttons["continueFromCheck"].tap()
-        XCTAssertTrue(app.buttons["digitalChoice"].waitForExistence(timeout: 5))
-        let choiceScreenshot = XCTAttachment(screenshot: app.screenshot())
-        choiceScreenshot.name = "Output choice"
-        choiceScreenshot.lifetime = .keepAlways
-        add(choiceScreenshot)
-        app.buttons["digitalChoice"].tap()
+        reveal(app.buttons["outputPrint"], in: app)
+        XCTAssertTrue(app.buttons["outputDigital"].waitForExistence(timeout: 5))
+        app.buttons["outputDigital"].tap()
         XCTAssertFalse(app.buttons["continueToShare"].exists)
         // Locked: no file exists yet. One credit unlocks it in place.
         XCTAssertTrue(app.buttons["unlockDigital"].waitForExistence(timeout: 10))
@@ -450,9 +445,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["continueFromCheck"], in: app)
-        app.buttons["continueFromCheck"].tap()
-        app.buttons["printChoice"].tap()
+        reveal(app.buttons["outputPrint"], in: app)
+        app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.scrollViews["sheetPreview"].waitForExistence(timeout: 10))
         let summary = app.staticTexts["layoutSummary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 5))
@@ -489,9 +483,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         XCTAssertTrue(app.navigationBars["Photo 2 of 2"].waitForExistence(timeout: 15))
-        reveal(app.buttons["continueFromCheck"], in: app)
-        app.buttons["continueFromCheck"].tap()
-        app.buttons["printChoice"].tap()
+        reveal(app.buttons["outputPrint"], in: app)
+        app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.buttons["personCircle-1"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["personCircle-2"].exists)
         // Selecting a person moves the tray to them.
@@ -533,9 +526,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["continueFromCheck"], in: app)
-        app.buttons["continueFromCheck"].tap()
-        app.buttons["printChoice"].tap()
+        reveal(app.buttons["outputPrint"], in: app)
+        app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
@@ -564,9 +556,8 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["continueFromCheck"], in: app)
-        app.buttons["continueFromCheck"].tap()
-        app.buttons["printChoice"].tap()
+        reveal(app.buttons["outputPrint"], in: app)
+        app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
@@ -623,6 +614,32 @@ final class IDPhotoSpikeUITests: XCTestCase {
         attach(app, "Shop print check")
     }
 
+    /// The measuring lines (D-2) draw in when the photo lands, fold into the chip, and come back on tap.
+    /// The simulator cannot run Vision, so "--uitesting-measured" supplies a synthetic face.
+    @MainActor
+    func testMeasuringLinesFoldIntoTheChip() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture", "--uitesting-measured"]
+        app.launchArguments.append("--uitesting-fresh")
+        app.launch()
+        XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        // The lines show by themselves once the photo lands…
+        let shown = app.buttons["measureChipLinesShown"]
+        XCTAssertTrue(shown.waitForExistence(timeout: 15))
+        XCTAssertTrue(shown.label.contains("mm"), shown.label)
+        attach(app, "Photo Check, measuring")
+        // …then fold into the chip.
+        let chip = app.buttons["measureChip"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 6))
+        attach(app, "Photo Check, measured")
+        chip.tap()
+        XCTAssertTrue(shown.waitForExistence(timeout: 3))
+        Thread.sleep(forTimeInterval: 1.0)
+        attach(app, "Photo Check, lines on request")
+        XCTAssertTrue(app.buttons["outputPrint"].exists)
+        XCTAssertTrue(any(app, "stepMarker").exists)
+    }
+
     @MainActor
     func testCreditsFromHome() throws {
         let app = XCUIApplication()
@@ -650,15 +667,14 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        reveal(app.buttons["continueFromCheck"], in: app, attempts: 10)
-        XCTAssertTrue(app.buttons["continueFromCheck"].isHittable)
+        reveal(app.buttons["outputPrint"], in: app, attempts: 10)
+        XCTAssertTrue(app.buttons["outputPrint"].isHittable)
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Photo Check at accessibility text size"
         attachment.lifetime = .keepAlways
         add(attachment)
-        app.buttons["continueFromCheck"].tap()
-        XCTAssertTrue(app.buttons["printChoice"].waitForExistence(timeout: 5))
-        app.buttons["printChoice"].tap()
+        XCTAssertTrue(app.buttons["outputPrint"].waitForExistence(timeout: 5))
+        app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
         attach(app, "Your sheet at accessibility text size")
         reveal(app.buttons["continueToShare"], in: app, attempts: 10)

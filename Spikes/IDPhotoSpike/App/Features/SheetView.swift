@@ -48,6 +48,7 @@ struct SheetView: View {
         .background(Design.Surface.screen)
         .navigationTitle("Your sheet")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) } }
         .sheet(isPresented: $showOptions) { SheetOptionsView(model: model) }
         .task { model.refreshSheetThumbnails() }
         .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }

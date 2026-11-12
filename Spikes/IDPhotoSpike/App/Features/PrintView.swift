@@ -43,6 +43,7 @@ struct PrintView: View {
         .navigationTitle("Print")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) }
             if locked == 0 {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { path.removeAll() }.accessibilityIdentifier("shareDone")

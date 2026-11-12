@@ -39,18 +39,21 @@ Buttons: one prominent button per screen (`brandProminentButtonStyle()`, large),
 | 1 | **Home** | Hero picture (a photo and the sheet it becomes; the person's own photo once they have one), the promise "Take it at home. Print it yourself.", the *Your sheet* card when a session exists, one card with the document and *Photo requirements*, **Take Photo**, **Choose from Library**, then the privacy line, the credits button, and the version | `HomeView.swift` |
 | 2 | **Choose document** | Sheet with search; **Custom size** first, then profiles grouped by country with size and background. Custom size takes width and height in mm or inches and offers shortcuts | `DocumentPickerView.swift` |
 | 3 | **Photo requirements** | The document's rules from the catalog with official sources and the review date | `HomeView.swift` (`RequirementsView`) |
-| 4 | **Before your photo** | Three things to get right, shown before the camera or the photo picker | `PreparationView.swift` |
+| 4 | **Before your photo** | Three things to get right. Shown in full the first time for each document; after that the camera or picker opens directly (requirements stay in Home, Photo Check's More menu, and Camera Help) | `PreparationView.swift`, `AppFlow.swift` |
 | 5 | **Camera** | Full-screen preview, one oval, one instruction about moving the phone, an arrow for direction, green when ready, white shutter, optional automatic capture with a countdown, camera switch, Help. After the shutter: the still with **Retake** and **Use Photo** | `Camera/` |
-| 6 | **Photo Check** | The photo settles into the official frame. One verdict (*Looks good*, *Review your photo*, *Better to retake*). A card with two folding rows: measured checks and the document's by-eye checks. Hold the photo to compare with the original. **Continue**, **Adjust**; **Retake** and a More menu in the toolbar. An unlocked photo says so, and Adjust asks before changing it | `PhotoCheckView.swift`, `CheckPresentation.swift` |
+| 6 | **Photo Check** | The photo settles into the official frame. One verdict (*Looks good*, *Review your photo*, *Better to retake*). A card with two folding rows: measured checks and the document's by-eye checks. Hold the photo to compare with the original. the document's main output as the prominent button (**Print**, or **Digital Photo** for digital-first documents such as the UK passport), the other output below it, and a plain **Adjust**; **Retake** and a More menu in the toolbar. An unlocked photo says so, and Adjust asks before changing it | `PhotoCheckView.swift`, `CheckPresentation.swift` |
 | 7 | **Adjust** | Sheet: the crop with drag and pinch, Auto/Reset, Compare, background choice, light and colour, Move and Zoom buttons, Details sliders (zoom, position, straighten, edge softness, correction strength); framing presets for custom sizes | `AdjustSheet.swift`, `CropPreview.swift` |
-| 8 | **Choose result** | Digital Photo or Print Sheet | `OutputChoiceView.swift` |
-| 9 | **Digital Photo** | Locked: the unlock card and **Unlock and Save**. Ready: the photo, **Share Photo**, **Done** | `OutputChoiceView.swift` |
+| 9 | **Digital Photo** | Locked: the unlock card and **Unlock and Save**. Ready: the photo, **Share Photo**, **Done** | `DigitalPhotoView.swift` |
 | 10 | **Your sheet** | The page as hero with "N copies · M pages". A tray with the person line and **Check**, face circles with copy badges, add-person menu, a copies stepper, paper chips, **More** (Sheet options: sizes per person, any paper, cutting options), **Continue** | `SheetView.swift` |
 | 11 | **Print** | Page thumbnail and "Your sheet is ready"; *Before you print* in three steps (load paper, Actual Size, measure the line). Locked: the unlock card, **Unlock and Print**, **Keep Editing**, or **Get Credits**. Unlocked: a **Check Your Print** row under the steps, then **Print at Home**, **Print at a Shop**, **More Formats**. A finished print job opens the check by itself | `PrintView.swift` |
 | 11a | **Check Your Print** | The 50 mm line (or one photo's outline when the page has no line) drawn at true size: lay the print on the screen. **Yes, Same Size** → Finished. **No** → *smaller or larger?* → the specific fix (Actual Size, Fit to Page, Borderless, paper) and **Print Again**. The shop route asks the shop to print at original size. Unknown iPhone model: measure with a ruler, or set up the screen once with a bank or ID card (**Screen Size**) | `PrintCheckView.swift`, `Domain/ScreenSize.swift` |
 | 11b | **Finished** | "Your photos are the right size", the person's own page with the cuts drawn in order (rows, then photos, then trims), three cutting tips, **Done** to Home | `FinishedView.swift`, `Domain/CutPlan.swift` |
 | 12 | **Credits** | Balance, what a credit covers, three packs with prices. The only place that shows money | `CreditsView.swift` |
 | 13 | **Settings** and **App Icon** | Credits, app icon picker (33 characters), privacy sentence, version | `HomeView.swift`, `AppIconPickerView.swift` |
+
+**Step marker** (Photo Check, Your sheet, Print, Digital Photo): "Photo › Check › Print" (or "Save") in the navigation bar, the current step in semibold, past steps with a checkmark; Photo Check shows past steps as checkmarks only, to fit beside Retake (`StepMarker.swift`).
+
+**Measuring** (Photo Check, D-2): when the photo lands, dashed white lines draw in at the top of the head and the chin, a solid one at the eyes, with a bracket and the head length ("Head 23.7 mm", or "about" when the top of the head is an estimate). After about three seconds they fold into a chip under the photo; tapping the chip shows them again. "Allowed 32–36 mm" and a status symbol appear only when the document's rules state a head height (`PhotoMeasurement.swift`, `MeasurementOverlay.swift`).
 
 **Unlock card** (Print and Digital Photo, while locked): "N photos · N credits", then "Includes the digital photo and any number of prints. After this, framing and edits are final.", then "You have N credits." That sentence is the point-of-no-return warning and must stay next to the button that spends the credit.
 
@@ -113,7 +116,7 @@ The highest-value missing piece (pillar 3 and the end of the journey).
 
 Done when: a first-time tester with a home printer reaches Finished and can say whether the print is the right size.
 
-### U2 — A shorter path with a visible thread (M) · Decided (D-1)
+### U2 — A shorter path with a visible thread (M) · Built in 0.18 (one review instead of two is still open)
 
 - **Remove *Choose result*.** Photo Check's main button becomes the document's main output (**Print** or **Digital Photo**) and the other output is the secondary button. Digital-only and shop-only documents show what they support.
 - **Before your photo** in full only the first time for a document; after that the camera opens directly and the tips live in Camera Help.
@@ -122,7 +125,7 @@ Done when: a first-time tester with a home printer reaches Finished and can say 
 
 Result: Home → Camera → Photo Check → Your sheet → Print (five screens instead of eight).
 
-### U3 — Show the measuring (M) · Decided (D-2)
+### U3 — Show the measuring (M) · Built in 0.18: the lines and chip (checks one by one and Actual size are still open)
 
 The signature Calipic moment, built from data the app already has (the face analysis and the profile's composition bands).
 

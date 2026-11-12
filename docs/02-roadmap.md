@@ -8,6 +8,7 @@ The roadmap is ambitious on purpose, and **nothing in it is final**. If a better
 
 - The full journey works on an iPhone for 22 documents and custom sizes: guided camera, automatic framing, background and light, Photo Check, Adjust, multi-person print sheets, home and shop printing, digital photo, credits with unlock in place, three languages.
 - **Good:** the camera screen, the deterministic core (crop solver, layout solver, rules as data), the test suite (162 passing).
+- **0.18 (2026-11-12) made it shorter and measured:** five screens instead of eight (no *Choose result*, preflight once per document), the step marker, measuring lines on the photo, and the photo analysed while the camera review is on screen.
 - **0.17 (2026-11-12) added the ending:** check the print against the screen at true size, the fix when it is wrong, Finished with the cut order, haptics, iOS 27 minimum, and two speed signposts.
 - **Not good enough yet:** the look (it reads like Settings), the sense of one journey, and visible precision. See the review in [03-design.md §5](03-design.md).
 - **Not real yet:** purchases (credits are added without payment), drafts (everything is lost when the app closes), and all evidence that needs devices and people (print measurements, speed, real faces).
@@ -43,7 +44,7 @@ Work that needs devices and people (track V) runs in parallel from now and feeds
 
 Done when: on the founder's iPhone and printer, a print can be checked against the screen without a ruler and the 50 mm line on screen measures 50 ± 0.5 mm.
 
-### 0.18 — Shorter and measured
+### 0.18 — Shorter and measured · Done (2026-11-12), except: one review instead of two, checks appearing one by one, Actual size on Photo Check
 
 1. **U2** Remove *Choose result*; Photo Check offers the outputs. Show *Before your photo* in full once per document. **Use Photo** flows into the Photo Check landing. Add the Photo · Check · Print marker.
 2. **U3** Measured lines and millimetre labels on the photo, the **Measured** chip, checks arriving one by one, the **Actual size** toggle.

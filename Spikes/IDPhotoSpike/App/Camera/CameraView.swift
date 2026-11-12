@@ -46,6 +46,8 @@ struct CameraMetrics: Sendable, Hashable {
 struct CameraView: View {
     let onCapture: (StagedPhoto, CameraMetrics) -> Void
     let onChoosePhoto: () -> Void
+    /// The still under review (to prepare it early), or nil when it is thrown away (roadmap P2).
+    var onReviewChange: (StagedPhoto?) -> Void = { _ in }
     @State private var camera = CameraController()
     @State private var errorMessage: String?
     @State private var flash = false
@@ -407,6 +409,7 @@ struct CameraView: View {
                     return
                 }
                 capturedPhoto = staged
+                onReviewChange(staged)
                 capturedImage = image
                 preparingReview = false
                 showingCapturedReview = true
@@ -466,7 +469,10 @@ struct CameraView: View {
 
     private func discardCapturedPhoto() {
         captureRevision = UUID()
-        if let capturedPhoto { Task { await CameraStillPreview.discard(capturedPhoto) } }
+        if let capturedPhoto {
+            onReviewChange(nil)
+            Task { await CameraStillPreview.discard(capturedPhoto) }
+        }
         capturedPhoto = nil
         capturedImage = nil
         showingCapturedReview = false
