@@ -158,7 +158,7 @@ enum DocumentChoice: Sendable, Hashable, Identifiable {
         return DigitalOutputSpec(pixels: format.output, minBytes: nil, maxBytes: nil, looseFraming: false)
     }
 
-    /// The document's official wording asks for unedited photos. Recorded so the app can say so (ADR-051, docs/26 D4).
+    /// The document's official wording asks for unedited photos. Recorded so the app can say so (ADR-051).
     var officialRulesForbidEditing: Bool { profile?.background.officialEditingRule == "disallowed" }
 
     /// What only a person can judge, from the profile's own checks. Print instructions are not photo checks.

@@ -84,7 +84,7 @@ struct PrintView: View {
         }
     }
 
-    /// The instructions that decide whether the print comes out at the right size (docs/26 A1).
+    /// The instructions that decide whether the print comes out at the right size (docs/03-design.md §3).
     private var steps: some View {
         VStack(alignment: .leading, spacing: Design.Spacing.text) {
             Text("Before you print")

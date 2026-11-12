@@ -1,12 +1,12 @@
 # Profile research index
 
-One document per official profile (L19-013). Each profile must pass the release gate in [01 §15](../01-product-definition.md). Official pages found through search count as sources (ADR-051). The research order is in [25 §3](../25-wave-a-document-types.md).
+One document per official profile. A profile ships only with its sourced research and review date ([06 §4](../06-markets-and-documents.md)). Official pages found through search count as sources (ADR-051).
 
 ## Status
 
 | Profile | Document | Status | Output | Official editing rule (reference) | Home print |
 |---|---|---|---|---|---|
-| Spain · DNI | [13](../13-spain-foto-carnet.md) | Researched (reference profile) | Print 26 × 32 mm | Not stated | Yes |
+| Spain · DNI | [spain-dni](spain-dni.md) | Researched (reference profile) | Print 26 × 32 mm | Not stated | Yes |
 | US · passport | [us-passport-and-visa](us-passport-and-visa.md) | Researched | Print 2 × 2 in + online-renewal digital | No software, app, filter, or AI changes | Yes, on photo paper |
 | US · visa | [us-passport-and-visa](us-passport-and-visa.md) | Researched | Digital 600 × 600 + print 2 × 2 in | As passport | When a post asks |
 | UK · passport | [uk-passport](uk-passport.md) | Researched | Digital ≥ 600 × 750 (primary) + print 35 × 45 | Unaltered by software | **No**: shop print |
@@ -37,8 +37,8 @@ Wave A has **22 profile files** (several items cover more than one document). Th
 
 **Open technical points:**
 
-- **Netherlands:** prints need 400 dpi, and the head size depends on age (L19-020).
-- **Australia and the UK:** the print route goes through a shop (L19-005).
+- **Netherlands:** prints need 400 dpi, and the head size depends on age .
+- **Australia and the UK:** the print route goes through a shop.
 
 ## Editing
 

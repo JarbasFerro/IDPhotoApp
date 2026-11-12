@@ -367,7 +367,7 @@ def write_icons():
           f"(grain {'on' if ICON_GRAIN else 'off'})")
 
 
-# The study sheet for docs/brand/prototypes/07: characters with and without cut-outs.
+# The study sheet: characters with and without cut-outs.
 SHEET = ROOT / "docs/brand/prototypes/icon-v2/sheet-appearances.png"
 SHEET_CHARACTERS = ["swept", "afro", "glasses", "hijab", "panda", "dinosaur", "astronaut", "robot"]
 # Stand-in for the field iOS puts behind a transparent dark or tinted icon; only used to draw the sheet.
@@ -415,6 +415,7 @@ def write_appearance_sheet():
         out.append("</svg>")
         render_all(jobs, scratch)
         render("\n".join(out), scratch / "sheet.png", width, alpha=False, scratch=scratch, height=height)
+        SHEET.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(scratch / "sheet.png"), str(SHEET))
     print("wrote", SHEET.relative_to(ROOT))
 

@@ -144,7 +144,7 @@ struct DesignTokensTests {
 
 #if DEBUG
 /// The camera guide rendered without a camera, from the same scene as the `#Preview`s, for
-/// docs/brand/prototypes/08-frame-motif-in-product.md. Evidence capture, not a regression test: it only runs with
+/// the frame-motif study (closed). Evidence capture, not a regression test: it only runs with
 /// TEST_RUNNER_FRAME_MOTIF_RENDER_DIR=<folder>, because rendering holds the main actor long enough to starve the
 /// yield-counting waits in PhotoWorkflowTests when the suites run in parallel.
 @MainActor

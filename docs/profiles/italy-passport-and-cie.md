@@ -1,6 +1,6 @@
 # Profile research — Italy passport and electronic ID card (CIE)
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
+**Status:** Researched; search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profiles:** `it.passport` and `it.cie`, both print. Rules are shared (ICAO), so this is one rule set and two profiles.
 

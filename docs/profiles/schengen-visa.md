@@ -1,6 +1,6 @@
 # Profile research — Schengen visa
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
+**Status:** Researched; search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profile:** `eu.schengen-visa`, print. One profile for all Schengen consulates. Each consulate may add details, so Help says to check the consulate's own page.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail when the app's words break the plain-language rule (docs/22 §5, docs/26 D3).
+"""Fail when the app's words break the plain-language rule (docs/03-design.md §4).
 
 Scans the English text of every live entry in the String Catalog for technical words people should not need.
 An entry may stay only if it is listed in ALLOWED with a reason. The list may shrink, never grow quietly:

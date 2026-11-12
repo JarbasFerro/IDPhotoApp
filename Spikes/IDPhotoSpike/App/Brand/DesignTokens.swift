@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Calipic's executable design tokens (docs/brand/11-design-tokens.md).
+/// Calipic's executable design tokens (docs/03-design.md §2).
 ///
 /// A small semantic layer over SwiftUI, named by role and not by value. Every value was taken from what the screens
 /// already used, so adopting a token changes nothing on screen. Colours are not here: the accent roles live in
@@ -45,7 +45,7 @@ enum Design {
     }
 
     /// Surfaces. Every screen sits on the grouped background and puts grouped content on cards, so screens match
-    /// in Light and Dark (docs/26 A6).
+    /// in Light and Dark.
     enum Surface {
         static let screen = Color(.systemGroupedBackground)
         static let card = Color(.secondarySystemGroupedBackground)

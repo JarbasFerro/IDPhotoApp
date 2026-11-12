@@ -1,7 +1,7 @@
 import Foundation
 
 /// One official document profile, decoded from the bundled rules catalog (Rules/catalog/v1, schema 1).
-/// Only the fields the app uses are decoded; the catalog validator owns the full schema (docs/05 §12).
+/// Only the fields the app uses are decoded; the catalog validator owns the full schema (Rules/README.md).
 struct DocumentProfile: Sendable, Hashable, Identifiable, Decodable {
     struct Jurisdiction: Sendable, Hashable, Decodable {
         let countryCode: String?

@@ -21,7 +21,7 @@ import argparse, csv, json, os, sys, time, urllib.parse, urllib.request
 FROM, TO = "202511", "202610"
 UA = {"User-Agent": "Mozilla/5.0 (market-research script)"}
 
-# Not in the World Bank dataset; added by hand (sources in docs/24-launch-country-ranking.md).
+# Not in the World Bank dataset; added by hand (sources in docs/06-markets-and-documents.md §6).
 MANUAL = {
     "TW": {"name": "Taiwan", "population": 23_400_000, "internet": 90.0, "gni": 34_000},
 }

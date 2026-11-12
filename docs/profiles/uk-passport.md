@@ -1,6 +1,6 @@
 # Profile research — United Kingdom passport
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
+**Status:** Researched; search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profile:** `gb.passport`. The **digital** route (online application) is primary. The print route is secondary and sent to a shop, not printed at home.
 
@@ -51,7 +51,7 @@ These numbers are taken directly from the rules above (≥ 600 × 750, ≤ 5 MB)
 | Home printing | **Generally not accepted:** "photos printed at home are not usually clear enough to measure facial biometrics" | O-s |
 | Copies and countersignature | Two identical photos. One is countersigned for first passports, lost/stolen/damaged replacements, and child renewals for children aged 11 or under | O-s |
 
-**Consequence:** for the UK print route, Calipic offers **Print at a shop** (L19-005) with the 300 ppi lab JPEG, not home printing. The home-print path is hidden for this profile, with one line explaining why.
+**Consequence:** for the UK print route, Calipic offers **Print at a shop** with the 300 ppi lab JPEG, not home printing. The home-print path is hidden for this profile, with one line explaining why.
 
 ## 4. Children
 

@@ -1,6 +1,6 @@
 # Profile research — Spain TIE (foreigner identity card) and driving licence
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051). Spain DNI is in [13](../13-spain-foto-carnet.md).
+**Status:** Researched; search-based official evidence accepted (ADR-051). Spain DNI is in [spain-dni](spain-dni.md).
 **Date:** 2026-11-11
 **Profiles:** `es.tie` and `es.driving-licence`, both print, **32 × 26 mm (height × width)**. This is the same physical format as the DNI.
 
@@ -14,4 +14,4 @@
 | Re-submission | — | Since 6 Nov 2024, no new photo is needed when DGT already holds a valid one | DGT |
 | Home printing | Not stated | Not stated | ? |
 
-**Calipic:** reuse the DNI geometry from [13](../13-spain-foto-carnet.md). The replacement colour is white for both. The driving licence's "fondo liso" also accepts white.
+**Calipic:** reuse the DNI geometry from [spain-dni](spain-dni.md). The replacement colour is white for both. The driving licence's "fondo liso" also accepts white.

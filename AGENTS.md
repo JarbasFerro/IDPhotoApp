@@ -1,6 +1,6 @@
 # ID Photo App — Implementation contract
 
-This file defines non-negotiable engineering conventions for human and AI contributors. Read the planning documents before changing production code, especially `docs/03-architecture.md`, `docs/04-ux-ui.md`, `docs/07-test-strategy.md`, `docs/08-privacy-security.md`, `docs/10-decisions.md`, and `docs/11-ios-excellence-strategy.md`.
+This file defines the engineering conventions for human and AI contributors. Start with [docs/00-handoff.md](docs/00-handoff.md). Before changing code, read [docs/04-architecture.md](docs/04-architecture.md), [docs/03-design.md](docs/03-design.md), and [docs/05-decisions.md](docs/05-decisions.md). The plan is [docs/02-roadmap.md](docs/02-roadmap.md).
 
 ## 1. Product target
 
@@ -232,7 +232,7 @@ Before considering work complete, ask:
 9. Does iOS 26 fallback safely when an iOS 27 feature is unavailable?
 10. Does this feature make the ID-photo task better, or is it merely showcasing an API?
 
-When the answer changes a foundational decision, update `docs/10-decisions.md` before quietly implementing a workaround.
+When the answer changes a foundational decision, update `docs/05-decisions.md` before quietly implementing a workaround.
 ## 19. Model tiering for AI agents
 
 Contributors may run on a frontier model or on a small/fast model. Tier is chosen by task, not by convenience.
@@ -273,3 +273,12 @@ Operating rules:
 - Search and summary agents stay read-only.
 - One bounded task per small agent. If it would need the whole conversation to succeed, it is the wrong agent.
 - Every other section of this file applies to every tier without exception.
+
+## 20. Working with the founder
+
+- Visuals and experience come first. Look at screenshots of every changed screen in Light and Dark before committing.
+- Nothing is final. Propose anything that would make the app look, feel, or perform better; record a changed decision in `docs/05-decisions.md` first.
+- Commit and push to `main` after each finished batch without asking. Bump the version before committing app changes (section 17).
+- Design choices go to the founder as two or three options; save each round in `docs/ui/explorations/`.
+- Keep the documents short and current: a change to a screen, a rule, or the plan updates `docs/03-design.md`, `docs/06-markets-and-documents.md`, or `docs/02-roadmap.md` in the same commit. Do not add new planning documents; extend the seven that exist.
+- The repository is public: no real faces, device identifiers, account details, or secrets.

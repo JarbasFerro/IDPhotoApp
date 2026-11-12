@@ -1,9 +1,8 @@
 import XCTest
 
-/// Product-context evidence for the provisional brand accent candidates (docs/brand/prototypes/04-product-context.md).
-/// Each capture test drives the normal flow once and attaches screenshots named `brand-<candidate>-<appearance>-<Screen>`;
-/// `scripts/brand/export-brand-screenshots.sh` runs them once per appearance and exports the attachments. They are
-/// evidence capture, not regression tests, so they only run when the runner has BRAND_CONTEXT_CAPTURE=1
+/// Product-context evidence for the brand accent candidates (the study is closed: teal was chosen).
+/// Each capture test drives the normal flow once and attaches screenshots named `brand-<candidate>-<appearance>-<Screen>`.
+/// They are evidence capture, not regression tests, so they only run when the runner has BRAND_CONTEXT_CAPTURE=1
 /// (xcodebuild: TEST_RUNNER_BRAND_CONTEXT_CAPTURE=1); BrandCandidateTests covers the switch itself on every run.
 final class BrandContextUITests: XCTestCase {
     override func setUpWithError() throws {

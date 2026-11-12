@@ -1,8 +1,8 @@
 # Profile research — Wave A second group (verification list)
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051). Result: **7 profiles + 2 custom-size shortcuts**, confirmed by the founder on 2026-11-11.
+**Status:** Researched; search-based official evidence accepted (ADR-051). Result: **7 profiles + 2 custom-size shortcuts**, confirmed by the founder on 2026-11-11.
 **Date:** 2026-11-11
-**Input:** the "verify, then research" list in [25 §3](../25-wave-a-document-types.md).
+**Input:** the profiles that needed verification before research ([06 §3](../06-markets-and-documents.md)).
 
 ## 1. Summary
 

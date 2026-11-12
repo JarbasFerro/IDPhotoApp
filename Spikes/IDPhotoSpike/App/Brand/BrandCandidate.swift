@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Colour test systems from the controlled product-context tests (docs/brand/prototypes). Teal (B) was chosen
+/// Colour test systems from the controlled product-context tests (study closed; see docs/05-decisions.md, Brand). Teal (B) was chosen
 /// (BD-033) and is what the app wears by default, see `Brand`; launching a Debug build with
 /// `-brandCandidate A|B|C|D` swaps in a test system for comparisons. Status colours never derive from these.
 enum BrandCandidate: String, CaseIterable, Sendable {

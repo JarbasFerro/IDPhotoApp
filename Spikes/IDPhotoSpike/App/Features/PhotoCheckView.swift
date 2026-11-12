@@ -170,7 +170,7 @@ struct PhotoCheckView: View {
         .animation(.default, value: summary)
     }
 
-    /// One large answer. Facts and advisory checks sit behind it (docs/26 D8: only facts say "passed").
+    /// One large answer. Facts and advisory checks sit behind it (docs/03-design.md §4: only facts say a thing is done).
     private func verdict(_ summary: PhotoCheckSummary) -> some View {
         VStack(spacing: Design.Spacing.caption) {
             if summary.headline == .checking {
@@ -286,7 +286,7 @@ struct PhotoCheckView: View {
         .accessibilityLabel(Text(verbatim: "\(String(localized: row.title)), \(String(localized: StatusStyle.name(for: row.state))). \(String(localized: row.detail))"))
     }
 
-    /// Honest editing (docs/26 D4): when the document's own rules ask for an unedited photo, say what Calipic changed
+    /// Honest editing (ADR-051): when the document's own rules ask for an unedited photo, say what Calipic changed
     /// and offer the original in one tap. Editing itself stays available (ADR-051).
     private func editingNote(_ note: LocalizedStringResource) -> some View {
         VStack(alignment: .leading, spacing: Design.Spacing.text) {

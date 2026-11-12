@@ -1,6 +1,6 @@
 # Rules catalog
 
-Versioned document-profile data for Calipic, per [05 — Rules engine](../docs/05-rules-engine.md) and AGENTS.md §11. Country and document rules live here as data, never as UI code.
+Versioned document-profile data for Calipic (AGENTS.md §11; overview in [docs/06](../docs/06-markets-and-documents.md)). Country and document rules live here as data, never as UI code.
 
 ## Layout
 
@@ -29,7 +29,7 @@ Rules/catalog/v1/
 | `profileQuestions` | Questions the app asks for this profile only (for example `age_lte_10`) |
 | `sources` | Provenance: authority, title, URL, accessed date, language, type, and how it was retrieved |
 
-Capabilities follow doc 05 §8. No rule is `machine_hard` until a calibrated evaluator exists (AGENTS.md §9); the validator enforces this.
+Each rule declares a capability: `machine_hard` (reliable enough to pass or fail against a tolerance), `machine_advisory` (can flag a risk, cannot judge), `manual` (shown for the person to check), `informational`, or `unsupported` (a known requirement the app cannot help with, still shown). No rule is `machine_hard` until a calibrated evaluator exists (AGENTS.md §9); the validator enforces this.
 
 ## Validate
 
@@ -38,7 +38,7 @@ python3 scripts/rules/validate_catalog.py Rules/catalog/v1
 python3 -m unittest discover -s scripts/rules -p 'test_*.py'
 ```
 
-The validator implements doc 05 §12. Among other things it checks:
+Among other things the validator checks:
 
 - ranges and units;
 - sources referenced and present;

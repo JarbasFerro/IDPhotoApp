@@ -9,7 +9,7 @@ import SwiftUI
 /// (`strokeStyle()`), and pass that width as `lineWidth` so the visible gaps come out as intended.
 ///
 /// The shape is decorative. Callers hide it from assistive technologies and choose its colour: neutral or a status
-/// colour over a photo, never the brand teal over a portrait (docs/brand/prototypes/08-frame-motif-in-product.md).
+/// colour over a photo, never the brand teal over a portrait (docs/05-decisions.md, Brand).
 struct CalipicFrame: InsettableShape {
     /// Icon master values on the 1024 canvas: a 664-unit frame, radius 130, 30-unit visible gaps (the 72-unit stroke is the caller's).
     enum Icon {

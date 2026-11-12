@@ -1,6 +1,6 @@
 # Profile research — United States passport and US visa
 
-**Status:** Researched (L19-013). Accepted on search-based official evidence (ADR-051): travel.state.gov refuses automated reading, so the official wording comes from search results restricted to that domain.
+**Status:** Researched. Accepted on search-based official evidence (ADR-051): travel.state.gov refuses automated reading, so the official wording comes from search results restricted to that domain.
 **Date:** 2026-11-11
 **Profiles:** `us.passport` (print, plus the online-renewal digital preset) and `us.visa` (digital, plus print where a post asks for it).
 **Evidence:**
@@ -80,11 +80,11 @@
 
 | Check | Kind (ADR-007) | Notes |
 |---|---|---|
-| Output size, pixels, file size, format | `pass`/`fail` (deterministic) | Verified by reopening the file (FR-096) |
+| Output size, pixels, file size, format | `pass`/`fail` (deterministic) | Verified by reopening the file |
 | Head height 25–35 mm or 50–69 % | `warn` until calibrated, then `pass`/`fail` | The US measures to the **top of the hair**, not the crown estimate: calibrate the hair-top estimate (A5-005) |
 | Eye height 56–69 % | `warn` | Advisory for the passport, because the rule is stated only for visas |
-| Background white or off-white, uniform, no shadow | `warn` (L19-019) | Replacement is available; setup tips still give the best result |
-| Even lighting | `warn` (L19-014) | |
+| Background white or off-white, uniform, no shadow | `warn` | Replacement is available; setup tips still give the best result |
+| Even lighting | `warn` | |
 | Eyes open, mouth closed, neutral expression | `warn` / `manual_check` | Babies: eyes may be partly open → manual check, never fail |
 | No glasses | `manual_check` | Vision does not detect glasses reliably enough |
 | No other person, hands, or toys | `manual_check` | Always shown for children |

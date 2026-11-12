@@ -1,6 +1,6 @@
 # Profile research — South Korea passport
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051). **Flag: official pages say self-taken digital photos are unsuitable**; see §2.
+**Status:** Researched; search-based official evidence accepted (ADR-051). **Flag: official pages say self-taken digital photos are unsuitable**; see §2.
 **Date:** 2026-11-11
 **Profile:** `kr.passport`, print.
 
@@ -19,4 +19,4 @@
 
 Several posts state: **"instant photos or digital photos taken by individuals are unsuitable as passport photos"** (즉석사진 또는 개인이 촬영한 디지털 사진은 여권사진으로 부적합). See [Guatemala](https://overseas.mofa.go.kr/gt-ko/brd/m_5678/view.do?seq=961614), [Chile](https://overseas.mofa.go.kr/cl-ko/brd/m_6525/view.do?seq=1075253).
 
-This is not an editing rule. It says a home photo does not qualify, as in Germany and France ([25 §1](../25-wave-a-document-types.md)). **Founder decision needed:** keep this profile, or replace it with another Wave A document.
+This is not an editing rule. It says a home photo does not qualify, as in Germany and France ([06 §2](../06-markets-and-documents.md)). **Founder decision needed:** keep this profile, or replace it with another Wave A document.

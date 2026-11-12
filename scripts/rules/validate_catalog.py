@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the Calipic profile catalog (docs/05-rules-engine.md §12).
+"""Validate the Calipic profile catalog (Rules/README.md).
 
 Structural and semantic checks; no third-party dependencies. Exit code 1 on any error.
 

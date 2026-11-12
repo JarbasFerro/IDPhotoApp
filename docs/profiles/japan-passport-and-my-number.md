@@ -1,6 +1,6 @@
 # Profile research — Japan passport and My Number card
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
+**Status:** Researched; search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profiles:**
 
@@ -57,4 +57,4 @@ The diagram values are probably the top margin (4 ± 2), the bottom margin (7 ±
 - [ ] MOFA passport pages: editing or retouching rule; home printing
 - [ ] [J-LIS 顔写真のチェックポイント](https://www.kojinbango-card.go.jp/apprec/apply/facephoto/): head size and margins, editing wording, children
 - [ ] [J-LIS FAQ](https://www.kojinbango-card.go.jp/faq_photo2/): pixels and file size
-- [ ] Japanese text for the profile names: パスポート and マイナンバーカード, shown next to the English names ([25 §6](../25-wave-a-document-types.md))
+- [ ] Japanese text for the profile names: パスポート and マイナンバーカード, shown next to the English names

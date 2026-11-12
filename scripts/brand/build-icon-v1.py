@@ -100,7 +100,7 @@ def flat_svg(s, title):
 '''
 
 
-# Finalists from docs/brand/prototypes/05-color-recommendation.md. Test values (BD-037), not decisions.
+# Finalists of the colour study (closed: teal was chosen). Test values, not decisions.
 FINISHES = {
     "B-teal": {"top": "#15899A", "bottom": "#0A5863", "strand": "#0E6F7C"},
     "A-blue": {"top": "#2B50C8", "bottom": "#162F86", "strand": "#1F3FA8"},

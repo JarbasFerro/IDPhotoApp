@@ -143,7 +143,7 @@ struct DocumentSwitchingTests {
     }
 }
 
-/// Which document a launch starts on (docs/26 D5): saved choice, then the region's default, then ask once.
+/// Which document a launch starts on (docs/04-architecture.md §6): saved choice, then the region's default, then ask once.
 struct DocumentStoreTests {
     private let catalog = ProfileCatalog.bundled
 
@@ -190,7 +190,7 @@ struct DocumentStoreTests {
     }
 }
 
-/// Honest editing and by-eye checks on Photo Check (docs/26 D4, A4).
+/// Honest editing and by-eye checks on Photo Check (ADR-051).
 struct PhotoCheckHonestyTests {
     private func entry(background: BackgroundChoice, tone: Bool) throws -> PhotoEntry {
         let context = try #require(CGContext(data: nil, width: 4, height: 4, bitsPerComponent: 8, bytesPerRow: 0,

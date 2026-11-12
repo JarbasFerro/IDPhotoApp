@@ -201,7 +201,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertTrue(shutter.waitForExistence(timeout: 5))
     }
 
-    /// Opens the App Icon sheet from Home (BD-038) and keeps a screenshot for docs/brand/prototypes/07.
+    /// Opens the App Icon sheet from Home (BD-038) and keeps a screenshot of it.
     @MainActor
     func testAppIconPickerShowsTheSetAndTheCurrentIcon() throws {
         let app = XCUIApplication()

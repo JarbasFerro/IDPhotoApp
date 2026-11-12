@@ -1,6 +1,6 @@
 # Profile research — Netherlands passport, ID card, and driving licence
 
-**Status:** Researched (L19-013); search-based official evidence accepted (ADR-051).
+**Status:** Researched; search-based official evidence accepted (ADR-051).
 **Date:** 2026-11-11
 **Profiles:**
 
@@ -16,7 +16,7 @@
 | Pose | Head straight, eyes level, not tilted, shoulders straight, mouth closed, neutral | Rijksoverheid |
 | Print | Colour, high-quality smooth photo paper, **at least 400 dpi** | Rijksoverheid |
 | Recency | At most 6 months old | Rijksoverheid |
-| Who takes it | Self-made photos are allowed if they meet the rules (secondary sources; no prohibition found) | [25 §2](../25-wave-a-document-types.md) |
+| Who takes it | Self-made photos are allowed if they meet the rules (secondary sources; no prohibition found) | [06 §6](../06-markets-and-documents.md) |
 | Driving licence online | 901 × 1158 px JPEG, quality 80 %, ≤ 170 KB, from **RDW-recognized photographers** | [RDW](https://www.rdw.nl/zakelijke-partners/erkende-bedrijven/fotograferen-voor-rijbewijzen/fotograferen-voor-rijbewijs) |
 
 **Calipic values:**
