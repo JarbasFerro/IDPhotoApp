@@ -114,6 +114,20 @@ class CatalogTests(unittest.TestCase):
         json.dump(p2, open(src, "w"))
         self.assertCaught("file name must equal profileId")
 
+    def set_region_default(self, region, profile_id):
+        path = os.path.join(self.root, "catalog.json")
+        c = json.load(open(path))
+        c["regionDefaults"][region] = profile_id
+        json.dump(c, open(path, "w"))
+
+    def test_region_default_must_exist(self):
+        self.set_region_default("FR", "fr.passport.standard")
+        self.assertCaught("unknown profile 'fr.passport.standard'")
+
+    def test_region_default_must_be_that_countrys_profile(self):
+        self.set_region_default("CA", "us.visa.standard")
+        self.assertCaught("must be a profile of that country")
+
     def test_bad_replacement_colour(self):
         self.mutate("schengen.visa.standard", lambda p: p["background"].update(replacementColor="white"))
         self.assertCaught("replacementColor")

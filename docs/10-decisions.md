@@ -931,6 +931,8 @@ travel.state.gov also refuses automated reading, so official wording was gathere
 
 1. Calipic offers **background replacement and Document Tone on every profile**, official ones included, with the current defaults. Each profile document records the official editing wording as reference, but it does not switch features on or off.
 2. **Original** background and tone stay one tap away in Adjust, as today.
+   - **Honest editing (founder, 2026-11-11; spike 0.15.0):** the background is replaced only when the real wall fails the app's background check.
+   - When a document's official rules ask for an unedited photo and Calipic changed something, Photo Check says so in one line and offers **Use Original Photo** ([26 D4](26-ux-design-challenge.md)).
 3. **Evidence standard:** profile research based on official pages found through search counts as sourced for the [01 §15](01-product-definition.md) release gate. Browser confirmation is optional, not required.
 
 ### Consequences

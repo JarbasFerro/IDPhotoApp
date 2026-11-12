@@ -23,6 +23,17 @@ struct PhotoCheckSummary: Hashable, Sendable {
     let rows: [Row]
 
     static let checking = PhotoCheckSummary(headline: .checking, rows: [])
+
+    /// Rows that are not a clean pass.
+    var attention: [Row] { rows.filter { $0.state != .pass } }
+
+    /// The most serious state among the rows: fail, then warn, then manual check, then pass.
+    var worstState: CheckState {
+        if rows.contains(where: { $0.state == .fail }) { return .fail }
+        if rows.contains(where: { $0.state == .warn }) { return .warn }
+        if rows.contains(where: { $0.state == .manualCheck }) { return .manualCheck }
+        return .pass
+    }
 }
 
 enum CheckPresentation {
@@ -138,7 +149,7 @@ enum CheckPresentation {
     static func title(for headline: PhotoCheckSummary.Headline) -> LocalizedStringResource {
         switch headline {
         case .checking: "Checking your photo…"
-        case .good: "Camera checks look good"
+        case .good: "Looks good"
         case .review: "Review your photo"
         case .retake: "Better to retake"
         }
@@ -159,6 +170,30 @@ enum CheckPresentation {
         case .good: "checkmark.seal"
         case .review: "exclamationmark.circle"
         case .retake: "arrow.counterclockwise.circle"
+        }
+    }
+
+    /// Filled glyph for the large verdict.
+    static func verdictSymbol(for headline: PhotoCheckSummary.Headline) -> String {
+        switch headline {
+        case .checking: "sparkle.magnifyingglass"
+        case .good: "checkmark.circle.fill"
+        case .review: "exclamationmark.circle.fill"
+        case .retake: "arrow.counterclockwise.circle.fill"
+        }
+    }
+
+    /// What Calipic changed, for documents whose official rules ask for an unedited photo; nil when nothing
+    /// was changed or the rules do not forbid it.
+    static func editingNote(for entry: PhotoEntry, document: DocumentChoice) -> LocalizedStringResource? {
+        guard document.officialRulesForbidEditing else { return nil }
+        let background: Bool = { if case .color = entry.adjustment.background { return true } else { return false } }()
+        let tone = entry.adjustment.tone.isEnabled
+        switch (background, tone) {
+        case (true, true): return "Calipic replaced the background and evened the light."
+        case (true, false): return "Calipic replaced the background."
+        case (false, true): return "Calipic evened the light."
+        case (false, false): return nil
         }
     }
 

@@ -40,6 +40,17 @@ enum Design {
         static let tile: CGFloat = 10
         /// A card: a tappable or grouped surface on a screen.
         static let card: CGFloat = 16
+        /// A grouped list card and the stage behind a hero photo.
+        static let group: CGFloat = 22
+    }
+
+    /// Surfaces. Every screen sits on the grouped background and puts grouped content on cards, so screens match
+    /// in Light and Dark (docs/26 A6).
+    enum Surface {
+        static let screen = Color(.systemGroupedBackground)
+        static let card = Color(.secondarySystemGroupedBackground)
+        /// A quiet stage behind a photo shown as an object.
+        static let stage = Color(.tertiarySystemFill)
     }
 
     /// Line widths, in points.
@@ -78,6 +89,8 @@ enum Design {
         static let screenTitle = Font.title2.weight(.semibold)
         /// The check headline.
         static let statusTitle = Font.title3.weight(.semibold)
+        /// The one-line promise on Home and the verdict on Photo Check.
+        static let hero = Font.title.weight(.bold)
         /// Large status or card glyph next to a title.
         static let titleGlyph = Font.title2
         /// Card and section titles.

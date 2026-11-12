@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import Testing
 @testable import IDPhotoSpike
@@ -139,5 +140,119 @@ struct DocumentSwitchingTests {
         #expect(model.policy.background == .white)
         model.setDocument(.custom(widthMM: 30, heightMM: 40))
         #expect(model.printJob.items[0].trimWidthMM == 30 && model.printJob.items[0].trimHeightMM == 40)
+    }
+}
+
+/// Which document a launch starts on (docs/26 D5): saved choice, then the region's default, then ask once.
+struct DocumentStoreTests {
+    private let catalog = ProfileCatalog.bundled
+
+    @Test func savedChoiceWinsOverRegion() {
+        let start = DocumentStore.start(stored: "jp.passport.standard", regionCode: "US", catalog: catalog)
+        #expect(start.choice.id == "jp.passport.standard")
+        #expect(!start.needsPrompt)
+    }
+
+    @Test(arguments: [("US", "us.passport.standard"), ("GB", "gb.passport.standard"), ("ES", "es.national-id.dni"),
+                      ("de", "de.driving-licence.standard")])
+    func regionDefaultIsUsedWithoutASavedChoice(region: String, expected: String) {
+        let start = DocumentStore.start(stored: nil, regionCode: region, catalog: catalog)
+        #expect(start.choice.id == expected)
+        #expect(!start.needsPrompt)
+    }
+
+    @Test(arguments: ["BR", "CA", "FR", nil] as [String?])
+    func regionsWithoutAProfileAreAskedOnce(region: String?) {
+        let start = DocumentStore.start(stored: nil, regionCode: region, catalog: catalog)
+        #expect(start.needsPrompt)
+        #expect(start.choice == .initial)
+    }
+
+    @Test func regionDefaultsNeverPointAtAnotherCountry() {
+        for (region, id) in catalog.regionDefaults {
+            #expect(catalog.profile(id)?.jurisdiction.countryCode == region, "\(region) → \(id)")
+        }
+        // Visa profiles serve people outside the issuing country.
+        #expect(catalog.regionDefaults["CA"] == nil)
+    }
+
+    @Test func choicesRoundTripThroughStorage() throws {
+        let custom = DocumentChoice.custom(widthMM: 25, heightMM: 30.5)
+        #expect(DocumentStore.decode(DocumentStore.encode(custom), catalog: catalog) == custom)
+        let official = DocumentChoice.official(try #require(catalog.profile("kr.passport.standard")))
+        #expect(DocumentStore.decode(DocumentStore.encode(official), catalog: catalog) == official)
+    }
+
+    @Test(arguments: ["custom:5x30", "custom:abc", "custom:30", "zz.unknown.profile", ""])
+    func unusableSavedValuesFallBack(stored: String) {
+        #expect(DocumentStore.decode(stored, catalog: catalog) == nil)
+        #expect(DocumentStore.start(stored: stored, regionCode: "US", catalog: catalog).choice.id == "us.passport.standard")
+    }
+}
+
+/// Honest editing and by-eye checks on Photo Check (docs/26 D4, A4).
+struct PhotoCheckHonestyTests {
+    private func entry(background: BackgroundChoice, tone: Bool) throws -> PhotoEntry {
+        let context = try #require(CGContext(data: nil, width: 4, height: 4, bitsPerComponent: 8, bytesPerRow: 0,
+                                             space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                             bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        var entry = PhotoEntry(photo: PreparedPhoto(id: UUID(), pixels: SourcePixels(width: 4, height: 4),
+                                                    preview: try #require(context.makeImage())))
+        entry.adjustment.background = background
+        entry.adjustment.tone = tone ? ToneSettings() : .off
+        return entry
+    }
+
+    @Test func noteAppearsOnlyWhereRulesForbidEditingAndSomethingChanged() throws {
+        let us = DocumentChoice.official(try #require(ProfileCatalog.bundled.profile("us.passport.standard")))
+        let spain = DocumentChoice.official(try #require(ProfileCatalog.bundled.profile("es.national-id.dni")))
+        #expect(us.officialRulesForbidEditing)
+        #expect(!spain.officialRulesForbidEditing)
+        #expect(CheckPresentation.editingNote(for: try entry(background: .color(.white), tone: true), document: us) != nil)
+        #expect(CheckPresentation.editingNote(for: try entry(background: .original, tone: true), document: us) != nil)
+        #expect(CheckPresentation.editingNote(for: try entry(background: .original, tone: false), document: us) == nil)
+        #expect(CheckPresentation.editingNote(for: try entry(background: .color(.white), tone: true), document: spain) == nil)
+        #expect(CheckPresentation.editingNote(for: try entry(background: .color(.white), tone: true),
+                                              document: .custom(widthMM: 30, heightMM: 40)) == nil)
+    }
+
+    @Test func byEyeChecksComeFromTheProfileAndSkipPrintInstructions() throws {
+        let australia = DocumentChoice.official(try #require(ProfileCatalog.bundled.profile("au.passport.standard")))
+        #expect(australia.byEyeChecks == ["neutral-expression"])
+        let us = DocumentChoice.official(try #require(ProfileCatalog.bundled.profile("us.passport.standard")))
+        #expect(us.byEyeChecks.contains("no-glasses"))
+        #expect(DocumentChoice.custom(widthMM: 30, heightMM: 40).byEyeChecks.isEmpty)
+    }
+
+    @Test func worstStateOrdersFailWarnManualPass() {
+        func summary(_ states: [CheckState]) -> PhotoCheckSummary {
+            let topics: [PhotoCheckSummary.Row.Topic] = [.face, .framing, .background, .light, .detail]
+            return PhotoCheckSummary(headline: .review, rows: zip(topics, states).map {
+                .init(topic: $0, state: $1, title: "t", detail: "d")
+            })
+        }
+        #expect(summary([.pass, .manualCheck, .warn, .fail]).worstState == .fail)
+        #expect(summary([.pass, .manualCheck, .warn]).worstState == .warn)
+        #expect(summary([.pass, .manualCheck]).worstState == .manualCheck)
+        #expect(summary([.pass, .pass]).worstState == .pass)
+        #expect(summary([.pass, .warn, .manualCheck]).attention.count == 2)
+    }
+}
+
+/// Every catalog key the app shows must resolve to words, never to the raw key.
+struct CatalogStringsTests {
+    @Test func checkLabelsAndProfileNamesAreWords() {
+        for profile in ProfileCatalog.bundled.profiles {
+            let name = DocumentPresentation.name(.official(profile))
+            #expect(!name.hasPrefix("profile."), "\(profile.profileId)")
+            for check in profile.checks {
+                let label = DocumentPresentation.check(check.id)
+                #expect(!label.hasPrefix("check."), "\(profile.profileId): \(check.id)")
+            }
+            if let note = DocumentChoice.official(profile).printNoteKey {
+                #expect(!String(localized: String.LocalizationValue(note)).hasPrefix("output."), "\(profile.profileId)")
+            }
+        }
+        #expect(DocumentPresentation.check("eyes-open") == "Eyes open" || Locale.current.language.languageCode != "en")
     }
 }

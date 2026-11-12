@@ -6,7 +6,7 @@ Versioned document-profile data for Calipic, per [05 — Rules engine](../docs/0
 
 ```text
 Rules/catalog/v1/
-├── catalog.json                 # catalog version and the list of profiles
+├── catalog.json                 # catalog version, the list of profiles, and the default profile per region
 ├── profiles/<profileId>.json    # one official profile per file
 ├── custom-size-shortcuts.json   # custom-size shortcuts and options (ADR-018)
 └── strings.en.json              # English strings for profile names, checks, notes

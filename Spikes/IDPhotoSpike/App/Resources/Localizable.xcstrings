@@ -1789,22 +1789,6 @@
         }
       }
     },
-    "Camera checks look good" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Las comprobaciones de la cámara son favorables"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As verificações da câmera estão boas"
-          }
-        }
-      }
-    },
     "Camera Help" : {
       "localizations" : {
         "es" : {
@@ -2017,22 +2001,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confira visualmente a expressão, os olhos e os óculos. O Calipic não decide se um órgão aceita a foto."
-          }
-        }
-      }
-    },
-    "Check the photo by eye before use. The receiving office decides acceptance." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa la foto visualmente antes de usarla. La oficina receptora decide si la acepta."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confira a foto visualmente antes de usá-la. O órgão destinatário decide se a aceita."
           }
         }
       }
@@ -3518,38 +3486,6 @@
         }
       }
     },
-    "JPEG · %lld × %lld pixels" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG · %1$lld × %2$lld píxeles"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG · %1$lld × %2$lld pixels"
-          }
-        }
-      }
-    },
-    "JPEG, 520 × 640 pixels, for online forms. Tap a photo to share it." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG, 520 × 640 píxeles, para trámites en línea. Toca una foto para compartirla."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JPEG, 520 × 640 pixels, para formulários online. Toque em uma foto para compartilhar."
-          }
-        }
-      }
-    },
     "Just for fun" : {
       "localizations" : {
         "en" : {
@@ -3853,22 +3789,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abaixe o telefone até a altura dos olhos"
-          }
-        }
-      }
-    },
-    "Make an ID photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz una foto de carnet"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Faça uma foto para documento"
           }
         }
       }
@@ -4516,22 +4436,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Um JPEG para formulários on-line, pronto para compartilhar."
-          }
-        }
-      }
-    },
-    "One JPEG to share or upload" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un JPEG para compartir o subir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um JPEG para compartilhar ou enviar"
           }
         }
       }
@@ -5574,38 +5478,6 @@
         }
       }
     },
-    "Remove headphones. Check headwear, glasses, eyes and expression before use. The receiving office decides acceptance." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quítate los auriculares. Revisa las prendas de cabeza, las gafas, los ojos y la expresión antes de usarla. La oficina receptora decide si la acepta."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão antes de usar a foto. O órgão destinatário decide se a aceita."
-          }
-        }
-      }
-    },
-    "Remove headphones. Check headwear, glasses, eyes and expression." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quítate los auriculares. Revisa las prendas de cabeza, las gafas, los ojos y la expresión."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retire os fones de ouvido. Confira coberturas de cabeça, óculos, olhos e expressão."
-          }
-        }
-      }
-    },
     "Remove Photo" : {
       "localizations" : {
         "en" : {
@@ -5672,22 +5544,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trocado por branco. Confira as bordas do cabelo e dos ombros."
-          }
-        }
-      }
-    },
-    "Requirements" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requisitos"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Requisitos"
           }
         }
       }
@@ -6275,22 +6131,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trocar de câmera"
-          }
-        }
-      }
-    },
-    "Take a photo or choose one for Spain's DNI. Save a JPEG or print a sheet." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz una foto o elige una para el DNI español. Guarda un JPEG o imprime una hoja."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tire ou escolha uma foto para o DNI espanhol. Salve um JPEG ou imprima uma folha."
           }
         }
       }
@@ -8952,38 +8792,6 @@
         }
       }
     },
-    "Take a photo or choose one for your document. Save a JPEG or print a sheet." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz una foto o elige una para tu documento. Guarda un JPEG o imprime una hoja."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tire uma foto ou escolha uma para o seu documento. Salve um JPEG ou imprima uma folha."
-          }
-        }
-      }
-    },
-    "Change" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cambiar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alterar"
-          }
-        }
-      }
-    },
     "Chooses the country and document, or a custom size." : {
       "localizations" : {
         "es" : {
@@ -9540,6 +9348,454 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O enquadramento precisa de um rosto que o app consiga encontrar. Use Mover e ampliar."
+          }
+        }
+      }
+    },
+    "Take it at home.\nPrint it yourself." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hazla en casa.\nImprímela tú."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tire em casa.\nImprima você mesmo."
+          }
+        }
+      }
+    },
+    "Choose from Library" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elegir de la fototeca"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolher da Fototeca"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        }
+      }
+    },
+    "Example: one photo and a printed sheet of copies" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ejemplo: una foto y una hoja impresa con copias"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exemplo: uma foto e uma folha impressa com cópias"
+          }
+        }
+      }
+    },
+    "Your photo and its printed sheet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu foto y su hoja impresa"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua foto e a folha impressa"
+          }
+        }
+      }
+    },
+    "Your first photo is free." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu primera foto es gratis."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua primeira foto é grátis."
+          }
+        }
+      }
+    },
+    "Privacy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidad"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidade"
+          }
+        }
+      }
+    },
+    "Calipic works on your iPhone. No account, no ads, and nothing is uploaded." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic funciona en tu iPhone. Sin cuenta, sin anuncios y sin subir nada."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic funciona no seu iPhone. Sem conta, sem anúncios e nada é enviado."
+          }
+        }
+      }
+    },
+    "About" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre"
+          }
+        }
+      }
+    },
+    "Version" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versão"
+          }
+        }
+      }
+    },
+    "Framed for %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuadrada para %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadrada para %@"
+          }
+        }
+      }
+    },
+    "Everything measured looks fine" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo lo medido se ve bien"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo o que foi medido parece bom"
+          }
+        }
+      }
+    },
+    "^[%lld thing](inflect: true) to look at" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld cosa](inflect: true) por revisar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld coisa](inflect: true) para revisar"
+          }
+        }
+      }
+    },
+    "^[%lld thing](inflect: true) to check by eye" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld cosa](inflect: true) para comprobar a simple vista"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld coisa](inflect: true) para conferir a olho nu"
+          }
+        }
+      }
+    },
+    "The office that receives the photo decides whether to accept it." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La oficina que recibe la foto decide si la acepta."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O órgão que recebe a foto decide se a aceita."
+          }
+        }
+      }
+    },
+    "Expanded" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abierto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aberto"
+          }
+        }
+      }
+    },
+    "Collapsed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrado"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fechado"
+          }
+        }
+      }
+    },
+    "This document's rules ask for an unedited photo. %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las normas de este documento piden una foto sin editar. %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As regras deste documento pedem uma foto sem edição. %@"
+          }
+        }
+      }
+    },
+    "Calipic replaced the background and evened the light." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic sustituyó el fondo y equilibró la luz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic trocou o fundo e equilibrou a luz."
+          }
+        }
+      }
+    },
+    "Calipic replaced the background." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic sustituyó el fondo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic trocou o fundo."
+          }
+        }
+      }
+    },
+    "Calipic evened the light." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic equilibró la luz."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic equilibrou a luz."
+          }
+        }
+      }
+    },
+    "Use Original Photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar la foto original"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar a foto original"
+          }
+        }
+      }
+    },
+    "Photo Check" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisión de la foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificação da foto"
+          }
+        }
+      }
+    },
+    "More" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais"
+          }
+        }
+      }
+    },
+    "For online forms" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para formularios en línea"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para formulários online"
+          }
+        }
+      }
+    },
+    "Sized for online forms" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño para formularios en línea"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamanho para formulários online"
+          }
+        }
+      }
+    },
+    "Share Photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartir foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartilhar foto"
+          }
+        }
+      }
+    },
+    "For online forms. Tap a photo to share it." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para formularios en línea. Toca una foto para compartirla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para formulários online. Toque em uma foto para compartilhá-la."
           }
         }
       }

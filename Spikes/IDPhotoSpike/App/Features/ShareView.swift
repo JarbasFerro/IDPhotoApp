@@ -52,6 +52,7 @@ struct ShareView: View {
             }
             .padding()
         }
+        .background(Design.Surface.screen)
         .navigationTitle("Share")
         .navigationBarTitleDisplayMode(.inline)
         .task { if model.exported == nil, model.activity == nil { model.prepareExport() } }
@@ -99,7 +100,7 @@ struct ShareView: View {
             }
         }
         .padding()
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.card))
     }
 
     /// One thumbnail per person; tap a thumbnail to share that JPEG. The badge in the corner says so.
@@ -114,7 +115,7 @@ struct ShareView: View {
                         .accessibilityIdentifier("shareAllJPEGs")
                 }
             }
-            Text("JPEG, 520 × 640 pixels, for online forms. Tap a photo to share it.")
+            Text("For online forms. Tap a photo to share it.")
                 .font(Design.Typography.note).foregroundStyle(.secondary)
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: Design.Spacing.cardContent) {
@@ -154,6 +155,6 @@ struct ShareView: View {
             .scrollIndicators(.hidden)
         }
         .padding()
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.card))
     }
 }

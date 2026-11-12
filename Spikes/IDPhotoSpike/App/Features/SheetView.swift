@@ -124,7 +124,7 @@ struct SheetView: View {
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
             Button { path.append(.share) } label: {
-                Label("Continue", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
+                Text("Continue").frame(maxWidth: .infinity)
             }
             .brandProminentButtonStyle()
             .controlSize(.large)

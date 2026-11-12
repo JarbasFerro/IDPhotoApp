@@ -1,6 +1,6 @@
 # 26 — UX and design challenge
 
-**Status:** Critique and proposals for founder decision. Nothing here is accepted yet.
+**Status:** Critique and proposals. The founder approved building the first group on 2026-11-11; §4 shows what is done.
 **Date:** 2026-11-11
 **Evidence:** screenshots of spike 0.14.0 from the UI test run (every main screen), the UX-bearing docs (04, 15–19, 21, 22, brand 02, 07, 11, 12), and the code.
 **Chosen in round 1:** Home 1b and Photo Check 2a ([explorations](ui/explorations/README.md)).
@@ -60,6 +60,21 @@ Impact is on the four pillars in [20 §2](20-product-blueprint.md). Effort: S = 
 | 10 | **Real portraits** for design review and App Store images | D2 | High: needed to judge the look at all | M (people and consent, not code) |
 | 11 | **Actual size on screen:** a toggle on Photo Check that shows the photo at its true physical size | Trust in pillar 3 | Medium: a small, honest wow | S–M (needs a per-model screen density table) |
 | 12 | **Wording ladder** for verdicts (facts, advisory, by eye) | D8 | Medium: keeps 2a honest | S |
+
+**Done in spike 0.15.0:**
+
+- **1** Region-aware first document, with a one-time question where the region has no profile.
+- **2** Honest editing note with a one-tap Original. The background was already replaced only when the wall fails the check.
+- **5** Plain words: `scripts/strings/check_copy.py` runs in CI. Six Share-screen strings stay on its allow-list until the Print redesign.
+- **7** The Home line "Your first photo is free." The unlock sheet is still to design.
+- **8** One surface style, plus the first control fixes.
+- **12** The wording ladder.
+- Doc change 1 (§5), for Home, Photo Check, Choose document, Custom size, and Settings.
+
+The work also found and fixed two bugs:
+
+- the document's by-eye checks showed raw keys instead of words;
+- Share stated "520 × 640 pixels" for every document.
 
 **Suggested order:** 1, 5, 7, 8, and 12 go into the build of Home 1b and Photo Check 2a, because they touch the same screens. Then 4 and 9. Then design round 2 (Your sheet, Print, unlock sheet) with 3 and 6. Idea 2 needs a founder decision first, because it adjusts ADR-051. Idea 10 needs people.
 

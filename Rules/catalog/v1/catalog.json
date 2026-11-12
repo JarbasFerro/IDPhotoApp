@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026.11.0",
+  "catalogVersion": "2026.11.1",
   "generatedFor": "Calipic 1.0 Wave A",
   "profiles": [
     "au.passport.standard",
@@ -25,5 +25,18 @@
     "schengen.visa.standard",
     "us.passport.standard",
     "us.visa.standard"
-  ]
+  ],
+  "regionDefaults": {
+    "US": "us.passport.standard",
+    "GB": "gb.passport.standard",
+    "JP": "jp.passport.standard",
+    "IT": "it.national-id.cie",
+    "ES": "es.national-id.dni",
+    "NL": "nl.passport.standard",
+    "KR": "kr.passport.standard",
+    "AU": "au.passport.standard",
+    "DE": "de.driving-licence.standard",
+    "CH": "ch.national-id.no-chip",
+    "SA": "sa.residence-permit.photo-update"
+  }
 }

@@ -124,6 +124,28 @@ struct ProfileCatalog: Sendable, Decodable {
     let catalogVersion: String
     let profiles: [DocumentProfile]
     let customSizes: CustomSizes
+    /// ISO region code → the profile a new user in that region starts on. Regions without an entry are asked once.
+    var regionDefaults: [String: String] = [:]
+
+    private enum CodingKeys: String, CodingKey { case schemaVersion, catalogVersion, profiles, customSizes, regionDefaults }
+
+    init(schemaVersion: Int, catalogVersion: String, profiles: [DocumentProfile], customSizes: CustomSizes,
+         regionDefaults: [String: String] = [:]) {
+        self.schemaVersion = schemaVersion
+        self.catalogVersion = catalogVersion
+        self.profiles = profiles
+        self.customSizes = customSizes
+        self.regionDefaults = regionDefaults
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        catalogVersion = try container.decode(String.self, forKey: .catalogVersion)
+        profiles = try container.decode([DocumentProfile].self, forKey: .profiles)
+        customSizes = try container.decode(CustomSizes.self, forKey: .customSizes)
+        regionDefaults = try container.decodeIfPresent([String: String].self, forKey: .regionDefaults) ?? [:]
+    }
 
     static let resourceName = "CalipicCatalog"
 

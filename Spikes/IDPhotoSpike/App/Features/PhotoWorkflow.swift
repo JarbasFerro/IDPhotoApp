@@ -39,7 +39,7 @@ final class PhotoWorkflow {
     /// When true the editor shows the untouched preview (before/after comparison).
     var showsOriginal = false
     /// The document every photo in the session is made for. Changing it re-frames each photo (setDocument).
-    private(set) var document: DocumentChoice = .initial
+    private(set) var document: DocumentChoice
     /// Editing is offered on every profile (ADR-051); the replacement colour comes from the document.
     var policy: DocumentPolicy { DocumentPolicy(alteration: .allowed, background: document.backgroundColor) }
     var renderTarget: RenderTarget { document.renderTarget }
@@ -66,7 +66,10 @@ final class PhotoWorkflow {
     @ObservationIgnored private var revision = UUID()
     @ObservationIgnored private var exportLease: UUID?
 
-    init(pipeline: any PhotoProcessing) { self.pipeline = pipeline }
+    init(pipeline: any PhotoProcessing, document: DocumentChoice = .initial) {
+        self.pipeline = pipeline
+        self.document = document
+    }
 
     func setInitialized() { isInitialized = true }
 
@@ -221,6 +224,16 @@ final class PhotoWorkflow {
         }
         sheetThumbnails = [:]
         for entry in entries { refreshBackgroundPreview(for: entry.id) }
+    }
+
+    /// Back to the photo as taken: original background, no tone correction, colour. Framing is kept.
+    func useOriginalLook(for photoID: UUID) {
+        update(photoID) {
+            $0.adjustment.background = .original
+            $0.adjustment.tone = .off
+            $0.adjustment.monochrome = false
+        }
+        refreshBackgroundPreview(for: photoID)
     }
 
     /// The render target for one person: the document's, framed closer or wider for custom sizes.

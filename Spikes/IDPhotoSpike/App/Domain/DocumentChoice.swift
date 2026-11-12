@@ -158,6 +158,12 @@ enum DocumentChoice: Sendable, Hashable, Identifiable {
         return DigitalOutputSpec(pixels: format.output, minBytes: nil, maxBytes: nil, looseFraming: false)
     }
 
+    /// The document's official wording asks for unedited photos. Recorded so the app can say so (ADR-051, docs/26 D4).
+    var officialRulesForbidEditing: Bool { profile?.background.officialEditingRule == "disallowed" }
+
+    /// What only a person can judge, from the profile's own checks. Print instructions are not photo checks.
+    var byEyeChecks: [String] { profile?.checks.filter { $0.capability != "informational" }.map(\.id) ?? [] }
+
     /// Digital-only profiles (Saudi Absher) have no print route.
     var supportsPrint: Bool { profile.map { $0.printOutput != nil } ?? true }
     /// Australia and the UK: home prints are not accepted, so printing goes through a shop.

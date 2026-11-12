@@ -53,7 +53,11 @@ enum DocumentPresentation {
         return String(localized: "Schengen area")
     }
 
-    static func check(_ id: String) -> String { String(localized: String.LocalizationValue("check.\(id)")) }
+    /// The key is built as a plain String first: an interpolated literal would look up "check.%@" instead.
+    static func check(_ id: String) -> String {
+        let key = "check." + id
+        return String(localized: String.LocalizationValue(key))
+    }
 
     static func shortcut(_ shortcut: CustomSizeShortcut, locale: Locale = .current) -> String {
         let language = locale.language.languageCode?.identifier ?? ""

@@ -23,4 +23,4 @@ Problems addressed, from [22 §3.3](../../22-quality-and-delight-bar.md): Home s
 
 In all Home options, App Icon and the other settings move behind the top-right button (Settings & About, S-19), and the version stays on Home (AGENTS.md §17).
 
-**Decision (founder, 2026-11-11):** Home **1b** and Photo Check **2a**. Related proposals that touch the same screens are in [26 — UX and design challenge](../../26-ux-design-challenge.md).
+**Decision (founder, 2026-11-11):** Home **1b** and Photo Check **2a**. Built in spike 0.15.0; the contract is in [16 §3 and §8](../../16-screen-experience-spec.md). Related proposals that touch the same screens are in [26 — UX and design challenge](../../26-ux-design-challenge.md).

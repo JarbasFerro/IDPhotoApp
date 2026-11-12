@@ -19,6 +19,7 @@ private struct PendingAcquisition: Identifiable {
 /// Owns navigation and the two acquisition presentations; every screen reads the shared workflow.
 struct RootView: View {
     @Bindable var model: PhotoWorkflow
+    var promptForDocument = false
     @State private var path: [Route] = []
     @State private var showCamera = false
     @State private var showPicker = false
@@ -30,7 +31,7 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            HomeView(model: model, path: $path, acquire: acquire)
+            HomeView(model: model, path: $path, acquire: acquire, promptForDocument: promptForDocument)
                 .navigationDestination(for: Route.self) { route in
                     switch route {
                     case .check(let id):

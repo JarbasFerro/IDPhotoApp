@@ -1,8 +1,8 @@
 # 16 — Calipic screen experience specification
 
-**Status:** Active screen contract for the iPhone spike; state and visual evidence tracked below
-**Scope:** The current Spain DNI photo flow, including system presentations and exceptional states
-**Reviewed against:** SwiftUI source in `Spikes/IDPhotoSpike/App`, ADR-043, and brand documents, 2026-09-28
+**Status:** Active screen contract for the iPhone spike. Home, Photo Check, Choose document, Custom size, and Settings match spike 0.15.0 (2026-11-11). Sections 4–7 and 9–13 were last reviewed on 2026-09-28 and still describe the Spain-only flow in places; they are refreshed as each screen is redesigned ([26](26-ux-design-challenge.md)).
+**Scope:** Every screen of the flow for the chosen document, including system presentations and exceptional states
+**Reviewed against:** SwiftUI source in `Spikes/IDPhotoSpike/App`, ADR-043 to ADR-051, the brand documents, and [design round 1](ui/explorations/README.md)
 
 ## 1. How to use this document
 
@@ -46,6 +46,10 @@ Use a `NavigationStack` for Home → Check → Choose result → Digital Photo o
 
 ### 2.2 Shapes, surfaces, and color
 
+**Surfaces (0.15.0):** every screen sits on `Design.Surface.screen` (the system grouped background) and puts grouped content on `Design.Surface.card`. A photo shown as an object may sit on `Design.Surface.stage`. Home, Photo Check, Choose result, Digital Photo, and Share follow this; Your Sheet and Adjust are native lists and sheets.
+
+**Screen names:** the app and the docs use the same names: Home, Choose document, Custom size, Settings, Photo requirements, Before your photo, Camera, Photo Check, Adjust, Choose result, Digital Photo, Your sheet, Share (to become Print).
+
 | Element | Treatment |
 |---|---|
 | App background and lists | System background/list surfaces; no branded full-screen fill. |
@@ -78,18 +82,32 @@ All interactive targets are at least 44 × 44 pt. VoiceOver reads title → main
 
 **Purpose:** Start a photo quickly and resume the current sheet. **Current source:** `Features/HomeView.swift`.
 
-### Composition, top to bottom
+### Composition, top to bottom (design 1b, spike 0.15.0)
 
-1. Native navigation bar title **Calipic**. Avoid repeating the logo as a large hero. There is no camera permission prompt on arrival.
-2. One left-aligned promise in `.title2.semibold`: **“A correct ID photo in a minute.”** Under it, the current supporting paragraph says to take or choose a photo, identifies the Spain DNI use, offers digital or print output, and states that work stays on iPhone. Let it wrap naturally; put longer privacy and acceptance details below.
-3. Full-width primary **Take Photo** button with camera symbol. Full-width secondary **Choose Photo** button with photo symbol, 12 pt below. Both open the same short requirements preflight with their source selected. They are native large controls, enabled once private storage is ready; show **Preparing private photo storage…** while it starts. If the session is full, explain the limit next to the disabled action.
-4. When an import or file preparation runs, a compact progress row directly beneath the actions: spinner, **“Opening photo…”** or **“Preparing files…”**, then **Cancel**. The row remains in the reading order and announces completion or failure once.
-5. If a session exists, a tappable **Your sheet** card before the document card. Show up to four overlapping circular thumbnails, card title, localized people/copy count and paper name, trailing chevron. The whole card opens Sheet. VoiceOver gets one useful combined label rather than reading each decorative face.
-6. Tappable document card: 44 pt document symbol tile, **“Spain · DNI photo”**, **“26 × 32 mm · white background”** as secondary text, trailing chevron. It opens full Requirements. Do not imply a passport rule has been verified solely because dimensions match DNI.
-7. Quiet trust block: lock symbol plus **“Your photos stay on your iPhone.”** and a sentence that the receiving office decides acceptance. This is supporting text, never an official seal.
-8. Optional **App Icon** row with current small icon, label and chevron; only shown when alternate icons are supported. Version `marketing version (build)` is last, tertiary and monospaced digits. Developer details may remain behind the current long press, invisible in normal use.
+1. Native large navigation title **Calipic**. Trailing neutral **Settings** button (ellipsis) opens Settings (§3.2). No camera permission prompt on arrival.
+2. **Hero:** one photo and the sheet of copies it becomes, on a quiet stage (`Design.Surface.stage`, 22 pt corners, 236 pt high). Until the person has a photo it shows the brand's sample portrait; afterwards their own latest photo. It never shows a real person the app shipped with. VoiceOver reads one label for the whole picture.
+3. The promise in `Design.Typography.hero`: **"Take it at home. Print it yourself."** on two lines.
+4. Progress rows when they apply: **Preparing private photo storage…**, or a spinner with **Opening photo…** / **Preparing files…** and **Cancel**.
+5. If a session exists, the **Your sheet** card: up to four overlapping face thumbnails, people and copy count, paper name, chevron. It opens Your Sheet.
+6. One grouped card with two rows: the **document** (name, then size and background as secondary text; opens Choose document, §3.1) and **Photo requirements** (opens §4).
+7. Bottom action area on the screen background: full-width primary **Take Photo**; plain **Choose from Library** under it; then the footer. At accessibility text sizes the actions move into the scrolling content.
+8. Footer: **"Your first photo is free."** and **"Your photos stay on your iPhone."** at the leading edge; `marketing version (build)` at the trailing edge, tertiary, monospaced digits (AGENTS.md §17). A long press on the version toggles developer details.
 
-**Empty/session states:** With no photos, the Home should not show an empty “Your sheet” card. After returning from Share, the current session remains available. Import cancellation simply restores the previous state; an import failure shows a specific, recoverable message and leaves the session intact. Do not let an old failed import replace a newer selection.
+**First launch:** the document is the person's saved choice; otherwise the default for the iPhone's region from the catalog's `regionDefaults`; otherwise Spain DNI with the **Choose document** sheet presented once (`DocumentStore`).
+
+**Empty/session states:** With no photos, Home shows no "Your sheet" card. After returning from Share, the session remains available. Import cancellation restores the previous state; an import failure shows a specific, recoverable message and leaves the session intact. An old failed import never replaces a newer selection.
+
+### 3.1 Choose document and Custom size
+
+**Source:** `Features/DocumentPickerView.swift`. A sheet with search (**Country or document**), **Custom size** as the first row, then official profiles grouped by country, each with its size and background. The current choice has a checkmark. Choosing a profile applies it and closes the sheet.
+
+**Custom size** asks for width and height in mm or inches (each side 10–100 mm), offers the catalog's common sizes, and states that no official rules are checked. **Use This Size** applies it.
+
+Changing the document re-frames every photo already in the session and moves default print sizes to the new size.
+
+### 3.2 Settings
+
+**Source:** `SettingsView` in `Features/HomeView.swift`. A sheet with **App Icon** (current icon and name; opens §12), **Privacy** (one sentence), and **About** (version). Credits, restore, help, and *Delete all drafts* join it later (S-19).
 
 ## 4. Screen 2 — Photo requirements sheet
 
@@ -164,16 +182,21 @@ Picker cancellation is a quiet return. A corrupt, unsupported, or too-small phot
 
 **Purpose:** Show the prepared photo and honest, actionable checks. **Current source:** `Features/PhotoCheckView.swift`, `CheckPresentation.swift`.
 
-### Layout and content
+### Layout and content (design 2a, spike 0.15.0)
 
-1. Native back button; inline title **Your photo** or **Photo N of M**. Trailing neutral trash button with accessible label **Remove Photo**. Tapping it opens a confirmation dialog explaining that copies on the sheet are removed but the original in Photos stays.
-2. Large centered 26:32 portrait with paper edge and soft shadow. It should consume the flexible upper area without covering status or actions. It first shows the source while analysis runs; once ready, the portrait settles into the crop and the prepared background fades in. If Reduce Motion is on, switch without travel. The photo never becomes a status-colored card.
-3. Short caption below the portrait: **Finding your face…**, **Framing…**, or **Hold to compare with the original**. Press and hold shows the immutable source; release restores the prepared view. An accessibility action **Compare with original** offers the same function and clearly reports which view is showing.
-4. Status headline group: progress spinner or state symbol, short title, and short explanatory subtitle. Existing state family: **Checking your photo…**, **Looks good**, **A few things to check**, **Better to retake**. Use pass/warn/fail color only on the symbol, not across the whole portrait.
-5. Up to five check rows, from actual analysis: **Head/Face**, **Framing**, **Background**, **Light**, **Sharpness** as applicable. Each row contains state symbol, short semibold label, and plain detail. **Refine:** allow the detail to wrap beneath its title rather than squeeze two text columns on narrow iPhones. A warning's detail ends with a feasible fix. Manual check appears as its own named state and can never be silently converted to pass.
-6. Bottom action area over native bar material: full-width **Continue** primary; **Adjust** and **Retake** secondary below (side by side at normal type, stacked at accessibility sizes). Continue opens the output choice. Retake opens a native menu with **Take Photo** and **Choose Photo**; each goes through preflight. A toolbar **Requirements** action opens the full sourced list. Continue remains available after a warning, with the risk clear. If a measurable failure makes output impossible, disable it with a visible reason rather than allowing an inert tap.
+1. Native back button; inline title **Photo Check** or **Photo N of M**. Trailing **Retake** menu (**Take Photo**, **Choose Photo**; both go through the preflight) and a neutral **More** menu (**Photo requirements**, destructive **Remove Photo** with its confirmation).
+2. Centred portrait in the document's proportions, with paper edge and soft shadow: 250 pt wide while checking, 210 pt once framed. It first shows the source; when the check finishes it settles into the crop and the prepared background fades in. Reduce Motion removes the movement.
+3. Caption under the portrait: **Finding your face…**, **Framing…**, or **Hold to compare with the original**. Press and hold shows the original; the accessibility action **Compare with original** does the same.
+4. **Verdict**, centred: a large filled state symbol, the title in `Design.Typography.hero`, and one secondary line. Titles: **Checking your photo…**, **Looks good**, **Review your photo**, **Better to retake**. When it looks good the line reads **Framed for <document>**.
+5. One grouped card with up to two folding rows:
+   - **Measured:** **Everything measured looks fine**, or **N things to look at** with the most serious state's symbol. It opens to the rows from the analysis (Head, Framing, Background, Light, Sharpness). It is open by default unless the verdict is *Looks good*.
+   - **By eye:** **N things to check by eye**, with the first two as secondary text. It opens to the document's own checks from the catalog and one sentence: **The office that receives the photo decides whether to accept it.** Hidden for custom sizes.
+6. **Honest editing note**, only when the document's official rules ask for an unedited photo and Calipic changed something: **"This document's rules ask for an unedited photo. Calipic replaced the background and evened the light."** (or the part that applies) with **Use Original Photo**, which restores the original background and light in one tap (ADR-051).
+7. Bottom action area on the screen background: full-width primary **Continue**, then full-width **Adjust**. At accessibility text sizes they move into the scrolling content.
 
-The default normal-size screen should show photo, headline, essential checks, and actions without clipping; at large text sizes the entire content scrolls and actions remain reachable. VoiceOver reads the headline once, then each row as “topic, state, explanation.” Announce the final status after analysis, without moving focus away from the user's current control.
+**Wording ladder (docs/26 D8):** only facts may say a thing is done ("Framed to the official size"). Measurements that are not calibrated say **looks fine**. What only a person can judge is listed as **to check by eye**. Nothing on this screen says "passed" or "approved".
+
+VoiceOver reads the verdict once, then each folding row with its expanded or collapsed state, then each open detail as "topic, state, explanation".
 
 **Failure/unknown cases:** No face, multiple faces, tilted or incomplete head, limited resolution, uncertain hair edge, or unavailable Vision must have specific text and a next action. A photo removed while this route is open shows **This photo was removed** and an obvious way back to Home or Sheet.
 

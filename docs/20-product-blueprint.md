@@ -64,7 +64,7 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | F-04 | Worldwide launch catalog: most-used photo documents of the most relevant App Store countries, Wave A at 1.0 | Serve people wherever they are | Launch; country list proposed in [24](24-launch-country-ranking.md), **Decision D-8** | [ADR-047](10-decisions.md), L19-010, L19-013 |
 | F-05 | Short requirements preflight before every capture or import | Avoid an unusable photo before it is taken | Shipped (spike) | [16 §7](16-screen-experience-spec.md), ADR-043 |
 | F-06 | Full requirements with source link and review date | Trust and exceptions (glasses, headwear) | Shipped (spike); must move to profile data | [16 §4](16-screen-experience-spec.md) |
-| F-07 | Official editing rules recorded per profile, for reference; background replacement and tone are offered on every profile (ADR-051) | Studio result everywhere | Decided (ADR-051) | ADR-051, ADR-037, [profiles](profiles/README.md) |
+| F-07 | Official editing rules recorded per profile, for reference; background replacement and tone are offered on every profile (ADR-051) | Studio result everywhere | Shipped (spike) 0.15.0: editing offered everywhere; an honest note and one-tap Original where rules ask for unedited photos | ADR-051, ADR-037, [profiles](profiles/README.md) |
 | F-08 | Children use the adult flow with helper mode; baby relaxations never block, only warn | Parents' main job | Accepted for 1.0; age relaxations as profile data Post-launch | ADR-017, [14 §5.6](14-priority-feature-plan.md) |
 | F-09 | **Custom size without a country**: width × height in mm or inches, size shortcuts, framing Closer/Wider, free background choice, photographic checks only, never *Ready* | School, club, and other non-official photos | Shipped (spike) 0.14.0: size entry in mm or in, shortcuts, Closer/Wider framing, White or Light grey background, black and white | ADR-018, L19-018, [21 J9](21-user-journeys.md) |
 
@@ -143,7 +143,7 @@ Unchanged from [01 §8.3](01-product-definition.md) and [11 §7](11-ios-excellen
 
 | # | Screen | Purpose | Status | Contract |
 |---|---|---|---|---|
-| S-01 | Home | Start a photo; **Continue** drafts; see the profile and trust promise | Spike; needs the profile chooser entry, Continue (drafts), and a fresh-install visual ([22 §3](22-quality-and-delight-bar.md)) | 16 §3 |
+| S-01 | Home | Start a photo; **Continue** drafts; see the profile and trust promise | Spike 0.15.0 (design 1b); Continue for drafts still to add | 16 §3 |
 | S-02 | Choose document (profile picker) | Pick country and document; search; recents; **Custom size** as its own entry | Spike 0.13.0 | 04 Screen 2 → 16 |
 | S-03 | Photo requirements | Sourced rules, exceptions, review date | Spike | 16 §4 |
 | S-04 | Before your photo (preflight), including *Find a good spot* and *Who is taking the photo?* (self / helper) | Set up for success | Spike; setup coaching and helper choice **New** | 16 §7 |
@@ -151,7 +151,7 @@ Unchanged from [01 §8.3](01-product-definition.md) and [11 §7](11-ios-excellen
 | S-06 | Camera Help | Capture tips; automatic capture | Spike | 16 §5 |
 | S-07 | Captured photo review | Retake or Use Photo | Spike | 16 §6.1 |
 | S-08 | PhotosPicker | System import | System | 16 §7 |
-| S-09 | Photo Check | Prepared portrait, landing, checks, compare | Spike | 16 §8 |
+| S-09 | Photo Check | Prepared portrait, landing, checks, compare | Spike 0.15.0 (design 2a) | 16 §8 |
 | S-10 | Adjust (sheet) | Correct framing, background, light | Spike; refinement entry **New** | 16 §9 |
 | S-11 | Fix the edges (refinement) | Tap to fix hair or shoulder edges | **New** (P1) | 16 §15 |
 | S-12 | Choose result | Digital Photo or Print Sheet | Spike | 16 §11 |
@@ -161,7 +161,7 @@ Unchanged from [01 §8.3](01-product-definition.md) and [11 §7](11-ios-excellen
 | S-16 | Print check | Did the bar measure 50 mm? Fixes if not | **New** | — |
 | S-17 | Cutting guide | How to cut neatly | **New** | — |
 | S-18 | Unlock confirmation and credits | Point of no return before the first output; balance, buy, restore | **New** | ADR-048 → 16 |
-| S-19 | Settings & About | Privacy, help, icon, credits and restore, Delete all drafts, version, legal | **New** (App Icon row moves here; the version also stays on Home per AGENTS.md §17) | 04 → 16 |
+| S-19 | Settings & About | Privacy, help, icon, credits and restore, Delete all drafts, version, legal | Spike 0.15.0: App Icon, Privacy, version. Credits, help, and Delete all drafts still to add | 04 → 16 |
 | S-20 | Help topics | Home setup, printing, cutting, shop printing | **New** | — |
 | S-21 | App Icon | Choose the Home Screen icon | Spike | 16 §12 |
 | — | System surfaces | Share sheet, print controller, StoreKit purchase sheet, permission alerts | System | 16 §13 |

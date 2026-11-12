@@ -34,6 +34,7 @@ final class BrandContextUITests: XCTestCase {
         // First launch, no photo: Home, then the camera path as far as a simulator allows.
         var app = XCUIApplication()
         app.launchArguments = brandArguments
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
         attach(app, prefix + "Home")
@@ -48,6 +49,7 @@ final class BrandContextUITests: XCTestCase {
         // Second launch with the generated photo: Photo Check, Adjust, Sheet, Share, Home with the session.
         app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture"] + brandArguments
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(app.descendants(matching: .any)["photoCheck"].waitForExistence(timeout: 15))
         XCTAssertTrue(app.descendants(matching: .any)["checkHeadline"].waitForExistence(timeout: 15))

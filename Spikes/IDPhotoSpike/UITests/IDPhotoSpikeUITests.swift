@@ -28,6 +28,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     @MainActor
     func testHomeAndRequirements() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["takePhoto"].exists)
@@ -36,6 +37,14 @@ final class IDPhotoSpikeUITests: XCTestCase {
         homeScreenshot.name = "Home"
         homeScreenshot.lifetime = .keepAlways
         add(homeScreenshot)
+        XCTAssertTrue(any(app, "homeHero").exists)
+        XCUIDevice.shared.appearance = .dark
+        Thread.sleep(forTimeInterval: 1.5) // The appearance change is asynchronous.
+        let darkScreenshot = XCTAttachment(screenshot: app.screenshot())
+        darkScreenshot.name = "Home, dark"
+        darkScreenshot.lifetime = .keepAlways
+        add(darkScreenshot)
+        XCUIDevice.shared.appearance = .light
         let version = app.staticTexts["appVersion"]
         XCTAssertTrue(version.exists)
         // The accessibility label reads "Version 0.9.0 (52)".
@@ -60,6 +69,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     @MainActor
     func testDocumentPickerAndCustomSize() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(app.buttons["documentCard"].waitForExistence(timeout: 10))
         app.buttons["documentCard"].tap()
@@ -99,6 +109,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testCameraOverlayKeepsTheSubjectClear() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--camera-review-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(app.buttons["cameraHelp"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["cameraCancel"].exists)
@@ -129,6 +140,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testCameraOvalShowsOneActionableCorrection() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--camera-review-fixture", "--camera-review-off-center"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "cameraHint").waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Move the phone left"].exists)
@@ -145,6 +157,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testCameraCapturedReviewOffersRetake() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--camera-review-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         let shutter = app.buttons["shutter"]
         XCTAssertTrue(shutter.waitForExistence(timeout: 10))
@@ -166,6 +179,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     @MainActor
     func testAppIconPickerShowsTheSetAndTheCurrentIcon() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         let picker = try openAppIconPicker(app)
         XCTAssertTrue(app.staticTexts["People"].exists)
@@ -178,7 +192,10 @@ final class IDPhotoSpikeUITests: XCTestCase {
         screenshot.lifetime = .keepAlways
         add(screenshot)
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
-        app.buttons["Done"].tap()
+        // The picker sits over Settings; each has its own Done.
+        app.navigationBars["App Icon"].buttons["Done"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        app.navigationBars["Settings"].buttons["Done"].tap()
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 5))
     }
 
@@ -191,6 +208,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
             throw XCTSkip("Set TEST_RUNNER_APP_ICON_E2E to a character name to run this.")
         }
         let app = XCUIApplication()
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         _ = try openAppIconPicker(app)
         let cell = app.buttons["appIcon-\(name)"]
@@ -212,13 +230,13 @@ final class IDPhotoSpikeUITests: XCTestCase {
         add(screenshot)
     }
 
-    /// Taps the quiet "App Icon" row on Home and returns the icon buttons of the sheet.
+    /// Opens Settings from Home, taps "App Icon", and returns the icon buttons of the sheet.
     @MainActor
     private func openAppIconPicker(_ app: XCUIApplication) throws -> XCUIElementQuery {
         XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
+        app.buttons["settingsButton"].tap()
         let row = app.buttons["appIconRow"]
-        reveal(row, in: app)
-        XCTAssertTrue(row.exists)
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
         row.tap()
         XCTAssertTrue(app.navigationBars["App Icon"].waitForExistence(timeout: 5))
         return app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'appIcon-'"))
@@ -229,6 +247,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testCustomSizeAdjustControls() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-custom-size", "--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         reveal(app.buttons["adjust"], in: app)
@@ -257,17 +276,33 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testCheckAdjustSheetShareFlow() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         // Import lands on Photo Check.
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         XCTAssertTrue(any(app, "checkHeadline").waitForExistence(timeout: 15))
-        XCTAssertTrue(app.descendants(matching: .any)
-            .matching(NSPredicate(format: "label CONTAINS %@", "Remove headphones"))
-            .firstMatch.exists)
+        // The document's own by-eye checks fold into one row and open on tap.
+        let byEye = any(app, "byEyeRow")
+        XCTAssertTrue(byEye.exists)
         let checkScreenshot = XCTAttachment(screenshot: app.screenshot())
         checkScreenshot.name = "Photo Check"
         checkScreenshot.lifetime = .keepAlways
         add(checkScreenshot)
+        XCUIDevice.shared.appearance = .dark
+        Thread.sleep(forTimeInterval: 1.5)
+        let checkDark = XCTAttachment(screenshot: app.screenshot())
+        checkDark.name = "Photo Check, dark"
+        checkDark.lifetime = .keepAlways
+        add(checkDark)
+        XCUIDevice.shared.appearance = .light
+        // Scroll the row clear of the bottom action bar before tapping it.
+        let continueButton = app.buttons["continueFromCheck"]
+        for _ in 0..<6 where byEye.frame.maxY > continueButton.frame.minY - 8 {
+            app.scrollViews.firstMatch.swipeUp()
+        }
+        byEye.tap()
+        let eyesOpen = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Eyes open")).firstMatch
+        XCTAssertTrue(eyesOpen.waitForExistence(timeout: 5), app.debugDescription)
         // Adjust: direct manipulation plus the details sliders.
         reveal(app.buttons["adjust"], in: app)
         app.buttons["adjust"].tap()
@@ -327,6 +362,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testDigitalPhotoSkipsPrintSetup() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         reveal(app.buttons["continueFromCheck"], in: app)
@@ -351,6 +387,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     @MainActor
     func testCameraUnavailableOffersPhotoImport() throws {
         let app = XCUIApplication()
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(app.buttons["takePhoto"].waitForExistence(timeout: 10))
         app.buttons["takePhoto"].tap()
@@ -366,6 +403,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testSheetAddsASizeAndUpdatesTheSummary() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         reveal(app.buttons["continueFromCheck"], in: app)
@@ -395,6 +433,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
     func testTwoPeopleShareOneSheetAndExportTwoJPEGs() throws {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture-2"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         XCTAssertTrue(app.navigationBars["Photo 2 of 2"].waitForExistence(timeout: 15))
@@ -425,6 +464,7 @@ final class IDPhotoSpikeUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fixture", "-UIPreferredContentSizeCategoryName",
                                "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launchArguments.append("--uitesting-fresh")
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         reveal(app.buttons["continueFromCheck"], in: app, attempts: 10)

@@ -1,5 +1,5 @@
 {
- "catalogVersion": "2026.11.0",
+ "catalogVersion": "2026.11.1",
  "customSizes": {
   "options": {
    "blackAndWhite": true
@@ -3027,5 +3027,18 @@
    "wave": "A"
   }
  ],
+ "regionDefaults": {
+  "AU": "au.passport.standard",
+  "CH": "ch.national-id.no-chip",
+  "DE": "de.driving-licence.standard",
+  "ES": "es.national-id.dni",
+  "GB": "gb.passport.standard",
+  "IT": "it.national-id.cie",
+  "JP": "jp.passport.standard",
+  "KR": "kr.passport.standard",
+  "NL": "nl.passport.standard",
+  "SA": "sa.residence-permit.photo-update",
+  "US": "us.passport.standard"
+ },
  "schemaVersion": 1
 }

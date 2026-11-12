@@ -344,6 +344,22 @@ def validate_catalog(root):
         r.err("catalog.json", f"lists '{missing}' but no file exists")
     for extra in sorted(on_disk - listed):
         r.err("catalog.json", f"'{extra}' exists but is not listed")
+    # The document a new user in a region starts on. Only a profile of that same country may be a default:
+    # visa profiles serve people outside the issuing country and are never a regional default.
+    countries = {}
+    for name in files:
+        try:
+            p = json.load(open(os.path.join(profile_dir, name), encoding="utf-8"))
+            countries[p.get("profileId")] = (p.get("jurisdiction") or {}).get("countryCode")
+        except json.JSONDecodeError:
+            pass
+    for region, pid in (catalog.get("regionDefaults") or {}).items():
+        if not re.match(r"^[A-Z]{2}$", region):
+            r.err("catalog.json", f"regionDefaults key '{region}' must be ISO 3166-1 alpha-2")
+        if pid not in on_disk:
+            r.err("catalog.json", f"regionDefaults['{region}'] names unknown profile '{pid}'")
+        elif countries.get(pid) != region:
+            r.err("catalog.json", f"regionDefaults['{region}'] must be a profile of that country, not '{pid}'")
     for s in shortcuts.get("shortcuts", []):
         sw = f"shortcut '{s.get('id')}'"
         if not (number(s.get("widthMm")) and number(s.get("heightMm")) and s["widthMm"] > 0 and s["heightMm"] > 0):

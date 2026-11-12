@@ -1,0 +1,18 @@
+name: App wording
+
+on:
+  push:
+    paths: ["Spikes/IDPhotoSpike/App/Resources/Localizable.xcstrings", "scripts/strings/**", ".github/workflows/copy.yml"]
+  pull_request:
+    paths: ["Spikes/IDPhotoSpike/App/Resources/Localizable.xcstrings", "scripts/strings/**", ".github/workflows/copy.yml"]
+
+jobs:
+  plain-language:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Plain-language check
+        run: python3 scripts/strings/check_copy.py

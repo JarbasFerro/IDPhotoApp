@@ -1,49 +1,33 @@
 import SwiftUI
 
-/// Step 0: start immediately. One dominant action, the document, and the session if there is one.
+/// Step 0 (design 1b): the printed result as the hero, one promise, the document, and one dominant action.
 struct HomeView: View {
     @Bindable var model: PhotoWorkflow
     @Binding var path: [Route]
     let acquire: Acquire
+    /// First launch in a region without a profile: ask "What is the photo for?" once.
+    var promptForDocument = false
     @State private var showRequirements = false
     @State private var showDocuments = false
-    @State private var showAppIcons = false
+    @State private var showSettings = false
     @State private var appIcon = AppIconController()
-    @ScaledMetric(relativeTo: .footnote) private var appIconRowSide: CGFloat = Design.Size.settingsIcon
+    @AppStorage(DocumentStore.promptShownKey) private var documentPromptShown = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var isBusy: Bool { !model.isInitialized || model.activity != nil || !model.canAddPhoto }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Design.Spacing.section) {
-                VStack(alignment: .leading, spacing: Design.Spacing.text) {
-                    Text("Make an ID photo")
-                        .font(Design.Typography.screenTitle)
-                    Text("Take a photo or choose one for your document. Save a JPEG or print a sheet.")
-                        .foregroundStyle(.secondary)
-                }
-                .accessibilityElement(children: .combine)
-
-                VStack(spacing: Design.Spacing.control) {
-                    Button { acquire(.camera, model.entries.isEmpty ? .replace : .add) } label: {
-                        Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
-                    }
-                    .brandProminentButtonStyle()
-                    .controlSize(.large)
-                    .disabled(!model.isInitialized || model.activity != nil || !model.canAddPhoto)
-                    .accessibilityIdentifier("takePhoto")
-                    Button { acquire(.library, model.entries.isEmpty ? .replace : .add) } label: {
-                        Label("Choose Photo", systemImage: "photo.on.rectangle").frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .disabled(!model.isInitialized || model.activity != nil || !model.canAddPhoto)
-                    .accessibilityIdentifier("choosePhoto")
-                }
+            VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
+                hero
+                Text("Take it at home.\nPrint it yourself.")
+                    .font(Design.Typography.hero)
+                    .accessibilityAddTraits(.isHeader)
 
                 if !model.isInitialized {
                     ProgressView("Preparing private photo storage…")
                 }
-
                 if let activity = model.activity {
                     HStack {
                         ProgressView()
@@ -55,25 +39,84 @@ struct HomeView: View {
                 }
 
                 if !model.entries.isEmpty { sessionCard }
-
                 documentCard
-
-                Label("Your photos stay on your iPhone.", systemImage: "lock")
-                .font(Design.Typography.note)
-                .foregroundStyle(.secondary)
-
-                VStack(alignment: .leading, spacing: 0) {
-                    if appIcon.isSupported { appIconRow }
-                    versionLine
-                }
+                if dynamicTypeSize.isAccessibilitySize { actions }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.bottom)
+        }
+        .background(Design.Surface.screen)
+        .safeAreaInset(edge: .bottom) {
+            if !dynamicTypeSize.isAccessibilitySize {
+                actions
+                    .padding(.horizontal)
+                    .padding(.top, Design.Spacing.text)
+                    .background(Design.Surface.screen)
+            }
         }
         .navigationTitle(Text(verbatim: "Calipic"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Settings", systemImage: "ellipsis") { showSettings = true }
+                    .brandNeutralToolbarItem()
+                    .accessibilityIdentifier("settingsButton")
+            }
+        }
         .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
         .sheet(isPresented: $showDocuments) { DocumentPickerView(model: model) }
-        .sheet(isPresented: $showAppIcons) { AppIconPickerView(controller: appIcon) }
+        .sheet(isPresented: $showSettings) { SettingsView(appIcon: appIcon) }
+        .task {
+            guard promptForDocument, !documentPromptShown else { return }
+            documentPromptShown = true
+            showDocuments = true
+        }
     }
+
+    // MARK: - Hero
+
+    /// One photo and the sheet of copies it becomes. A sample until the person has a photo, then their own.
+    private var hero: some View {
+        let entry = model.entries.last
+        return ZStack {
+            RoundedRectangle(cornerRadius: Design.Radius.group).fill(Design.Surface.stage)
+            Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+                ForEach(0..<2, id: \.self) { _ in
+                    GridRow {
+                        ForEach(0..<4, id: \.self) { _ in
+                            heroPhoto(entry).frame(width: 36)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16).padding(.vertical, 13)
+            .background(.white, in: RoundedRectangle(cornerRadius: 3))
+            .shadow(color: .black.opacity(0.16), radius: 12, y: 8)
+            .rotationEffect(.degrees(3))
+            .offset(x: 46, y: -8)
+            heroPhoto(entry)
+                .frame(width: 100)
+                .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))
+                .shadow(color: .black.opacity(0.2), radius: 12, y: 8)
+                .rotationEffect(.degrees(-4))
+                .offset(x: -98, y: 38)
+        }
+        .frame(height: 236)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(entry == nil ? Text("Example: one photo and a printed sheet of copies") : Text("Your photo and its printed sheet"))
+        .accessibilityIdentifier("homeHero")
+    }
+
+    @ViewBuilder private func heroPhoto(_ entry: PhotoEntry?) -> some View {
+        let format = model.renderTarget.format
+        if let entry {
+            PortraitView(entry: entry, format: format)
+        } else {
+            // The sample keeps its own proportions (26:32); it is an example, not the chosen document.
+            Image("SamplePortrait").resizable().aspectRatio(488.0 / 600.0, contentMode: .fit)
+        }
+    }
+
+    // MARK: - Cards
 
     /// People already in the session: faces, copies, and the way back into the sheet.
     private var sessionCard: some View {
@@ -85,7 +128,7 @@ struct HomeView: View {
                             .resizable().scaledToFill()
                             .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
                             .clipShape(Circle())
-                            .overlay(Circle().strokeBorder(Color(.systemBackground), lineWidth: Design.Stroke.separation))
+                            .overlay(Circle().strokeBorder(Design.Surface.card, lineWidth: Design.Stroke.separation))
                             .accessibilityIdentifier("face-\(index + 1)")
                     }
                 }
@@ -95,10 +138,10 @@ struct HomeView: View {
                         .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
             }
             .padding()
-            .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -109,23 +152,22 @@ struct HomeView: View {
         .accessibilityIdentifier("yourSheet")
     }
 
+    /// The document the photo is for, and its requirements, as one grouped card.
     private var documentCard: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing.control) {
+        VStack(spacing: 0) {
             Button { showDocuments = true } label: {
-                HStack(spacing: Design.Spacing.cardContent) {
-                    Image(systemName: model.document.isCustom ? "ruler" : "person.text.rectangle")
-                        .font(Design.Typography.titleGlyph)
-                        .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
-                        .background(.fill.secondary, in: RoundedRectangle(cornerRadius: Design.Radius.tile))
+                HStack(spacing: Design.Spacing.control) {
                     VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                        Text(DocumentPresentation.name(model.document)).font(Design.Typography.cardTitle)
-                        Text(DocumentPresentation.detail(model.document)).font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                        Text(DocumentPresentation.name(model.document)).foregroundStyle(.primary)
+                        Text(DocumentPresentation.detail(model.document))
+                            .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                     }
-                    Spacer()
-                    Text("Change").font(Design.Typography.cardDetail).foregroundStyle(Color.brandAccent)
+                    .multilineTextAlignment(.leading)
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
-                .padding()
-                .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+                .padding(.horizontal).padding(.vertical, Design.Spacing.control)
+                .frame(minHeight: Design.Size.minimumTarget)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -133,14 +175,15 @@ struct HomeView: View {
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Chooses the country and document, or a custom size.")
             .accessibilityIdentifier("documentCard")
+            Divider().padding(.leading)
             Button { showRequirements = true } label: {
-                HStack(spacing: Design.Spacing.row) {
-                    Label("Photo requirements", systemImage: "list.bullet.rectangle")
+                HStack {
+                    Text("Photo requirements").foregroundStyle(.primary)
                     Spacer()
-                    Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
-                .font(Design.Typography.note)
-                .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget, alignment: .leading)
+                .padding(.horizontal)
+                .frame(minHeight: 52)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -148,49 +191,104 @@ struct HomeView: View {
             .accessibilityAddTraits(.isButton)
             .accessibilityIdentifier("requirementsLink")
         }
+        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
     }
 
-    /// Quiet entry to choose-your-icon (BD-038). It lives here, outside the capture → check → print path.
-    private var appIconRow: some View {
-        Button { showAppIcons = true } label: {
-            HStack(spacing: Design.Spacing.row) {
-                Image(appIcon.current.previewAssetName)
-                    .resizable()
-                    .frame(width: appIconRowSide, height: appIconRowSide)
-                    .accessibilityHidden(true)
-                Text("App Icon")
-                Spacer()
-                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+    // MARK: - Actions and footer
+
+    private var actions: some View {
+        VStack(spacing: Design.Spacing.tight) {
+            Button { acquire(.camera, model.entries.isEmpty ? .replace : .add) } label: {
+                Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
             }
-            .font(Design.Typography.note)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget, alignment: .leading)
-            .contentShape(Rectangle())
+            .brandProminentButtonStyle()
+            .controlSize(.large)
+            .disabled(isBusy)
+            .accessibilityIdentifier("takePhoto")
+            Button("Choose from Library") { acquire(.library, model.entries.isEmpty ? .replace : .add) }
+                .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
+                .disabled(isBusy)
+                .accessibilityIdentifier("choosePhoto")
+            footer
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityValue(Text(appIcon.current.label))
-        .accessibilityIdentifier("appIconRow")
     }
 
-    private var versionLine: some View {
+    /// Price and privacy in plain sight (ADR-048 §8), and the version (AGENTS.md §17).
+    private var footer: some View {
         VStack(alignment: .leading, spacing: Design.Spacing.tight) {
-            Text(developerMode ? "\(AppVersion.display) · developer details on" : AppVersion.display)
-                .font(Design.Typography.noteDigits)
-                .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget, alignment: .leading)
-                .contentShape(Rectangle())
-                .accessibilityLabel(Text("Version \(AppVersion.display)"))
-                .accessibilityIdentifier("appVersion")
-                .onLongPressGesture(minimumDuration: 1.2) { developerMode.toggle() }
-                .sensoryFeedback(.impact(weight: .light), trigger: developerMode)
+            HStack(alignment: .lastTextBaseline) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Your first photo is free.")
+                    Text("Your photos stay on your iPhone.")
+                }
+                .font(Design.Typography.note)
+                .foregroundStyle(.secondary)
+                .accessibilityElement(children: .combine)
+                Spacer(minLength: Design.Spacing.control)
+                Text(developerMode ? "\(AppVersion.display) · developer details on" : AppVersion.display)
+                    .font(Design.Typography.noteDigits)
+                    .foregroundStyle(.tertiary)
+                    .frame(minHeight: Design.Size.minimumTarget, alignment: .bottom)
+                    .contentShape(Rectangle())
+                    .accessibilityLabel(Text("Version \(AppVersion.display)"))
+                    .accessibilityIdentifier("appVersion")
+                    .onLongPressGesture(minimumDuration: 1.2) { developerMode.toggle() }
+                    .sensoryFeedback(.impact(weight: .light), trigger: developerMode)
+            }
             if developerMode, let metrics = model.lastCameraMetrics {
                 Text("Camera: start \(metrics.startupMilliseconds ?? 0) ms · capture \(metrics.captureMilliseconds ?? 0) ms")
                     .font(Design.Typography.noteDigits).foregroundStyle(.tertiary)
                     .accessibilityIdentifier("cameraMetrics")
             }
         }
+    }
+}
+
+/// Settings & About (S-19): durable things that are not part of making a photo.
+struct SettingsView: View {
+    let appIcon: AppIconController
+    @Environment(\.dismiss) private var dismiss
+    @State private var showAppIcons = false
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = Design.Size.settingsIcon
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if appIcon.isSupported {
+                    Section {
+                        Button { showAppIcons = true } label: {
+                            HStack(spacing: Design.Spacing.control) {
+                                Image(appIcon.current.previewAssetName)
+                                    .resizable()
+                                    .frame(width: iconSide, height: iconSide)
+                                    .accessibilityHidden(true)
+                                Text("App Icon").foregroundStyle(.primary)
+                                Spacer()
+                                Text(appIcon.current.label).foregroundStyle(.secondary)
+                                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(Text("App Icon"))
+                        .accessibilityValue(Text(appIcon.current.label))
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityIdentifier("appIconRow")
+                    }
+                }
+                Section("Privacy") {
+                    Text("Calipic works on your iPhone. No account, no ads, and nothing is uploaded.")
+                }
+                Section("About") {
+                    LabeledContent("Version", value: AppVersion.display)
+                }
+            }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+        .sheet(isPresented: $showAppIcons) { AppIconPickerView(controller: appIcon) }
     }
 }
 

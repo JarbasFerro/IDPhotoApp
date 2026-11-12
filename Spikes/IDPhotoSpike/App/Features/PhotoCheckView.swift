@@ -10,6 +10,9 @@ struct PhotoCheckView: View {
     @State private var showRequirements = false
     @State private var confirmRemove = false
     @State private var comparing = false
+    /// nil follows the verdict: details open by themselves when something needs a look.
+    @State private var showMeasured: Bool?
+    @State private var showByEye = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
     @State private var landed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -35,30 +38,42 @@ struct PhotoCheckView: View {
                     .padding(.horizontal)
                     .padding(.vertical, 8)
                 }
+                .background(Design.Surface.screen)
                 .safeAreaInset(edge: .bottom) {
                     if !dynamicTypeSize.isAccessibilitySize {
                         actions
                             .padding(.horizontal)
                             .padding(.top, 10)
                             .padding(.bottom, 6)
-                            .background(.bar)
+                            .background(Design.Surface.screen)
                     }
                 }
             } else {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
             }
         }
-        .navigationTitle(position.map { $0.1 > 1 ? String(localized: "Photo \($0.0) of \($0.1)") : String(localized: "Your photo") } ?? String(localized: "Your photo"))
+        .navigationTitle(position.map { $0.1 > 1 ? String(localized: "Photo \($0.0) of \($0.1)") : String(localized: "Photo Check") } ?? String(localized: "Photo Check"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Requirements", systemImage: "info.circle") { showRequirements = true }
-                    .brandNeutralToolbarItem()
+                Menu {
+                    Button { acquire(.camera, .replace) } label: { Label("Take Photo", systemImage: "camera") }
+                    Button { acquire(.library, .replace) } label: { Label("Choose Photo", systemImage: "photo.on.rectangle") }
+                } label: {
+                    Text("Retake")
+                }
+                .accessibilityIdentifier("retake")
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Remove Photo", systemImage: "trash", role: .destructive) { confirmRemove = true }
-                    .disabled(model.activity != nil)
-                    .brandNeutralToolbarItem()
+                Menu {
+                    Button { showRequirements = true } label: { Label("Photo requirements", systemImage: "list.bullet.rectangle") }
+                    Button(role: .destructive) { confirmRemove = true } label: { Label("Remove Photo", systemImage: "trash") }
+                        .disabled(model.activity != nil)
+                } label: {
+                    Label("More", systemImage: "ellipsis")
+                }
+                .brandNeutralToolbarItem()
+                .accessibilityIdentifier("photoMenu")
             }
         }
         .confirmationDialog("Remove this photo and its copies on the sheet?", isPresented: $confirmRemove, titleVisibility: .visible) {
@@ -86,7 +101,7 @@ struct PhotoCheckView: View {
     /// Press and hold to see the original.
     private func portrait(_ entry: PhotoEntry) -> some View {
         let checking = entry.isAnalyzing || !landed
-        let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 220 : (checking ? 280 : 250)
+        let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 200 : (checking ? 250 : 210)
         let format = model.renderTarget.format
         let portrait = PortraitView(entry: entry, format: format, showsOriginal: comparing || !landed,
                                     label: comparing ? "Original photo" : "Framed photo", animated: !reduceMotion)
@@ -124,80 +139,166 @@ struct PhotoCheckView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // MARK: - Verdict and details (design 2a)
+
     private func summaryBlock(_ entry: PhotoEntry) -> some View {
         let whiteApplied: Bool = { if case .color = entry.adjustment.background { return true } else { return false } }()
         let summary = CheckPresentation.summary(for: entry, whiteApplied: whiteApplied, sourceIsSmall: model.sourceIsSmall)
-        return VStack(alignment: .leading, spacing: Design.Spacing.row) {
-            HStack(alignment: .firstTextBaseline, spacing: Design.Spacing.row) {
-                if summary.headline == .checking {
-                    ProgressView()
-                } else {
-                    Image(systemName: CheckPresentation.symbol(for: summary.headline))
-                        .font(Design.Typography.titleGlyph)
-                        .foregroundStyle(StatusStyle.color(for: summary.headline))
-                }
-                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    Text(CheckPresentation.title(for: summary.headline)).font(Design.Typography.statusTitle)
-                    Text(CheckPresentation.subtitle(for: summary.headline)).font(Design.Typography.note).foregroundStyle(.secondary)
-                }
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("checkHeadline")
-            HStack(alignment: .top, spacing: Design.Spacing.row) {
-                Image(systemName: StatusStyle.symbol(for: .manualCheck))
-                    .foregroundStyle(StatusStyle.color(for: .manualCheck))
-                    .frame(width: 20)
-                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    Text("Check by eye").font(Design.Typography.rowTitle)
-                    Text("Remove headphones. Check headwear, glasses, eyes and expression.")
-                        .font(Design.Typography.note).foregroundStyle(.secondary)
-                }
-            }
-            .accessibilityElement(children: .combine)
-            ForEach(summary.rows) { row in
-                HStack(alignment: .top, spacing: Design.Spacing.row) {
-                    Image(systemName: StatusStyle.symbol(for: row.state))
-                        .foregroundStyle(StatusStyle.color(for: row.state))
-                        .frame(width: 20)
-                    VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                        Text(row.title).font(Design.Typography.rowTitle)
-                        Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
-                    }
-                }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text(verbatim: "\(String(localized: row.title)), \(String(localized: StatusStyle.name(for: row.state))). \(String(localized: row.detail))"))
+        return VStack(alignment: .leading, spacing: Design.Spacing.group) {
+            verdict(summary)
+            if summary.headline != .checking {
+                detailsCard(summary)
+                if let note = CheckPresentation.editingNote(for: entry, document: model.document) { editingNote(note) }
             }
         }
         .animation(.default, value: summary)
     }
 
+    /// One large answer. Facts and advisory checks sit behind it (docs/26 D8: only facts say "passed").
+    private func verdict(_ summary: PhotoCheckSummary) -> some View {
+        VStack(spacing: Design.Spacing.caption) {
+            if summary.headline == .checking {
+                ProgressView().controlSize(.large)
+            } else {
+                Image(systemName: CheckPresentation.verdictSymbol(for: summary.headline))
+                    .font(.largeTitle)
+                    .foregroundStyle(StatusStyle.color(for: summary.headline))
+                    .accessibilityHidden(true)
+            }
+            Text(CheckPresentation.title(for: summary.headline))
+                .font(Design.Typography.hero)
+            Group {
+                if summary.headline == .good {
+                    Text("Framed for \(DocumentPresentation.name(model.document))")
+                } else {
+                    Text(CheckPresentation.subtitle(for: summary.headline))
+                }
+            }
+            .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+        }
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("checkHeadline")
+    }
+
+    private func detailsCard(_ summary: PhotoCheckSummary) -> some View {
+        let measuredOpen = showMeasured ?? (summary.headline != .good)
+        let byEye = model.document.byEyeChecks
+        let worst = summary.worstState
+        return VStack(spacing: 0) {
+            if !summary.rows.isEmpty {
+                disclosureRow(symbol: StatusStyle.symbol(for: worst), color: StatusStyle.color(for: worst),
+                              title: summary.attention.isEmpty
+                                  ? Text("Everything measured looks fine")
+                                  : Text("^[\(summary.attention.count) thing](inflect: true) to look at"),
+                              subtitle: nil, isOpen: measuredOpen, identifier: "measuredRow") {
+                    showMeasured = !measuredOpen
+                }
+                if measuredOpen {
+                    VStack(alignment: .leading, spacing: Design.Spacing.control) {
+                        ForEach(summary.rows) { row in measuredRow(row) }
+                    }
+                    .padding(.horizontal).padding(.bottom, Design.Spacing.cardContent)
+                }
+            }
+            if !byEye.isEmpty {
+                if !summary.rows.isEmpty { Divider().padding(.leading) }
+                disclosureRow(symbol: StatusStyle.symbol(for: .manualCheck), color: StatusStyle.color(for: .manualCheck),
+                              title: Text("^[\(byEye.count) thing](inflect: true) to check by eye"),
+                              subtitle: Text(verbatim: byEye.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
+                              isOpen: showByEye, identifier: "byEyeRow") {
+                    showByEye.toggle()
+                }
+                if showByEye {
+                    VStack(alignment: .leading, spacing: Design.Spacing.row) {
+                        ForEach(byEye, id: \.self) { id in
+                            Label { Text(DocumentPresentation.check(id)) } icon: {
+                                Image(systemName: "circle").foregroundStyle(.tertiary)
+                            }
+                        }
+                        Text("The office that receives the photo decides whether to accept it.")
+                            .font(Design.Typography.note).foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal).padding(.bottom, Design.Spacing.cardContent)
+                }
+            }
+        }
+        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
+    }
+
+    private func disclosureRow(symbol: String, color: Color, title: Text, subtitle: Text?, isOpen: Bool,
+                               identifier: String, toggle: @escaping () -> Void) -> some View {
+        Button(action: { withAnimation(reduceMotion ? nil : .default) { toggle() } }) {
+            HStack(spacing: Design.Spacing.control) {
+                Image(systemName: symbol).foregroundStyle(color).frame(width: 24)
+                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                    title.foregroundStyle(.primary)
+                    if let subtitle, !isOpen {
+                        subtitle.font(Design.Typography.note).foregroundStyle(.secondary).lineLimit(1)
+                    }
+                }
+                .multilineTextAlignment(.leading)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                    .rotationEffect(.degrees(isOpen ? 90 : 0))
+            }
+            .padding(.horizontal)
+            .frame(minHeight: 54)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityValue(isOpen ? Text("Expanded") : Text("Collapsed"))
+        .accessibilityIdentifier(identifier)
+    }
+
+    private func measuredRow(_ row: PhotoCheckSummary.Row) -> some View {
+        HStack(alignment: .top, spacing: Design.Spacing.control) {
+            Image(systemName: StatusStyle.symbol(for: row.state))
+                .foregroundStyle(StatusStyle.color(for: row.state))
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                Text(row.title).font(Design.Typography.rowTitle)
+                Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: "\(String(localized: row.title)), \(String(localized: StatusStyle.name(for: row.state))). \(String(localized: row.detail))"))
+    }
+
+    /// Honest editing (docs/26 D4): when the document's own rules ask for an unedited photo, say what Calipic changed
+    /// and offer the original in one tap. Editing itself stays available (ADR-051).
+    private func editingNote(_ note: LocalizedStringResource) -> some View {
+        VStack(alignment: .leading, spacing: Design.Spacing.text) {
+            Text("This document's rules ask for an unedited photo. \(String(localized: note))")
+                .font(Design.Typography.note).foregroundStyle(.secondary)
+            Button("Use Original Photo") { model.useOriginalLook(for: photoID) }
+                .font(Design.Typography.note.weight(.semibold))
+                .frame(minHeight: Design.Size.minimumTarget)
+                .accessibilityIdentifier("useOriginal")
+        }
+        .padding(.horizontal, Design.Spacing.tight)
+    }
+
     private var actions: some View {
         VStack(spacing: Design.Spacing.control) {
             Button { path.append(.outputChoice(photoID)) } label: {
-                Label("Continue", systemImage: "arrow.right").frame(maxWidth: .infinity)
+                Text("Continue").frame(maxWidth: .infinity)
             }
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(model.activity != nil)
             .accessibilityIdentifier("continueFromCheck")
-            let layout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
-            layout {
-                Button { showAdjust = true } label: {
-                    Label("Adjust", systemImage: "slider.horizontal.3").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .accessibilityIdentifier("adjust")
-                Menu {
-                    Button { acquire(.camera, .replace) } label: { Label("Take Photo", systemImage: "camera") }
-                    Button { acquire(.library, .replace) } label: { Label("Choose Photo", systemImage: "photo.on.rectangle") }
-                } label: {
-                    Label("Retake", systemImage: "arrow.counterclockwise").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .accessibilityIdentifier("retake")
+            Button { showAdjust = true } label: {
+                Text("Adjust").frame(maxWidth: .infinity)
             }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .accessibilityIdentifier("adjust")
         }
     }
 }

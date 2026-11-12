@@ -5,11 +5,20 @@ struct IDPhotoSpikeApp: App {
     private let pipeline: PhotoPipeline
     @State private var model: PhotoWorkflow
     @Environment(\.scenePhase) private var scenePhase
+    /// UI tests pass "--uitesting-fresh": Spain DNI, nothing read from or written to saved settings, no first-launch question.
+    private let isolated: Bool
+    private let needsDocumentPrompt: Bool
 
     init() {
         let pipeline = PhotoPipeline()
         self.pipeline = pipeline
-        _model = State(initialValue: PhotoWorkflow(pipeline: pipeline))
+        isolated = ProcessInfo.processInfo.arguments.contains("--uitesting-fresh")
+        let start = isolated
+            ? DocumentStore.Start(choice: .initial, needsPrompt: false)
+            : DocumentStore.start(stored: UserDefaults.standard.string(forKey: DocumentStore.key),
+                                  regionCode: Locale.current.region?.identifier, catalog: .bundled)
+        needsDocumentPrompt = start.needsPrompt
+        _model = State(initialValue: PhotoWorkflow(pipeline: pipeline, document: start.choice))
     }
 
     var body: some Scene {
@@ -19,10 +28,10 @@ struct IDPhotoSpikeApp: App {
                 if ProcessInfo.processInfo.arguments.contains("--camera-review-fixture") {
                     CameraView(onCapture: { _, _ in }, onChoosePhoto: {})
                 } else {
-                    RootView(model: model)
+                    RootView(model: model, promptForDocument: needsDocumentPrompt)
                 }
                 #else
-                RootView(model: model)
+                RootView(model: model, promptForDocument: needsDocumentPrompt)
                 #endif
             }
                 // Teal (BD-033); `-brandCandidate` in Debug builds still swaps in a test system for comparisons.
@@ -48,6 +57,9 @@ struct IDPhotoSpikeApp: App {
                     } catch {
                         model.errorMessage = String(localized: "Private photo storage could not be prepared. Reopen the app to try again.")
                     }
+                }
+                .onChange(of: model.document) { _, document in
+                    if !isolated { UserDefaults.standard.set(DocumentStore.encode(document), forKey: DocumentStore.key) }
                 }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .background { model.cancel() }

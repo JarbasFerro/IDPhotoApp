@@ -23,7 +23,7 @@ def build():
                 for pid in catalog["profiles"]]
     shortcuts = json.load(open(os.path.join(CATALOG, "custom-size-shortcuts.json"), encoding="utf-8"))
     bundle = {"schemaVersion": catalog["schemaVersion"], "catalogVersion": catalog["catalogVersion"],
-              "profiles": profiles, "customSizes": shortcuts}
+              "profiles": profiles, "customSizes": shortcuts, "regionDefaults": catalog.get("regionDefaults", {})}
     return json.dumps(bundle, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
 
 

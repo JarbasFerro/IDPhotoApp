@@ -24,7 +24,7 @@ struct OutputChoiceView: View {
                     .accessibilityElement(children: .contain)
 
                     Button { path.append(.digital(photoID)) } label: {
-                        choice(title: "Digital Photo", detail: "One JPEG to share or upload", symbol: "photo")
+                        choice(title: "Digital Photo", detail: "For online forms", symbol: "photo")
                     }
                     .buttonStyle(.plain)
                     .accessibilityHint("Opens a single digital photo ready to share.")
@@ -38,15 +38,13 @@ struct OutputChoiceView: View {
                         .accessibilityIdentifier("printChoice")
                     }
 
-                    Text("Check the photo by eye before use. The receiving office decides acceptance.")
-                        .font(Design.Typography.note)
-                        .foregroundStyle(.secondary)
                 } else {
                     ContentUnavailableView("This photo was removed", systemImage: "photo")
                 }
             }
             .padding()
         }
+        .background(Design.Surface.screen)
         .navigationTitle("Choose result")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -66,7 +64,7 @@ struct OutputChoiceView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.fill.tertiary, in: RoundedRectangle(cornerRadius: Design.Radius.card))
+        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.card))
         .contentShape(RoundedRectangle(cornerRadius: Design.Radius.card))
     }
 }
@@ -96,23 +94,18 @@ struct DigitalShareView: View {
                     }
                     PortraitView(entry: entry, format: model.renderTarget.format, label: "Digital photo ready to share")
                         .frame(maxWidth: 240)
-                    Text("JPEG · \(model.renderTarget.digital.pixels.width) × \(model.renderTarget.digital.pixels.height) pixels")
+                    Text("Sized for online forms")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
-                    Text("Remove headphones. Check headwear, glasses, eyes and expression before use. The receiving office decides acceptance.")
-                        .font(Design.Typography.note)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     ShareLink(item: result.jpeg) {
-                        Label("Share JPEG", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
+                        Label("Share Photo", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
                     .accessibilityIdentifier("shareDigitalJPEG")
-                    Button("Done") { path.removeAll() }
+                    Button { path.removeAll() } label: { Text("Done").frame(maxWidth: .infinity) }
                         .buttonStyle(.bordered)
                         .controlSize(.large)
-                        .frame(maxWidth: .infinity)
                         .accessibilityIdentifier("digitalDone")
                 } else if model.activity == .exporting {
                     ProgressView("Preparing your photo…")
@@ -130,6 +123,7 @@ struct DigitalShareView: View {
             }
             .padding()
         }
+        .background(Design.Surface.screen)
         .navigationTitle("Digital Photo")
         .navigationBarTitleDisplayMode(.inline)
         .task { if result == nil, model.activity == nil { model.prepareDigitalExport(for: photoID) } }
