@@ -23,12 +23,12 @@ Take the photo with a guided camera, let the app frame it to the document's rule
 
 ## Run it
 
-Open [`Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj`](Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj) in Xcode 27 and run the `IDPhotoSpike` scheme on an iPhone or a simulator (iOS 27 or later). The simulator has no camera; use **Choose from Library** there.
+Open [`Calipic/Calipic.xcodeproj`](Calipic/Calipic.xcodeproj) in Xcode 27 and run the `Calipic` scheme on an iPhone or a simulator (iOS 27 or later). The simulator has no camera; use **Choose from Library** there.
 
 ```sh
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 xcrun simctl list devices available
-scripts/test-spike.sh "platform=iOS Simulator,id=<simulator UUID>"
+scripts/test.sh auto        # all tests on an iOS 27 iPhone simulator
 ```
 
 More commands are in the [handoff](docs/00-handoff.md).
@@ -36,7 +36,7 @@ More commands are in the [handoff](docs/00-handoff.md).
 ## Layout
 
 ```text
-Spikes/IDPhotoSpike/   the app, its tests, and UI tests
+Calipic/               the app, its tests, and UI tests
 Rules/catalog/v1/      document rules as versioned data, with sources
 scripts/               version bump, tests, rules validator, wording check, icon generators, country ranking
 docs/                  the seven documents above, profile research, design rounds, screenshots

@@ -53,7 +53,7 @@ CI runs both on every change (`.github/workflows/rules.yml`).
 
 ## In the app
 
-The spike app bundles one generated file, `Spikes/IDPhotoSpike/App/Resources/CalipicCatalog.json`. After changing `Rules/`, rebuild it:
+The spike app bundles one generated file, `Calipic/App/Resources/CalipicCatalog.json`. After changing `Rules/`, rebuild it:
 
 ```sh
 python3 scripts/rules/build_app_catalog.py

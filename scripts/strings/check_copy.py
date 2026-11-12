@@ -13,7 +13,7 @@ import re
 import sys
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
-CATALOG = os.path.join(ROOT, "Spikes", "IDPhotoSpike", "App", "Resources", "Localizable.xcstrings")
+CATALOG = os.path.join(ROOT, "Calipic", "App", "Resources", "Localizable.xcstrings")
 
 BANNED = re.compile(r"\b(JPEG|JPG|PDF|pixels?|px|DPI|ppi|segmentation|mask|ICAO|bleed)\b", re.IGNORECASE)
 

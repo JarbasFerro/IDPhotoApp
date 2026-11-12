@@ -51,7 +51,7 @@ Buttons: one prominent button per screen (`brandProminentButtonStyle()`, large),
 | 12 | **Credits** | Balance, what a credit covers, three packs with prices. The only place that shows money | `CreditsView.swift` |
 | 13 | **Settings** and **App Icon** | Credits, app icon picker (33 characters), privacy sentence, version | `HomeView.swift`, `AppIconPickerView.swift` |
 
-**Step marker** (Photo Check, Your sheet, Print, Digital Photo): "Photo › Check › Print" (or "Save") in the navigation bar, the current step in semibold, past steps with a checkmark; Photo Check shows past steps as checkmarks only, to fit beside Retake (`StepMarker.swift`).
+**Step marker** (Photo Check, Your sheet, Print, Digital Photo): "Photo › Check › Print" (or "Save") in the navigation bar, the current step in semibold, past steps with a checkmark and their word. A centred bar item gets only twice the room to the nearer side, so the marker picks the first version that fits: footnote size, caption size, then without the upcoming step (Photo Check, beside Retake and More). A past step never shrinks to a bare checkmark (`StepMarker.swift`).
 
 **Measuring** (Photo Check, D-2): when the photo lands, dashed white lines draw in at the top of the head and the chin, a solid one at the eyes, with a bracket and the head length ("Head 23.7 mm", or "about" when the top of the head is an estimate). After about three seconds they fold into a chip under the photo; tapping the chip shows them again. "Allowed 32–36 mm" and a status symbol appear only when the document's rules state a head height (`PhotoMeasurement.swift`, `MeasurementOverlay.swift`).
 

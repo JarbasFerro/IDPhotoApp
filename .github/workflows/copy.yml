@@ -2,9 +2,9 @@ name: App wording
 
 on:
   push:
-    paths: ["Spikes/IDPhotoSpike/App/Resources/Localizable.xcstrings", "scripts/strings/**", ".github/workflows/copy.yml"]
+    paths: ["Calipic/App/Resources/Localizable.xcstrings", "scripts/strings/**", ".github/workflows/copy.yml"]
   pull_request:
-    paths: ["Spikes/IDPhotoSpike/App/Resources/Localizable.xcstrings", "scripts/strings/**", ".github/workflows/copy.yml"]
+    paths: ["Calipic/App/Resources/Localizable.xcstrings", "scripts/strings/**", ".github/workflows/copy.yml"]
 
 jobs:
   plain-language:

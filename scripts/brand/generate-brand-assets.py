@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Regenerates the provisional brand test assets in the spike's asset catalog.
+"""Regenerates the brand assets in the app's asset catalog.
 
-- BrandAccentA…D colorsets: the shared *provisional* test palette (any/dark x normal/high contrast, sRGB). This is
-  the accent role: text, glyphs, selection.
-- BrandAccentFillA…D colorsets: the accent FILL role, for filled buttons under a white label. Each fill is derived
+- BrandAccent colorset: teal (BD-033), any/dark x normal/high contrast, sRGB. This is the accent role: text,
+  glyphs, selection.
+- BrandAccentFill colorset: the accent FILL role, for filled buttons under a white label. Each fill is derived
   from the accent of the same appearance (same hue and saturation, lightness lowered only as far as needed) and the
   script fails if any fill gives a white label less than 4.5:1.
 - The choose-your-icon set (BD-038), all derived from VARIANTS in scripts/brand/build-icon-v2.py:
@@ -40,11 +40,11 @@ import sys
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-SPIKE = ROOT / "Spikes/IDPhotoSpike"
-CATALOG = SPIKE / "App/Resources/Assets.xcassets"
-STRINGS = SPIKE / "App/Resources/Localizable.xcstrings"
-PROJECT = SPIKE / "IDPhotoSpike.xcodeproj/project.pbxproj"
-ICON_CATALOG_SWIFT = SPIKE / "App/Brand/AppIconCatalog.swift"
+APP = ROOT / "Calipic"
+CATALOG = APP / "App/Resources/Assets.xcassets"
+STRINGS = APP / "App/Resources/Localizable.xcstrings"
+PROJECT = APP / "Calipic.xcodeproj/project.pbxproj"
+ICON_CATALOG_SWIFT = APP / "App/Brand/AppIconCatalog.swift"
 INFO = {"author": "xcode", "version": 1}
 
 # The icon geometry lives in build-icon-v2.py; its file name has hyphens, so it is loaded by path.
@@ -65,13 +65,10 @@ ICON_CORNER_RATIO = 0.2237
 GROUPS = ["people", "fun"]
 LANGUAGES = ["en", "es", "pt-BR"]
 
-# id: (light, dark, increase-contrast light, increase-contrast dark)
+# Colour-set suffix: (light, dark, increase-contrast light, increase-contrast dark). Teal (BD-033) is the only
+# entry since the colour study closed; the empty suffix writes BrandAccent and BrandAccentFill.
 PALETTE = {
-    "A": ("1F3FA8", "7C98F5", "142C7A", "A9BCFF"),
-    "B": ("0E6F7C", "4FC3D1", "084C55", "8ADFE9"),
-    # C and D light are the round-1 corrections (03-accessibility-color.md): 4.5:1 as text on white.
-    "C": ("51728E", "9DB7CF", "3D5A73", "C3D6E6"),
-    "D": ("A45E00", "F0B55A", "7A4800", "FFD08A"),
+    "": ("0E6F7C", "4FC3D1", "084C55", "8ADFE9"),
 }
 
 ON_FILL = "FFFFFF"
@@ -526,7 +523,7 @@ def main():
     for identifier, values in PALETTE.items():
         write_colorset(f"BrandAccent{identifier}", values)
         write_colorset(f"BrandAccentFill{identifier}", fill_palette[identifier])
-        print(f"{identifier} fill  " + "  ".join(f"#{fill} {contrast(fill, ON_FILL):.2f}:1" for fill in fill_palette[identifier]))
+        print(f"{identifier or 'teal'} fill  " + "  ".join(f"#{fill} {contrast(fill, ON_FILL):.2f}:1" for fill in fill_palette[identifier]))
 
     write_icons()
     ICON_CATALOG_SWIFT.write_text(swift_catalog())

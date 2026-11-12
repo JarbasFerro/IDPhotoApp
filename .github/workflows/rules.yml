@@ -2,9 +2,9 @@ name: Rules catalog
 
 on:
   push:
-    paths: ["Rules/**", "scripts/rules/**", "Spikes/IDPhotoSpike/App/Resources/CalipicCatalog.json", ".github/workflows/rules.yml"]
+    paths: ["Rules/**", "scripts/rules/**", "Calipic/App/Resources/CalipicCatalog.json", ".github/workflows/rules.yml"]
   pull_request:
-    paths: ["Rules/**", "scripts/rules/**", "Spikes/IDPhotoSpike/App/Resources/CalipicCatalog.json", ".github/workflows/rules.yml"]
+    paths: ["Rules/**", "scripts/rules/**", "Calipic/App/Resources/CalipicCatalog.json", ".github/workflows/rules.yml"]
 
 jobs:
   validate:

@@ -53,14 +53,16 @@ Done when: on the founder's iPhone and printer, a print can be checked against t
 
 Done when: a first-time tester goes from launch to a shared digital photo in under 90 seconds, and says unprompted that the app measured the photo.
 
-### 0.19 — Calipic becomes the app
+### 0.19 — Calipic becomes the app · Done (2026-11-12)
 
-1. **E1** Rename the target, scheme, bundle identifier, and folders from `IDPhotoSpike` to Calipic; move the app to the repository root layout the team wants; keep git history with `git mv`.
+1. **E1** Rename the target, scheme, bundle identifier, and folders from `Calipic` to Calipic; move the app to the repository root layout the team wants; keep git history with `git mv`.
 2. Swift tests in CI on a macOS runner, if a runner with the needed SDK is available; otherwise a documented local gate.
 3. Remove spike-only switches that are settled (the brand colour candidates), keeping developer details behind the long press.
 4. Update [04-architecture.md](04-architecture.md) and every path in the docs.
 
 Done when: the same tests pass under the new names and a fresh clone builds with the commands in the handoff document.
+
+Result: the app is `Calipic/` (target, scheme, module, and folders renamed with `git mv`), bundle identifier `com.jarbasferro.calipic`. The Swift Testing suite runs in CI on `macos-26` with Xcode 27; UI tests stay a local gate (`scripts/test.sh auto`). The colour test systems A–D, their switch, and their evidence test are gone; teal is the only brand colour. The step marker keeps the word of past steps on Photo Check (founder feedback on 0.18).
 
 ## 4. Tracks
 

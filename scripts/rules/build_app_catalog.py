@@ -14,7 +14,7 @@ import sys
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 CATALOG = os.path.join(ROOT, "Rules", "catalog", "v1")
-TARGET = os.path.join(ROOT, "Spikes", "IDPhotoSpike", "App", "Resources", "CalipicCatalog.json")
+TARGET = os.path.join(ROOT, "Calipic", "App", "Resources", "CalipicCatalog.json")
 
 
 def build():

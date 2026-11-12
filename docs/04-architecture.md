@@ -1,17 +1,17 @@
 # 04 — Architecture
 
-How the code is organised today (spike 0.16.0) and the rules it must keep. The engineering contract is [AGENTS.md](../AGENTS.md); this file is the map.
+How the code is organised today (0.19.0) and the rules it must keep. The engineering contract is [AGENTS.md](../AGENTS.md); this file is the map.
 
 ## 1. The shape of the app
 
-One app target, `Spikes/IDPhotoSpike`, about 8,000 lines of Swift plus 3,500 lines of tests. Swift 6 language mode, strict concurrency, no third-party dependencies. The Xcode project uses folder synchronisation: a new file in a folder joins the target automatically.
+One app target, `Calipic`, about 8,000 lines of Swift plus 3,500 lines of tests. Swift 6 language mode, strict concurrency, no third-party dependencies. The Xcode project uses folder synchronisation: a new file in a folder joins the target automatically.
 
-It is called a spike for history's sake. It is the product: turning it into the production app is a rename and a tidy-up, not a rewrite ([roadmap E1](02-roadmap.md)).
+It began as a feasibility spike (`Spikes/IDPhotoSpike`) and became the production app in 0.19 by a rename with `git mv`, so `git log --follow` reaches the spike history. Unit tests are `CalipicTests`, UI tests `CalipicUITests`.
 
 ```text
-Spikes/IDPhotoSpike/
+Calipic/
 ├── App/
-│   ├── IDPhotoSpikeApp.swift     start-up, launch flags, document and credits stores
+│   ├── CalipicApp.swift     start-up, launch flags, document and credits stores
 │   ├── Domain/                   pure logic, no UI, no frameworks beyond Foundation and CoreGraphics types
 │   ├── Imaging/                  the photo pipeline: files, Vision, Core Image, rendering, export
 │   ├── Camera/                   AVFoundation session, live guidance, camera screen
@@ -85,24 +85,25 @@ Named types, never bare `CGRect`s across layers: source pixels, normalized image
 
 | What | How |
 |---|---|
-| All tests on a simulator | `scripts/test-spike.sh "platform=iOS Simulator,id=<UUID>"` (list with `xcrun simctl list devices available`) |
+| All tests on a simulator | `scripts/test.sh auto` (first iOS 27 iPhone) or `scripts/test.sh "platform=iOS Simulator,id=<UUID>"` |
+| Unit tests only (CI) | `scripts/test.sh --unit auto` |
 | Read a result | `xcrun xcresulttool get test-results summary --path <file>.xcresult` |
 | Screenshots from UI tests | `xcrun xcresulttool export attachments --path <file>.xcresult --output-path <dir>` |
 | Rules | `python3 scripts/rules/validate_catalog.py Rules/catalog/v1` and `python3 -m unittest discover -s scripts/rules -p 'test_*.py'` |
 | Bundled catalog is current | `python3 scripts/rules/build_app_catalog.py --check` |
 | Plain wording | `python3 scripts/strings/check_copy.py` |
 
-State at 0.16.0: 170 tests, 162 pass, 7 skipped (evidence-capture tests that run only on request), 1 known issue (the private portrait harness cannot run Vision in the simulator).
+State at 0.19.0: 180 tests (161 Swift Testing, 19 UI), 177 pass, 3 skipped (evidence capture and the private portrait harness, which run only on request).
 
 UI tests launch with flags: `--uitesting-fresh` (Spain DNI, nothing saved, one in-memory credit, print panel suppressed), `--uitesting-fixture`, `--uitesting-fixture-2`, `--uitesting-custom-size`.
 
-CI on GitHub runs only the Python checks (rules and wording). **Swift tests are not in CI**; run them locally before every commit that touches the app.
+CI on GitHub runs the Python checks (rules and wording) and, for any change under `Calipic/`, the Swift Testing suite on a macOS runner with Xcode 27 (`.github/workflows/swift-tests.yml`). UI tests are not in CI: they take about five minutes and need a fixed simulator; run them locally before every commit that touches the app.
 
 Simulators cannot prove camera behaviour, memory, heat, speed, or print size. Those need a physical iPhone and real prints.
 
 ## 10. Performance: what is known
 
-Signposts exist for: camera start, capture, ingest, face analysis, segmentation, tone, composite, render, layout, PDF, export, digital export, and (since 0.17) `HomeAppeared`, `Verdict` (analysis to verdict on screen), and `FilesReady` (unlock to files ready). Subsystem `com.jarbasferro.IDPhotoSpike`.
+Signposts exist for: camera start, capture, ingest, face analysis, segmentation, tone, composite, render, layout, PDF, export, digital export, and (since 0.17) `HomeAppeared`, `Verdict` (analysis to verdict on screen), and `FilesReady` (unlock to files ready). Subsystem `com.jarbasferro.calipic`.
 
 **There is no full baseline.** The only device numbers are old: on an iPhone 15 Pro Max with iOS 26.6.2 (version 0.5.2, September 2026), camera start took 273 ms and shutter to staged photo 506 ms. On a Mac, face analysis took 50–120 ms per portrait after a model load of about 2 s. Until a proper baseline exists, nothing is a budget. The measuring plan and the ideas for speed are in [roadmap track P](02-roadmap.md).
 
@@ -152,4 +153,4 @@ Found while building; keep them in mind before changing these areas.
 **Testing**
 
 - iOS simulators cannot run these Vision models ("Could not create inference context"). Real-face checks run through the private macOS harness or on a device.
-- Tests that capture evidence (brand screenshots, frame studies) are skipped unless asked for by environment variable.
+- Tests that capture evidence (frame studies) are skipped unless asked for by environment variable.

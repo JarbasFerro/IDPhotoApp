@@ -1,6 +1,6 @@
 # Screenshot gallery
 
-Spike 0.18.0, iOS 27 simulator, exported with `scripts/ui/export-gallery.sh` from the UI tests. Test photos are synthetic colour blocks; the simulator cannot run face analysis, so the measuring screenshots use a synthetic face (`--uitesting-measured`). Dark screenshots are only those taken with the simulator itself in Dark (see the handoff: `XCUIDevice` appearance has no effect on iOS 27).
+0.18.0, iOS 27 simulator, exported with `scripts/ui/export-gallery.sh` from the UI tests. Test photos are synthetic colour blocks; the simulator cannot run face analysis, so the measuring screenshots use a synthetic face (`--uitesting-measured`). Dark screenshots are only those taken with the simulator itself in Dark (see the handoff: `XCUIDevice` appearance has no effect on iOS 27).
 
 - [Adjust custom size light](adjust-custom-size-light.png)
 - [Adjust top](adjust-top.png)

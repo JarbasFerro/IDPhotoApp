@@ -2,7 +2,7 @@
 
 For whoever continues this project, human or model. Read this page, then [AGENTS.md](../AGENTS.md) (the rules), then [02-roadmap.md](02-roadmap.md) (what to do next).
 
-**State:** tag `v0.18.0`, 2026-11-12. All tests pass on the iOS 27 simulator. The app runs on the founder's iPhone.
+**State:** tag `v0.19.0`, 2026-11-12. The app is `Calipic/` (target, scheme, and module `Calipic`, bundle identifier `com.jarbasferro.calipic`). All tests pass on the iOS 27 simulator; the unit tests also run in CI. The app runs on the founder's iPhone.
 
 ## 1. What this is
 
@@ -32,8 +32,11 @@ Always use the full Xcode: `export DEVELOPER_DIR=/Applications/Xcode.app/Content
 # Simulators available on this Mac
 xcrun simctl list devices available
 
-# All tests (unit and UI). Takes about five minutes.
-scripts/test-spike.sh "platform=iOS Simulator,id=<simulator UUID>"
+# All tests (unit and UI) on the first iOS 27 iPhone simulator. Takes about five minutes.
+scripts/test.sh auto
+# Unit tests only, as CI runs them (seconds once built). A specific simulator also works:
+scripts/test.sh --unit auto
+scripts/test.sh "platform=iOS Simulator,id=<simulator UUID>"
 
 # Result summary and screenshots from a run made with -resultBundlePath
 xcrun xcresulttool get test-results summary --path build/<name>.xcresult
@@ -46,10 +49,10 @@ python3 scripts/strings/check_copy.py
 
 # Build for a connected iPhone, install, launch
 xcrun devicectl list devices
-xcodebuild -project Spikes/IDPhotoSpike/IDPhotoSpike.xcodeproj -scheme IDPhotoSpike -configuration Debug \
+xcodebuild -project Calipic/Calipic.xcodeproj -scheme Calipic -configuration Debug \
   -destination 'id=<device identifier>' -derivedDataPath build/DerivedDataDevice -allowProvisioningUpdates build
-xcrun devicectl device install app --device <device identifier> build/DerivedDataDevice/Build/Products/Debug-iphoneos/IDPhotoSpike.app
-xcrun devicectl device process launch --device <device identifier> com.jarbasferro.IDPhotoSpike
+xcrun devicectl device install app --device <device identifier> build/DerivedDataDevice/Build/Products/Debug-iphoneos/Calipic.app
+xcrun devicectl device process launch --device <device identifier> com.jarbasferro.calipic
 ```
 
 Launching fails while the iPhone is locked; the install still succeeds.
@@ -75,6 +78,8 @@ Launching fails while the iPhone is locked; the install still succeeds.
 - **A disabled button accepts a tap silently in UI tests.** Wait for `isEnabled` first.
 - **Appearance in UI tests:** `XCUIDevice.shared.appearance` has no effect on the iOS 27 simulator. For Dark screenshots set the simulator itself: `xcrun simctl ui <id> appearance dark`, run the test, then set it back to `light`.
 - **The simulator has no camera and cannot run some Vision models.** Camera screens use a synthetic subject there; one private-portrait test is a known issue.
+- **UI tests near the bottom edge:** a drag that starts in the bottom band is read as the go-home swipe and sends the app to the background, and every later tap lands on the Home Screen. Use `reveal(_:in:bottomClearance:)` before dragging a slider.
+- **The bundle identifier changed in 0.19** (`com.jarbasferro.IDPhotoSpike` → `com.jarbasferro.calipic`). The old build is a separate app on a device, with its own credits and settings; delete it by hand.
 - **Rules changes** need the validator, then `build_app_catalog.py`, then String Catalog entries for new names or checks.
 - **Catalog and paper IDs are data:** paper chips are `paper-<id>` (`photo-4x6`, `a4`, …), profiles are `<country>.<document>.<variant>`.
 
@@ -90,4 +95,4 @@ Launching fails while the iPhone is locked; the install still succeeds.
 
 1. Read [03-design.md](03-design.md) Part B and [02-roadmap.md §3](02-roadmap.md).
 2. Read the founder's answers D-1 to D-8 at the end of [05-decisions.md](05-decisions.md); they shape the next batches.
-3. Build **0.19 — the production app** ([roadmap §3](02-roadmap.md)). 0.17 and 0.18 are done.
+3. Build **0.20 — the look** ([roadmap §3](02-roadmap.md)). It starts with the design round for the stage colour and Dark paper (D-3) and the pull-up sheet prototype (D-4); the founder picks before code. 0.17 to 0.19 are done.
