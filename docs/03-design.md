@@ -23,7 +23,10 @@ All in `App/Brand/DesignTokens.swift` (`Design.…`) and `BrandRoles.swift`. Use
 | Group | Tokens |
 |---|---|
 | Colour | `Color.brandAccent` (text, glyphs, selection), `Color.brandAccentFill` (filled buttons, badges). Light `#0E6F7C`; Dark accent `#4FC3D1`, fill `#25828E`. Asset catalog holds Increase Contrast values |
-| Surfaces | `Surface.screen` (grouped background), `Surface.card`, `Surface.stage` (quiet field behind a photo) |
+| Surfaces | `Surface.screen` (grouped background), `Surface.card`, `Surface.stage` (Home hero), `Surface.mat` (the cutting mat, below) |
+| Cutting mat | Photos and pages lie on a teal-grey mat with a fine grid (`#DCE8E6` / `#0E2C2E`, `Stage.swift`) on Photo Check, Your sheet, Print, Finished, and Digital Photo. **No bare text on the grid:** captions and counts sit below the mat; the measurement chip has a solid background; the grid stays out from under the navigation bar. **The grid is not a scale:** never on Check your print. Home, Adjust, and settings stay plain |
+| Paper | One shadow (`paperShadow`: contact edge plus a small spread). In Dark, paper is shown at about 94 % white (`paperDimmedInDark`); exported files are untouched |
+| Readouts | Pure measurements ("34 mm", "10 × 15 cm") use the monospaced system design (`Typography.readout`); sentences with a number keep the text face with monospaced digits |
 | Radius | `photo` 6, `tile` 10, `card` 16, `group` 22 |
 | Spacing | `titlePair` 2, `tight` 4, `caption` 6, `text` 8, `row` 10, `control` 12, `cardContent` 14, `group` 16, `block` 20, `sectionTight` 24, `section` 28 |
 | Type | `hero` (title, bold), `screenTitle` (title2, semibold), `statusTitle`, `cardTitle` (headline), `cardDetail` (subheadline), `rowTitle`, `note` (footnote), `noteDigits`, `caption`. System text styles only |
@@ -146,7 +149,7 @@ Done when: testers, asked what the app did, mention that it measured the photo.
 - Unlock: the page lifts slightly and the unlock card folds away; one success haptic.
 - Reduce Motion: cross-fades. All of it interruptible: a back swipe mid-transition must work.
 
-### U5 — The look: stage, paper, type, numbers (M) · Design round decided (D-3)
+### U5 — The look: stage, paper, type, numbers (M) · Built in 0.20: option B, Cutting mat (round 3)
 
 One design round (three options, judged with real portraits in Light and Dark), then tokens.
 

@@ -79,11 +79,13 @@ struct PrintView: View {
 
     private var header: some View {
         let layout = model.layout
-        // A landscape page is kept lower so the title beside it still has room.
         let landscape = layout.pages.first.map { $0.widthMM > $0.heightMM } ?? false
-        return HStack(alignment: .center, spacing: Design.Spacing.group) {
-            SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: landscape ? 84 : 130)
-                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+        return VStack(alignment: .leading, spacing: Design.Spacing.group) {
+            // The page lies on the mat, running up behind the navigation bar; the words sit below, on the plain screen.
+            SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: landscape ? 110 : 170)
+                .padding(.vertical, Design.Spacing.group)
+                .frame(maxWidth: .infinity)
+                .onMat(bleed: 16)
             VStack(alignment: .leading, spacing: Design.Spacing.tight) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(Design.Typography.titleGlyph)

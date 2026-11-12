@@ -290,7 +290,7 @@ struct TrueSizeReference: View {
                     .frame(width: w * pointsPerMM, height: h * pointsPerMM)
             }
             Text(reference.label)
-                .font(Design.Typography.noteDigits).foregroundStyle(.secondary)
+                .font(Design.Typography.readout(.caption, weight: .regular)).foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Real-size guide, \(reference.label)"))

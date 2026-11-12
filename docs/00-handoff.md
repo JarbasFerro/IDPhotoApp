@@ -2,7 +2,7 @@
 
 For whoever continues this project, human or model. Read this page, then [AGENTS.md](../AGENTS.md) (the rules), then [02-roadmap.md](02-roadmap.md) (what to do next).
 
-**State:** tag `v0.19.0`, 2026-11-12. The app is `Calipic/` (target, scheme, and module `Calipic`, bundle identifier `com.jarbasferro.calipic`). All tests pass on the iOS 27 simulator. CI has a Swift tests job, but GitHub's runner has no Xcode 27 yet, so it skips with a warning: run `scripts/test.sh auto` before every app commit. The app runs on the founder's iPhone.
+**State:** tag `v0.20.0` (the cutting-mat look), 2026-11-12. The app is `Calipic/` (target, scheme, and module `Calipic`, bundle identifier `com.jarbasferro.calipic`). All tests pass on the iOS 27 simulator. CI has a Swift tests job, but GitHub's runner has no Xcode 27 yet, so it skips with a warning: run `scripts/test.sh auto` before every app commit. The app runs on the founder's iPhone.
 
 ## 1. What this is
 
@@ -95,4 +95,4 @@ Launching fails while the iPhone is locked; the install still succeeds.
 
 1. Read [03-design.md](03-design.md) Part B and [02-roadmap.md §3](02-roadmap.md).
 2. Read the founder's answers D-1 to D-8 at the end of [05-decisions.md](05-decisions.md); they shape the next batches.
-3. Build **0.20 — the look** ([roadmap §3](02-roadmap.md)). It starts with the design round for the stage colour and Dark paper (D-3) and the pull-up sheet prototype (D-4); the founder picks before code. 0.17 to 0.19 are done.
+3. Finish **0.20**: the look is built (cutting mat, design round 3 option B). Still open: U4, one continuous photo (zoom transitions, the portrait becomes its copies), and U10, real faces (needs the founder). Then 0.21, drafts.

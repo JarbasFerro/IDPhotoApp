@@ -21,20 +21,25 @@ struct SheetView: View {
             if dynamicTypeSize.isAccessibilitySize {
                 ScrollView {
                     VStack(spacing: Design.Spacing.group) {
-                        paper(layout, box: CGSize(width: 260, height: 260))
+                        matPreview(layout, box: CGSize(width: 260, height: 260))
+                            .padding(.vertical, Design.Spacing.group)
+                            .onMat()
+                        summaryLine(layout)
                         trayContent(layout).padding(.horizontal)
                     }
-                    .padding(.vertical)
+                    .padding(.bottom)
                 }
             } else {
                 VStack(spacing: 0) {
                     GeometryReader { geometry in
-                        // Room for the summary line, and for the page captions when there are several pages.
-                        let reserved: CGFloat = layout.pages.count > 1 ? 96 : 64
-                        paper(layout, box: CGSize(width: max(160, geometry.size.width - 48),
-                                                  height: max(160, geometry.size.height - reserved)))
+                        matPreview(layout, box: CGSize(width: max(160, geometry.size.width - 48),
+                                                       height: max(160, geometry.size.height - 32)))
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
+                    // The page lies on the mat, which runs up behind the navigation bar; the text sits below it.
+                    .onMat()
+                    summaryLine(layout)
+                        .padding(.vertical, Design.Spacing.text)
                     trayContent(layout)
                         .padding(.horizontal, 20).padding(.top, 18).padding(.bottom, Design.Spacing.text)
                         .background {
@@ -54,15 +59,18 @@ struct SheetView: View {
         .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
     }
 
-    private func paper(_ layout: PrintLayout, box: CGSize) -> some View {
-        VStack(spacing: Design.Spacing.text) {
-            SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, pageBox: box)
-            Text(summary(layout))
-                .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
-                .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .default, value: summary(layout))
-                .accessibilityIdentifier("layoutSummary")
-        }
+    private func matPreview(_ layout: PrintLayout, box: CGSize) -> some View {
+        // Page captions are left to the accessibility label here: bare text may not sit on the mat's grid.
+        SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, captions: false, pageBox: box)
+    }
+
+    private func summaryLine(_ layout: PrintLayout) -> some View {
+        Text(summary(layout))
+            .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+            .monospacedDigit()
+            .contentTransition(.numericText())
+            .animation(reduceMotion ? nil : .default, value: summary(layout))
+            .accessibilityIdentifier("layoutSummary")
     }
 
     // MARK: - Tray
@@ -197,11 +205,12 @@ struct SheetView: View {
         let selected = paper.id == model.printJob.paper.id
         // A quiet neutral chip; the chosen paper carries the accent.
         return Button { model.printJob.paper = paper } label: {
-            Text(PaperNames.short(for: paper)).foregroundStyle(selected ? Color.brandAccent : Color.primary)
+            Text(PaperNames.short(for: paper))
+                .font(Design.Typography.readout(.callout, weight: selected ? .semibold : .regular))
+                .foregroundStyle(selected ? Color.brandAccent : Color.primary)
         }
             .buttonStyle(.bordered).buttonBorderShape(.capsule)
             .tint(selected ? Color.brandAccent : Color.gray)
-            .fontWeight(selected ? .semibold : .regular)
             .accessibilityAddTraits(selected ? .isSelected : [])
             .accessibilityIdentifier("paper-\(paper.id)")
     }
@@ -424,6 +433,8 @@ struct SheetPreview: View {
     /// First page only, no captions, for cards.
     var compact = false
     var compactHeight: CGFloat = 130
+    /// "Page 1 of 2" under each page. Off when the pages lie on the mat, where bare text is not allowed.
+    var captions = true
     /// The space each full page is fitted into, keeping the paper's proportions.
     var pageBox = CGSize(width: 260, height: 260)
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -434,6 +445,8 @@ struct SheetPreview: View {
             SheetPageView(page: page, thumbnails: thumbnails, animated: false)
                 .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
                 .frame(height: compactHeight)
+                .paperDimmedInDark()
+                .paperShadow()
                 .accessibilityLabel(Text("Page 1 of \(layout.pages.count): \(page.placements.count) photos"))
                 .accessibilityIdentifier("sheetThumbnail")
         } else {
@@ -445,8 +458,9 @@ struct SheetPreview: View {
                         VStack(spacing: Design.Spacing.tight) {
                             SheetPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion)
                                 .frame(width: width, height: width / aspect)
-                                .shadow(color: .black.opacity(0.10), radius: 6, y: 3)
-                            if layout.pages.count > 1 {
+                                .paperDimmedInDark()
+                                .paperShadow()
+                            if captions, layout.pages.count > 1 {
                                 Text("Page \(index + 1) of \(layout.pages.count)").font(Design.Typography.caption)
                             }
                         }

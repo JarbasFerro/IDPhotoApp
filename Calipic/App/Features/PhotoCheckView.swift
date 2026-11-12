@@ -132,15 +132,19 @@ struct PhotoCheckView: View {
         let portrait = PortraitView(entry: entry, format: format, showsOriginal: comparing || !landed,
                                     label: comparing ? "Original photo" : "Framed photo", animated: !reduceMotion)
         return VStack(spacing: Design.Spacing.caption) {
-            Group {
-                if developerMode {
-                    CaptureProtected { portrait }.aspectRatio(format.aspectRatio, contentMode: .fit)
-                } else {
-                    portrait
+            // The photo and its measurement lie on the mat; the only thing on the grid besides the photo is the chip,
+            // which has its own solid background. Captions sit below, on the plain screen.
+            VStack(spacing: Design.Spacing.control) {
+                Group {
+                    if developerMode {
+                        CaptureProtected { portrait }.aspectRatio(format.aspectRatio, contentMode: .fit)
+                    } else {
+                        portrait
+                    }
                 }
-            }
                 .frame(maxWidth: width)
-                .shadow(color: .black.opacity(checking ? 0.04 : 0.12), radius: 12, y: 6)
+                .paperDimmedInDark()
+                .paperShadow(lifted: checking)
                 .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
                 .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
                     withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { comparing = pressing }
@@ -154,14 +158,18 @@ struct PhotoCheckView: View {
                                            visible: showsMeasureLines)
                     }
                 }
+                if let measurement = measurement(for: entry), landed, !entry.isAnalyzing {
+                    MeasurementChip(measurement: measurement, showsRange: model.document.statesHeadHeight, showsLines: $showsMeasureLines)
+                }
+            }
+            .padding(.vertical, Design.Spacing.group)
+            .frame(maxWidth: .infinity)
+            .onMat(bleed: 16)
             Text(comparing ? "Original" : entry.isAnalyzing ? "Finding your face…" : !landed ? "Framing…" : "Hold to compare with the original")
                 .font(Design.Typography.caption).foregroundStyle(.secondary)
                 .animation(nil, value: checking)
                 // Leaf element that marks the screen for UI tests; identifiers on containers hide their children.
                 .accessibilityIdentifier("photoCheck")
-            if let measurement = measurement(for: entry), landed, !entry.isAnalyzing {
-                MeasurementChip(measurement: measurement, showsRange: model.document.statesHeadHeight, showsLines: $showsMeasureLines)
-            }
             if developerMode {
                 Text(verbatim: CaptureProtection.isAvailable
                      ? "Capture protection test: on. Take a screenshot to check."

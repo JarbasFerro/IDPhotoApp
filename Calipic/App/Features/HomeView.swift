@@ -95,13 +95,15 @@ struct HomeView: View {
             }
             .padding(.horizontal, 16).padding(.vertical, 13)
             .background(.white, in: RoundedRectangle(cornerRadius: 3))
-            .shadow(color: .black.opacity(0.16), radius: 12, y: 8)
+            .paperDimmedInDark()
+            .paperShadow()
             .rotationEffect(.degrees(3))
             .offset(x: 46, y: -8)
             heroPhoto(entry)
                 .frame(width: 100)
                 .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))
-                .shadow(color: .black.opacity(0.2), radius: 12, y: 8)
+                .paperDimmedInDark()
+                .paperShadow()
                 .rotationEffect(.degrees(-4))
                 .offset(x: -98, y: 38)
         }

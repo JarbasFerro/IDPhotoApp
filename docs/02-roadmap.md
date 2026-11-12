@@ -20,7 +20,7 @@ The roadmap is ambitious on purpose, and **nothing in it is final**. If a better
 | **0.17** | The ending | A print they can check against the screen, a cutting guide, a finished moment; controls that respond to touch | U1, U6, P1 |
 | **0.18** | Shorter and measured | Five screens instead of eight; the app visibly measures the photo; results appear almost at once | U2, U3, P2, U15 |
 | **0.19** | Calipic becomes the app | Nothing visible: the spike becomes the production project, with Swift tests in CI | E1 |
-| **0.20** | The look | A recognisable Calipic: warm stage, real paper, one continuous photo from shutter to sheet, real faces on Home | U5, U4, U10 |
+| **0.20** | The look (stage, paper, readouts **done in 0.20.0**; transitions and real faces open) | A recognisable Calipic: the cutting mat, real paper, one continuous photo from shutter to sheet, real faces on Home | U5, U4, U10 |
 | **0.21** | Keep my work | Close the app and continue later; reprint for free; delete everything in one tap | E2, U9 |
 | **0.22** | Real credits | Buying a pack works; the balance survives a reinstall | E3, U12 |
 | **0.23** | Tools | An editor and a sheet that feel like instruments; every unhappy path designed | U7, U8, U13, U14, P4, P5 |
@@ -221,7 +221,7 @@ Written 2026-11-12 for a founder with limited usage across subscriptions. The ti
 | 20 | The rename itself (`git mv`, project settings, paths in docs) | Sonnet 5.5 | Mechanical but wide; tests verify it |
 | 21 | Swift tests in CI | Sonnet 5.5 | Configuration, checkable |
 | **0.20** | | | |
-| 22 | Design round for the look (stage, paper, type) | Fable 5.2 | The most visible creative choice before launch; one short session (round 3 is in [explorations](ui/explorations/README.md), waiting for the founder) |
+| 22 | Design round for the look (stage, paper, type) | Fable 5.2 | The most visible creative choice before launch; one short session (round 3 is in [explorations](ui/explorations/README.md), founder chose B) |
 | 23 | Build the chosen look and the continuous-photo transitions | Sonnet 5.5, Opus 5.5 reviews the screenshots | Implementation from a chosen design |
 | — | Consented private portraits for review | Founder | People, not code |
 | **0.21** | | | |

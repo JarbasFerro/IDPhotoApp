@@ -19,10 +19,10 @@ struct FinishedView: View {
         let layout = model.layout
         ScrollView {
             VStack(spacing: Design.Spacing.sectionTight) {
-                header
                 if let page = layout.pages.first {
                     pageDrawing(page, layout: layout)
                 }
+                header
                 tips
                 if dynamicTypeSize.isAccessibilitySize { doneButton }
             }
@@ -79,15 +79,20 @@ struct FinishedView: View {
         let height = width / aspect
         let samePlans = layout.pages.dropFirst().allSatisfy { CutPlan(page: $0).cuts.count == plan.cuts.count }
         return VStack(spacing: Design.Spacing.control) {
+            // The page lies on the mat, which runs up behind the navigation bar; the note sits below it.
             ZStack {
                 SheetPageView(page: page, thumbnails: model.sheetThumbnails, animated: false)
                     .frame(width: width, height: height)
-                    .shadow(color: .black.opacity(0.10), radius: 6, y: 3)
+                    .paperDimmedInDark()
+                    .paperShadow()
                 CutOverlay(plan: plan, page: page)
                     .frame(width: width + 2 * CutOverlay.margin, height: height + 2 * CutOverlay.margin)
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Page with \(plan.cuts.count) cuts, in order")
+            .padding(.vertical, Design.Spacing.group)
+            .frame(maxWidth: .infinity)
+            .onMat(bleed: 16)
             if layout.pages.count > 1 {
                 Text(samePlans ? "Every page is cut the same way." : "Page 1 shown.")
                     .font(Design.Typography.note)

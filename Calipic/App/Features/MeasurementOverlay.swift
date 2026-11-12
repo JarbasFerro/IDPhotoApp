@@ -79,10 +79,9 @@ struct MeasurementOverlay: View {
 
     private var label: some View {
         VStack(alignment: .trailing, spacing: 0) {
-            Text(MeasurementPresentation.head(measurement)).font(.caption2.weight(.semibold))
-            if showsRange { Text(MeasurementPresentation.allowed(measurement)).font(.caption2) }
+            Text(MeasurementPresentation.head(measurement)).font(Design.Typography.readout(.caption2, weight: .semibold))
+            if showsRange { Text(MeasurementPresentation.allowed(measurement)).font(Design.Typography.readout(.caption2, weight: .regular)) }
         }
-        .monospacedDigit()
         .padding(.horizontal, 6).padding(.vertical, 3)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 6))
         .environment(\.colorScheme, .dark)
@@ -104,19 +103,22 @@ struct MeasurementChip: View {
         Button { showsLines.toggle() } label: {
             HStack(spacing: Design.Spacing.tight) {
                 Image(systemName: "ruler").accessibilityHidden(true)
-                Text(MeasurementPresentation.head(measurement)).monospacedDigit()
+                Text(MeasurementPresentation.head(measurement))
                 if showsRange {
                     Image(systemName: measurement.headInRange ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                         .foregroundStyle(measurement.headInRange ? StatusStyle.pass : StatusStyle.warn)
                         .accessibilityHidden(true)
                 }
             }
-            .font(Design.Typography.caption)
+            .font(Design.Typography.readout(.caption))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 12).padding(.vertical, 6)
+            // Solid, so nothing of the mat's grid shows through the text (the grid is decoration only).
+            .background(Design.Surface.card, in: Capsule())
+            .overlay(Capsule().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
+            .contentShape(Capsule())
         }
-        .buttonStyle(.bordered)
-        .buttonBorderShape(.capsule)
-        .controlSize(.small)
-        .tint(Color.secondary)
+        .buttonStyle(.plain)
         .accessibilityLabel(Text(MeasurementPresentation.spoken(measurement, showsRange: showsRange)))
         .accessibilityHint(showsLines ? Text("Hides the measuring lines.") : Text("Shows the measuring lines on the photo."))
         // Two identifiers so UI tests can tell whether the lines are on the photo.

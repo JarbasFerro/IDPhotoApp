@@ -67,4 +67,4 @@ Made as a local page ([source](2026-11-12-look-round3.html), rendered with Chrom
 
 The four parts can be mixed (for example B's stage with A's numbers).
 
-**Decision:** waiting for the founder.
+**Decision (founder, 2026-11-12):** **B, Cutting mat**, with one condition: the text over the mat in the mock-up was not legible. Built in 0.20.0 with two rules: no bare text on the grid (captions and counts sit below the mat, the measurement chip has a solid background, the grid stays out from under the navigation bar), and the grid is never shown where something is true size (Check your print).

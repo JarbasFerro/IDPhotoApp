@@ -17,6 +17,14 @@ struct DigitalShareView: View {
         ScrollView {
             VStack(alignment: .center, spacing: Design.Spacing.block) {
                 if let result, let entry {
+                    // The photo lies on the mat, running up behind the navigation bar; the words sit below it.
+                    PortraitView(entry: entry, format: model.renderTarget.format, label: "Digital photo ready to share")
+                        .frame(maxWidth: 240)
+                        .paperDimmedInDark()
+                        .paperShadow()
+                        .padding(.vertical, Design.Spacing.group)
+                        .frame(maxWidth: .infinity)
+                        .onMat(bleed: 16)
                     HStack(spacing: Design.Spacing.row) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(Design.Typography.titleGlyph)
@@ -25,8 +33,6 @@ struct DigitalShareView: View {
                         Text("Your digital photo is ready.")
                             .font(Design.Typography.screenTitle)
                     }
-                    PortraitView(entry: entry, format: model.renderTarget.format, label: "Digital photo ready to share")
-                        .frame(maxWidth: 240)
                     Text("Sized for online forms")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
