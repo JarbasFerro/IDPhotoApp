@@ -191,7 +191,7 @@ A date never ends a phase early. Scope is cut instead, in this order: Wave A siz
 
 Written 2026-11-12 for a founder with limited usage across subscriptions. The tiers follow [AGENTS.md §19](../AGENTS.md): small models only for fully specified, cheaply verified work; frontier models for judgment, cross-file state, precise math, reviews, and anything outward-facing.
 
-**Spending rule:** Sonnet 5.5 is the default worker. Opus 5.5 plans each batch (one pass that writes the briefs) and does the cross-file and visual work. Haiku 5.5 takes mechanical steps. Fable 5.2 is kept for the two highest-stakes designs (drafts and purchases). A GPT model, on the other subscription, reviews each batch independently: a different provider catches different mistakes and uses the other quota.
+**Spending rule:** Sonnet 5.5 is the default worker. Opus 5.5 plans each batch (one pass that writes the briefs) and does the cross-file and visual work. Haiku 5.5 takes mechanical steps. Fable 5.2 is kept for the two highest-stakes designs (drafts and purchases) and the design round for the look. A GPT model, on the other subscription, reviews each batch independently: a different provider catches different mistakes and uses the other quota.
 
 | # | Step | Model | Why this model |
 |---|---|---|---|
@@ -221,7 +221,7 @@ Written 2026-11-12 for a founder with limited usage across subscriptions. The ti
 | 20 | The rename itself (`git mv`, project settings, paths in docs) | Sonnet 5.5 | Mechanical but wide; tests verify it |
 | 21 | Swift tests in CI | Sonnet 5.5 | Configuration, checkable |
 | **0.20** | | | |
-| 22 | Design round for the look (stage, paper, type) | Opus 5.5 | Visual judgment; the founder chooses |
+| 22 | Design round for the look (stage, paper, type) | Fable 5.2 | The most visible creative choice before launch; one short session (round 3 is in [explorations](ui/explorations/README.md), waiting for the founder) |
 | 23 | Build the chosen look and the continuous-photo transitions | Sonnet 5.5, Opus 5.5 reviews the screenshots | Implementation from a chosen design |
 | — | Consented private portraits for review | Founder | People, not code |
 | **0.21** | | | |

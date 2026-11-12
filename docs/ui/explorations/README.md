@@ -52,3 +52,19 @@ Problems addressed:
 5a, 5b, and 5c are three states of one design; 5d is the alternative to it. 4c follows either 4a or 4b.
 
 **Decision (founder, 2026-11-12):** Your sheet **3b**, Print **4a**, unlock **5d**. With it, the price display changed: the app shows **credits**, not money. A person starts with 1 credit; packs are 1 for USD 0.99, 5 for USD 3.99, and 10 for USD 6.99 ([ADR-048](../../05-decisions.md)). Built in spike 0.16.0. 4c (*Check your print*) is not built yet; it is item U1 in the [roadmap](../../02-roadmap.md).
+
+## Round 3 — The look (2026-11-12)
+
+![Round 3](2026-11-12-look-round3.png)
+
+Made as a local page ([source](2026-11-12-look-round3.html), rendered with Chrome on a Mac so the system fonts are the real ones). Decision D-3: what sits behind the photo and the paper, paper in Dark, how numbers are written, and the shadow (U5). The portrait is the app's stand-in drawing.
+
+| ID | Look | Stage | Paper in Dark | Numbers | Shadow |
+|---|---|---|---|---|---|
+| A | Warm studio | Warm neutral across the whole screen (`#F3F1ED` / `#17181A`) | 94 % white | SF Rounded, semibold | Soft, warm, wide |
+| B | Cutting mat | Teal-grey mat with a millimetre grid behind the photo and the page (`#DCE8E6` / `#0E2C2E`); the rest stays system | 94 % white | SF Mono | Tight contact shadow |
+| C | Light table | A dark inset panel in both appearances (`#1B1C1F` / `#101113`) | Full white | SF expanded bold, small-cap units | A faint glow |
+
+The four parts can be mixed (for example B's stage with A's numbers).
+
+**Decision:** waiting for the founder.

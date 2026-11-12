@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calipic — Round 3, the look</title>
+<!-- Source of docs/ui/explorations/2026-11-12-look-round3.png. Render on a Mac (system fonts):
+     Chrome --headless=new --force-device-scale-factor=2 --window-size=1560,2440 --screenshot=<png> <this file> -->
+<style>
+  /* System font files, so numbers render as they will on iPhone (Chrome has no ui-rounded). */
+  @font-face { font-family: "CP Rounded"; src: url("file:///System/Library/Fonts/SFNSRounded.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "CP Mono"; src: url("file:///System/Library/Fonts/SFNSMono.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "CP Sans"; src: url("file:///System/Library/Fonts/SFNS.ttf"); font-weight: 100 900; font-stretch: 30% 150%; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; background: #FAFAFB; color: #111; width: 1560px; padding: 44px 40px 40px; -webkit-font-smoothing: antialiased; }
+  h1 { font-size: 30px; letter-spacing: -0.02em; }
+  .sub { color: #5d6166; font-size: 15px; margin-top: 6px; max-width: 900px; line-height: 1.45; }
+  .heads, .row { display: grid; grid-template-columns: 250px repeat(4, 280px); gap: 28px; }
+  .heads { margin-top: 30px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #7a7f85; }
+  .row { margin-top: 14px; padding-top: 22px; border-top: 1px solid #e3e4e7; }
+  .about h2 { font-size: 22px; letter-spacing: -0.01em; }
+  .about .id { display: inline-block; font: 600 12px ui-monospace, Menlo, monospace; color: #0E6F7C; border: 1px solid #0E6F7C; border-radius: 5px; padding: 1px 6px; margin-bottom: 8px; }
+  .about p { font-size: 13.5px; line-height: 1.45; color: #3c4045; margin-top: 8px; }
+  .about dl { margin-top: 12px; font-size: 12px; color: #5d6166; line-height: 1.5; }
+  .about dt { font-weight: 600; color: #222; margin-top: 6px; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,.18); vertical-align: -2px; margin-right: 4px; }
+
+  /* ---------- phone ---------- */
+  .phone { width: 280px; height: 640px; border-radius: 38px; overflow: hidden; position: relative; background: var(--screen); color: var(--ink);
+           box-shadow: 0 0 0 1px rgba(0,0,0,.14), 0 18px 40px rgba(0,0,0,.10); font-size: 13px; }
+  .light { --ink:#000; --ink2:rgba(60,60,67,.62); --ink3:rgba(60,60,67,.32); --teal:#0E6F7C; --fill:#0E6F7C; --soft:rgba(14,111,124,.16); --chip:rgba(118,118,128,.14); --glass:rgba(255,255,255,.82); --pass:#1E9E4A; --paper:#fff; --edge:rgba(0,0,0,.22); }
+  .dark  { --ink:#fff; --ink2:rgba(235,235,245,.62); --ink3:rgba(235,235,245,.30); --teal:#4FC3D1; --fill:#0B6370; --soft:rgba(79,195,209,.20); --chip:rgba(118,118,128,.28); --glass:rgba(60,60,64,.78); --pass:#30D158; --paper:#F0F0EE; --edge:rgba(255,255,255,.10); }
+  .status { height: 40px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 26px 2px; font-weight: 600; font-size: 13px; position: relative; z-index: 3; }
+  .status i { width: 22px; height: 10px; border-radius: 3px; background: currentColor; display: block; margin-bottom: 3px; }
+  .nav { height: 42px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; position: relative; z-index: 3; }
+  .round { width: 30px; height: 30px; border-radius: 50%; background: var(--glass); box-shadow: 0 0 0 .5px var(--edge), 0 2px 6px rgba(0,0,0,.08); display: grid; place-items: center; font-size: 17px; line-height: 1; padding-bottom: 2px; }
+  .pill { height: 30px; flex: none; border-radius: 15px; background: var(--glass); box-shadow: 0 0 0 .5px var(--edge), 0 2px 6px rgba(0,0,0,.08); display: flex; align-items: center; gap: 9px; padding: 0 10px; color: var(--teal); font-size: 12px; }
+  .pill b { color: var(--ink); letter-spacing: 1px; }
+  .steps { font-size: 10px; color: var(--ink2); display: flex; gap: 3px; align-items: center; white-space: nowrap; }
+  .steps b { color: var(--ink); } .steps s { text-decoration: none; color: var(--ink3); }
+  .stagebox { position: relative; }
+  .caption { text-align: center; font-size: 10px; color: var(--ink2); margin-top: 7px; }
+  .num { font-stretch: var(--numstretch, 100%); font-family: var(--numfont); font-variant-numeric: tabular-nums; letter-spacing: var(--numtrack, 0); font-weight: var(--numweight, 500); }
+  .unit { font-size: var(--unitsize, 1em); text-transform: var(--unitcase, none); letter-spacing: var(--unittrack, 0); }
+
+  /* photo with measuring lines */
+  .photo { width: 150px; height: 185px; margin: 6px auto 0; position: relative; background: var(--paper); border-radius: 4px; box-shadow: var(--shadow); }
+  .photo img, .cell img { width: 100%; height: 100%; display: block; border-radius: inherit; filter: var(--paperdim, none); }
+  .ml { position: absolute; left: 0; right: 0; height: 0; border-top: 1px dashed rgba(255,255,255,.98); filter: drop-shadow(0 0 .6px rgba(0,0,0,.9)) drop-shadow(0 .5px 1px rgba(0,0,0,.55)); }
+  .ml.solid { border-top-style: solid; }
+  .bracket { position: absolute; right: 7px; top: 22.5%; height: 49.5%; width: 4px; border: 1.5px solid #fff; border-left: 0; filter: drop-shadow(0 0 .6px rgba(0,0,0,.9)) drop-shadow(0 .5px 1px rgba(0,0,0,.55)); }
+  .mlabel { position: absolute; right: 4px; top: 75%; background: rgba(30,30,32,.72); color: #fff; font-size: 8.5px; padding: 2px 5px; border-radius: 4px; line-height: 1.25; text-align: right; }
+  .mchip { margin: 7px auto 0; width: max-content; background: var(--chip); border-radius: 12px; padding: 3px 10px; font-size: 10.5px; color: var(--ink2); display: flex; gap: 5px; align-items: center; }
+  .mchip u { text-decoration: none; color: var(--pass); }
+  .verdict { text-align: center; margin-top: 10px; }
+  .badge { width: 24px; height: 24px; border-radius: 50%; background: var(--pass); color: #fff; display: inline-grid; place-items: center; font-size: 14px; font-weight: 700; }
+  .verdict h3 { font-size: var(--herosize, 19px); letter-spacing: var(--herotrack, -0.01em); font-weight: 700; margin-top: 5px; }
+  .verdict p { font-size: 10.5px; color: var(--ink2); margin-top: 2px; }
+  .card { background: var(--card); border-radius: 18px; margin: 9px 11px 0; padding: 8px 12px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 11.5px; padding: 3px 0; }
+  .check u { text-decoration: none; color: var(--pass); font-weight: 700; } .check small { display: block; color: var(--ink2); font-size: 10px; }
+  .check .r { margin-left: auto; color: var(--ink2); font-size: 10.5px; white-space: nowrap; }
+  .actions { position: absolute; left: 11px; right: 11px; bottom: 16px; }
+  .btn { height: 34px; border-radius: 17px; display: grid; place-items: center; font-size: 12.5px; }
+  .btn.p { background: var(--fill); color: #fff; } .btn.s { background: var(--soft); color: var(--teal); margin-top: 7px; } .btn.t { color: var(--teal); margin-top: 3px; }
+
+  /* sheet */
+  .paper { width: 232px; height: 155px; margin: 26px auto 0; background: var(--paper); position: relative; box-shadow: var(--shadow); border-radius: 1.5px; }
+  .grid8 { position: absolute; left: 14px; right: 14px; top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px 6px; }
+  .cell { aspect-ratio: 26/32; outline: .5px solid rgba(0,0,0,.25); position: relative; }
+  .cell::before, .cell::after { content: ""; position: absolute; background: #222; }
+  .cell::before { width: 4px; height: .7px; left: -5px; top: 0; box-shadow: 0 0 0 0 #222; } .cell::after { width: .7px; height: 4px; top: -5px; left: 0; }
+  .rule50 { position: absolute; bottom: 9px; left: 50%; width: 76px; margin-left: -38px; border-top: 1px solid #222; }
+  .count { text-align: center; margin-top: 12px; font-size: var(--countsize, 12px); color: var(--ink2); }
+  .tray { position: absolute; left: 0; right: 0; bottom: 0; background: var(--card); border-radius: 24px 24px 0 0; padding: 14px 13px 18px; }
+  .tray .hd { display: flex; justify-content: space-between; font-weight: 600; font-size: 12px; } .tray .hd span { color: var(--teal); font-weight: 400; }
+  .tray .meta { font-size: 10.5px; color: var(--ink2); margin-top: 1px; }
+  .people { display: flex; align-items: center; gap: 9px; margin-top: 11px; }
+  .face { width: 34px; height: 34px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--fill); position: relative; overflow: visible; }
+  .face img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: 50% 30%; }
+  .face b { position: absolute; right: -6px; top: -5px; min-width: 15px; height: 15px; border-radius: 8px; background: var(--fill); color: #fff; font-size: 9px; display: grid; place-items: center; box-shadow: 0 0 0 1.5px var(--card); }
+  .add { width: 34px; height: 34px; border-radius: 50%; border: 1px dashed var(--teal); color: var(--teal); display: grid; place-items: center; font-size: 17px; opacity: .8; }
+  .stepper { margin-left: auto; background: var(--chip); border-radius: 13px; height: 26px; width: 62px; display: flex; justify-content: space-around; align-items: center; font-size: 15px; }
+  .chips { display: flex; gap: 5px; margin-top: 11px; } .chips span { background: var(--chip); border-radius: 12px; padding: 4px 8px; font-size: 10.5px; white-space: nowrap; }
+  .chips .on { background: var(--soft); color: var(--teal); font-weight: 600; }
+  .tray .btn { margin-top: 12px; }
+
+  /* ---------- looks ---------- */
+  /* A · Warm studio: the whole screen is the stage */
+  .A.light { --screen:#F3F1ED; --card:#fff; --shadow: 0 1px 1.5px rgba(40,30,10,.16), 0 12px 26px rgba(70,50,20,.14); }
+  .A.dark  { --screen:#17181A; --card:#242528; --shadow: 0 1px 2px rgba(0,0,0,.6), 0 14px 30px rgba(0,0,0,.5); }
+  .A { --numfont: "CP Rounded"; --numweight: 600; --countsize: 13px; }
+  .A .stagebox { padding-bottom: 2px; }
+
+  /* B · Cutting mat: a measured surface under photo and paper */
+  .B.light { --screen:#F2F2F7; --card:#fff; --mat:#DCE8E6; --g1:rgba(14,111,124,.07); --g5:rgba(14,111,124,.17); --shadow: 0 .5px 0 rgba(0,0,0,.35), 0 2px 5px rgba(10,50,55,.22); }
+  .B.dark  { --screen:#000; --card:#1C1C1E; --mat:#0E2C2E; --g1:rgba(138,223,233,.05); --g5:rgba(138,223,233,.13); --shadow: 0 .5px 0 rgba(0,0,0,.8), 0 3px 8px rgba(0,0,0,.55); }
+  .B { --numfont: "CP Mono"; --numweight: 500; --numtrack: -0.04em; --countsize: 12px; }
+  .B .stagebox { background-color: var(--mat); margin-top: -82px; padding: 86px 0 11px; border-radius: 0 0 22px 22px;
+     background-image: linear-gradient(var(--g5) 1px, transparent 1px), linear-gradient(90deg, var(--g5) 1px, transparent 1px), linear-gradient(var(--g1) 1px, transparent 1px), linear-gradient(90deg, var(--g1) 1px, transparent 1px);
+     background-size: 30px 30px, 30px 30px, 6px 6px, 6px 6px; background-position: 9px 4px; }
+  .B .sheetstage { padding-bottom: 16px; }
+
+  /* C · Light table: a dark stage in both appearances; the paper glows */
+  .C.light { --screen:#F2F2F7; --card:#fff; --table:#1B1C1F; }
+  .C.dark  { --screen:#000; --card:#1C1C1E; --table:#101113; }
+  .C { --numfont: "CP Sans"; --numweight: 700; --numstretch: 125%; --unitsize: .78em; --unitcase: uppercase; --unittrack: .06em; --countsize: 13px; --paper:#fff; --paperdim: none;
+       --shadow: 0 0 0 .5px rgba(255,255,255,.25), 0 0 34px rgba(255,255,255,.16), 0 10px 22px rgba(0,0,0,.6); --herosize: 21px; --herotrack: -0.025em; }
+  .C .stagebox { background: radial-gradient(120% 90% at 50% 38%, #2a2c30 0%, var(--table) 70%); margin: 2px 10px 0; padding: 10px 0 10px; border-radius: 22px; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.10); }
+  .C .stagebox .caption, .C .stagebox .count { color: rgba(235,235,245,.66); }
+  .C .stagebox .mchip { background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); }
+  .C .paper { margin-top: 14px; }
+  .dark.A .photo img, .dark.A .cell img, .dark.B .photo img, .dark.B .cell img { filter: brightness(.94); }
+  .foot { margin-top: 26px; font-size: 12.5px; color: #5d6166; line-height: 1.5; max-width: 1100px; }
+</style>
+</head>
+<body>
+<h1>Round 3 — The look</h1>
+<p class="sub">What sits behind the photo and the paper, how paper looks in Dark, how numbers are written, and the shadow. Controls stay Apple's own in every option. The portrait is the app's stand-in drawing, not a person.</p>
+<div class="heads"><div></div><div>Photo Check · Light</div><div>Your sheet · Light</div><div>Photo Check · Dark</div><div>Your sheet · Dark</div></div>
+<div id="rows"></div>
+<p class="foot">Same in all three: teal only on controls, never over the portrait; measuring lines are white hairlines; status keeps a symbol and a word; exported files are never dimmed or tinted, only the on-screen paper in Dark.</p>
+
+<script>
+const P = "../../../Calipic/App/Resources/Assets.xcassets/SamplePortrait.imageset/sample-portrait.svg";
+const mm = (n) => `<span class="num">${n}<span class="unit">&nbsp;mm</span></span>`;
+const bar = (steps, right) => `
+  <div class="status"><span>9:41</span><i></i></div>
+  <div class="nav"><div class="round">‹</div><div class="steps">${steps}</div>${right}</div>`;
+const check = (look, mode) => `
+  <div class="phone ${look} ${mode}">
+    ${bar(`<span>✓ Photo</span><s>›</s><b>Check</b><s>›</s><s>Print</s>`, `<div class="pill">Retake <b>•••</b></div>`)}
+    <div class="stagebox">
+      <div class="photo"><img src="${P}">
+        <div class="ml" style="top:22.5%"></div><div class="ml solid" style="top:48%"></div><div class="ml" style="top:72%"></div>
+        <div class="bracket"></div><div class="mlabel">Head ${mm(34)}<br>allowed <span class="num">32–36</span></div>
+      </div>
+      <div class="caption">Hold to compare with the original</div>
+      <div class="mchip">▭ Head ${mm(34)} <u>✓</u></div>
+    </div>
+    <div class="verdict"><span class="badge">✓</span><h3>Ready to print</h3><p>The measurable checks look right.</p></div>
+    <div class="card">
+      <div class="check"><u>✓</u><div>Size<small>Official photo size</small></div><span class="r">${mm("35 × 45")}</span></div>
+      <div class="check"><u>✓</u><div>Head<small>Straight and level</small></div><span class="r">${mm(34)}</span></div>
+    </div>
+    <div class="actions"><div class="btn p">Print</div><div class="btn s">Digital Photo</div><div class="btn t">Adjust</div></div>
+  </div>`;
+const sheet = (look, mode) => `
+  <div class="phone ${look} ${mode}">
+    ${bar(`<span>✓ Photo</span><s>›</s><span>✓ Check</span><s>›</s><b>Print</b>`, `<div style="width:30px"></div>`)}
+    <div class="stagebox sheetstage">
+      <div class="paper"><div class="grid8">${`<div class="cell"><img src="${P}"></div>`.repeat(8)}</div><div class="rule50"></div></div>
+      <div class="count"><span class="num">8</span> copies · <span class="num">1</span> page · <span class="num">10 × 15<span class="unit">&nbsp;cm</span></span></div>
+    </div>
+    <div class="tray">
+      <div class="hd">Your photo <span>Check</span></div>
+      <div class="meta">${mm("35 × 45")} · <span class="num">8</span> copies</div>
+      <div class="people"><div class="face"><img src="${P}"><b class="num">8</b></div><div class="add">+</div><div class="stepper"><span>−</span><span>+</span></div></div>
+      <div class="chips"><span class="on num">10 × 15 cm</span><span class="num">13 × 18 cm</span><span>A4</span><span>More</span></div>
+      <div class="btn p">Continue</div>
+    </div>
+  </div>`;
+const looks = [
+  ["A", "Warm studio", "The whole screen becomes a warm, quiet backdrop, like studio paper. Nothing frames the photo; it simply sits on the surface with a soft shadow.",
+   [["Stage", `<i class="sw" style="background:#F3F1ED"></i>#F3F1ED · <i class="sw" style="background:#17181A"></i>#17181A, whole screen`], ["Paper in Dark", "94 % white"], ["Numbers", "SF Rounded, semibold"], ["Shadow", "Soft and warm, wide"]]],
+  ["B", "Cutting mat", "The photo and the page lie on a measured mat with a fine millimetre grid, in the brand's teal family. It says “this app measures” before a single word does.",
+   [["Stage", `<i class="sw" style="background:#DCE8E6"></i>#DCE8E6 · <i class="sw" style="background:#0E2C2E"></i>#0E2C2E, with grid, top of the screen`], ["Paper in Dark", "94 % white"], ["Numbers", "SF Mono, like an instrument readout"], ["Shadow", "Tight contact shadow: paper lying flat"]]],
+  ["C", "Light table", "The photo sits in a dark well in both appearances, so the paper is the brightest thing on screen, as on a photographer's light table.",
+   [["Stage", `<i class="sw" style="background:#1B1C1F"></i>#1B1C1F · <i class="sw" style="background:#101113"></i>#101113, an inset panel`], ["Paper in Dark", "Full white, it is the light"], ["Numbers", "SF expanded bold, small-cap units"], ["Shadow", "A faint glow around paper"]]],
+];
+document.getElementById("rows").innerHTML = looks.map(([id, name, text, tokens]) => `
+  <div class="row"><div class="about"><span class="id">${id}</span><h2>${name}</h2><p>${text}</p>
+    <dl>${tokens.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl></div>
+    ${check(id, "light")}${sheet(id, "light")}${check(id, "dark")}${sheet(id, "dark")}</div>`).join("");
+</script>
+</body>
+</html>
