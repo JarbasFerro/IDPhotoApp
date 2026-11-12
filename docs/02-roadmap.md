@@ -182,3 +182,63 @@ A date never ends a phase early. Scope is cut instead, in this order: Wave A siz
 4. Best frame from a burst; reading the printed check line with the camera.
 5. Age-related profile exceptions as data.
 6. Optional on-device coaching, advisory only.
+
+## 8. Implementation steps and the model for each
+
+Written 2026-11-12 for a founder with limited usage across subscriptions. The tiers follow [AGENTS.md §19](../AGENTS.md): small models only for fully specified, cheaply verified work; frontier models for judgment, cross-file state, precise math, reviews, and anything outward-facing.
+
+**Spending rule:** Sonnet 5.5 is the default worker. Opus 5.5 plans each batch (one pass that writes the briefs) and does the cross-file and visual work. Haiku 5.5 takes mechanical steps. Fable 5.2 is kept for the two highest-stakes designs (drafts and purchases). A GPT model, on the other subscription, reviews each batch independently: a different provider catches different mistakes and uses the other quota.
+
+| # | Step | Model | Why this model |
+|---|---|---|---|
+| **0.17** | | | |
+| 1 | Plan 0.17: briefs for every step below, with files and acceptance checks | Opus 5.5 | Planning for other models |
+| 2 | Deployment target 26.0 → 27.0, iOS 27 test simulator, AGENTS.md lines | Haiku 5.5 | Mechanical; build and tests verify it |
+| 3 | True-size table (iPhone model → screen density) and points-per-millimetre formula, with tests | Opus 5.5 | Units and device data: a plausible wrong value is costly |
+| 4 | *Check your print* screen and the "No" diagnosis | Opus 5.5 | New visual moment plus print logic |
+| 5 | *Finished* screen and cutting guide | Sonnet 5.5 | Follows the spec in 03-design U1 |
+| 6 | Feedback map: haptics and number transitions | Sonnet 5.5 | Small judgment across several screens |
+| 7 | New signposts for the performance baseline | Haiku 5.5 | Pattern already in the code |
+| 8 | Spanish and Portuguese for new strings | Haiku 5.5 | Translation drafts, reviewed in step 10 |
+| 9 | UI tests and screenshots | Sonnet 5.5 | Test updates with some judgment |
+| 10 | Review: code, wording, light and dark screenshots | GPT (other subscription) | Independent second opinion |
+| 11 | Fix findings, version bump, commit, tag, push, install on the iPhone | Opus 5.5 | Outward-facing actions |
+| — | Measure the baseline and the 50 mm line on the iPhone and printer | Founder | Needs the device and a ruler |
+| **0.18** | | | |
+| 12 | Plan 0.18 | Opus 5.5 | Planning |
+| 13 | Remove *Choose result*; outputs on Photo Check; preflight once per document; step marker | Opus 5.5 | Navigation and state across several files |
+| 14 | Measuring lines on the photo (U3): image space → screen → millimetres | Opus 5.5 | Coordinate spaces; the signature moment |
+| 15 | Analyse during the camera review; checks appear one by one | Opus 5.5 | Concurrency and stale results |
+| 16 | Gallery export script | Haiku 5.5 | Bounded script, output is checkable |
+| 17 | Strings, UI tests | Haiku 5.5, then Sonnet 5.5 | As in 0.17 |
+| 18 | Review, then ship | GPT, then Opus 5.5 | As in 0.17 |
+| **0.19** | | | |
+| 19 | Rename plan: new names, bundle ID, effect on the installed app | Opus 5.5 | Irreversible identity change |
+| 20 | The rename itself (`git mv`, project settings, paths in docs) | Sonnet 5.5 | Mechanical but wide; tests verify it |
+| 21 | Swift tests in CI | Sonnet 5.5 | Configuration, checkable |
+| **0.20** | | | |
+| 22 | Design round for the look (stage, paper, type) | Opus 5.5 | Visual judgment; the founder chooses |
+| 23 | Build the chosen look and the continuous-photo transitions | Sonnet 5.5, Opus 5.5 reviews the screenshots | Implementation from a chosen design |
+| — | Consented private portraits for review | Founder | People, not code |
+| **0.21** | | | |
+| 24 | Design drafts and the export gate: storage format, protection, retention (D-7), the test that proves nothing locked leaves the app | Fable 5.2 | Privacy and money; the costliest mistake in the plan |
+| 25 | Build drafts and the gate from that design | Opus 5.5 | State across the whole app |
+| 26 | Continue shelf on Home | Sonnet 5.5 | Screen work on top of the model |
+| 27 | Security and privacy review of drafts | GPT, then Fable 5.2 on disputed findings | Two independent reviews where it matters |
+| **0.22** | | | |
+| 28 | Design purchases: reserve, commit, release; restore; iCloud mirror | Fable 5.2 | No double charge, no lost paid photo |
+| 29 | Build StoreKit and the Credits screen | Opus 5.5 | Follows the design; many edge cases |
+| — | Sandbox and TestFlight purchase tests | Founder, with Sonnet 5.5 writing the test checklist | Needs App Store Connect |
+| **0.23** | | | |
+| 30 | Prototype the pull-up sheets against today's layout (D-4) | Sonnet 5.5 | Two variants behind a switch |
+| 31 | Adjust as a tool, Your sheet as a cutting mat | Opus 5.5 | Gestures, precise geometry, feel |
+| 32 | Unhappy-path screens, document picker improvements | Sonnet 5.5 | Follows existing patterns |
+| **Later** | | | |
+| 33 | Calibrate checks on real portraits | Opus 5.5 | Thresholds become hard checks only with evidence |
+| 34 | Hair-edge repair with iterative segmentation | Opus 5.5 | Vision API, little prior art in the code |
+| 35 | Wave B profile research and rule data | Opus 5.5 | Sourced rules; the validator checks the data |
+| 36 | Export performance with large photos | Opus 5.5 | Profiling and memory |
+| 37 | Settings, Help, App Intents | Sonnet 5.5 | Standard screens and APIs |
+| 38 | App Store text and screenshots | Opus 5.5 drafts, founder approves | Public wording, honesty rules |
+
+GPT 6 Astra and GPT 6.1 Sol are listed only as "GPT" because their relative strengths were not assessed here. Use whichever the subscription allows more of for reviews; for a review, the stronger one is worth it.
