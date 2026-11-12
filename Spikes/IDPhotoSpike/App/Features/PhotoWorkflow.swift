@@ -18,6 +18,9 @@ struct PhotoEntry: Identifiable {
     var toneAssessment: ToneAssessment?
     /// Closer or wider framing; applies to custom sizes only (official profiles keep their own target).
     var framing: FramingPreset = .standard
+    /// Unlocked with a credit (ADR-048): every output of this photo is free, and its look is final until it is
+    /// edited again, which locks it.
+    var isUnlocked = false
 
     var id: UUID { photo.id }
 }
@@ -66,9 +69,13 @@ final class PhotoWorkflow {
     @ObservationIgnored private var revision = UUID()
     @ObservationIgnored private var exportLease: UUID?
 
-    init(pipeline: any PhotoProcessing, document: DocumentChoice = .initial) {
+    /// The person's credits. One credit unlocks one photo (ADR-048).
+    let credits: CreditStore
+
+    init(pipeline: any PhotoProcessing, document: DocumentChoice = .initial, credits: CreditStore? = nil) {
         self.pipeline = pipeline
         self.document = document
+        self.credits = credits ?? CreditStore()
     }
 
     func setInitialized() { isInitialized = true }
@@ -86,7 +93,8 @@ final class PhotoWorkflow {
     var photo: PreparedPhoto? { selected?.photo }
     var adjustment: CropAdjustment {
         get { selected?.adjustment ?? CropAdjustment() }
-        set { if let index = selectedIndex { entries[index].adjustment = newValue } }
+        // An unlocked photo's look is final: edits reach it only after `relock`.
+        set { if let index = selectedIndex, !entries[index].isUnlocked { entries[index].adjustment = newValue } }
     }
     var analysis: FaceAnalysis? { selected?.analysis }
     var analysisUnavailable: Bool { selected?.analysisUnavailable ?? false }
@@ -197,6 +205,30 @@ final class PhotoWorkflow {
                             visionRollDegrees: analysis.visionRollDegrees, lensSmudgeConfidence: analysis.lensSmudgeConfidence)
     }
 
+    // MARK: - Credits and unlocking (ADR-048)
+
+    /// People on the sheet who still need a credit before anything leaves the app.
+    var lockedCount: Int { entries.filter { !$0.isUnlocked }.count }
+
+    /// Spends one credit per locked photo among `ids` and unlocks them. Changes nothing and returns false when
+    /// the balance is short. Already unlocked photos cost nothing.
+    @discardableResult
+    func unlock(_ ids: [UUID]) -> Bool {
+        let locked = entries.filter { ids.contains($0.id) && !$0.isUnlocked }.map(\.id)
+        guard credits.spend(locked.count) else { return false }
+        for id in locked { update(id) { $0.isUnlocked = true } }
+        return true
+    }
+
+    @discardableResult
+    func unlockAll() -> Bool { unlock(entries.map(\.id)) }
+
+    /// Makes a photo editable again. Its next output needs a new credit.
+    func relock(_ photoID: UUID) {
+        update(photoID) { $0.isUnlocked = false }
+        finishExport()
+    }
+
     // MARK: - Document
 
     /// Switches the session to another document: re-frames every analysed photo for it, moves the default
@@ -209,6 +241,8 @@ final class PhotoWorkflow {
         document = next
         let target = renderTarget
         for index in entries.indices {
+            // Another document is another photo (ADR-048 §2): it is framed again and needs its own credit.
+            entries[index].isUnlocked = false
             reframe(at: index)
             if case .color = entries[index].adjustment.background {
                 entries[index].adjustment.background = .color(policy.background)
@@ -228,6 +262,7 @@ final class PhotoWorkflow {
 
     /// Back to the photo as taken: original background, no tone correction, colour. Framing is kept.
     func useOriginalLook(for photoID: UUID) {
+        guard let index = index(of: photoID), !entries[index].isUnlocked else { return }
         update(photoID) {
             $0.adjustment.background = .original
             $0.adjustment.tone = .off
@@ -243,7 +278,7 @@ final class PhotoWorkflow {
 
     /// Changes how much of the person a custom-size photo shows, re-solving from the measured face.
     func setFraming(_ preset: FramingPreset, for photoID: UUID) {
-        guard let index = index(of: photoID), entries[index].framing != preset else { return }
+        guard let index = index(of: photoID), entries[index].framing != preset, !entries[index].isUnlocked else { return }
         entries[index].framing = preset
         reframe(at: index)
         sheetThumbnails = [:]
@@ -324,8 +359,9 @@ final class PhotoWorkflow {
 
     // MARK: - Export
 
+    /// The export gate: nothing is rendered for a locked photo (ADR-049 §3).
     func prepareExport() {
-        guard !entries.isEmpty, activity == nil else { return }
+        guard !entries.isEmpty, activity == nil, lockedCount == 0 else { return }
         cancelWork()
         let currentRevision = revision
         let edits = entries.map { PhotoEdit(photo: $0.photo, adjustment: $0.adjustment) }
@@ -352,7 +388,7 @@ final class PhotoWorkflow {
     }
 
     func prepareDigitalExport(for photoID: UUID) {
-        guard let entry = entries.first(where: { $0.id == photoID }), activity == nil else { return }
+        guard let entry = entries.first(where: { $0.id == photoID }), activity == nil, entry.isUnlocked else { return }
         cancelWork()
         let currentRevision = revision
         let edit = PhotoEdit(photo: entry.photo, adjustment: entry.adjustment)

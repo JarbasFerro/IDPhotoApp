@@ -13,6 +13,7 @@ struct PhotoCheckView: View {
     /// nil follows the verdict: details open by themselves when something needs a look.
     @State private var showMeasured: Bool?
     @State private var showByEye = false
+    @State private var confirmEdit = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
     @State private var landed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -83,6 +84,12 @@ struct PhotoCheckView: View {
                 path.removeAll()
             }
         } message: { Text("The original in your photo library is kept.") }
+        .confirmationDialog("This photo is final", isPresented: $confirmEdit, titleVisibility: .visible) {
+            Button("Edit Photo") {
+                model.relock(photoID)
+                showAdjust = true
+            }
+        } message: { Text("Editing it locks it again. The changed photo will use another credit.") }
         .sheet(isPresented: $showAdjust) { AdjustSheet(model: model, photoID: photoID) }
         .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
@@ -147,8 +154,17 @@ struct PhotoCheckView: View {
         return VStack(alignment: .leading, spacing: Design.Spacing.group) {
             verdict(summary)
             if summary.headline != .checking {
+                // Said right under the verdict: an unlocked photo is final, and Adjust asks before changing it.
+                if entry.isUnlocked {
+                    Label("Unlocked. Printing and sharing this photo is free.", systemImage: "checkmark.seal")
+                        .font(Design.Typography.note).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityIdentifier("unlockedNote")
+                }
                 detailsCard(summary)
-                if let note = CheckPresentation.editingNote(for: entry, document: model.document) { editingNote(note) }
+                if !entry.isUnlocked, let note = CheckPresentation.editingNote(for: entry, document: model.document) {
+                    editingNote(note)
+                }
             }
         }
         .animation(.default, value: summary)
@@ -293,7 +309,10 @@ struct PhotoCheckView: View {
             .controlSize(.large)
             .disabled(model.activity != nil)
             .accessibilityIdentifier("continueFromCheck")
-            Button { showAdjust = true } label: {
+            Button {
+                // An unlocked photo is final (ADR-048 §5): warn before it is locked again.
+                if model.entries.first(where: { $0.id == photoID })?.isUnlocked == true { confirmEdit = true } else { showAdjust = true }
+            } label: {
                 Text("Adjust").frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)

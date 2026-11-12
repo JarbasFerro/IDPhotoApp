@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var showRequirements = false
     @State private var showDocuments = false
     @State private var showSettings = false
+    @State private var showCredits = false
     @State private var appIcon = AppIconController()
     @AppStorage(DocumentStore.promptShownKey) private var documentPromptShown = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
@@ -64,7 +65,8 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
         .sheet(isPresented: $showDocuments) { DocumentPickerView(model: model) }
-        .sheet(isPresented: $showSettings) { SettingsView(appIcon: appIcon) }
+        .sheet(isPresented: $showSettings) { SettingsView(appIcon: appIcon, credits: model.credits) }
+        .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
         .task {
             guard promptForDocument, !documentPromptShown else { return }
             documentPromptShown = true
@@ -213,22 +215,26 @@ struct HomeView: View {
         }
     }
 
-    /// Price and privacy in plain sight (ADR-048 §8), and the version (AGENTS.md §17).
+    /// Credits and privacy in plain sight (ADR-048 §8), and the version (AGENTS.md §17).
     private var footer: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing.tight) {
-            HStack(alignment: .lastTextBaseline) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Your first photo is free.")
-                    Text("Your photos stay on your iPhone.")
-                }
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Your photos stay on your iPhone.")
                 .font(Design.Typography.note)
                 .foregroundStyle(.secondary)
-                .accessibilityElement(children: .combine)
+            HStack(alignment: .center) {
+                Button { showCredits = true } label: {
+                    Text(CreditsPresentation.count(model.credits.balance))
+                        .font(Design.Typography.note.weight(.semibold))
+                        .frame(minHeight: Design.Size.minimumTarget)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityHint("Shows your credits and how to get more.")
+                .accessibilityIdentifier("creditsButton")
                 Spacer(minLength: Design.Spacing.control)
                 Text(developerMode ? "\(AppVersion.display) · developer details on" : AppVersion.display)
                     .font(Design.Typography.noteDigits)
                     .foregroundStyle(.tertiary)
-                    .frame(minHeight: Design.Size.minimumTarget, alignment: .bottom)
+                    .frame(minHeight: Design.Size.minimumTarget)
                     .contentShape(Rectangle())
                     .accessibilityLabel(Text("Version \(AppVersion.display)"))
                     .accessibilityIdentifier("appVersion")
@@ -247,8 +253,10 @@ struct HomeView: View {
 /// Settings & About (S-19): durable things that are not part of making a photo.
 struct SettingsView: View {
     let appIcon: AppIconController
+    let credits: CreditStore
     @Environment(\.dismiss) private var dismiss
     @State private var showAppIcons = false
+    @State private var showCredits = false
     @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = Design.Size.settingsIcon
 
     var body: some View {
@@ -277,6 +285,21 @@ struct SettingsView: View {
                         .accessibilityIdentifier("appIconRow")
                     }
                 }
+                Section {
+                    Button { showCredits = true } label: {
+                        HStack {
+                            Text("Credits").foregroundStyle(.primary)
+                            Spacer()
+                            Text(CreditsPresentation.count(credits.balance)).foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityIdentifier("settingsCredits")
+                }
                 Section("Privacy") {
                     Text("Calipic works on your iPhone. No account, no ads, and nothing is uploaded.")
                 }
@@ -289,6 +312,7 @@ struct SettingsView: View {
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
         .sheet(isPresented: $showAppIcons) { AppIconPickerView(controller: appIcon) }
+        .sheet(isPresented: $showCredits) { CreditsView(credits: credits) }
     }
 }
 

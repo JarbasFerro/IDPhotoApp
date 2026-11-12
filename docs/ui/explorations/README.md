@@ -52,4 +52,4 @@ Problems addressed, from [26](../../26-ux-design-challenge.md):
 
 5a, 5b, and 5c are three states of one design; 5d is the alternative to it. 4c follows either 4a or 4b.
 
-**Decision:** pending founder choice.
+**Decision (founder, 2026-11-12):** Your sheet **3b**, Print **4a**, unlock **5d**. With it, the price display changed: the app shows **credits**, not money. A person starts with 1 credit; packs are 1 for USD 0.99, 5 for USD 3.99, and 10 for USD 6.99 ([ADR-048 amendment](../../10-decisions.md)). Built in spike 0.16.0; the contract is in [16 §10 and §11](../../16-screen-experience-spec.md). 4c (*Check your print*) is not built yet (L19-003).

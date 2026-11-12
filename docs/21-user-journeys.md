@@ -56,7 +56,7 @@ Rules derived from the curve:
 | 8 | Photo Check | Presses and holds the portrait. | Shows the original while held (W4). | Proof of the improvement; trust. | — |
 | 9 | Choose result S-12 | Taps **Print Sheet**. | Edits are kept for either path. Nothing has been charged; everything so far is saved as a draft (ADR-049). | Relaxed. | — |
 | 10 | Your sheet S-14 | Leaves 4 × 6 selected; raises copies to 8. | Photos glide into new positions as copies change (W5). Shows "12 of 12 copies placed". | Playful, satisfying. | Copies don't fit: offers larger paper, fewer copies, or another page. |
-| 10a | Unlock confirmation S-18 **New** | Taps **Continue** on Your sheet. | Point of no return (ADR-048): her photo, any open checks, *Free photo* (or *1 credit*, or *USD 0.99*), and *After this, the photo's framing and edits are final. Printing or sharing it again is free.* **Unlock and continue** / **Keep editing**. | Fair; no surprise. | Purchase cancelled or pending: back to the sheet, draft locked and intact, nothing charged. File generation fails: the credit is released. |
+| 10a | Unlock card on Print (S-18, design 5d; spike 0.16) | Taps **Continue** on Your sheet. | Point of no return (ADR-048, amended): the Print screen shows *1 photo · 1 credit*, *Includes the digital photo and any number of prints. After this, framing and edits are final.*, and *You have 1 credit.* **Unlock and Print** / **Keep Editing**. With no credits: **Get Credits** opens the packs. | Fair; no surprise. | Purchase cancelled or pending: back to Print, draft locked and intact, nothing charged. File generation fails: the credit is released. |
 | 11 | Print & Share S-15 | Taps Print. | Prepares and verifies files: *Your files are ready* (W6). AirPrint prefers bordered paper. One line: load the chosen paper and avoid any "fit" or "borderless" option. Not every print dialog shows a scaling control, so the copy names what to avoid rather than a switch that may not exist. Sending to the printer is a separate state from a correct print. | Confident. | Export fails: *Files not ready* + Try Again. Printer not found: share PDF or JPEG instead. |
 | 12 | Print check S-16 **New** | Measures the bar with a ruler (or holds the print to the camera, post-launch). Answers *Yes, 50 mm*. | Confirms: *Your photos are the right size* with a quiet tick (W7). | **"It actually came out right."** End peak. | *No*: asks the measured value, explains the cause (Fit to Page, borderless, wrong paper), and offers a reprint with the fixed settings. |
 | 13 | Cutting guide S-17 **New** | Follows three steps: cut along the tick marks, rows first, then columns. | Shows the cut order on her actual sheet layout. | Finished the real job (W8). | — |
@@ -70,7 +70,7 @@ Rules derived from the curve:
 2. Each person is captured in turn. After each Photo Check, **Add another person** (from Your sheet or Choose result) keeps the earlier people and their edits.
 3. Your sheet shows a circle per person. Each person can have their own sizes (for example 26 × 32 for DNI and 35 × 45 for a passport) and copy counts. The layout solver mixes them on one page.
 4. One print, one cutting session. **Moment:** watching four faces arrange themselves on one sheet (W5) is the family "wow", and no mainstream iOS competitor does it clearly ([14 §5.3](14-priority-feature-plan.md)).
-5. Pricing: one credit per person (ADR-048). Building the sheet is free. Before any file is made, the unlock confirmation lists everyone still locked and the total (for example 4 × USD 0.99, or 3 × when the free photo is unused).
+5. Pricing: one credit per person (ADR-048). Building the sheet is free. Before any file is made, the unlock card on Print shows how many photos are still locked and the cost in credits (for example *4 photos · 4 credits*). A family with the starting credit buys the pack of five once.
 
 ### J3 — Baby or child, with a helper (Marcos holds the phone)
 
@@ -120,7 +120,7 @@ The school asks for three new photos of each child every year, at a size it choo
 2. Preflight and camera as in J1 and J3. With **Someone helping**, the parent takes each child's photo.
 3. Photo Check runs only photographic checks (sharp, eyes open, good light, enough detail for the size). Headline: *Looks good for printing*. Never *Ready* for a document, and no rule sources.
 4. Adjust offers Closer or Wider framing, and Original, White, or Light grey background.
-5. Your sheet: each child gets 3 copies; the layout fits all of them on one sheet. The unlock confirmation shows one credit per child (ADR-048).
+5. Your sheet: each child gets 3 copies; the layout fits all of them on one sheet. The unlock card on Print shows one credit per child (ADR-048).
 6. Print, measure the bar, cut. Next year: Continue shows nothing older than 30 days without use, but the custom size is remembered.
 
 ### J8 — VoiceOver and Voice Control (Daniel), post-launch

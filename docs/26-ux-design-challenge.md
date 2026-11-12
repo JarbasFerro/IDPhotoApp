@@ -1,6 +1,6 @@
 # 26 — UX and design challenge
 
-**Status:** Critique and proposals. The founder approved building the first group on 2026-11-11; §4 shows what is done.
+**Status:** Critique and proposals. The founder approved building the first group on 2026-11-11 and chose design round 2 on 2026-11-12; §4 shows what is done.
 **Date:** 2026-11-11
 **Evidence:** screenshots of spike 0.14.0 from the UI test run (every main screen), the UX-bearing docs (04, 15–19, 21, 22, brand 02, 07, 11, 12), and the code.
 **Chosen in round 1:** Home 1b and Photo Check 2a ([explorations](ui/explorations/README.md)).
@@ -71,7 +71,15 @@ Impact is on the four pillars in [20 §2](20-product-blueprint.md). Effort: S = 
 - **12** The wording ladder.
 - Doc change 1 (§5), for Home, Photo Check, Choose document, Custom size, and Settings.
 
-The work also found and fixed two bugs:
+**Done in spike 0.16.0** (design round 2: 3b, 4a, 5d):
+
+- **3** The ending, in part: Share became **Print**, with *Before you print* as the content of the screen, **Print at a Shop**, and **More Formats**. The print check and the *Finished* moment are still to build.
+- **5** No allow-listed Share strings remain; format names are gone from the fast path.
+- **7** The price is visible as a **credits** balance on Home and in Settings; unlocking happens in place on Print and Digital Photo (ADR-048 amendment). The line "Your first photo is free." was replaced by the balance.
+- **A9**, in part: people on Your sheet are face circles with copy counts.
+- Doc 16 §10 and §11 rewritten for Your sheet, Print, Digital Photo, and Credits.
+
+The 0.15.0 work also found and fixed two bugs:
 
 - the document's by-eye checks showed raw keys instead of words;
 - Share stated "520 × 640 pixels" for every document.

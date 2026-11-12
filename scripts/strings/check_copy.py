@@ -22,13 +22,6 @@ ALLOWED = {
     "This photo could not be opened. Choose a JPEG, HEIC, or PNG image.": "error recovery",
     # A digital-only document has no physical size; its pixel size is the fact people look for.
     "%lld × %lld px": "size of a digital-only document",
-    # Share screen, to be redesigned as Print in design round 2 (docs/26 A7). Remove these then.
-    "AirPrint uses the nearest paper your printer offers; share the PDF or JPEG for other sizes.": "pending Print redesign",
-    "Page JPEG": "pending Print redesign",
-    "Share JPEG": "pending Print redesign",
-    "Share JPEG, photo %lld": "pending Print redesign",
-    "Share PDF": "pending Print redesign",
-    "Share print sheet as JPEG": "pending Print redesign",
 }
 
 

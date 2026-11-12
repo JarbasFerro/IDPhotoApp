@@ -7,7 +7,7 @@ import Testing
 struct PhotoWorkflowTests {
     @Test func lateImportCannotOverwriteReplacement() async throws {
         let pipeline = DelayedPipeline()
-        let model = PhotoWorkflow(pipeline: pipeline)
+        let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         let first = try await fixture()
         let second = try await fixture()
         model.importPhoto { StagedPhoto(directory: URL(fileURLWithPath: "/unused-first")) }
@@ -24,8 +24,9 @@ struct PhotoWorkflowTests {
 
     @Test func cancelledExportCannotPresentAFileAndIsDiscarded() async throws {
         let pipeline = DelayedPipeline()
-        let model = PhotoWorkflow(pipeline: pipeline)
+        let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         model.install(try await fixture(), mode: .add)
+        #expect(model.unlockAll())
         model.prepareExport()
         await pipeline.waitForExport()
         model.cancel()
@@ -39,10 +40,11 @@ struct PhotoWorkflowTests {
 
     @Test func digitalExportUsesOnlyTheSelectedPhotoAndDiscardsLateResult() async throws {
         let pipeline = DelayedPipeline()
-        let model = PhotoWorkflow(pipeline: pipeline)
+        let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         let first = try await fixture(), second = try await fixture()
         model.install(first, mode: .add)
         model.install(second, mode: .add)
+        #expect(model.unlock([second.id]))
         model.prepareDigitalExport(for: second.id)
         await pipeline.waitForDigitalExport()
         #expect(await pipeline.digitalExportedIDs == [second.id])
@@ -55,7 +57,7 @@ struct PhotoWorkflowTests {
 
     @Test func addingASecondPersonKeepsTheFirstAndGivesEachTheirOwnCopies() async throws {
         let pipeline = DelayedPipeline()
-        let model = PhotoWorkflow(pipeline: pipeline)
+        let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         let first = try await fixture(), second = try await fixture()
         model.install(first, mode: .add)
         model.adjustment.zoom = 2
@@ -69,6 +71,7 @@ struct PhotoWorkflowTests {
         model.selectedID = first.id
         #expect(model.adjustment.zoom == 2)
         // Export hands over every person, in session order.
+        #expect(model.unlockAll())
         model.prepareExport()
         await pipeline.waitForExport()
         #expect(await pipeline.exportedEdits == [[first.id, second.id]])
@@ -77,7 +80,7 @@ struct PhotoWorkflowTests {
 
     @Test func removingTheSelectedPersonDropsTheirCopiesAndSelectsTheNeighbour() async throws {
         let pipeline = DelayedPipeline()
-        let model = PhotoWorkflow(pipeline: pipeline)
+        let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         let first = try await fixture(), second = try await fixture(), third = try await fixture()
         for photo in [first, second, third] { model.install(photo, mode: .add) }
         model.addPrintItem(format: .europe35x45, photoID: second.id)
@@ -96,7 +99,7 @@ struct PhotoWorkflowTests {
 
     @Test func replacingAPersonKeepsTheirSizesAndCopies() async throws {
         let pipeline = DelayedPipeline()
-        let model = PhotoWorkflow(pipeline: pipeline)
+        let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         let first = try await fixture(), replacement = try await fixture()
         model.install(first, mode: .add)
         model.addPrintItem(format: .europe35x45)

@@ -19,6 +19,32 @@ final class IDPhotoSpikeUITests: XCTestCase {
         }
     }
 
+    /// Waits until a button that is disabled while files are being made accepts taps again.
+    @MainActor
+    private func waitUntilEnabled(_ element: XCUIElement, timeout: TimeInterval = 20) {
+        let enabled = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true AND isEnabled == true"), object: element)
+        XCTAssertEqual(XCTWaiter().wait(for: [enabled], timeout: timeout), .completed, "\(element) never became enabled")
+    }
+
+    @MainActor
+    private func attach(_ app: XCUIApplication, _ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    /// The same screen in light and in dark; the appearance change is asynchronous.
+    @MainActor
+    private func attachBothAppearances(_ app: XCUIApplication, _ name: String) {
+        attach(app, name)
+        XCUIDevice.shared.appearance = .dark
+        Thread.sleep(forTimeInterval: 1.5)
+        attach(app, name + ", dark")
+        XCUIDevice.shared.appearance = .light
+        Thread.sleep(forTimeInterval: 1.0)
+    }
+
     /// Identifier lookup independent of the element type SwiftUI chose for the container.
     @MainActor
     private func any(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
@@ -338,19 +364,32 @@ final class IDPhotoSpikeUITests: XCTestCase {
         app.buttons["printChoice"].tap()
         XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
-        let sheetScreenshot = XCTAttachment(screenshot: app.screenshot())
-        sheetScreenshot.name = "Print sheet"
-        sheetScreenshot.lifetime = .keepAlways
-        add(sheetScreenshot)
+        XCTAssertTrue(app.steppers["copiesStepper"].exists)
+        attachBothAppearances(app, "Your sheet")
         app.buttons["continueToShare"].tap()
-        // Share: files prepared on arrival.
+        // Print: nothing can leave the app until the photo is unlocked with a credit (ADR-048, ADR-049).
+        XCTAssertTrue(any(app, "unlockCard").waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["creditBalanceLine"].label.contains("1"))
+        XCTAssertFalse(app.buttons["printAtHome"].exists)
+        XCTAssertFalse(app.buttons["moreFormats"].exists)
+        XCTAssertFalse(app.buttons["shareDone"].exists)
+        attachBothAppearances(app, "Print, locked")
+        app.buttons["unlockAndPrint"].tap()
+        // Unlocked: print at home or at a shop; other files under More formats.
+        XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
+        waitUntilEnabled(app.buttons["moreFormats"])
+        attachBothAppearances(app, "Print")
+        app.buttons["moreFormats"].tap()
         XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))
         XCTAssertTrue(app.buttons["sharePDF"].exists)
-        let shareScreenshot = XCTAttachment(screenshot: app.screenshot())
-        shareScreenshot.name = "Share"
-        shareScreenshot.lifetime = .keepAlways
-        add(shareScreenshot)
-        reveal(app.buttons["shareDone"], in: app)
+        attach(app, "More formats")
+        app.buttons["formatsDone"].tap()
+        XCTAssertTrue(app.buttons["formatsDone"].waitForNonExistence(timeout: 5))
+        app.buttons["printAtShop"].tap()
+        XCTAssertTrue(app.buttons["sharePages"].waitForExistence(timeout: 10))
+        attach(app, "Print at a shop")
+        app.buttons["shopDone"].tap()
+        XCTAssertTrue(app.buttons["shopDone"].waitForNonExistence(timeout: 5))
         app.buttons["shareDone"].tap()
         // Back home with the session kept.
         XCTAssertTrue(app.buttons["yourSheet"].waitForExistence(timeout: 5))
@@ -374,6 +413,11 @@ final class IDPhotoSpikeUITests: XCTestCase {
         add(choiceScreenshot)
         app.buttons["digitalChoice"].tap()
         XCTAssertFalse(app.buttons["continueToShare"].exists)
+        // Locked: no file exists yet. One credit unlocks it in place.
+        XCTAssertTrue(app.buttons["unlockDigital"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["shareDigitalJPEG"].exists)
+        attach(app, "Digital photo, locked")
+        app.buttons["unlockDigital"].tap()
         XCTAssertTrue(app.buttons["shareDigitalJPEG"].waitForExistence(timeout: 20))
         XCTAssertFalse(app.buttons["sharePDF"].exists)
         let screenshot = XCTAttachment(screenshot: app.screenshot())
@@ -413,19 +457,27 @@ final class IDPhotoSpikeUITests: XCTestCase {
         let summary = app.staticTexts["layoutSummary"]
         XCTAssertTrue(summary.waitForExistence(timeout: 5))
         let before = summary.label
+        // Copies change on the sheet itself.
+        app.steppers["copiesStepper"].buttons.element(boundBy: 1).tap()
+        XCTAssertNotEqual(summary.label, before)
+        let afterCopies = summary.label
+        // A different paper is one tap away.
+        app.buttons["paper-a4"].tap()
+        XCTAssertTrue(app.buttons["paper-a4"].isSelected)
+        // Extra sizes live in the options sheet.
+        app.buttons["moreOptions"].tap()
         let addSize = app.buttons["addSize-1"]
-        reveal(addSize, in: app)
+        XCTAssertTrue(addSize.waitForExistence(timeout: 5))
+        attach(app, "Sheet options")
         addSize.tap()
         // The size list is a confirmation dialog; its buttons surface by label.
         let option = app.buttons.matching(NSPredicate(format: "label CONTAINS '45'")).firstMatch
         XCTAssertTrue(option.waitForExistence(timeout: 5))
         option.tap()
-        XCTAssertTrue(app.staticTexts["layoutSummary"].waitForExistence(timeout: 5))
-        XCTAssertNotEqual(app.staticTexts["layoutSummary"].label, before)
-        let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "Your sheet"
-        screenshot.lifetime = .keepAlways
-        add(screenshot)
+        app.buttons["optionsDone"].tap()
+        XCTAssertTrue(app.buttons["optionsDone"].waitForNonExistence(timeout: 5))
+        XCTAssertNotEqual(summary.label, afterCopies)
+        attach(app, "Your sheet, two sizes on A4")
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
     }
 
@@ -440,23 +492,87 @@ final class IDPhotoSpikeUITests: XCTestCase {
         reveal(app.buttons["continueFromCheck"], in: app)
         app.buttons["continueFromCheck"].tap()
         app.buttons["printChoice"].tap()
-        XCTAssertTrue(app.buttons["person-1"].waitForExistence(timeout: 10))
-        reveal(app.buttons["person-2"], in: app)
-        XCTAssertTrue(app.buttons["person-2"].exists)
-        let composer = XCTAttachment(screenshot: app.screenshot())
-        composer.name = "Your sheet, two people"
-        composer.lifetime = .keepAlways
-        add(composer)
+        XCTAssertTrue(app.buttons["personCircle-1"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["personCircle-2"].exists)
+        // Selecting a person moves the tray to them.
+        app.buttons["personCircle-2"].tap()
+        XCTAssertTrue(app.buttons["person-2"].waitForExistence(timeout: 5))
+        attachBothAppearances(app, "Your sheet, two people")
         app.buttons["continueToShare"].tap()
+        // Two people need two credits; a new person starts with one.
+        XCTAssertTrue(app.buttons["getCredits"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["unlockAndPrint"].exists)
+        attach(app, "Print, not enough credits")
+        app.buttons["getCredits"].tap()
+        XCTAssertTrue(app.buttons["pack-5"].waitForExistence(timeout: 5))
+        attachBothAppearances(app, "Credits")
+        app.buttons["pack-5"].tap()
+        XCTAssertTrue(app.staticTexts["creditBalance"].label.contains("6"))
+        app.buttons["creditsDone"].tap()
+        XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 5))
+        app.buttons["unlockAndPrint"].tap()
+        waitUntilEnabled(app.buttons["moreFormats"])
+        app.buttons["moreFormats"].tap()
         XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))
-        reveal(app.buttons["shareAllJPEGs"], in: app)
         XCTAssertTrue(app.buttons["shareJPEG-2"].exists)
         XCTAssertTrue(app.buttons["shareAllJPEGs"].exists)
-        reveal(app.buttons["shareDone"], in: app)
+        app.buttons["formatsDone"].tap()
+        XCTAssertTrue(app.buttons["formatsDone"].waitForNonExistence(timeout: 5))
         app.buttons["shareDone"].tap()
         // Home shows both faces in the session card.
         XCTAssertTrue(app.buttons["yourSheet"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.images["face-2"].exists || app.buttons["yourSheet"].label.contains("2"))
+        XCTAssertTrue(app.buttons["creditsButton"].label.contains("4"), app.buttons["creditsButton"].label)
+    }
+
+    /// An unlocked photo is final: editing it asks first, and going ahead locks it again (ADR-048).
+    @MainActor
+    func testEditingAnUnlockedPhotoAsksFirst() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
+        app.launch()
+        XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        reveal(app.buttons["continueFromCheck"], in: app)
+        app.buttons["continueFromCheck"].tap()
+        app.buttons["printChoice"].tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
+        app.buttons["continueToShare"].tap()
+        XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
+        app.buttons["unlockAndPrint"].tap()
+        waitUntilEnabled(app.buttons["moreFormats"])
+        // Back to the sheet, then to the photo.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["person-1"].waitForExistence(timeout: 5))
+        app.buttons["person-1"].tap()
+        XCTAssertTrue(any(app, "unlockedNote").waitForExistence(timeout: 10))
+        attach(app, "Photo Check, unlocked")
+        reveal(app.buttons["adjust"], in: app)
+        app.buttons["adjust"].tap()
+        let edit = app.buttons["Edit Photo"]
+        XCTAssertTrue(edit.waitForExistence(timeout: 5))
+        attach(app, "This photo is final")
+        edit.tap()
+        XCTAssertTrue(any(app, "unlockedNote").waitForNonExistence(timeout: 5))
+    }
+
+    @MainActor
+    func testCreditsFromHome() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--uitesting-fresh")
+        app.launch()
+        let credits = app.buttons["creditsButton"]
+        XCTAssertTrue(credits.waitForExistence(timeout: 10))
+        XCTAssertTrue(credits.label.contains("1"), credits.label)
+        credits.tap()
+        XCTAssertTrue(app.staticTexts["creditBalance"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["pack-1"].exists)
+        XCTAssertTrue(app.buttons["pack-10"].exists)
+        app.buttons["pack-10"].tap()
+        XCTAssertTrue(app.staticTexts["creditBalance"].label.contains("11"))
+        try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
+        app.buttons["creditsDone"].tap()
+        XCTAssertTrue(credits.label.contains("11"), credits.label)
     }
 
     @MainActor
@@ -477,14 +593,17 @@ final class IDPhotoSpikeUITests: XCTestCase {
         XCTAssertTrue(app.buttons["printChoice"].waitForExistence(timeout: 5))
         app.buttons["printChoice"].tap()
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
+        attach(app, "Your sheet at accessibility text size")
+        reveal(app.buttons["continueToShare"], in: app, attempts: 10)
         XCTAssertTrue(app.buttons["continueToShare"].isHittable)
         app.buttons["continueToShare"].tap()
-        XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))
-        reveal(app.buttons["shareJPEG"], in: app, attempts: 10)
-        XCTAssertTrue(app.buttons["shareJPEG"].isHittable)
-        let shareScreenshot = XCTAttachment(screenshot: app.screenshot())
-        shareScreenshot.name = "Share at accessibility text size"
-        shareScreenshot.lifetime = .keepAlways
-        add(shareScreenshot)
+        XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 20))
+        reveal(app.buttons["unlockAndPrint"], in: app, attempts: 10)
+        XCTAssertTrue(app.buttons["unlockAndPrint"].isHittable)
+        attach(app, "Print at accessibility text size")
+        app.buttons["unlockAndPrint"].tap()
+        XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
+        reveal(app.buttons["printAtHome"], in: app, attempts: 10)
+        XCTAssertTrue(app.buttons["printAtHome"].isHittable)
     }
 }

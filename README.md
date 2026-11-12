@@ -23,7 +23,7 @@ External reviews of 2026-11-11, kept as records: [ChatGPT](docs/20-product-outco
 **Founder decisions (2026-11-11):**
 
 - **Worldwide launch:** the most-used photo documents of the most relevant App Store countries, in tiers (ADR-047).
-- **Pricing:** first photo free, then USD 0.99 per photo, with free editing until an explicit point of no return (ADR-048).
+- **Pricing:** one free credit, then one credit per photo, sold in packs of 1, 5, and 10 (USD 0.99, 3.99, 6.99); free editing until an explicit point of no return (ADR-048, amended 2026-11-12).
 - **Drafts:** saved free of charge; a locked draft can never leave the app (ADR-049).
 - **Accessibility:** a native baseline for 1.0 (ADR-050).
 - **Children:** use the same flow as adults (ADR-017).
@@ -81,7 +81,7 @@ The app should make the complete ID-photo workflow fast and understandable:
 7. Let the user make manual corrections without losing the original.
 8. Export a digital file and/or a print-ready sheet using native share, save, and print experiences.
 
-The product is useful without advertising interruptions. The first photo is free; each further photo costs one USD 0.99 credit, spent only after an explicit confirmation (ADR-048). Pricing never compromises the core workflow, privacy, or output quality.
+The product is useful without advertising interruptions. The first photo is free; each further photo costs one credit, bought in packs of 1, 5, or 10, and spent only when the person unlocks the photo on the Print or Digital Photo screen (ADR-048). Pricing never compromises the core workflow, privacy, or output quality.
 
 ## Guiding principles
 

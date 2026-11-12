@@ -74,6 +74,8 @@ struct DigitalShareView: View {
     let photoID: UUID
     @Binding var path: [Route]
 
+    @State private var showCredits = false
+
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
     private var result: DigitalExport? {
         guard model.digitalExport?.photoID == photoID else { return nil }
@@ -107,6 +109,27 @@ struct DigitalShareView: View {
                         .buttonStyle(.bordered)
                         .controlSize(.large)
                         .accessibilityIdentifier("digitalDone")
+                } else if let entry, !entry.isUnlocked {
+                    // Nothing is made for a locked photo: unlock in place, with the cost in credits (design 5d).
+                    PortraitView(entry: entry, format: model.renderTarget.format, label: "Prepared photo")
+                        .frame(maxWidth: 200)
+                    UnlockCard(photos: 1, balance: model.credits.balance)
+                    if model.credits.canAfford(1) {
+                        Button {
+                            if model.unlock([photoID]) { model.prepareDigitalExport(for: photoID) }
+                        } label: { Text("Unlock and Save").frame(maxWidth: .infinity) }
+                        .brandProminentButtonStyle()
+                        .controlSize(.large)
+                        .accessibilityIdentifier("unlockDigital")
+                    } else {
+                        Button { showCredits = true } label: { Text("Get Credits").frame(maxWidth: .infinity) }
+                            .brandProminentButtonStyle()
+                            .controlSize(.large)
+                            .accessibilityIdentifier("getCredits")
+                    }
+                    Button("Keep Editing") { path.removeLast() }
+                        .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
+                        .accessibilityIdentifier("keepEditing")
                 } else if model.activity == .exporting {
                     ProgressView("Preparing your photo…")
                         .frame(maxWidth: .infinity, minHeight: 240)
@@ -126,6 +149,7 @@ struct DigitalShareView: View {
         .background(Design.Surface.screen)
         .navigationTitle("Digital Photo")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
         .task { if result == nil, model.activity == nil { model.prepareDigitalExport(for: photoID) } }
         .onDisappear { model.finishExport() }
         .sensoryFeedback(.success, trigger: result?.id)

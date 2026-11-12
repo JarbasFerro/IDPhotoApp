@@ -1,8 +1,8 @@
 # 16 — Calipic screen experience specification
 
-**Status:** Active screen contract for the iPhone spike. Home, Photo Check, Choose document, Custom size, and Settings match spike 0.15.0 (2026-11-11). Sections 4–7 and 9–13 were last reviewed on 2026-09-28 and still describe the Spain-only flow in places; they are refreshed as each screen is redesigned ([26](26-ux-design-challenge.md)).
+**Status:** Active screen contract for the iPhone spike. Home, Photo Check, Choose document, Custom size, Settings, Your sheet, Print, Digital Photo, and Credits match spike 0.16.0 (2026-11-12). Sections 4–7, 9, 12, and 13, and the inventory in §17, were last reviewed on 2026-09-28 and still describe the Spain-only flow in places; they are refreshed as each screen is redesigned ([26](26-ux-design-challenge.md)).
 **Scope:** Every screen of the flow for the chosen document, including system presentations and exceptional states
-**Reviewed against:** SwiftUI source in `Spikes/IDPhotoSpike/App`, ADR-043 to ADR-051, the brand documents, and [design round 1](ui/explorations/README.md)
+**Reviewed against:** SwiftUI source in `Spikes/IDPhotoSpike/App`, ADR-043 to ADR-051, the brand documents, and [design rounds 1 and 2](ui/explorations/README.md)
 
 ## 1. How to use this document
 
@@ -29,7 +29,9 @@ There is no profile picker, general Settings, or background-refinement screen in
 | Camera tutorial | Mandatory two-page introduction on first use | Camera opens after preflight; optional short tip and persistent Instructions help. Implemented. |
 | Photo Check next step | Add to sheet | Continue to two-choice output screen. Implemented. |
 | Digital result | Requires the sheet and a combined export | Direct verified JPEG for the checked person, with no PDF or page generation. Implemented. |
-| Print result | Combined print and JPEG cards | Sheet remains first for print; print and page-share actions remain in Share. Implemented; print hierarchy needs device review. |
+| Print result | Combined print and JPEG cards on a Share screen | **Print** screen with the instructions as content and the unlock in place (designs 4a, 5d). Implemented in 0.16.0; the print check is still to build. |
+| Your sheet | A settings list under a small preview | The paper as hero with one tray (design 3b). Implemented in 0.16.0. |
+| Price | Not shown | Credits balance on Home and in Settings; money only on the Credits screen (ADR-048 amendment). Implemented in 0.16.0 without StoreKit. |
 | Adjust | Native controls below the portrait; gesture alternatives hidden in Details | Native scrolling sheet with labeled Move and Zoom buttons and Details. Implemented; visual spacing under review. |
 | Error copy and states | Several generic alerts and dead ends | Recoverable inline/result states and import retry. Partly implemented; see §14. |
 | Visual evidence | Older brand screenshots and selected UI-test attachments | New synthetic-fixture captures for each main screen, plus compact/large text and Light/Dark review. In progress. |
@@ -91,11 +93,11 @@ All interactive targets are at least 44 × 44 pt. VoiceOver reads title → main
 5. If a session exists, the **Your sheet** card: up to four overlapping face thumbnails, people and copy count, paper name, chevron. It opens Your Sheet.
 6. One grouped card with two rows: the **document** (name, then size and background as secondary text; opens Choose document, §3.1) and **Photo requirements** (opens §4).
 7. Bottom action area on the screen background: full-width primary **Take Photo**; plain **Choose from Library** under it; then the footer. At accessibility text sizes the actions move into the scrolling content.
-8. Footer: **"Your first photo is free."** and **"Your photos stay on your iPhone."** at the leading edge; `marketing version (build)` at the trailing edge, tertiary, monospaced digits (AGENTS.md §17). A long press on the version toggles developer details.
+8. Footer: **"Your photos stay on your iPhone."** at the leading edge; then the **credits button** (the balance, for example "1 credit"; opens Credits, §11.4) and `marketing version (build)` at the trailing edge, tertiary, monospaced digits (AGENTS.md §17). A long press on the version toggles developer details. No money amount appears on Home (ADR-048 amendment).
 
 **First launch:** the document is the person's saved choice; otherwise the default for the iPhone's region from the catalog's `regionDefaults`; otherwise Spain DNI with the **Choose document** sheet presented once (`DocumentStore`).
 
-**Empty/session states:** With no photos, Home shows no "Your sheet" card. After returning from Share, the session remains available. Import cancellation restores the previous state; an import failure shows a specific, recoverable message and leaves the session intact. An old failed import never replaces a newer selection.
+**Empty/session states:** With no photos, Home shows no "Your sheet" card. After returning from Print, the session remains available. Import cancellation restores the previous state; an import failure shows a specific, recoverable message and leaves the session intact. An old failed import never replaces a newer selection.
 
 ### 3.1 Choose document and Custom size
 
@@ -107,7 +109,7 @@ Changing the document re-frames every photo already in the session and moves def
 
 ### 3.2 Settings
 
-**Source:** `SettingsView` in `Features/HomeView.swift`. A sheet with **App Icon** (current icon and name; opens §12), **Privacy** (one sentence), and **About** (version). Credits, restore, help, and *Delete all drafts* join it later (S-19).
+**Source:** `SettingsView` in `Features/HomeView.swift`. A sheet with **Credits** (the balance; opens Credits, §11.4), **App Icon** (current icon and name; opens §12), **Privacy** (one sentence), and **About** (version). Restore, help, and *Delete all drafts* join it later (S-19).
 
 ## 4. Screen 2 — Photo requirements sheet
 
@@ -193,6 +195,7 @@ Picker cancellation is a quiet return. A corrupt, unsupported, or too-small phot
    - **By eye:** **N things to check by eye**, with the first two as secondary text. It opens to the document's own checks from the catalog and one sentence: **The office that receives the photo decides whether to accept it.** Hidden for custom sizes.
 6. **Honest editing note**, only when the document's official rules ask for an unedited photo and Calipic changed something: **"This document's rules ask for an unedited photo. Calipic replaced the background and evened the light."** (or the part that applies) with **Use Original Photo**, which restores the original background and light in one tap (ADR-051).
 7. Bottom action area on the screen background: full-width primary **Continue**, then full-width **Adjust**. At accessibility text sizes they move into the scrolling content.
+8. **Unlocked photos:** once a credit has unlocked the photo, the line **"Unlocked. Printing and sharing this photo is free."** appears under the verdict and the editing note is hidden. **Adjust** then asks first: **This photo is final** / *Editing it locks it again. The changed photo will use another credit.* with **Edit Photo** and **Cancel**. Going ahead relocks the photo and opens Adjust; nothing is charged until the photo is output again (ADR-048 amendment §5).
 
 **Wording ladder (docs/26 D8):** only facts may say a thing is done ("Framed to the official size"). Measurements that are not calibrated say **looks fine**. What only a person can judge is listed as **to check by eye**. Nothing on this screen says "passed" or "approved".
 
@@ -220,45 +223,87 @@ Avoid a permanent floating glass control cluster over the face. If one is explor
 
 ## 10. Screen 7 — Your Sheet
 
-**Purpose:** Arrange one or more prepared portraits on real paper. **Current source:** `Features/SheetView.swift`.
+**Purpose:** Arrange one or more prepared portraits on real paper. **Current source:** `Features/SheetView.swift`. **Design:** 3b, spike 0.16.0.
 
-Use a native `List` with inline title **Your sheet**. The first section is a live sheet preview in a quiet white page shape with true paper aspect ratio, subtle edge and shadow. Multiple pages are horizontally scrollable; each has **Page N of M** beneath it. The accessible page element states page count and number of placed photos. Beneath preview, show paper name, localized page count, and “placed of requested copies.” If copies cannot fit, show a warning with count and the concrete choices **choose larger paper**, **reduce copies**, or **allow more pages** if available. A genuinely empty layout shows **Nothing to print** with a recovery action.
+### Layout
 
-Each person has a section header with small rectangular portrait, **Your photo** or **Photo N**, and a **Check** button opening that person's Photo Check. Within the section, every print size is a native Stepper row: localized physical dimensions on the left, copy count on the right. Swipe removal is destructive and labeled **Remove**; also provide an accessible non-swipe removal action. **Add another size** opens a confirmation dialog of supported dimension presets. Additional sizes must be clearly identified as sizes, not as alternate document compliance claims.
+1. Inline title **Your sheet** on the screen background.
+2. **The paper is the hero.** The page preview fills the space above the tray: a white page in the paper's true proportions, with a hairline edge and a soft shadow. It is white in Light and Dark, and its cut marks are always dark. Several pages scroll sideways, each with **Page N of M** under it. Under the pages, one summary line: **N copies · M pages**. An empty layout shows **Nothing to print** and *Add copies or choose a larger paper.*
+3. **The tray** sits at thumb height on the card surface with rounded top corners. Top to bottom:
+   - **Person line:** **Your photo** or **Photo N**, then that person's sizes and copies ("26 × 32 mm · 6 copies"). Trailing **Check** opens that person's Photo Check.
+   - **People and copies:** each person is a 52 pt face circle with a copy-count badge; the selected person has the accent ring. A dashed **+** circle is the **Add another person** menu (**Take Photo**, **Choose Photo**); at the limit it is disabled and says **Sheet is full**. Beside the circles, a native **Stepper** changes the selected person's copies (0–50).
+   - **Paper chips:** two photo papers and the region's office paper (10 × 15 cm, 13 × 18 cm, A4; or 4 × 6 in, 5 × 7 in, Letter), named in the region's units. The current paper is tinted and semibold. A different current paper appears as an extra chip. **More** opens Sheet options.
+   - A warning when copies do not fit: **N copies do not fit within M pages.**
+   - Full-width primary **Continue**, disabled only when there is no printable page or work is running.
+4. At accessibility text sizes the screen scrolls: a 260 pt preview, then the tray content.
 
-An **Add another person** menu offers **Take Photo** and **Choose Photo**. At the maximum, show the limit in the disabled row. Explain nearby that each person's photo keeps its own framing/background/light while sharing this sheet.
+Changing copies or paper rearranges the photos on the page with the restrained rearrange motion; Reduce Motion updates at once.
 
-**Paper** section: native **Paper size** picker with the supported presets, including the current 10 × 15 cm / 4 × 6 in label. Custom selection reveals labeled width and height numeric fields, **Apply custom size**, inline 50–500 mm validation, and the AirPrint nearest-paper explanation. Keep units visible in labels and speakable in VoiceOver. Keyboard should not cover Apply or the bottom Continue button.
+### Sheet options
 
-**Cutting options** disclosure is closed initially. Inside are native controls in this order: **Orientation** Automatic/Portrait/Landscape; **Safety margin around each photo**; **Corner cut marks**; **50 mm check bar**; **As many copies as possible**; **Order on the page** One size at a time/Mix sizes. The footer explains the safety margin and measurement bar. **Refine:** use short inline help for options whose effect is not visible at preview scale, and ensure default settings produce a correct, useful sheet without opening this section.
+A sheet titled **Sheet options** with **Done**. It holds what is not needed every time:
 
-A full-width native prominent **Continue** sits in a bottom safe-area bar. Disable it only when the sheet has no printable page or work is running, with the cause visible in the list. Copy/paper changes update the page preview with the established restrained rearrangement motion. Reduce Motion updates instantly.
+- **Per person:** one Stepper row per print size, **Remove** by swipe, and **Add another size**, which opens the **Add a size** dialog. Extra sizes are sizes, not other documents' compliance claims.
+- **Paper:** the **Paper size** picker with every preset and **Custom** (width and height in mm, **Apply custom size**, 50–500 mm validation, and *Your printer uses the nearest paper it offers. For other sizes, print at a shop.*).
+- **Cutting options**, closed at first: **Orientation**; **Safety margin around each photo**; **Corner cut marks**; **50 mm check bar**; **As many copies as possible**; **Order on the page**. The footer explains the safety margin and the check bar.
 
-## 11. Screen 8 — Choose result, Digital Photo, and print Share
+The defaults must give a correct, useful sheet without opening Sheet options.
 
-**Purpose:** Let the person choose a single digital JPEG or a physical print sheet from the same checked edit. **Current source:** `Features/OutputChoiceView.swift`, `PhotoWorkflow.swift`, `PhotoPipeline.swift`, `ShareView.swift`.
+## 11. Screen 8 — Choose result, Digital Photo, Print, and Credits
 
-### Choose result
+**Purpose:** Turn the checked photo into a digital photo or a print, and unlock it with a credit at that moment. **Current source:** `Features/OutputChoiceView.swift`, `PrintView.swift`, `CreditsView.swift`, `PhotoWorkflow.swift`, `Domain/Credits.swift`. **Designs:** 4a and 5d, spike 0.16.0.
 
-After **Continue** on Photo Check, push a scrollable screen with inline title **Choose result**. A small 26:32 prepared portrait sits beside **Choose your result** and one sentence explaining that framing and adjustments are saved for either path. The primary full-width choice is **Digital Photo**, photo symbol, **“One JPEG for online forms, ready to share.”** The secondary full-width choice is **Print Sheet**, printer symbol, **“Set paper and copies for one or more people.”** Both have chevrons and full-row targets. A footnote asks the person to check expression, eyes, and glasses and says the receiving office decides acceptance. Back returns to the same Photo Check and its edits.
+### 11.1 Choose result
 
-### Direct Digital Photo
+After **Continue** on Photo Check, a screen titled **Choose result** offers the document's outputs: **Digital Photo** and **Print Sheet**, each a full-width row with a symbol, one line of description, and a chevron. The document's main output comes first. Back returns to Photo Check with its edits. This screen is a candidate for removal ([26](26-ux-design-challenge.md), idea 4).
 
-Push a native scroll view with inline title **Digital Photo**. While the selected person's JPEG is rendering and being reopened for verification, show **Preparing your photo…** with a spinner. No print layout, PDF, or page JPEG is created. On success show a quiet check symbol, **Your digital photo is ready.**, the selected 26:32 portrait, the app's **JPEG · 520 × 640 pixels** preset, and the remaining manual-check sentence. The full-width primary **Share JPEG** uses the system ShareLink; **Done** returns Home with the session kept. System share cancellation keeps this screen ready. On failure show **Photo not ready**, the plain cause if available, and **Try Again**; keep the source and edit. Back returns to Choose result so the person can choose Print Sheet without reacquisition. The temporary JPEG stays alive while this result and its system share activity are active.
+### 11.2 Digital Photo
 
-### Print Share
+Inline title **Digital Photo**.
 
-**Purpose:** Deliver the prepared files using familiar system paths. **Current source:** `Features/ShareView.swift`, `PrintController.swift`.
+- **Locked:** the prepared portrait, the **unlock card** (§11.5) for one photo, then **Unlock and Save** and **Keep Editing**. With no credits, the primary button is **Get Credits**. No file exists while the photo is locked.
+- **Preparing:** **Preparing your photo…** with a spinner while the file is rendered and reopened for verification.
+- **Ready:** a check symbol, **Your digital photo is ready.**, the portrait, **Sized for online forms**, primary **Share Photo** (system share sheet), and **Done**, which returns Home with the session kept.
+- **Failure:** **Photo not ready**, the plain cause when known, and **Try Again**. The source and edits are kept.
 
-Use inline title **Share**. On entry, show a centered spinner and **“Preparing your files…”** while export and post-export verification run. Do not display a success seal until the files actually exist and checks have passed. On error, show **Files not ready**, one plain cause when known, and primary **Try Again**; keep the sheet settings and source photos intact.
+### 11.3 Print
 
-When ready, the top result group contains a 56 pt checkmark seal, **“Your files are ready.”**, and **“Print the sheet or share the photos.”** This is a quiet confirmation with one success haptic and optional non-repeating symbol motion. It must not imply official acceptance. Then:
+Inline title **Print**. The screen's job is a print that comes out at the right size, so the instructions are its content, not a footnote ([26](26-ux-design-challenge.md), A1 and A7).
 
-1. **Print sheet** card: small true-proportion page thumbnail, title, paper/copy/page summary, and a short instruction **“Print at Actual Size (100 %), not Fit to Page. Measure the 50 mm bar before cutting.”** Show **Print** as the primary card action where system printing is available. Beneath it, **Share PDF** and **Share JPEG** for whole pages as native ShareLinks. Do not label a page JPEG as an individual ID photo. If a check bar is off, adapt the instruction so it does not tell people to measure an absent bar.
-2. **Digital photo(s)** card: the combined print export also contains one JPEG per person. Show the app's JPEG pixel preset as export metadata, not a sourced official upload requirement. When several people are present, show **Share all** and labels **Photo N** under thumbnails. Each thumbnail is a ShareLink with a complete spoken label. The direct Digital Photo route above remains the simplest way to share just the checked person.
-3. Full-width neutral **Done** returns Home with the session kept. System share/print cancellation leaves Share ready for another attempt. Temporary export files are managed through workflow lifetime; they must not disappear while the system share or print controller still needs them.
+1. **Header:** the first page as a thumbnail, a check symbol, **Your sheet is ready**, and **N copies on <paper> paper**.
+2. **Before you print**, three numbered steps in one card:
+   1. **Load <paper> photo paper** (or **Load <paper> paper** for A4, Letter, and other office sizes).
+   2. **Choose Actual Size, or 100 %**, with *Never Fit to Page or borderless*.
+   3. **Measure the 50 mm line before cutting**, or **Measure one photo before cutting** when the check bar is off.
+3. The document's print note from the catalog, when it has one (for example a document that needs a shop print).
+4. **Bottom action area.**
+   - **Locked:** the unlock card (§11.5) for every photo still locked, then **Unlock and Print** (**Unlock and Continue** when home printing is not available or the document is shop-only) and **Keep Editing**, which returns to Your sheet. With too few credits, the primary button is **Get Credits**. No toolbar **Done**: nothing has been produced yet.
+   - **Unlocked:** primary **Print at Home** (system print panel), bordered **Print at a Shop**, and plain **More Formats**. A shop-only document shows **Print at a Shop** as the primary and no home button. Toolbar **Done** returns Home with the session kept.
+5. Files are made on demand, once, the first time an action needs them; the tapped button shows a spinner meanwhile. A failure shows the app's alert with the plain cause, and the buttons work again.
 
-The two cards should remain visually distinct without becoming a dense export dashboard. Preserve a comfortable hierarchy at large text sizes and make all ShareLink targets at least 44 pt.
+**Print at a shop** (sheet): three steps (**Order a standard print on <paper> paper**; **Ask for no cropping and no Fit to Page**; the measuring step) and **Share Print Image(s)**, which shares one image per page at the paper's size.
+
+**More formats** (sheet): **Share Print Document** (*A document with every page at its exact size, for printing from a computer.*) and, under **Digital photo(s)**, **Share Digital Photo** per person with its thumbnail, plus **Share All Digital Photos** for several people. Format names (PDF, JPEG) do not appear ([22 §5](22-quality-and-delight-bar.md)).
+
+The print check after printing (design 4c, L19-003) is not built yet.
+
+### 11.4 Credits
+
+A sheet titled **Credits** with **Done**. Opened from Home, Settings, and **Get Credits**.
+
+- The balance in the hero type ("1 credit"), then: *One credit unlocks one photo: its digital file and any number of prints. Printing or sharing it again is free.*
+- **Get more:** three rows, **1 credit**, **5 credits**, **10 credits**, each with its price at the trailing edge. This is the only place in the app that shows money (ADR-048 amendment §2). The App Store version shows StoreKit's localized price; the spike shows the USD reference price and adds the credits without payment, and the footer says so.
+- A success haptic and a numeric transition when the balance changes.
+
+### 11.5 Unlock card
+
+One card, used on Print and Digital Photo while a photo is locked (design 5d). There is no separate confirmation sheet.
+
+- Row: **N photos** at the leading edge, **N credits** at the trailing edge.
+- Under it: *Includes the digital photo and any number of prints. After this, framing and edits are final.* This sentence is the point-of-no-return warning and must stay next to the button that spends the credit.
+- Below the card: **You have N credits.**
+
+The card speaks in credits only. Unlocking is immediate and needs no network. Reprinting or sharing an unlocked photo never shows the card again.
 
 ## 12. Screen 9 — App Icon sheet
 
@@ -297,9 +342,11 @@ The next UI pass should verify these states as concrete screen variants, not onl
 | Import | Picker cancelled; unsupported/corrupt file; small image; cancellation; successive picks. |
 | Photo Check | Checking; good; warning; fail; manual check; no/multiple face; analysis unavailable; low-quality mask; portrait comparison; removed photo. |
 | Adjust | Automatic/original; White enabled/disabled; segmenting; mask warning; tone allowed/forbidden; Details expanded; large text; undo/reset. |
-| Sheet | One/multiple people; one/multiple sizes; zero/maximum copies; empty; incomplete layout; custom paper invalid; multiple pages; keyboard visible. |
-| Share | Preparing; verified files; print unavailable; individual/multiple JPEG; failed export/retry; system share/print cancellation. |
-| Output choice / digital | Both choices; removed person; JPEG preparing/verified/failure/retry; Back and Done; cancelled ShareLink; selected-person-only file. |
+| Sheet | One/multiple people; selected person; zero/maximum copies; each paper chip; empty; incomplete layout; multiple pages; Sheet options with several sizes and invalid custom paper; accessibility text size. |
+| Print | Locked with enough credits; locked with too few; unlocked; preparing after a tap; home printing unavailable; shop-only document; failed export; system share/print cancellation. |
+| Output choice / digital | Both choices; removed person; locked with and without credits; preparing/ready/failure/retry; Back and Done; cancelled share. |
+| Credits | Balance 0, 1, many; pack added; opened from Home, Settings, and Get Credits. |
+| Photo Check, unlocked | Unlocked note; **This photo is final** dialog; relock after **Edit Photo**. |
 | App Icon | Current/alternate choice; changing; change failure; supported/unsupported device. |
 
 For every variant, inspect safe areas, one dominant action, localized copy, VoiceOver focus/readout, Voice Control names, Dynamic Type, Dark Mode, high contrast, reduced transparency, and reduced motion. Camera and printing need physical-device and physical-output review in addition to simulator screenshots. UI snapshots should use controlled non-personal fixtures; never commit family or identity photos.
@@ -337,9 +384,9 @@ Shipped English phrases in the inventory below are String Catalog keys unless id
 | Adjust alternatives | **Move Up**, **Move Down**, **Move Left**, **Move Right**, **Zoom In**, **Zoom Out**, **Reset Position** | Labeled native buttons below portrait | Exact visible names are Voice Control names; edits are bounded. |
 | Adjust details | **Zoom**, **Left and right**, **Up and down**, **Straighten**, conditional **Edge softness** and **Correction strength** | Native sliders | Slider value and adjustment work through VoiceOver. |
 | Choose result | **Choose result**, **Choose your result**, saved-edits sentence, **Digital Photo**, **Print Sheet**, each description and manual-check footer in §11 | Small portrait, `photo`, `printer`, chevrons; push selected route | Whole choice row is one labeled button with descriptive text. |
-| Digital preparing/ready/error | **Preparing your photo…**; **Your digital photo is ready.**; `JPEG · {width} × {height} pixels`; manual-check sentence; **Share JPEG**, **Done**; **Photo not ready**, cause, **Try Again** | Progress, check symbol, 26:32 portrait, ShareLink | Title and file details precede primary Share JPEG; error action repeats export. |
-| Sheet | **Your sheet**, `Page {n} of {m}`, people/size/copy rows, **Add another size**, **Add another person**, paper and cutting controls in §10, **Continue** | White paper preview, Stepper, pickers, disclosures | Page describes count/placement; person can be removed without a swipe. |
-| Print Share | **Share**, **Preparing your files…**, **Your files are ready.**, print/page and digital cards, **Print**, **Share PDF**, **Share JPEG**, **Done**; **Files not ready**, **Try Again** | Verified result, paper thumbnail, native Print/ShareLinks | Card titles distinguish individual photo JPEG from page JPEG. |
+| Digital locked/preparing/ready/error | Unlock card, **Unlock and Save** / **Get Credits**, **Keep Editing**; **Preparing your photo…**; **Your digital photo is ready.**, **Sized for online forms**, **Share Photo**, **Done**; **Photo not ready**, cause, **Try Again** | Progress, check symbol, portrait, system share | The card reads photos, cost, and the final-edits sentence before the unlock button. |
+| Sheet | **Your sheet**, `Page {n} of {m}`, `{n} copies · {m} pages`, person line with **Check**, face circles, **Add another person**, copies Stepper, paper chips, **More**, **Continue**; Sheet options in §10 | White paper preview, tray, Stepper, chips | A face circle reads **Photo {n}: {n} copies** and its selected state; the page describes count and placement. |
+| Print | **Print**, **Your sheet is ready**, **Before you print** and its three steps, unlock card, **Unlock and Print** / **Get Credits**, **Keep Editing**; **Print at Home**, **Print at a Shop**, **More Formats**, **Done**; sheets in §11.3 and **Credits** in §11.4 | Page thumbnail, numbered steps, native print panel and share sheets | Each step reads as one element; button names match the text. |
 | App Icon | **App Icon**, **People**, **Just for fun**, named choices, explanatory footnote, **Done**, change-failure alert | Square icon grid and selected badge | Cell name and selected trait; system error can be retried. |
 
 **Dynamic presentation keys.** `CameraPresentation.text(for:)` uses **Position your face inside the guide**; **Only one person in the frame**; **Bring the phone closer**; **Move the phone farther away**; **Centre your face in the oval**; **Move the phone left/right**; **Raise/Lower the phone**; **Tilt the phone up/down**; **Raise/Lower the phone to eye level**; **Hold the phone upright**; **Level the phone to match your head**; **Keep your head level**; **Look straight at the camera**; **Hold the phone at eye level**; **Move away from the bright light behind you**; **Find more light on your face**; **Tip: turn slightly to your left/right, towards the light**; **Hold still**; **Ready to take photo**. Each slash pair is a separate localized key. The stabilized cue represents physical phone motion; horizontal direction is derived using lens facing and preview mirroring. A green oval means measured camera checks look ready, never that the photo is officially acceptable.

@@ -11,6 +11,8 @@ final class PrintController: NSObject, UIPrintInteractionControllerDelegate {
     private(set) var lastPaperChoice: String?
 
     static var isAvailable: Bool { UIPrintInteractionController.isPrintingAvailable }
+    /// UI tests cannot drive the system print panel, so it is not presented under their launch flag.
+    static var isSuppressedForUITests: Bool { ProcessInfo.processInfo.arguments.contains("--uitesting-fresh") }
 
     func present(pdf: URL, jobName: String) {
         guard let document = CGPDFDocument(pdf as CFURL), let page = document.page(at: 1) else { return }

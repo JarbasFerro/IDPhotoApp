@@ -43,7 +43,7 @@ struct RootView: View {
                     case .sheet:
                         SheetView(model: model, path: $path, acquire: acquire)
                     case .share:
-                        ShareView(model: model, path: $path)
+                        PrintView(model: model, path: $path)
                     }
                 }
         }

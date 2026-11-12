@@ -121,9 +121,9 @@ Status key: **Shipped (spike)** = working in `Spikes/IDPhotoSpike` 0.12.7, still
 | ID | Function | User value | Status | Specified in |
 |---|---|---|---|---|
 | F-50 | Session: people, edits, and sheet kept while the app runs | Come back to print more copies | Shipped (spike) in memory; replaced by F-60 | ADR-049 |
-| F-51 | **Pricing**: first photo free (one free credit), then USD 0.99 per photo; no subscription, no ads | Fair, transparent price | Launch | BD-029, [ADR-048](10-decisions.md), L19-006 |
+| F-51 | **Pricing**: one free credit to start; one credit per photo; packs of 1, 5, and 10 credits (USD 0.99, 3.99, 6.99); the app shows credits, not money; no subscription, no ads | Fair, transparent price | Launch | BD-029, [ADR-048](10-decisions.md), L19-006 |
 | F-52 | Restore purchases; keep the balance and the used free credit across reinstalls and devices | Trust and App Review compliance | Launch; design spike first | ADR-048 §7, AS18-006, L19-006 |
-| F-59 | **Unlock confirmation** (point of no return): photo, open warnings, cost or total, "edits become final; printing again is free" | Edit freely, pay once, no surprise | Launch | ADR-048 §4, L19-006 |
+| F-59 | **Unlock in place** (point of no return): on Print and Digital Photo, the photos to unlock, the cost in credits, "framing and edits are final", and the balance; no separate sheet | Edit freely, pay once, no surprise | Launch | ADR-048 §4, L19-006 |
 | F-60 | **Drafts**: every person and sheet saved automatically; Continue on Home; Delete and Delete all; 30-day retention | Finish later, add family, reprint free | Launch | ADR-049, L19-012 |
 | F-61 | **Export gate**: one service for every output path; a locked photo never leaves the app | No bypass of the credit | Launch | ADR-049 §3, L19-012 |
 | F-53 | Settings and About: privacy explanation, App Icon, restore, help, version, legal | Durable needs in one place | Partial: App Icon and version on Home | U10-012, FR-003 |
@@ -156,11 +156,11 @@ Unchanged from [01 §8.3](01-product-definition.md) and [11 §7](11-ios-excellen
 | S-11 | Fix the edges (refinement) | Tap to fix hair or shoulder edges | **New** (P1) | 16 §15 |
 | S-12 | Choose result | Digital Photo or Print Sheet | Spike | 16 §11 |
 | S-13 | Digital Photo | Verified JPEG and share | Spike; per-profile preset **New** | 16 §11 |
-| S-14 | Your sheet | People, sizes, copies, paper, cutting options | Spike | 16 §10 |
-| S-15 | Print & Share | Print, PDF, page JPEGs, digital photos | Spike; shop path **New** | 16 §11 |
+| S-14 | Your sheet | The paper as hero; people, copies, and paper in one tray; sizes and cutting options in Sheet options (design 3b) | Spike 0.16 | 16 §10 |
+| S-15 | Print | *Before you print* steps; Print at Home, Print at a Shop, More Formats (design 4a) | Spike 0.16 | 16 §11 |
 | S-16 | Print check | Did the bar measure 50 mm? Fixes if not | **New** | — |
 | S-17 | Cutting guide | How to cut neatly | **New** | — |
-| S-18 | Unlock confirmation and credits | Point of no return before the first output; balance, buy, restore | **New** | ADR-048 → 16 |
+| S-18 | Unlock card and Credits | Unlock in place on Print and Digital Photo (design 5d); Credits screen with balance and packs; restore later | Spike 0.16 (no StoreKit yet) | ADR-048 amendment, 16 §11 |
 | S-19 | Settings & About | Privacy, help, icon, credits and restore, Delete all drafts, version, legal | Spike 0.15.0: App Icon, Privacy, version. Credits, help, and Delete all drafts still to add | 04 → 16 |
 | S-20 | Help topics | Home setup, printing, cutting, shop printing | **New** | — |
 | S-21 | App Icon | Choose the Home Screen icon | Spike | 16 §12 |
@@ -190,10 +190,10 @@ Home ─┬─ Continue: drafts and unlocked photos (ADR-049)
       Photo Check ── Adjust ── Fix the edges          free, saved as a draft
             ▼
       Choose result
-      ├─ Digital Photo ── [Unlock] ── Share JPEG
-      └─ Your sheet ── [Unlock everyone still locked] ── Print & Share ── Print check ── Cutting guide
+      ├─ Digital Photo ── [Unlock] ── Share photo
+      └─ Your sheet ── Print ── [Unlock everyone still locked] ── Print at home or at a shop ── Print check ── Cutting guide
 
-[Unlock] = confirmation at the point of no return (S-18): price or total, edits become final, reprints free.
+[Unlock] = the unlock card on the screen itself (S-18): cost in credits, edits become final, reprints free.
 It appears only for people not yet unlocked; reprinting an unlocked photo goes straight through.
 ```
 
@@ -213,7 +213,7 @@ Known testers tend to be kind. So measure what they **do** (time, retakes, the m
 | Preference against a shop or booth photo of the same person, judged by other testers who don't know which is which | Studio quality | Calipic preferred or equal in most pairs; no skin-tone group where it loses most pairs | Quality study L19-007 |
 | First home print at the correct size (bar 50 mm ± 0.5 mm) | Exact print | Every tester's printer, first try or after one Print check fix | Testers' own printers + the P1 printer round |
 | Ease and satisfaction (1–5 each) | Satisfaction | ≥ 8 of 10 rate both 4 or 5 | Questionnaire |
-| Understands what was paid for, after the unlock confirmation | Fair pricing | ≥ 8 of 10 explain it correctly; nobody surprised that edits became final | Questionnaire |
+| Understands what was paid for, after unlocking | Fair pricing | ≥ 8 of 10 explain it correctly; nobody surprised that edits became final | Questionnaire |
 | Understands that *Ready* is not a guarantee of acceptance | Trust | Every tester; one misunderstanding means a copy fix and a retest | Questionnaire |
 | Crash-free sessions | Reliability | ≥ 99.5 % in TestFlight | TestFlight, Xcode Organizer |
 | App Store rating, first 90 days | Rank and trust | ≥ 4.7 | App Store Connect |
@@ -227,7 +227,7 @@ Known testers tend to be kind. So measure what they **do** (time, retakes, the m
 | ID | Decision | Outcome | Record |
 |---|---|---|---|
 | D-1 | Launch market and profiles | **Worldwide.** The most-used photo documents of the most relevant App Store countries, in tiers. Tier 1 ships at 1.0, and each profile still passes the [01 §15](01-product-definition.md) gate. | ADR-047 |
-| D-2 | Pricing | **First photo free (one free credit), then USD 0.99 per photo.** Editing is free until the unlock confirmation (point of no return). Reprints of an unlocked photo are free. | ADR-048 |
+| D-2 | Pricing | **One free credit, then one credit per photo; packs of 1, 5, and 10 credits for USD 0.99, 3.99, and 6.99.** The app shows credits, not money. Editing is free until the unlock (point of no return). Reprints of an unlocked photo are free. | ADR-048, amended 2026-11-12 |
 | D-3 | Children | **Same flow as adults.** Helper mode is recommended; baby relaxations only warn; baby support is not advertised. | ADR-017 |
 | D-4 | Persistence | **Drafts** saved without spending credits. A locked draft can never leave the app (one export gate). 30-day retention is the proposed default. | ADR-049 |
 | D-5 | Measurement | **Beta testers the founder knows.** TestFlight and observed sessions; no analytics SDK. | ADR-020 |

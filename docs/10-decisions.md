@@ -810,7 +810,7 @@ L19-010 data changes the country order; an official source forbids at-home prepa
 
 ## ADR-048 — Pricing: one free photo, then one credit per photo
 
-**Status:** Accepted (founder, 2026-11-11). Resolves ADR-015 and amends BD-029: one free credit in total, not a free result plus a free credit.
+**Status:** Accepted (founder, 2026-11-11); **amended 2026-11-12** (credit packs, credits on screen, unlock in place: see the amendment below, which wins where it differs from §1, §4, and §8). Resolves ADR-015 and amends BD-029: one free credit in total, not a free result plus a free credit.
 **Date:** 2026-11-11
 
 ### Context
@@ -842,7 +842,31 @@ Needs: a StoreKit consumable, a credit ledger with reserve, commit, and release,
 
 ### Revisit trigger
 
-Beta testers misunderstand what a credit covers or regret the point of no return; families find the per-person price too high (test a pack, for example 5 photos).
+Beta testers misunderstand what a credit covers or regret the point of no return; the packs below do not make a family sheet feel fairly priced.
+
+### Amendment (founder, 2026-11-12): credit packs, credits on screen, unlock in place
+
+Decided with design round 2 ([explorations](ui/explorations/README.md): 3b, 4a, 5d).
+
+1. **Packs replace the single price (§1).** A new person starts with **1 credit**. More credits are StoreKit consumables in three packs; local prices follow Apple's equalization.
+
+   | Pack | Reference price | Per credit |
+   |---|---|---|
+   | 1 credit | USD 0.99 | USD 0.99 |
+   | 5 credits | USD 3.99 | USD 0.80 |
+   | 10 credits | USD 6.99 | USD 0.70 |
+
+2. **The app speaks in credits, not money (§4, §8).** Cost and balance appear as credits everywhere: "1 photo · 1 credit", "You have 1 credit". A money amount appears in one place only: the **Credits** screen, beside the pack being bought, using StoreKit's localized price. The App Store listing still states the prices. No price in preflight.
+3. **Unlock in place, no confirmation sheet (§4; design 5d).** The Print and Digital Photo screens show an unlock card while a photo is locked: the number of photos to unlock, the cost in credits, the point-of-no-return sentence (*Includes the digital photo and any number of prints. After this, framing and edits are final.*), and the balance. Actions: **Unlock and Print** (or **Unlock and Save**) and **Keep Editing**. With too few credits, the primary action becomes **Get Credits** and opens the Credits screen; the work stays intact. S-18 is no longer a separate confirmation sheet; it is the unlock card plus the Credits screen.
+4. **The balance is always one tap away:** a credits button at the bottom of Home and a row in Settings, both opening Credits.
+5. **Editing after unlocking (§5) asks first:** *This photo is final. Editing it locks it again. The changed photo will use another credit.* Going ahead relocks the photo; nothing is charged until it is output again.
+6. **Unchanged:** what a credit unlocks (§2), when it is spent (§3), integrity (§6), the free credit and restore (§7), no subscription, no ads, no countdowns or upsell after success.
+
+A six-person sheet now needs the starting credit plus one pack of five (USD 3.99), instead of USD 4.95.
+
+**Open points:** the unlock card does not repeat the open warnings from Photo Check, which §4 asked the confirmation sheet to show; decide with beta feedback whether the card needs them. Changing the document relocks every photo (the photo is a different product), and the app does not warn about that yet.
+
+**State in spike 0.16.0:** the ledger, packs, unlock card, Credits screen, relock-on-edit, and the export gate for print and digital files are built. StoreKit is not connected: a pack is added without payment and the screen says so. Credits are spent immediately rather than reserved and committed, and the unlocked state lasts only until the app closes, because drafts (ADR-049) are not built.
 
 ---
 

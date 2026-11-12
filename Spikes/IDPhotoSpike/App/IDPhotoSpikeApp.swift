@@ -18,7 +18,9 @@ struct IDPhotoSpikeApp: App {
             : DocumentStore.start(stored: UserDefaults.standard.string(forKey: DocumentStore.key),
                                   regionCode: Locale.current.region?.identifier, catalog: .bundled)
         needsDocumentPrompt = start.needsPrompt
-        _model = State(initialValue: PhotoWorkflow(pipeline: pipeline, document: start.choice))
+        // UI tests get an in-memory balance of one credit; real launches keep the balance on the device.
+        let credits = CreditStore(defaults: isolated ? nil : .standard)
+        _model = State(initialValue: PhotoWorkflow(pipeline: pipeline, document: start.choice, credits: credits))
     }
 
     var body: some Scene {
