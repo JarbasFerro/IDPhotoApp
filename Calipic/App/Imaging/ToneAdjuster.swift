@@ -105,7 +105,8 @@ final class ToneAdjuster: Sendable {
 
     // MARK: - Measurement
 
-    /// Luminance statistics over the face rectangle and colour cast over the background (mask below 40/255).
+    /// Luminance statistics over the person inside the face rectangle (mask at or above 128/255 when a mask exists) and
+    /// colour cast over the background (mask below 40/255).
     static func metrics(of image: CGImage, faceBox: NormalizedCrop?, mask: CGImage?) -> ToneMetrics {
         let width = 256
         let height = max(1, Int((Double(width) * Double(image.height) / Double(image.width)).rounded()))
@@ -140,7 +141,10 @@ final class ToneAdjuster: Sendable {
                 let index = (row * width + column) * 4
                 let r = Double(rgba[index]) / 255, g = Double(rgba[index + 1]) / 255, b = Double(rgba[index + 2]) / 255
                 let x = (Double(column) + 0.5) / Double(width), y = (Double(row) + 0.5) / Double(height)
-                if x >= face.x && x <= face.x + face.width && y >= face.y && y <= face.y + face.height {
+                // Only the person counts as face: the rectangle also covers background beside the cheeks and above the
+                // brow, which is pure white once the background is replaced and read as "blown out" (0.20 review).
+                let isPerson = maskBytes.isEmpty || maskBytes[row * width + column] >= 128
+                if isPerson, x >= face.x && x <= face.x + face.width && y >= face.y && y <= face.y + face.height {
                     let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
                     faceSum += luminance; faceCount += 1
                     if rgba[index] <= 2 && rgba[index + 1] <= 2 && rgba[index + 2] <= 2 { dark += 1 }

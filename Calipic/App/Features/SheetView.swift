@@ -90,13 +90,13 @@ struct SheetView: View {
         guard !reduceMotion, let index = path.firstIndex(of: .sheet), index > 0, case .check = path[index - 1],
               let rows = model.layout.pages.first?.displayRows.count, rows > 1 else { return }
         revealedRows = 0
-        try? await Task.sleep(for: .milliseconds(450))
+        try? await Task.sleep(for: .milliseconds(300))
         for row in 1...rows {
             guard !Task.isCancelled else { break }
             withAnimation(.spring(duration: 0.35, bounce: 0.2)) { revealedRows = row }
             try? await Task.sleep(for: .milliseconds(110))
         }
-        revealedRows = nil
+        withAnimation(.easeOut(duration: 0.25)) { revealedRows = nil }
     }
 
     private func summaryLine(_ layout: PrintLayout) -> some View {
@@ -623,6 +623,8 @@ struct SheetPageView: View {
                     }
                 }
                 .allowsHitTesting(false)
+                // While copies appear row by row, the marks wait too: alone they read as an empty, broken page.
+                .opacity(revealedRows == nil ? 1 : 0)
             }
             .animation(Design.Motion.rearrange.resolved(animated: animated), value: page.placements)
         }

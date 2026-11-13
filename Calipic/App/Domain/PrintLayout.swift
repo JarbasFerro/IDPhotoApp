@@ -199,10 +199,11 @@ enum PrintLayoutSolver {
                                                   availableWidth: size.w - 2 * margin,
                                                   availableHeight: size.h - 2 * margin - reserve,
                                                   gutter: gutter, strategy: options.fillStrategy) else { continue }
-                        // At equal copies, margin and check bar, every photo the same way up: a page mixing upright and
-                        // sideways photos is harder to cut and looks wrong (founder, 0.20 review).
-                        let score = [plan.placed, bleed, bar ? 1 : 0, -plan.orientationCount, -plan.distinctHeights,
-                                     -plan.usedLength, -index]
+                        // Copies first; then keeping a safety margin at all and the check bar; then every photo the same
+                        // way up (a mixed page is harder to cut and looks wrong, founder 0.20 reviews); only then the
+                        // margin's exact size, so 0.5 mm all upright beats 1 mm with a sideways row.
+                        let score = [plan.placed, bleed > 0 ? 1 : 0, bar ? 1 : 0, -plan.orientationCount, bleed,
+                                     -plan.distinctHeights, -plan.usedLength, -index]
                         if best == nil || best!.score.lexicographicallyPrecedes(score) {
                             best = (score, plan, size.w, size.h, bleed, bar)
                         }

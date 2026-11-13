@@ -72,8 +72,9 @@ struct PrintLayoutSolverTests {
         #expect(fixed.pages[0].placements.count == 5)
         #expect(fixed.pages.count == 2)
         let full = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 12)]))
-        #expect(full.pages.count == 1 && full.pages[0].bleedMM == 1)
-        #expect(full.pages[0].calibrationBar == nil) // no room left on a full 12-up sheet
+        // A full 12-up sheet keeps the check bar with a smaller margin (0.20.7); it used to drop the bar for 1 mm.
+        #expect(full.pages.count == 1 && full.pages[0].bleedMM > 0 && full.pages[0].bleedMM < 1)
+        #expect(full.pages[0].calibrationBar != nil)
         let spare = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 6)]))
         #expect(spare.pages[0].calibrationBar != nil)
     }
@@ -184,6 +185,17 @@ struct PrintLayoutSolverTests {
             let page = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, copies)], options: options)).pages[0]
             #expect(page.placements.count == copies)
             #expect(Set(page.placements.map(\.rotated)).count == 1, "\(copies) copies mix orientations")
+        }
+    }
+
+    /// Founder's second recording (0.20.7): with the default options, 10 and 11 copies still had a sideways row because
+    /// a full 1 mm margin outranked one orientation, although 12 upright copies fit with a smaller margin.
+    @Test func defaultOptionsKeepOneOrientationUpToAFullPage() {
+        for copies in 1...12 {
+            let page = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, copies)])).pages[0]
+            #expect(page.placements.count == copies)
+            #expect(Set(page.placements.map(\.rotated)).count == 1, "\(copies) copies mix orientations")
+            #expect(page.bleedMM > 0 && page.calibrationBar != nil, "\(copies) copies lost the margin or the check bar")
         }
     }
 }

@@ -37,6 +37,29 @@ struct ToneTests {
         return (try #require(context.makeImage()), try #require(mask.makeImage()), NormalizedCrop(x: 0.35, y: 0.3, width: 0.3, height: 0.3))
     }
 
+    /// Founder's recording (0.20.7): after the background turned white, the white beside the cheeks inside the face
+    /// rectangle read as a blown-out face and "Looks good" flipped to a light warning. Only the person counts.
+    @Test func replacedWhiteBackgroundInsideTheFaceBoxIsNotClipping() throws {
+        let space = try #require(CGColorSpace(name: CGColorSpace.sRGB))
+        let context = try #require(CGContext(data: nil, width: 400, height: 500, bitsPerComponent: 8, bytesPerRow: 0,
+                                             space: space, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        context.setFillColor(CGColor(srgbRed: 1, green: 1, blue: 1, alpha: 1)); context.fill(CGRect(x: 0, y: 0, width: 400, height: 500))
+        // Face 140...260 wide; the face rectangle below spans 120...280, so a strip of white sits on each side.
+        context.setFillColor(CGColor(srgbRed: 0.72, green: 0.55, blue: 0.45, alpha: 1)); context.fill(CGRect(x: 140, y: 150, width: 120, height: 200))
+        let gray = try #require(CGColorSpace(name: CGColorSpace.linearGray))
+        let mask = try #require(CGContext(data: nil, width: 400, height: 500, bitsPerComponent: 8, bytesPerRow: 0,
+                                          space: gray, bitmapInfo: CGImageAlphaInfo.none.rawValue))
+        mask.setFillColor(CGColor(gray: 0, alpha: 1)); mask.fill(CGRect(x: 0, y: 0, width: 400, height: 500))
+        mask.setFillColor(CGColor(gray: 1, alpha: 1)); mask.fill(CGRect(x: 140, y: 150, width: 120, height: 200))
+        let image = try #require(context.makeImage()), maskImage = try #require(mask.makeImage())
+        let box = NormalizedCrop(x: 0.30, y: 0.35, width: 0.40, height: 0.30)
+        let withMask = ToneAdjuster.metrics(of: image, faceBox: box, mask: maskImage)
+        #expect(withMask.faceClippedBright == 0)
+        #expect(ToneAssessment.assess(withMask).state == .pass)
+        // Without a mask the white strips would count: the reason the mask is used.
+        #expect(ToneAdjuster.metrics(of: image, faceBox: box, mask: nil).faceClippedBright > ToneAssessment.clippingLimit)
+    }
+
     @Test func strengthZeroIsIdentityAndFullStrengthNeutralisesTheCast() throws {
         let s = try scene()
         let reference = try #require(ToneAdjuster.backgroundReference(of: s.image, mask: s.mask))
