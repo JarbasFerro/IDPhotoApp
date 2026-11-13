@@ -36,7 +36,7 @@ struct SheetView: View {
                                                        height: max(160, geometry.size.height - 32)))
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    // The page lies on the mat, which runs up behind the navigation bar; the text sits below it.
+                    // The page lies on the mat; the text sits below it.
                     .onMat()
                     summaryLine(layout)
                         .padding(.vertical, Design.Spacing.text)
@@ -206,7 +206,7 @@ struct SheetView: View {
         // A quiet neutral chip; the chosen paper carries the accent.
         return Button { model.printJob.paper = paper } label: {
             Text(PaperNames.short(for: paper))
-                .font(Design.Typography.readout(.callout, weight: selected ? .semibold : .regular))
+                .font(Design.Typography.sizeChoice(.callout, weight: selected ? .semibold : .regular))
                 .foregroundStyle(selected ? Color.brandAccent : Color.primary)
         }
             .buttonStyle(.bordered).buttonBorderShape(.capsule)

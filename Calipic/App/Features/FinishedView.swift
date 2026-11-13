@@ -79,7 +79,7 @@ struct FinishedView: View {
         let height = width / aspect
         let samePlans = layout.pages.dropFirst().allSatisfy { CutPlan(page: $0).cuts.count == plan.cuts.count }
         return VStack(spacing: Design.Spacing.control) {
-            // The page lies on the mat, which runs up behind the navigation bar; the note sits below it.
+            // The page lies on the mat; the note sits below it.
             ZStack {
                 SheetPageView(page: page, thumbnails: model.sheetThumbnails, animated: false)
                     .frame(width: width, height: height)

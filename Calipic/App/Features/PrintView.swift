@@ -81,7 +81,7 @@ struct PrintView: View {
         let layout = model.layout
         let landscape = layout.pages.first.map { $0.widthMM > $0.heightMM } ?? false
         return VStack(alignment: .leading, spacing: Design.Spacing.group) {
-            // The page lies on the mat, running up behind the navigation bar; the words sit below, on the plain screen.
+            // The page lies on the mat; the words sit below, on the plain screen.
             SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: landscape ? 110 : 170)
                 .padding(.vertical, Design.Spacing.group)
                 .frame(maxWidth: .infinity)

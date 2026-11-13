@@ -8,8 +8,7 @@ import SwiftUI
 /// - **The grid is decoration, not a scale.** It is never shown where something on screen is true size
 ///   (Check your print), so nobody measures against it.
 /// - **No bare text on the grid.** Captions and counts sit below the mat; anything that must sit on it (the
-///   measurement chip) carries its own solid background. The grid also stays out of the area above the mat's
-///   content, so navigation bar items sit on the plain tint.
+///   measurement chip) carries its own solid background. The mat never runs behind the navigation bar.
 extension Design.Surface {
     /// The mat's colour: `#DCE8E6` in Light, `#0E2C2E` in Dark.
     static let mat = Color("StageMat")
@@ -17,11 +16,10 @@ extension Design.Surface {
     static let matLine = Color("StageMatLine")
 }
 
-/// The mat: tint everywhere, grid lines inside its own bounds only, fading in over the first points.
+/// The mat: its tint and a fine grid.
 struct MatSurface: View {
     /// Points between fine lines; every fifth line is stronger.
     private static let pitch: CGFloat = 6
-    private static let fadeIn: CGFloat = 14
     @Environment(\.colorScheme) private var scheme
     @Environment(\.displayScale) private var displayScale
 
@@ -49,32 +47,20 @@ struct MatSurface: View {
                 y += Self.pitch; index += 1
             }
         }
-        .mask(
-            LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 1)],
-                           startPoint: .top, endPoint: .bottom)
-                .frame(height: Self.fadeIn)
-                .frame(maxHeight: .infinity, alignment: .top)
-                .background(Color.black.padding(.top, Self.fadeIn))
-        )
         .background(Design.Surface.mat)
         .accessibilityHidden(true)
     }
 }
 
 extension View {
-    /// Lays this block on the cutting mat. The tint runs up behind the navigation bar (and past it, for
-    /// overscroll); the grid stays within the block. `bleed` is the horizontal padding of the enclosing content,
-    /// so the mat reaches the screen edges. The bottom corners are rounded like a grouped surface.
-    func onMat(bleed: CGFloat = 0, runsUnderBar: Bool = true) -> some View {
+    /// Lays this block on the cutting mat: a rounded mat lying on the plain screen, a little in from the screen
+    /// edges. `bleed` is the horizontal padding of the enclosing content, so the mat keeps the same margin on
+    /// every screen. The navigation bar stays plain; a tint behind it made the steps look heavy (founder, 0.20).
+    func onMat(bleed: CGFloat = 0) -> some View {
         background {
-            let shape = UnevenRoundedRectangle(bottomLeadingRadius: Design.Radius.group, bottomTrailingRadius: Design.Radius.group)
-            ZStack(alignment: .bottom) {
-                if runsUnderBar {
-                    Design.Surface.mat.padding(.top, -1_200)
-                }
-                MatSurface().clipShape(shape)
-            }
-            .padding(.horizontal, -bleed)
+            MatSurface()
+                .clipShape(RoundedRectangle(cornerRadius: Design.Radius.mat, style: .continuous))
+                .padding(.horizontal, Design.Spacing.matMargin - bleed)
         }
     }
 
@@ -100,9 +86,19 @@ private struct PaperShadow: ViewModifier {
     func body(content: Content) -> some View {
         let dark = scheme == .dark
         content
-            .shadow(color: .black.opacity(dark ? 0.7 : 0.30), radius: 0.5, y: 0.5)
-            .shadow(color: .black.opacity(dark ? 0.5 : 0.20), radius: lifted ? 9 : 3, y: lifted ? 6 : 2)
+            .shadow(color: .black.opacity(dark ? 0.7 : 0.32), radius: 0.5, y: 0.5)
+            .shadow(color: .black.opacity(dark ? 0.55 : 0.24), radius: lifted ? 16 : 8, y: lifted ? 10 : 5)
     }
+}
+
+extension Design.Radius {
+    /// The mat's corners.
+    static let mat: CGFloat = 26
+}
+
+extension Design.Spacing {
+    /// Space between the mat and the screen edges.
+    static let matMargin: CGFloat = 8
 }
 
 extension Design.Typography {
@@ -110,5 +106,11 @@ extension Design.Typography {
     /// have their own voice. Sentences that merely contain a number keep the text face with monospaced digits.
     static func readout(_ style: Font.TextStyle, weight: Font.Weight = .medium) -> Font {
         .system(style, design: .monospaced).weight(weight)
+    }
+
+    /// A choice that names a size ("10 × 15 cm" on a paper chip): rounded, so it reads as a friendly button
+    /// rather than an instrument (founder, 0.20 review).
+    static func sizeChoice(_ style: Font.TextStyle, weight: Font.Weight = .medium) -> Font {
+        .system(style, design: .rounded).weight(weight)
     }
 }

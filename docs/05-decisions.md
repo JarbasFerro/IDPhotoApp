@@ -85,7 +85,7 @@ The open questions left by the documentation cleanup, answered one by one.
 |---|---|---|
 | D-1 | The *Choose result* screen | **Remove it.** Photo Check's main button goes to the document's main output; the other output is a second button (roadmap U2) |
 | D-2 | Measurements on the photo | **Lines that settle:** head, eye, and chin lines with millimetre labels appear when the photo lands, then fold into a *Measured* chip that brings them back (U3). Replaces the old brand rejection of calliper drawings, because these are real numbers, not decoration |
-| D-3 | Stage colour and paper in Dark | **Design round first**, then (round 3, 2026-11-12) **option B, Cutting mat**, on condition that no text sits on the grid. Built in 0.20; still to be judged with real portraits on the iPhone (U5) |
+| D-3 | Stage colour and paper in Dark | **Design round first**, then (round 3, 2026-11-12) **option B, Cutting mat**, on condition that no text sits on the grid. Built in 0.20. After the iPhone review (0.20.1): the mat is a rounded panel and no longer tints the navigation bar, the shadow is deeper, paper chips are rounded. Still to be judged with real portraits on the iPhone (U5) |
 | D-4 | Controls in pull-up sheets over a full-height photo or page | **Prototype both** behind a switch, compare on the iPhone, keep the better one (U7, U8). ADR-043's "controls below" stands until then |
 | D-5 | When the spike becomes the production app | **After 0.17 and 0.18**, in 0.19 (E1) |
 | D-6 | Minimum iOS | **iOS 27 only** (ADR-024 above). Not the recommendation (iOS 26): simpler code and the newest APIs were preferred over reach to iPhones that have not updated |

@@ -17,7 +17,7 @@ struct DigitalShareView: View {
         ScrollView {
             VStack(alignment: .center, spacing: Design.Spacing.block) {
                 if let result, let entry {
-                    // The photo lies on the mat, running up behind the navigation bar; the words sit below it.
+                    // The photo lies on the mat; the words sit below it.
                     PortraitView(entry: entry, format: model.renderTarget.format, label: "Digital photo ready to share")
                         .frame(maxWidth: 240)
                         .paperDimmedInDark()

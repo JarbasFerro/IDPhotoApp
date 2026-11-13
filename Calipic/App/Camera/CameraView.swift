@@ -59,6 +59,8 @@ struct CameraView: View {
     @State private var showCameraHelp = false
     @State private var capturedPhoto: StagedPhoto?
     @State private var capturedImage: CGImage?
+    /// Whether the preview was mirrored when the still was taken (front camera), so the review can match it.
+    @State private var capturedMirrored = false
     @State private var showingCapturedReview = false
     @State private var preparingReview = false
     @State private var captureRevision = UUID()
@@ -182,9 +184,16 @@ struct CameraView: View {
                 if showingCapturedReview, let capturedImage {
                     // An opaque backdrop: the live preview keeps running for Retake, but must not show around the still.
                     Color.black.ignoresSafeArea().accessibilityHidden(true)
-                    Image(decorative: capturedImage, scale: 1, orientation: .up)
-                        .resizable().scaledToFit()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    // The still freezes exactly what the preview showed: the same fill and, on the front camera, the
+                    // same mirroring. The file itself keeps the whole frame and is never mirrored (founder, 0.20 review).
+                    Color.clear
+                        .overlay {
+                            Image(decorative: capturedImage, scale: 1, orientation: .up)
+                                .resizable().scaledToFill()
+                                .scaleEffect(x: capturedMirrored ? -1 : 1, y: 1)
+                        }
+                        .clipped()
+                        .ignoresSafeArea()
                         .accessibilityHidden(true)
                     capturedReviewControls
                 } else {
@@ -390,6 +399,7 @@ struct CameraView: View {
         let revision = UUID()
         captureRevision = revision
         preparingReview = true
+        let mirrored = camera.position == .front
         flash = true
         Task {
             try? await Task.sleep(for: .milliseconds(120))
@@ -411,6 +421,7 @@ struct CameraView: View {
                 capturedPhoto = staged
                 onReviewChange(staged)
                 capturedImage = image
+                capturedMirrored = mirrored
                 preparingReview = false
                 showingCapturedReview = true
                 AccessibilityNotification.Announcement(String(localized: "Photo captured. Review your photo.")).post()
