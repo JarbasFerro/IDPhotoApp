@@ -17,6 +17,9 @@ struct PrintView: View {
     @State private var promptRoute = false
     /// Opacity of the one-time 2 pt pulse around the route cards.
     @State private var pulseOpacity = 0.0
+    /// The first-run tutorial ended here (ADR-052): "You're all set", then possibly Check Your Print.
+    @State private var showAllSet = false
+    @State private var checkAfterAllSet = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
@@ -47,6 +50,8 @@ struct PrintView: View {
             }
         }
         .background(Design.Surface.screen)
+        .tutorialCoach(coachCard)
+        .animation(reduceMotion ? nil : .smooth, value: locked)
         .safeAreaInset(edge: .bottom) {
             if !dynamicTypeSize.isAccessibilitySize {
                 // A raised tray, as on Your sheet, so it reads as a panel over the steps rather than more of the page
@@ -67,7 +72,8 @@ struct PrintView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) }
-            if locked == 0 {
+            // In the tutorial the way out is printing or sharing (ADR-052); Back still works.
+            if locked == 0, !coaching {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { path.removeAll() }.accessibilityIdentifier("shareDone")
                 }
@@ -80,6 +86,13 @@ struct PrintView: View {
                                onFinished: { showCheck = false; path.removeAll() })
             }
         }
+        .sheet(isPresented: $showAllSet, onDismiss: {
+            if checkAfterAllSet { checkAfterAllSet = false; showCheck = true } else { path.removeAll() }
+        }) {
+            TutorialDoneView(output: .print, route: route, creditsLeft: model.credits.balance,
+                             checkPrint: route == .home ? { checkAfterAllSet = true; showAllSet = false } : nil,
+                             done: { showAllSet = false })
+        }
         .sheet(isPresented: $showFormats) { if let result = model.exported { FormatsView(result: result) } }
         .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
         .task { model.refreshSheetThumbnails() }
@@ -91,6 +104,25 @@ struct PrintView: View {
         .onChange(of: model.errorMessage) { _, message in if message != nil { pending = nil } }
         .onDisappear { model.finishExport() }
         .sensoryFeedback(.success, trigger: locked == 0)
+    }
+
+    // MARK: - Tutorial (ADR-052)
+
+    private var coaching: Bool { model.tutorial.isActive }
+
+    private var coachCard: CoachCard? {
+        guard coaching else { return nil }
+        let step = TutorialFlow.step(on: .print, documentConfirmed: true, hasPhoto: true, unlocked: locked == 0)
+        return CoachCard(step: step, steps: TutorialFlow.steps(for: .print),
+                         title: TutorialCopy.title(step, output: .print, hasPhoto: true),
+                         message: TutorialCopy.message(step, output: .print, hasPhoto: true, route: route))
+    }
+
+    /// The photo left the app inside the tutorial: it is over.
+    private func finishTutorial() {
+        guard coaching else { return }
+        model.tutorial.complete()
+        showAllSet = true
     }
 
     // MARK: - Content
@@ -333,6 +365,7 @@ struct PrintView: View {
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
+                    .coachTarget(coaching)
                     .accessibilityIdentifier("unlockAndPrint")
                 } else {
                     Button { showCredits = true } label: { Text("Get Credits").frame(maxWidth: .infinity) }
@@ -359,16 +392,21 @@ struct PrintView: View {
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
+                    .coachTarget(coaching)
                     .accessibilityIdentifier("printAtHome")
                 } else if let result = model.exported {
-                    // Straight to the share sheet: AirDrop to a kiosk, a print app, or a message to the shop.
-                    ShareLink(items: result.pages) {
+                    // Straight to the share sheet: AirDrop to a kiosk, a print app, or a message to the shop. The
+                    // system sheet is presented directly so a completed share can end the tutorial.
+                    Button {
+                        ShareController.present(result.pages) { shared in if shared { finishTutorial() } }
+                    } label: {
                         Label(result.pages.count == 1 ? "Share Print Image" : "Share Print Images",
                               systemImage: "square.and.arrow.up")
                             .frame(maxWidth: .infinity)
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
+                    .coachTarget(coaching)
                     .accessibilityIdentifier("sharePages")
                 } else {
                     // The files are still being made after unlocking.
@@ -417,11 +455,14 @@ struct PrintView: View {
     private func perform(_ action: Action, _ result: PhotoExport) {
         switch action {
         case .home:
-            // UI tests cannot drive the system print panel; everything up to it is covered.
-            guard !PrintController.isSuppressedForUITests else { return }
+            // UI tests cannot drive the system print panel; everything up to it is covered. In the tutorial they
+            // stand in for a finished job so "You're all set" can be tested.
+            guard !PrintController.isSuppressedForUITests else { if coaching { finishTutorial() }; return }
             PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Calipic sheet")) { sent in
-                // A finished job leads straight to the check; a cancelled panel leaves Print as it was.
-                if sent { showCheck = true }
+                // A finished job leads straight to the check (after "You're all set" in the tutorial); a cancelled
+                // panel leaves Print as it was.
+                guard sent else { return }
+                if coaching { finishTutorial() } else { showCheck = true }
             }
         case .formats: showFormats = true
         }

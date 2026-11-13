@@ -73,11 +73,15 @@ final class PhotoWorkflow {
 
     /// The person's credits. One credit unlocks one photo (ADR-048).
     let credits: CreditStore
+    /// The first-run tutorial (ADR-052); finished unless a new install starts it.
+    let tutorial: TutorialCoach
 
-    init(pipeline: any PhotoProcessing, document: DocumentChoice = .initial, credits: CreditStore? = nil) {
+    init(pipeline: any PhotoProcessing, document: DocumentChoice = .initial, credits: CreditStore? = nil,
+         tutorial: TutorialCoach? = nil) {
         self.pipeline = pipeline
         self.document = document
         self.credits = credits ?? CreditStore()
+        self.tutorial = tutorial ?? TutorialCoach()
     }
 
     func setInitialized() { isInitialized = true }
@@ -358,6 +362,7 @@ final class PhotoWorkflow {
     func unlock(_ ids: [UUID]) -> Bool {
         let locked = entries.filter { ids.contains($0.id) && !$0.isUnlocked }.map(\.id)
         guard credits.spend(locked.count) else { return false }
+        if !locked.isEmpty { tutorial.creditSpent() }
         for id in locked { update(id) { $0.isUnlocked = true } }
         return true
     }

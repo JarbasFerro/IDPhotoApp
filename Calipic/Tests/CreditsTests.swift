@@ -3,11 +3,11 @@ import Foundation
 import Testing
 @testable import Calipic
 
-/// Credits (ADR-048, amended 2026-11-12): one to start, one per photo, packs of 1, 5, and 10.
+/// Credits (ADR-048, amended 2026-11-13): two to start (one for the tutorial), one per photo, packs of 1, 5, and 10.
 struct CreditLedgerTests {
-    @Test func everyoneStartsWithOneCredit() {
-        #expect(CreditLedger().balance == 1)
-        #expect(CreditLedger.startingBalance == 1)
+    @Test func aNewInstallStartsWithTwoCredits() {
+        #expect(CreditLedger().balance == 2)
+        #expect(CreditLedger.startingBalance == 2)
     }
 
     @Test func spendingNeverGoesBelowZero() {
@@ -48,10 +48,10 @@ struct CreditStoreTests {
         let defaults = try #require(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let store = CreditStore(defaults: defaults)
-        #expect(store.balance == 1)
+        #expect(store.balance == 2)
         store.add(CreditPack.all[1])
         #expect(store.spend(2))
-        #expect(CreditStore(defaults: defaults).balance == 4)
+        #expect(CreditStore(defaults: defaults).balance == 5)
     }
 
     @Test func aFailedSpendChangesNothing() {

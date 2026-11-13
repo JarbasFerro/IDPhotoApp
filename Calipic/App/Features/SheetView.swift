@@ -58,6 +58,11 @@ struct SheetView: View {
             }
         }
         .background(Design.Surface.screen)
+        .tutorialCoach(model.tutorial.isActive
+            ? CoachCard(step: .sheet, steps: TutorialFlow.steps(for: .print),
+                        title: TutorialCopy.title(.sheet, output: .print, hasPhoto: true),
+                        message: TutorialCopy.message(.sheet, output: .print, hasPhoto: true, route: nil))
+            : nil)
         .navigationTitle("Your sheet")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -154,6 +159,7 @@ struct SheetView: View {
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(layout.pages.isEmpty || model.activity != nil)
+            .coachTarget(model.tutorial.isActive)
             .accessibilityIdentifier("continueToShare")
         }
     }

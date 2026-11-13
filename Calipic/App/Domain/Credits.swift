@@ -16,9 +16,10 @@ struct CreditPack: Identifiable, Hashable, Sendable {
     ]
 }
 
-/// Pure credit arithmetic. One credit unlocks one photo; everyone starts with one.
+/// Pure credit arithmetic. One credit unlocks one photo; a new install starts with two, one of them for the
+/// first-run tutorial (ADR-048 amended, ADR-052).
 struct CreditLedger: Equatable, Sendable {
-    static let startingBalance = 1
+    static let startingBalance = 2
     private(set) var balance: Int
 
     init(balance: Int = CreditLedger.startingBalance) { self.balance = max(0, balance) }
@@ -68,6 +69,12 @@ final class CreditStore {
     /// Adds a pack's credits. Until StoreKit (0.22) it adds them without payment; StoreKit replaces this call site later.
     func add(_ pack: CreditPack) {
         ledger.add(pack.credits)
+        save()
+    }
+
+    /// Gives credits back without a purchase (a tutorial photo lost before it left the app).
+    func grant(_ count: Int) {
+        ledger.add(count)
         save()
     }
 

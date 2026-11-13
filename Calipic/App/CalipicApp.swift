@@ -18,9 +18,15 @@ struct CalipicApp: App {
             : DocumentStore.start(stored: UserDefaults.standard.string(forKey: DocumentStore.key),
                                   regionCode: Locale.current.region?.identifier, catalog: .bundled)
         needsDocumentPrompt = start.needsPrompt
-        // UI tests get an in-memory balance of one credit; real launches keep the balance on the device.
-        let credits = CreditStore(defaults: isolated ? nil : .standard)
-        _model = State(initialValue: PhotoWorkflow(pipeline: pipeline, document: start.choice, credits: credits))
+        // UI tests get an in-memory balance of one credit and no tutorial, unless "--uitesting-tutorial" asks for a
+        // new install's two credits and the tutorial; real launches keep both on the device.
+        let tutorialTest = ProcessInfo.processInfo.arguments.contains("--uitesting-tutorial")
+        let credits = isolated ? CreditStore(startingBalance: tutorialTest ? CreditLedger.startingBalance : 1)
+                               : CreditStore(defaults: .standard)
+        let tutorial = isolated ? TutorialCoach(state: tutorialTest ? .fresh : .done)
+                                : TutorialCoach.load(defaults: .standard, credits: credits)
+        _model = State(initialValue: PhotoWorkflow(pipeline: pipeline, document: start.choice, credits: credits,
+                                                   tutorial: tutorial))
     }
 
     var body: some Scene {

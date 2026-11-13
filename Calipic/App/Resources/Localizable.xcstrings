@@ -84,6 +84,678 @@
         }
       }
     },
+    "A selfie becomes an ID photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un selfi se convierte en foto de carné"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uma selfie vira uma foto 3x4"
+          }
+        }
+      }
+    },
+    "Against a plain wall, with the camera guiding you." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ante una pared lisa, con la cámara guiándote."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diante de uma parede lisa, com a câmera guiando você."
+          }
+        }
+      }
+    },
+    "At home on photo paper, or at any print shop." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En casa en papel fotográfico, o en cualquier tienda de fotos."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Em casa, em papel fotográfico, ou em qualquer loja de impressão."
+          }
+        }
+      }
+    },
+    "Check the size" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba el tamaño"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira o tamanho"
+          }
+        }
+      }
+    },
+    "Choose the paper and how many copies, then tap Continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el papel y cuántas copias, y toca Continuar."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha o papel e quantas cópias, depois toque em Continuar."
+          }
+        }
+      }
+    },
+    "Choose where you'll print: at home or at a shop." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige dónde imprimirás: en casa o en una tienda."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha onde vai imprimir: em casa ou em uma loja."
+          }
+        }
+      }
+    },
+    "Continue your first photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continúa tu primera foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue sua primeira foto"
+          }
+        }
+      }
+    },
+    "Developer details are on. Credits are not changed." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los detalles de desarrollo están activados. Los créditos no cambian."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os detalhes de desenvolvedor estão ativados. Os créditos não mudam."
+          }
+        }
+      }
+    },
+    "Each credit unlocks one person's photo, for every print and digital copy." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada crédito desbloquea la foto de una persona, para todas sus impresiones y copias digitales."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada crédito desbloqueia a foto de uma pessoa, para todas as impressões e cópias digitais."
+          }
+        }
+      }
+    },
+    "First photo · %lld of %lld" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primera foto · %1$lld de %2$lld"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primeira foto · %1$lld de %2$lld"
+          }
+        }
+      }
+    },
+    "Framed and checked" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuadrada y revisada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadrada e verificada"
+          }
+        }
+      }
+    },
+    "Is this your document?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Es este tu documento?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este é o seu documento?"
+          }
+        }
+      }
+    },
+    "Lay out your sheet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepara tu hoja"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monte sua folha"
+          }
+        }
+      }
+    },
+    "Let's make your first ID photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hagamos tu primera foto de carné"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vamos fazer sua primeira foto 3x4"
+          }
+        }
+      }
+    },
+    "Load photo paper in your printer, then tap Print." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pon papel fotográfico en tu impresora y toca Imprimir."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque papel fotográfico na impressora e toque em Imprimir."
+          }
+        }
+      }
+    },
+    "Look at anything marked. Retakes and adjustments are free. Then continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa lo que esté marcado. Repetir y ajustar es gratis. Después continúa."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja o que estiver marcado. Refazer e ajustar é grátis. Depois continue."
+          }
+        }
+      }
+    },
+    "Look at anything marked. Retakes and adjustments are free. Then tap Print." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa lo que esté marcado. Repetir y ajustar es gratis. Después toca Imprimir."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veja o que estiver marcado. Refazer e ajustar é grátis. Depois toque em Imprimir."
+          }
+        }
+      }
+    },
+    "Measure the 50 mm line on the print. If it's right, every photo is the right size." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mide la línea de 50 mm en la impresión. Si es correcta, todas las fotos tienen el tamaño correcto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meça a linha de 50 mm na impressão. Se estiver certa, todas as fotos estão no tamanho certo."
+          }
+        }
+      }
+    },
+    "Need it for an online form?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿La necesitas para un formulario en línea?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Precisa para um formulário online?"
+          }
+        }
+      }
+    },
+    "Print it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprímela"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprima"
+          }
+        }
+      }
+    },
+    "Print your photos" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprime tus fotos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprima suas fotos"
+          }
+        }
+      }
+    },
+    "Restart the First-Photo Guide" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar la guía de la primera foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar o guia da primeira foto"
+          }
+        }
+      }
+    },
+    "Save your photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda tu foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salve sua foto"
+          }
+        }
+      }
+    },
+    "Send the image to your print shop, or save it to Files to take with you." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envía la imagen a tu tienda de fotos, o guárdala en Archivos para llevarla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envie a imagem para a loja de impressão, ou salve no Arquivos para levar."
+          }
+        }
+      }
+    },
+    "Share it, or save it to Files, to use it in your online form." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compártela o guárdala en Archivos para usarla en tu formulario en línea."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compartilhe ou salve no Arquivos para usar no seu formulário online."
+          }
+        }
+      }
+    },
+    "Sized for your document, with anything to fix pointed out." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al tamaño de tu documento, señalando lo que haya que corregir."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tamanho do seu documento, apontando o que precisar corrigir."
+          }
+        }
+      }
+    },
+    "Stand facing a window, in front of a plain light wall. Or choose a photo from your library." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponte frente a una ventana, delante de una pared lisa y clara. O elige una foto de tu fototeca."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fique de frente para uma janela, diante de uma parede lisa e clara. Ou escolha uma foto da sua Fototeca."
+          }
+        }
+      }
+    },
+    "Start" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empezar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Começar"
+          }
+        }
+      }
+    },
+    "Take your photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz tu foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tire sua foto"
+          }
+        }
+      }
+    },
+    "The digital photo is included: tap Digital Photo on Photo Check." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La foto digital está incluida: toca Foto digital en Revisión de la foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A foto digital está incluída: toque em Foto digital na Verificação da foto."
+          }
+        }
+      }
+    },
+    "The photo is sized for it. Tap it to choose another, or continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La foto se ajusta a su tamaño. Tócalo para elegir otro, o continúa."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A foto é dimensionada para ele. Toque para escolher outro, ou continue."
+          }
+        }
+      }
+    },
+    "This first photo uses one of your two free credits. After that, it's yours to print and share again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta primera foto usa uno de tus dos créditos gratis. Después es tuya para imprimirla y compartirla de nuevo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta primeira foto usa um dos seus dois créditos grátis. Depois, ela é sua para imprimir e compartilhar de novo."
+          }
+        }
+      }
+    },
+    "Unlock with a free credit" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquea con un crédito gratis"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloqueie com um crédito grátis"
+          }
+        }
+      }
+    },
+    "We frame and check it" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La encuadramos y revisamos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nós enquadramos e verificamos"
+          }
+        }
+      }
+    },
+    "We'll guide you through it, from the photo to the print. It takes a few minutes." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te guiamos de la foto a la impresión. Son unos minutos."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vamos guiar você da foto à impressão. Leva poucos minutos."
+          }
+        }
+      }
+    },
+    "You have %lld free credits. This first photo uses one, and it's yours to print again at no cost." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tienes %lld créditos gratis. Esta primera foto usa uno, y podrás volver a imprimirla sin coste."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você tem %lld créditos grátis. Esta primeira foto usa um, e você pode imprimi-la de novo sem custo."
+          }
+        }
+      }
+    },
+    "You're all set" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo listo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo pronto"
+          }
+        }
+      }
+    },
+    "Your first ID photo is saved. Next time, it works the same way, without the guide." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu primera foto de carné está guardada. La próxima vez funciona igual, sin la guía."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua primeira foto 3x4 está salva. Da próxima vez funciona igual, sem o guia."
+          }
+        }
+      }
+    },
+    "Your first ID photos are printing. Next time, it works the same way, without the guide." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus primeras fotos de carné se están imprimiendo. La próxima vez funciona igual, sin la guía."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suas primeiras fotos 3x4 estão sendo impressas. Da próxima vez funciona igual, sem o guia."
+          }
+        }
+      }
+    },
+    "Your photo is waiting where you left it." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu foto te espera donde la dejaste."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua foto está esperando onde você parou."
+          }
+        }
+      }
+    },
+    "Your print image is on its way to the shop. Next time, it works the same way, without the guide." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu imagen va camino de la tienda. La próxima vez funciona igual, sin la guía."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua imagem está a caminho da loja. Da próxima vez funciona igual, sem o guia."
+          }
+        }
+      }
+    },
+    "^[%lld credit](inflect: true) left" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld crédito disponible](inflect: true)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld crédito disponível](inflect: true)"
+          }
+        }
+      }
+    },
     "^[%lld person](inflect: true) · ^[%lld copy](inflect: true) · %@" : {
       "localizations" : {
         "es" : {

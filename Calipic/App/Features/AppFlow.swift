@@ -53,6 +53,10 @@ struct RootView: View {
                 }
         }
         .environment(\.zoomNamespace, zoom)
+        // A new install begins with the welcome page and the guided first photo (ADR-052).
+        .fullScreenCover(isPresented: Binding(get: { model.tutorial.needsWelcome }, set: { _ in })) {
+            TutorialWelcomeView(credits: model.credits.balance) { model.tutorial.welcomed() }
+        }
         .sheet(item: $pendingAcquisition, onDismiss: startApprovedAcquisition) {
             pending in
             PreparationView(source: pending.source, document: model.document, onContinue: { selectedSource in

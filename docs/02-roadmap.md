@@ -88,6 +88,7 @@ Specified in [03-design.md §7](03-design.md).
 | U14 | Designed unhappy paths | S–M | 0.23 |
 | U15 | Screenshot gallery per release | S | 0.18 |
 | U16 | Final icon with dark, tinted, and layered variants; App Store screenshots | M | 0.40 |
+| U17 | First-photo guide: welcome, coached real flow to the print, two free credits (ADR-052) | M | **done in 0.20.14** |
 
 ### P — Performance and feel
 

@@ -57,6 +57,8 @@ struct HomeView: View {
             .padding(.bottom)
         }
         .background(Design.Surface.screen)
+        .tutorialCoach(coachCard)
+        .animation(reduceMotion ? nil : .smooth, value: model.tutorial.state)
         .safeAreaInset(edge: .bottom) {
             if !dynamicTypeSize.isAccessibilitySize {
                 actions
@@ -74,8 +76,11 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
-        .sheet(isPresented: $showDocuments) { DocumentPickerView(model: model) }
-        .sheet(isPresented: $showSettings) { SettingsView(appIcon: appIcon, credits: model.credits) }
+        // Looking at the document list counts as confirming it in the tutorial.
+        .sheet(isPresented: $showDocuments, onDismiss: { if model.tutorial.isActive { model.tutorial.confirmDocument() } }) {
+            DocumentPickerView(model: model)
+        }
+        .sheet(isPresented: $showSettings) { SettingsView(appIcon: appIcon, credits: model.credits, tutorial: model.tutorial) }
         .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
         .confirmationDialog(pendingRemoval == .all ? Text("Remove all photos and their copies on the sheet?")
                                                    : Text("Remove this photo and its copies on the sheet?"),
@@ -95,12 +100,39 @@ struct HomeView: View {
             }
             .accessibilityIdentifier("confirmRemovePhoto")
         } message: { _ in Text("The original in your photo library is kept.") }
-        .task {
-            guard promptForDocument, !documentPromptShown else { return }
+        // On a new install the question waits for the welcome page to close.
+        .task(id: model.tutorial.needsWelcome) {
+            guard promptForDocument, !documentPromptShown, !model.tutorial.needsWelcome else { return }
             documentPromptShown = true
             showDocuments = true
         }
         .onAppear { Self.signposter.emitEvent("HomeAppeared") }
+    }
+
+    // MARK: - Tutorial (ADR-052)
+
+    private var coachStep: TutorialStep? {
+        guard model.tutorial.isActive else { return nil }
+        return TutorialFlow.step(on: .home, documentConfirmed: model.tutorial.state.documentConfirmed,
+                                 hasPhoto: !model.entries.isEmpty, unlocked: false)
+    }
+
+    private var coachCard: CoachCard? {
+        guard let step = coachStep else { return nil }
+        let output = model.document.primaryOutput
+        let hasPhoto = !model.entries.isEmpty && step == .photo
+        var card = CoachCard(step: hasPhoto ? .check : step, steps: TutorialFlow.steps(for: output),
+                             title: TutorialCopy.title(step, output: output, hasPhoto: hasPhoto),
+                             message: TutorialCopy.message(step, output: output, hasPhoto: hasPhoto, route: nil))
+        if step == .document {
+            card.actionTitle = "Continue"
+            card.action = { model.tutorial.confirmDocument() }
+        } else if hasPhoto, let first = model.entries.first {
+            // Back on Home with a photo in progress: pick up at its Photo Check.
+            card.actionTitle = "Continue"
+            card.action = { path = [.check(first.id)] }
+        }
+        return card
     }
 
     // MARK: - Hero
@@ -280,6 +312,7 @@ struct HomeView: View {
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Chooses the country and document, or a custom size.")
+            .coachTarget(coachStep == .document, cornerRadius: Design.Radius.group)
             .accessibilityIdentifier("documentCard")
             Divider().padding(.leading)
             Button { showRequirements = true } label: {
@@ -304,14 +337,21 @@ struct HomeView: View {
 
     private var actions: some View {
         VStack(spacing: Design.Spacing.tight) {
-            Button { acquire(.camera, model.entries.isEmpty ? .replace : .add) } label: {
+            Button {
+                if model.tutorial.isActive { model.tutorial.confirmDocument() }
+                acquire(.camera, model.entries.isEmpty ? .replace : .add)
+            } label: {
                 Label("Take Photo", systemImage: "camera").frame(maxWidth: .infinity)
             }
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(isBusy)
+            .coachTarget(coachStep == .photo && model.entries.isEmpty)
             .accessibilityIdentifier("takePhoto")
-            Button("Choose from Library") { acquire(.library, model.entries.isEmpty ? .replace : .add) }
+            Button("Choose from Library") {
+                if model.tutorial.isActive { model.tutorial.confirmDocument() }
+                acquire(.library, model.entries.isEmpty ? .replace : .add)
+            }
                 .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
                 .disabled(isBusy)
                 .accessibilityIdentifier("choosePhoto")
@@ -358,6 +398,8 @@ struct HomeView: View {
 struct SettingsView: View {
     let appIcon: AppIconController
     let credits: CreditStore
+    var tutorial: TutorialCoach?
+    @AppStorage(DeveloperMode.key) private var developerMode = false
     @Environment(\.dismiss) private var dismiss
     @State private var showAppIcons = false
     @State private var showCredits = false
@@ -403,6 +445,15 @@ struct SettingsView: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityAddTraits(.isButton)
                     .accessibilityIdentifier("settingsCredits")
+                }
+                // Developer details only: walk the first-photo guide again on a device that already finished it.
+                if developerMode, let tutorial {
+                    Section {
+                        Button("Restart the First-Photo Guide") { tutorial.restart(); dismiss() }
+                            .accessibilityIdentifier("restartTutorial")
+                    } footer: {
+                        Text("Developer details are on. Credits are not changed.")
+                    }
                 }
                 Section("Privacy") {
                     Text("Calipic works on your iPhone. No account, no ads, and nothing is uploaded.")

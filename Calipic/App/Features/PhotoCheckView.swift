@@ -59,6 +59,7 @@ struct PhotoCheckView: View {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
             }
         }
+        .tutorialCoach(coachCard)
         .navigationTitle(position.map { $0.1 > 1 ? String(localized: "Photo \($0.0) of \($0.1)") : String(localized: "Photo Check") } ?? String(localized: "Photo Check"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -338,11 +339,12 @@ struct PhotoCheckView: View {
     /// The main output on its own line; the other output and Adjust share the next one, so the buttons take two
     /// lines instead of three. At accessibility text sizes they stack.
     private var actions: some View {
-        let outputs = model.document.availableOutputs
+        // The tutorial offers only the main output, the way it continues (ADR-052).
+        let outputs = model.tutorial.isActive ? [model.document.primaryOutput] : model.document.availableOutputs
         let secondary = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
         return VStack(spacing: Design.Spacing.control) {
-            if let first = outputs.first { outputButton(first).brandProminentButtonStyle() }
+            if let first = outputs.first { outputButton(first).brandProminentButtonStyle().coachTarget(model.tutorial.isActive) }
             secondary {
                 ForEach(Array(outputs.dropFirst()), id: \.self) { output in
                     outputButton(output).buttonStyle(.bordered)
@@ -421,5 +423,15 @@ struct PortraitView: View {
             .rotationEffect(.degrees(-adjustment.clamped().rotationDegrees),
                             anchor: UnitPoint(x: crop.x + crop.width / 2, y: crop.y + crop.height / 2))
             .offset(x: -crop.x / crop.width * size.width, y: -crop.y / crop.height * size.height)
+    }
+}
+
+extension PhotoCheckView {
+    fileprivate var coachCard: CoachCard? {
+        guard model.tutorial.isActive else { return nil }
+        let output = model.document.primaryOutput
+        return CoachCard(step: .check, steps: TutorialFlow.steps(for: output),
+                         title: TutorialCopy.title(.check, output: output, hasPhoto: true),
+                         message: TutorialCopy.message(.check, output: output, hasPhoto: true, route: nil))
     }
 }
