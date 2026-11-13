@@ -53,7 +53,9 @@ struct CameraView: View {
     @State private var flash = false
     @State private var countdown: Int?
     /// New key on purpose: devices that ran 0.8 to 0.10.1 have the old key stored as true.
-    @AppStorage("autoCaptureEnabled") private var autoCapture = false
+    /// On by default since 0.20.7 (ADR-044 note): the photo is taken after a visible three-second countdown once the
+    /// checks settle. A new key, so an earlier "off" from when it was opt-in does not carry over.
+    @AppStorage("autoCaptureDefaultOn") private var autoCapture = true
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
     @State private var showCameraHelp = false
@@ -63,6 +65,8 @@ struct CameraView: View {
     @State private var capturedMirrored = false
     @State private var showingCapturedReview = false
     @State private var preparingReview = false
+    /// Use Photo was tapped: the camera stays until Photo Check is ready underneath, so Home never flashes between them.
+    @State private var usingPhoto = false
     @State private var captureRevision = UUID()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -125,7 +129,7 @@ struct CameraView: View {
         .sensoryFeedback(.selection, trigger: countdown) { _, value in value != nil }
         .task(id: "\(camera.hint.rawValue)-\(autoCapture)-\(showCameraHelp)-\(preparingReview)-\(showingCapturedReview)") {
             // Auto capture: "ready" held through a visible countdown; any hint change cancels it.
-            guard autoCapture, !showCameraHelp, !preparingReview, !showingCapturedReview,
+            guard autoCapture, !reviewFixture, !showCameraHelp, !preparingReview, !showingCapturedReview,
                   camera.hint == .ready, camera.state == .running, !camera.isCapturing
             else { countdown = nil; return }
             // Three seconds: enough to stop reading the screen and look at the lens.
@@ -437,6 +441,7 @@ struct CameraView: View {
         VStack(spacing: 0) {
             HStack {
                 Button("Cancel") { discardCapturedPhoto(); dismiss() }
+                    .disabled(usingPhoto)
                     .accessibilityIdentifier("cameraReviewCancel")
                 Spacer()
             }
@@ -453,12 +458,19 @@ struct CameraView: View {
                     Button("Retake") { discardCapturedPhoto() }
                         .buttonStyle(.glass)
                         .tint(.white)
+                        .disabled(usingPhoto)
                         .accessibilityIdentifier("cameraRetake")
-                    Button("Use Photo") {
+                    Button {
                         guard let capturedPhoto else { return }
                         self.capturedPhoto = nil
+                        usingPhoto = true
                         onCapture(capturedPhoto, CameraMetrics(startupMilliseconds: camera.startupMilliseconds,
                                                                captureMilliseconds: camera.lastCaptureMilliseconds))
+                    } label: {
+                        HStack(spacing: 8) {
+                            if usingPhoto { ProgressView().tint(.white) }
+                            Text("Use Photo")
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Color.brandAccentFill)
@@ -488,6 +500,7 @@ struct CameraView: View {
         capturedImage = nil
         showingCapturedReview = false
         preparingReview = false
+        usingPhoto = false
     }
 }
 

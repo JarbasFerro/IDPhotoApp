@@ -125,14 +125,14 @@ Found while building; keep them in mind before changing these areas.
 - Stills are capped at 12.6 megapixels with balanced quality. Asking for 48 megapixels with maximum quality made the shutter take seconds.
 - Face angles must be read from the face object converted to the preview layer's space. The raw metadata angles are relative to the landscape sensor, so a level head reads as 90°.
 - After an interruption (lock and unlock), restart the capture session explicitly; the "interruption ended" notice alone leaves a frozen preview.
-- The face should fill 18–42 % of the screen. The first thresholds (30–55 %) forced the phone uncomfortably close.
+- The face should fill 12–46 % of the screen (0.20.7; the face box is brows to chin). The first thresholds (30–55 %) forced the phone uncomfortably close; 16 % and a 40 cm distance limit still flipped between "closer" and "farther" at arm's length. "Too close" is now under 30 cm and needs 5 cm of clearance to go away.
 - Instructions tell the person how to move the **phone**. Instructions about moving the face confused testers. Left and right depend on the lens and on whether the preview is mirrored.
 - Studio Light cannot be offered to third-party photo capture.
 
 **Framing**
 
 - The roll that matters for the crop comes from the eye line, not from Vision's roll value (they differ by up to 4°).
-- Yaw and pitch are noisy. They stay advisory.
+- Yaw and pitch are noisy. They stay advisory: Photo Check uses the camera's limits (turn 20°, nod 15°), not 5°, so a photo the camera called ready is not told to retake (0.20.7). The light check warns at 2 % of the face clipped, not ICAO's 0.1 %, which is three pixels on the analysis image.
 - The chin landmark sits slightly low; the crown is an estimate. Crown to chin is modelled as 1.8 × eye line to chin, which held on the portraits tried so far (adults, short hair). Children, tall hair, and headwear are not validated.
 - Tilts up to 30° are levelled (0.20.4; was 15°), and the crop is kept inside the source so levelling pulls in no blank corners when there is room. Up to 15° this passes without comment; from 15° to 30° the photo is levelled and Photo Check says so, because the shoulders may look uneven; above 30° the app reports the tilt and asks for a retake.
 - Rotation can reveal blank corners when the crop touches the edge of the source.

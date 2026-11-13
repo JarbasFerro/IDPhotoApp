@@ -26,6 +26,8 @@ struct RootView: View {
     @State private var pendingAcquisition: PendingAcquisition?
     @State private var approvedAcquisition: PendingAcquisition?
     @State private var choosePhotoAfterCamera = false
+    /// The camera's photo is being prepared; the camera closes once Photo Check is in place behind it.
+    @State private var awaitingCameraPhoto = false
     @State private var selection: PhotosPickerItem?
     @State private var importMode: PhotoWorkflow.ImportMode = .replace
     /// Comma-separated ids of documents whose "Before your photo" sheet was shown (D-1: in full once per document).
@@ -62,11 +64,14 @@ struct RootView: View {
         .photosPicker(isPresented: $showPicker, selection: $selection, matching: .images, preferredItemEncoding: .current)
         .fullScreenCover(isPresented: $showCamera, onDismiss: {
             // A still prepared during its review but never used (Cancel) is thrown away.
+            awaitingCameraPhoto = false
             model.discardAhead()
             if choosePhotoAfterCamera { choosePhotoAfterCamera = false; showPicker = true }
         }) {
             CameraView(onCapture: { staged, metrics in
-                showCamera = false
+                // Stay on the camera until the photo is installed (onChange of lastInstalled below), so closing it
+                // reveals Photo Check rather than Home (founder, 0.20 review).
+                awaitingCameraPhoto = true
                 model.lastCameraMetrics = metrics
                 model.useCapture(staged, mode: importMode)
             }, onChoosePhoto: { choosePhotoAfterCamera = true; showCamera = false },
@@ -83,8 +88,24 @@ struct RootView: View {
         }
         .onChange(of: model.lastInstalled) { _, event in
             guard let event else { return }
-            // A retake replaces the current Photo Check; a new person gets their own.
-            if case .check = path.last { path[path.count - 1] = .check(event.id) } else { path.append(.check(event.id)) }
+            // Behind the camera the change happens without animation; the camera then slides away to reveal it.
+            var transaction = Transaction()
+            transaction.disablesAnimations = awaitingCameraPhoto
+            withTransaction(transaction) {
+                // A retake replaces the current Photo Check; a new person gets their own.
+                if case .check = path.last { path[path.count - 1] = .check(event.id) } else { path.append(.check(event.id)) }
+            }
+            if awaitingCameraPhoto { awaitingCameraPhoto = false; showCamera = false }
+        }
+        .task(id: awaitingCameraPhoto) {
+            // Safety net: never leave the camera waiting on a photo that will not arrive.
+            guard awaitingCameraPhoto else { return }
+            try? await Task.sleep(for: .seconds(15))
+            if !Task.isCancelled, awaitingCameraPhoto { awaitingCameraPhoto = false; showCamera = false }
+        }
+        .onChange(of: model.errorMessage) { _, message in
+            // Preparing the camera's photo failed: close the camera so the alert shows.
+            if message != nil, awaitingCameraPhoto { awaitingCameraPhoto = false; showCamera = false }
         }
         .alert("Unable to complete", isPresented: Binding(get: {
             if case .digital = path.last { return false }

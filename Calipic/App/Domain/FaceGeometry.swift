@@ -150,8 +150,11 @@ struct CompositionSpec: Sendable, Hashable {
     var maxRollDegrees = 15.0
     /// Tilts up to this are levelled automatically; beyond it the photo is measured but not rotated.
     var maxAutoLevelDegrees = 30.0
-    var maxYawDegrees = 5.0
-    var maxPitchDegrees = 5.0
+    /// Head turn and nod are noisy on phone photos (architecture §11), so Photo Check only reports a clearly turned or
+    /// tilted head, with the same limits the camera uses before it says "Ready" (`CaptureGuidanceThresholds`). At 5° a photo the
+    /// camera accepted was then told to retake (founder, 0.20 review).
+    var maxYawDegrees = 20.0
+    var maxPitchDegrees = 15.0
     var minimumInterEyePixels = 90.0
     var recommendedInterEyePixels = 120.0
     /// Minimum space between the crown and the top edge, as a fraction of photo height.

@@ -6,7 +6,9 @@ struct PrintView: View {
     @Bindable var model: PhotoWorkflow
     @Binding var path: [Route]
     @State private var pending: Action?
-    @State private var showShop = false
+    /// Home or shop: one choice drives the steps and the main button, so a shop print needs no extra sheet
+    /// (founder, 0.20 review: Print at a Shop opened a sheet whose button opened the share sheet).
+    @State private var chosenRoute: PrintCheckView.PrintRoute = .home
     @State private var showFormats = false
     @State private var showCredits = false
     @State private var showCheck = false
@@ -14,11 +16,12 @@ struct PrintView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
 
-    enum Action { case home, shop, formats }
+    enum Action { case home, formats }
 
     private var locked: Int { model.lockedCount }
     private var shopOnly: Bool { model.document.printIsShopOnly }
     private var canPrintAtHome: Bool { PrintController.isAvailable && !shopOnly }
+    private var route: PrintCheckView.PrintRoute { canPrintAtHome ? chosenRoute : .shop }
     private var isWorking: Bool { model.activity == .exporting }
 
     var body: some View {
@@ -59,15 +62,10 @@ struct PrintView: View {
                 }
             }
         }
-        .sheet(isPresented: $showShop) {
-            if let result = model.exported {
-                ShopPrintView(model: model, result: result) { showShop = false; path.removeAll() }
-            }
-        }
         .sheet(isPresented: $showCheck) {
             NavigationStack {
-                PrintCheckView(model: model, route: .home,
-                               onPrintAgain: canPrintAtHome ? { printAgain() } : nil,
+                PrintCheckView(model: model, route: route,
+                               onPrintAgain: route == .home ? { printAgain() } : nil,
                                onFinished: { showCheck = false; path.removeAll() })
             }
         }
@@ -109,25 +107,42 @@ struct PrintView: View {
         }
     }
 
-    /// The instructions that decide whether the print comes out at the right size (docs/03-design.md §3).
+    /// The instructions that decide whether the print comes out at the right size (docs/03-design.md §3), for printing
+    /// at home or ordering at a shop.
     private var steps: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing.text) {
+        let paper = PaperNames.short(for: model.printJob.paper)
+        let measure = model.printJob.options.calibrationBar
+            ? Text("Measure the 50 mm line before cutting") : Text("Measure one photo before cutting")
+        return VStack(alignment: .leading, spacing: Design.Spacing.text) {
+            if canPrintAtHome {
+                Picker("Where to print", selection: $chosenRoute) {
+                    Text("At Home").tag(PrintCheckView.PrintRoute.home)
+                    Text("At a Shop").tag(PrintCheckView.PrintRoute.shop)
+                }
+                .pickerStyle(.segmented)
+                .padding(.bottom, Design.Spacing.text)
+                .accessibilityIdentifier("printRoutePicker")
+            }
             Text("Before you print")
                 .font(Design.Typography.note.weight(.semibold)).foregroundStyle(.secondary)
                 .padding(.horizontal, Design.Spacing.tight)
                 .accessibilityAddTraits(.isHeader)
             VStack(spacing: 0) {
-                step(1, title: PaperNames.isPhotoPaper(model.printJob.paper)
-                        ? Text("Load \(PaperNames.short(for: model.printJob.paper)) photo paper")
-                        : Text("Load \(PaperNames.short(for: model.printJob.paper)) paper"), detail: nil)
+                if route == .home {
+                    step(1, title: PaperNames.isPhotoPaper(model.printJob.paper)
+                            ? Text("Load \(paper) photo paper") : Text("Load \(paper) paper"), detail: nil)
+                    Divider().padding(.leading, 56)
+                    step(2, title: Text("Choose Actual Size, or 100 %"), detail: Text("Never Fit to Page or borderless"))
+                } else {
+                    step(1, title: Text("Order a standard print on \(paper) paper"), detail: nil)
+                    Divider().padding(.leading, 56)
+                    step(2, title: Text("Ask for no cropping and no Fit to Page"), detail: nil)
+                }
                 Divider().padding(.leading, 56)
-                step(2, title: Text("Choose Actual Size, or 100 %"), detail: Text("Never Fit to Page or borderless"))
-                Divider().padding(.leading, 56)
-                step(3, title: model.printJob.options.calibrationBar
-                        ? Text("Measure the 50 mm line before cutting") : Text("Measure one photo before cutting"),
-                     detail: nil)
+                step(3, title: measure, detail: nil)
             }
             .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
+            .animation(reduceMotion ? nil : .snappy, value: route)
             if let note = model.document.printNoteKey {
                 Label(String(localized: String.LocalizationValue(note)), systemImage: "storefront")
                     .font(Design.Typography.note)
@@ -165,7 +180,8 @@ struct PrintView: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                     Text("Check Your Print").foregroundStyle(.primary)
-                    Text("Lay it on the screen to see it is the right size")
+                    Text(route == .home ? "Lay it on the screen to see it is the right size"
+                                        : "When the prints are back, lay one on the screen")
                         .font(Design.Typography.note).foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)
@@ -213,22 +229,32 @@ struct PrintView: View {
                     .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
                     .accessibilityIdentifier("keepEditing")
             } else {
-                if canPrintAtHome {
-                    Button { run(.home) } label: { label("Print at Home", working: pending == .home) }
-                        .brandProminentButtonStyle()
-                        .controlSize(.large)
-                        .accessibilityIdentifier("printAtHome")
-                    Button { run(.shop) } label: { label("Print at a Shop", working: pending == .shop) }
-                        .buttonStyle(.bordered)
-                        .controlSize(.large)
-                        .accessibilityIdentifier("printAtShop")
+                if route == .home {
+                    Button { run(.home) } label: {
+                        label("Print", systemImage: "printer", working: pending == .home)
+                    }
+                    .brandProminentButtonStyle()
+                    .controlSize(.large)
+                    .accessibilityIdentifier("printAtHome")
+                } else if let result = model.exported {
+                    // Straight to the share sheet: AirDrop to a kiosk, a print app, or a message to the shop.
+                    ShareLink(items: result.pages) {
+                        Label(result.pages.count == 1 ? "Share Print Image" : "Share Print Images",
+                              systemImage: "square.and.arrow.up")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .brandProminentButtonStyle()
+                    .controlSize(.large)
+                    .accessibilityIdentifier("sharePages")
                 } else {
-                    Button { run(.shop) } label: { label("Print at a Shop", working: pending == .shop) }
+                    // The files are still being made after unlocking.
+                    Button {} label: { label("Share Print Image", systemImage: "square.and.arrow.up", working: true) }
                         .brandProminentButtonStyle()
                         .controlSize(.large)
-                        .accessibilityIdentifier("printAtShop")
+                        .disabled(true)
+                        .accessibilityIdentifier("sharePagesPreparing")
                 }
-                Button { run(.formats) } label: { label("More Formats", working: pending == .formats) }
+                Button { run(.formats) } label: { label("More Formats", systemImage: nil, working: pending == .formats) }
                     .frame(minHeight: Design.Size.minimumTarget)
                     .accessibilityIdentifier("moreFormats")
             }
@@ -236,9 +262,9 @@ struct PrintView: View {
         .disabled(isWorking && pending != nil)
     }
 
-    private func label(_ title: LocalizedStringKey, working: Bool) -> some View {
+    private func label(_ title: LocalizedStringKey, systemImage: String?, working: Bool) -> some View {
         HStack(spacing: Design.Spacing.text) {
-            if working { ProgressView() }
+            if working { ProgressView() } else if let systemImage { Image(systemName: systemImage) }
             Text(title)
         }
         .frame(maxWidth: .infinity)
@@ -273,56 +299,8 @@ struct PrintView: View {
                 // A finished job leads straight to the check; a cancelled panel leaves Print as it was.
                 if sent { showCheck = true }
             }
-        case .shop: showShop = true
         case .formats: showFormats = true
         }
-    }
-}
-
-/// Printing at a kiosk or print service: one image per page at the paper's size, and how to order it.
-struct ShopPrintView: View {
-    @Bindable var model: PhotoWorkflow
-    let result: PhotoExport
-    /// Leaves the printing flow after the check (Finished → Done).
-    let onFinished: () -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    Label("Order a standard print on \(PaperNames.short(for: model.printJob.paper)) paper", systemImage: "1.circle")
-                    Label("Ask for no cropping and no Fit to Page", systemImage: "2.circle")
-                    Label(model.printJob.options.calibrationBar
-                          ? LocalizedStringKey("Measure the 50 mm line before cutting") : LocalizedStringKey("Measure one photo before cutting"),
-                          systemImage: "3.circle")
-                } footer: {
-                    if let note = model.document.printNoteKey {
-                        Text(String(localized: String.LocalizationValue(note)))
-                    }
-                }
-                Section {
-                    ShareLink(items: result.pages) {
-                        Label(result.pages.count == 1 ? "Share Print Image" : "Share Print Images", systemImage: "square.and.arrow.up")
-                    }
-                    .accessibilityIdentifier("sharePages")
-                }
-                Section {
-                    NavigationLink {
-                        PrintCheckView(model: model, route: .shop, onFinished: onFinished)
-                    } label: {
-                        Label("Check Your Print", systemImage: "ruler")
-                    }
-                    .accessibilityIdentifier("checkShopPrint")
-                } footer: {
-                    Text("When the prints are back, lay one on the screen to see it is the right size.")
-                }
-            }
-            .navigationTitle("Print at a shop")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityIdentifier("shopDone") } }
-        }
-        .presentationDetents([.medium, .large])
     }
 }
 

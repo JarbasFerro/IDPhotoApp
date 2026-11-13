@@ -138,4 +138,23 @@ struct CropSolverTests {
         let g = geometry(eyeY: 0.37, eyeX: 0.48, roll: -2.5, maskAbove: 500)
         #expect(CropSolver.solve(geometry: g) == CropSolver.solve(geometry: g))
     }
+
+    /// Photo Check uses the camera's limits for head turn and nod, so a photo the camera called ready is not told to
+    /// retake for a few degrees (founder, 0.20 review).
+    @Test func smallTurnsPassAndClearTurnsWarn() {
+        func check(yaw: Double, pitch: Double) -> (yaw: CheckState?, pitch: CheckState?) {
+            let g = geometry()
+            let turned = FaceGeometry(source: g.source, faceCount: 1, faceBox: g.faceBox, leftEye: g.leftEye, rightEye: g.rightEye,
+                                      chin: g.chin, crown: g.crown, eyeToChinPixels: g.eyeToChinPixels,
+                                      yawDegrees: yaw, pitchDegrees: pitch)
+            let checks = CropSolver.solve(geometry: turned).checks
+            return (checks.first { $0.kind == .yaw }?.state, checks.first { $0.kind == .pitch }?.state)
+        }
+        #expect(check(yaw: 10, pitch: 8) == (.pass, .pass))
+        #expect(check(yaw: 25, pitch: 0).yaw == .warn)
+        #expect(check(yaw: 0, pitch: -18).pitch == .warn)
+        let camera = CaptureGuidanceThresholds()
+        #expect(CompositionSpec.icaoEngineeringDefault.maxYawDegrees == camera.maxYawDegrees)
+        #expect(CompositionSpec.icaoEngineeringDefault.maxPitchDegrees == camera.maxPitchDegrees)
+    }
 }

@@ -49,8 +49,10 @@ struct ToneAssessment: Sendable, Hashable {
         return issues.isEmpty ? .pass : .warn
     }
 
-    /// ICAO Portrait Quality: no more than 0.1 % of facial pixels saturated at either end.
-    static let clippingLimit = 0.001
+    /// A visibly blown-out or crushed patch: 2 % of the face rectangle. ICAO Portrait Quality allows 0.1 %, but on the
+    /// 256 px analysis image that is about three pixels, so pupils, nostrils and a shine on the forehead set it off on
+    /// well-lit phone photos (founder, 0.20 review).
+    static let clippingLimit = 0.02
 
     static func assess(_ m: ToneMetrics) -> ToneAssessment {
         var issues: [Issue] = []

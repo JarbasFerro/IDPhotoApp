@@ -401,11 +401,11 @@ final class CalipicUITests: XCTestCase {
         attach(app, "More formats")
         app.buttons["formatsDone"].tap()
         XCTAssertTrue(app.buttons["formatsDone"].waitForNonExistence(timeout: 5))
-        app.buttons["printAtShop"].tap()
-        XCTAssertTrue(app.buttons["sharePages"].waitForExistence(timeout: 10))
-        attach(app, "Print at a shop")
-        app.buttons["shopDone"].tap()
-        XCTAssertTrue(app.buttons["shopDone"].waitForNonExistence(timeout: 5))
+        // At a shop: the steps change and the main button shares the print image directly, with no extra sheet.
+        app.segmentedControls["printRoutePicker"].buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["printAtHome"].exists)
+        attachBothAppearances(app, "Print at a shop")
         app.buttons["shareDone"].tap()
         // Back home with the session kept.
         XCTAssertTrue(app.buttons["yourSheet"].waitForExistence(timeout: 5))
@@ -621,12 +621,11 @@ final class CalipicUITests: XCTestCase {
     @MainActor
     func testShopPrintOffersTheCheck() throws {
         let app = launchToUnlockedPrint()
-        let shop = app.buttons["printAtShop"]
-        reveal(shop, in: app)
-        shop.tap()
-        XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 5))
-        XCTAssertTrue(any(app, "checkShopPrint").exists)
-        any(app, "checkShopPrint").tap()
+        app.segmentedControls["printRoutePicker"].buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 10))
+        let check = app.buttons["checkPrintButton"]
+        reveal(check, in: app)
+        check.tap()
         XCTAssertTrue(any(app, "trueSizeReference").waitForExistence(timeout: 5))
         app.buttons["checkNoMatch"].tap()
         XCTAssertTrue(app.buttons["checkNotSure"].waitForExistence(timeout: 5))

@@ -64,7 +64,7 @@ The decisions that are in force, one short entry each. ADR numbers are kept beca
 | ADR | Decision | Status |
 |---|---|---|
 | 043 | A short requirements summary before capture or import; Adjust is a native sheet; no mandatory tutorial | Accepted; flow under review ([02-roadmap.md](02-roadmap.md) U2) |
-| 044 | Camera: one oval, one instruction about moving the **phone**, a plain white shutter, green when the live checks settle. Automatic capture is optional, in Help | Accepted |
+| 044 | Camera: one oval, one instruction about moving the **phone**, a plain white shutter, green when the live checks settle. Automatic capture (a visible three-second countdown) is **on by default since 0.20.7** and can be turned off in Help; it was opt-in until the founder's recording showed 14 s of hints before the shutter | Accepted |
 | 045, 046 | After the shutter, show the real still with Retake and Use Photo. One soft bloom and one haptic at capture; no claims on the captured image before analysis | Accepted |
 
 ## Brand (from the brand decisions log)

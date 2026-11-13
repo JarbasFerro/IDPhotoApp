@@ -20,11 +20,11 @@ struct CaptureGuidanceTests {
     @Test func hintsNeedSeveralFramesBeforeTheySwitch() {
         var tracker = GuidanceTracker()
         #expect(tracker.hint == .noFace)
-        #expect(feed(&tracker, face(height: 0.12), times: 4) == .noFace)
-        #expect(feed(&tracker, face(height: 0.12), times: 1) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.08), times: 4) == .noFace)
+        #expect(feed(&tracker, face(height: 0.08), times: 1) == .moveCloser)
         // A single odd frame does not change the hint.
         #expect(feed(&tracker, .empty, times: 1) == .moveCloser)
-        #expect(feed(&tracker, face(height: 0.12), times: 1) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.08), times: 1) == .moveCloser)
     }
 
     @Test func goodFramingGoesThroughHoldStillToReady() {
@@ -40,11 +40,11 @@ struct CaptureGuidanceTests {
 
     @Test func sizeHysteresisPreventsToggling() {
         var tracker = GuidanceTracker()
-        _ = feed(&tracker, face(height: 0.13), times: 5)
+        _ = feed(&tracker, face(height: 0.09), times: 5)
         #expect(tracker.hint == .moveCloser)
-        // Just over the limit is not enough to leave "move closer".
-        #expect(feed(&tracker, face(height: 0.17), times: 6) == .moveCloser)
-        #expect(feed(&tracker, face(height: 0.22), times: 5) == .holdStill)
+        // Just over the limit (0.12) is not enough to leave "move closer"; clearing it by the margin is.
+        #expect(feed(&tracker, face(height: 0.13), times: 6) == .moveCloser)
+        #expect(feed(&tracker, face(height: 0.18), times: 5) == .holdStill)
     }
 
     @Test func eachConditionHasItsOwnHintInPriorityOrder() {
@@ -99,7 +99,7 @@ struct CaptureGuidanceTests {
 
     @Test func sizeUsesOvalCueButPoseAndLightDoNot() {
         var tracker = GuidanceTracker()
-        _ = feed(&tracker, face(height: 0.12), times: 5)
+        _ = feed(&tracker, face(height: 0.08), times: 5)
         #expect(tracker.correction == .closer)
         tracker = GuidanceTracker()
         _ = feed(&tracker, face(height: 0.5), times: 5)
@@ -161,7 +161,7 @@ struct CaptureGuidanceTests {
 
     @Test func framingSegmentTracksSizeAndCentre() {
         var tracker = GuidanceTracker()
-        tracker.update(face(height: 0.12))
+        tracker.update(face(height: 0.08))
         #expect(tracker.readiness.framing == .attention)
         tracker.update(face(height: 0.3, centerX: 0.8))
         #expect(tracker.readiness.framing == .attention)
@@ -174,9 +174,16 @@ struct CaptureGuidanceTests {
     @Test func distanceAndPitchHints() {
         var tracker = GuidanceTracker()
         var frame = face(height: 0.3)
-        frame.distanceCM = 30
+        frame.distanceCM = 25
         #expect(feed(&tracker, frame, times: 5) == .tooClose)
         #expect(tracker.readiness.distance == .attention)
+        // Hysteresis: just past the limit is not enough to clear the hint, 5 cm past it is.
+        frame.distanceCM = 32
+        #expect(feed(&tracker, frame, times: 5) == .tooClose)
+        frame.distanceCM = 36
+        #expect(feed(&tracker, frame, times: 5) == .holdStill)
+        frame.distanceCM = 25
+        #expect(feed(&tracker, frame, times: 5) == .tooClose)
         frame.distanceCM = 65
         frame.pitchDegrees = 18
         #expect(feed(&tracker, frame, times: 5) == .eyeLevel)

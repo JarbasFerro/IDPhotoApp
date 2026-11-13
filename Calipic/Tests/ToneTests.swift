@@ -10,8 +10,11 @@ struct ToneTests {
         #expect(ToneAssessment.assess(fine).state == .pass)
         let dark = ToneMetrics(faceMeanLuminance: 0.2, faceClippedDark: 0, faceClippedBright: 0, backgroundCast: 0)
         #expect(ToneAssessment.assess(dark).issues == [.underexposed])
-        let blown = ToneMetrics(faceMeanLuminance: 0.6, faceClippedDark: 0, faceClippedBright: 0.01, backgroundCast: 0)
+        let blown = ToneMetrics(faceMeanLuminance: 0.6, faceClippedDark: 0, faceClippedBright: 0.05, backgroundCast: 0)
         #expect(ToneAssessment.assess(blown).issues == [.clipped] && ToneAssessment.assess(blown).state == .warn)
+        // Pupils, nostrils and a shine spot: a few saturated pixels on a well-lit face are not a light problem.
+        let speckles = ToneMetrics(faceMeanLuminance: 0.55, faceClippedDark: 0.006, faceClippedBright: 0.004, backgroundCast: 0)
+        #expect(ToneAssessment.assess(speckles).state == .pass)
         let warm = ToneMetrics(faceMeanLuminance: 0.6, faceClippedDark: 0, faceClippedBright: 0, backgroundCast: 0.1)
         #expect(ToneAssessment.assess(warm).issues == [.colourCast])
         #expect(ToneSettings(isEnabled: true, strength: .nan).clamped().strength == 0.6)

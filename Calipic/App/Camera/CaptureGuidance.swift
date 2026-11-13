@@ -106,7 +106,9 @@ struct CaptureReadiness: Sendable, Hashable {
 struct CaptureGuidanceThresholds: Sendable, Hashable {
     /// Face rectangle height as a fraction of the visible preview height. The source photo is cropped later, so
     /// arm's-length framing (face about a sixth to almost half of a tall phone screen) is enough.
-    var minFaceHeight = 0.16
+    /// 0.12 (was 0.16, 0.20 review): a face box that small in a 12 MP still is still ~480 px tall, ample for the crop,
+    /// and the narrower band flipped between "closer" and "farther" at arm's length.
+    var minFaceHeight = 0.12
     var maxFaceHeight = 0.46
     /// Margin added when leaving a size hint, so a face near the limit does not toggle.
     var sizeHysteresis = 0.03
@@ -123,7 +125,10 @@ struct CaptureGuidanceThresholds: Sendable, Hashable {
     var deviceRollAttribution = 4.0
     var devicePitchAttribution = 8.0
     /// Below this the wide front lens distorts the nose and hides the ears.
-    var minDistanceCM = 40.0
+    /// 30 cm (was 40): a selfie at arm's length is 40–50 cm and the estimate is noisy, so 40 kept crossing the line.
+    var minDistanceCM = 30.0
+    /// Once "too close" shows, the phone must clear the limit by this much before the hint goes away.
+    var distanceHysteresisCM = 5.0
     /// |ln(left/right)| beyond this is a one-sided light; 0.41 is a 3:2 ratio. Advisory only: it never blocks.
     var maxLightImbalance = 0.41
     /// Background brighter than the face by this factor is backlight.
@@ -229,7 +234,8 @@ struct GuidanceTracker: Sendable, Hashable {
         if box.height > maxHeight { return .moveBack }
         let centerX = box.x + box.width / 2, centerY = box.y + box.height / 2
         if abs(centerX - 0.5) > t.horizontalTolerance || abs(centerY - t.targetCenterY) > t.verticalTolerance { return .centerFace }
-        if let distance = frame.distanceCM, distance < t.minDistanceCM { return .tooClose }
+        let minDistance = t.minDistanceCM + (hint == .tooClose ? t.distanceHysteresisCM : 0)
+        if let distance = frame.distanceCM, distance < minDistance { return .tooClose }
         // Relative pose errors, attributed to whichever is tilted: the phone or the head.
         if let roll = frame.rollDegrees, abs(roll) > t.maxRollDegrees {
             return abs(frame.device?.rollDegrees ?? 0) > t.deviceRollAttribution ? .levelPhone : .keepLevel
