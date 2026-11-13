@@ -547,6 +547,11 @@ enum PaperNames {
 /// Pages drawn from the layout: each placement is a view keyed by item and copy, so a change of copies or paper
 /// animates every photo to its new position; ticks and the calibration bar are drawn in a Canvas on top.
 struct SheetPreview: View {
+    private var firstPageWidth: CGFloat {
+        guard let page = layout.pages.first else { return pageBox.width }
+        return min(pageBox.width, pageBox.height * page.displayAspect)
+    }
+
     let layout: PrintLayout
     /// Crops per print item; placements without one are drawn as grey boxes.
     var thumbnails: [UUID: CGImage] = [:]
@@ -559,6 +564,9 @@ struct SheetPreview: View {
     var pageBox = CGSize(width: 260, height: 260)
     /// Rows of the first page to show; nil shows them all.
     var revealedRows: Int?
+    /// The page in the middle of the strip. It follows new pages as copies are added (founder, 0.20.9: pages 3–5 were
+    /// never brought into view).
+    @State private var focusedPage: Int?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -589,6 +597,7 @@ struct SheetPreview: View {
                         }
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel(Text("Page \(index + 1) of \(layout.pages.count): \(page.placements.count) photos"))
+                        .id(index)
                     }
                     if layout.pages.isEmpty {
                         ContentUnavailableView("Nothing to print", systemImage: "printer",
@@ -596,12 +605,20 @@ struct SheetPreview: View {
                             .frame(height: 220)
                     }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 4)
+                .scrollTargetLayout()
                 .padding(.vertical, 6)
             }
-            // One page sits in the middle; several pages start at the first and scroll.
-            .defaultScrollAnchor(.center, for: .alignment)
+            // Pages snap one at a time and sit in the middle of the mat; the margin centres a page of the first one's
+            // width, so a single page sits centred too.
+            .contentMargins(.horizontal, max(4, (pageBox.width + 48 - firstPageWidth) / 2), for: .scrollContent)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $focusedPage, anchor: .center)
+            .onChange(of: layout.pages.count) { old, new in
+                // A new page appears where the new copies went: bring it into view. Fewer pages: stay in range.
+                let animation: Animation? = reduceMotion ? nil : .smooth(duration: 0.4)
+                if new > old { withAnimation(animation) { focusedPage = new - 1 } }
+                else if let focusedPage, focusedPage >= new { withAnimation(animation) { self.focusedPage = max(0, new - 1) } }
+            }
             .accessibilityIdentifier("sheetPreview")
         }
     }
@@ -653,8 +670,10 @@ struct SheetPageView: View {
             let scale = min(geometry.size.width / page.widthMM, geometry.size.height / page.heightMM)
             let hidden = hiddenPlacements
             ZStack(alignment: .topLeading) {
+              // The paper stays put; only the photos cross-fade. With the paper inside the fading layer, the mat
+              // showed through for a moment and the page flashed dark on every added copy (founder, 0.20.9).
+              Color.white
               ZStack(alignment: .topLeading) {
-                Color.white
                 ForEach(keyed) { item in
                     let placement = item.placement
                     let waiting = hidden.contains(item.id)

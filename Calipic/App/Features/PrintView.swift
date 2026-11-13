@@ -8,7 +8,8 @@ struct PrintView: View {
     @State private var pending: Action?
     /// Home or shop: one choice drives the steps and the main button, so a shop print needs no extra sheet
     /// (founder, 0.20 review: Print at a Shop opened a sheet whose button opened the share sheet).
-    @State private var chosenRoute: PrintCheckView.PrintRoute = .home
+    /// Nothing is chosen at first: where to print is a decision the person makes (founder, 0.20.9).
+    @State private var chosenRoute: PrintCheckView.PrintRoute?
     @State private var showFormats = false
     @State private var showCredits = false
     @State private var showCheck = false
@@ -21,7 +22,7 @@ struct PrintView: View {
     private var locked: Int { model.lockedCount }
     private var shopOnly: Bool { model.document.printIsShopOnly }
     private var canPrintAtHome: Bool { PrintController.isAvailable && !shopOnly }
-    private var route: PrintCheckView.PrintRoute { canPrintAtHome ? chosenRoute : .shop }
+    private var route: PrintCheckView.PrintRoute? { canPrintAtHome ? chosenRoute : .shop }
     private var isWorking: Bool { model.activity == .exporting }
 
     var body: some View {
@@ -29,7 +30,7 @@ struct PrintView: View {
             VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 header
                 steps
-                if locked == 0 { checkRow }
+                if locked == 0, route != nil { checkRow }
                 if dynamicTypeSize.isAccessibilitySize { actions }
             }
             .padding(.horizontal)
@@ -64,7 +65,7 @@ struct PrintView: View {
         }
         .sheet(isPresented: $showCheck) {
             NavigationStack {
-                PrintCheckView(model: model, route: route,
+                PrintCheckView(model: model, route: route ?? .home,
                                onPrintAgain: route == .home ? { printAgain() } : nil,
                                onFinished: { showCheck = false; path.removeAll() })
             }
@@ -115,20 +116,28 @@ struct PrintView: View {
             ? Text("Measure the 50 mm line before cutting") : Text("Measure one photo before cutting")
         return VStack(alignment: .leading, spacing: Design.Spacing.text) {
             if canPrintAtHome {
-                Picker("Where to print", selection: $chosenRoute) {
-                    Text("At Home").tag(PrintCheckView.PrintRoute.home)
-                    Text("At a Shop").tag(PrintCheckView.PrintRoute.shop)
+                Text("Where will you print?")
+                    .font(Design.Typography.cardTitle)
+                    .padding(.horizontal, Design.Spacing.tight)
+                    .accessibilityAddTraits(.isHeader)
+                HStack(spacing: Design.Spacing.control) {
+                    routeCard(.home, title: "At Home", detail: "Your printer and photo paper", symbol: "printer")
+                    routeCard(.shop, title: "At a Shop", detail: "A print shop or kiosk", symbol: "storefront")
                 }
-                .pickerStyle(.segmented)
+                .fixedSize(horizontal: false, vertical: true) // both cards as tall as the taller one
                 .padding(.bottom, Design.Spacing.text)
-                .accessibilityIdentifier("printRoutePicker")
             }
             Text("Before you print")
                 .font(Design.Typography.note.weight(.semibold)).foregroundStyle(.secondary)
                 .padding(.horizontal, Design.Spacing.tight)
                 .accessibilityAddTraits(.isHeader)
             VStack(spacing: 0) {
-                if route == .home {
+                if route == nil {
+                    Text("Choose where you print to see the steps.")
+                        .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal).padding(.vertical, Design.Spacing.control)
+                } else if route == .home {
                     step(1, title: PaperNames.isPhotoPaper(model.printJob.paper)
                             ? Text("Load \(paper) photo paper") : Text("Load \(paper) paper"), detail: nil)
                     Divider().padding(.leading, 56)
@@ -138,8 +147,10 @@ struct PrintView: View {
                     Divider().padding(.leading, 56)
                     step(2, title: Text("Ask for no cropping and no Fit to Page"), detail: nil)
                 }
-                Divider().padding(.leading, 56)
-                step(3, title: measure, detail: nil)
+                if route != nil {
+                    Divider().padding(.leading, 56)
+                    step(3, title: measure, detail: nil)
+                }
             }
             .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
             .animation(reduceMotion ? nil : .snappy, value: route)
@@ -150,6 +161,44 @@ struct PrintView: View {
                     .accessibilityIdentifier("printRouteNote")
             }
         }
+    }
+
+    /// One of the two places to print, as a large selectable card: the choice has to be obvious.
+    private func routeCard(_ value: PrintCheckView.PrintRoute, title: LocalizedStringKey, detail: LocalizedStringKey,
+                           symbol: String) -> some View {
+        let selected = chosenRoute == value
+        return Button {
+            withAnimation(reduceMotion ? nil : .snappy) { chosenRoute = value }
+        } label: {
+            VStack(alignment: .leading, spacing: Design.Spacing.caption) {
+                HStack(alignment: .top) {
+                    Image(systemName: symbol)
+                        .font(.title2)
+                        .foregroundStyle(Color.brandAccent)
+                    Spacer(minLength: 0)
+                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(selected ? Color.brandAccent : Color.secondary.opacity(0.5))
+                        .contentTransition(.symbolEffect(.replace))
+                }
+                Text(title).font(Design.Typography.rowTitle).foregroundStyle(.primary)
+                Text(detail).font(Design.Typography.note).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(Design.Spacing.cardContent)
+            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
+            .overlay {
+                RoundedRectangle(cornerRadius: Design.Radius.group)
+                    .strokeBorder(selected ? Color.brandAccent : Color(.separator), lineWidth: selected ? 2 : 1)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: Design.Radius.group))
+        }
+        .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: selected) { _, now in now }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityIdentifier(value == .home ? "routeHome" : "routeShop")
     }
 
     private func step(_ number: Int, title: Text, detail: Text?) -> some View {
@@ -229,7 +278,14 @@ struct PrintView: View {
                     .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
                     .accessibilityIdentifier("keepEditing")
             } else {
-                if route == .home {
+                if route == nil {
+                    // The choice comes first; the button says so instead of guessing.
+                    Button {} label: { Text("Choose where to print").frame(maxWidth: .infinity) }
+                        .brandProminentButtonStyle()
+                        .controlSize(.large)
+                        .disabled(true)
+                        .accessibilityIdentifier("chooseRouteFirst")
+                } else if route == .home {
                     Button { run(.home) } label: {
                         label("Print", systemImage: "printer", working: pending == .home)
                     }

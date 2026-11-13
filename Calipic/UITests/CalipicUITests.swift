@@ -396,6 +396,10 @@ final class CalipicUITests: XCTestCase {
         attachBothAppearances(app, "Print, locked")
         app.buttons["unlockAndPrint"].tap()
         // Unlocked: print at home or at a shop; other files under More formats.
+        // Unlocked: where to print is an explicit choice before the main button works.
+        XCTAssertTrue(app.buttons["chooseRouteFirst"].waitForExistence(timeout: 10))
+        attachBothAppearances(app, "Print, choose where")
+        app.buttons["routeHome"].tap()
         XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
         waitUntilEnabled(app.buttons["moreFormats"])
         attachBothAppearances(app, "Print")
@@ -406,7 +410,7 @@ final class CalipicUITests: XCTestCase {
         app.buttons["formatsDone"].tap()
         XCTAssertTrue(app.buttons["formatsDone"].waitForNonExistence(timeout: 5))
         // At a shop: the steps change and the main button shares the print image directly, with no extra sheet.
-        app.segmentedControls["printRoutePicker"].buttons.element(boundBy: 1).tap()
+        app.buttons["routeShop"].tap()
         XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["printAtHome"].exists)
         attachBothAppearances(app, "Print at a shop")
@@ -482,6 +486,8 @@ final class CalipicUITests: XCTestCase {
         attach(app, "Fill pages")
         twoPages.tap()
         XCTAssertTrue(summary.label.contains("2 pages"), summary.label)
+        Thread.sleep(forTimeInterval: 0.8) // the strip scrolls to the new page
+        attachBothAppearances(app, "Your sheet, second page in view")
         app.steppers["copiesStepper"].buttons.element(boundBy: 0).tap()
         let afterCopies = summary.label
         // A different paper is one tap away.
@@ -598,6 +604,7 @@ final class CalipicUITests: XCTestCase {
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
         app.buttons["unlockAndPrint"].tap()
         waitUntilEnabled(app.buttons["moreFormats"])
+        app.buttons["routeHome"].tap()
         return app
     }
 
@@ -607,7 +614,7 @@ final class CalipicUITests: XCTestCase {
         let app = launchToUnlockedPrint()
         let check = app.buttons["checkPrintButton"]
         XCTAssertTrue(check.waitForExistence(timeout: 5))
-        reveal(check, in: app)
+        reveal(check, in: app, bottomClearance: 240)
         attach(app, "Print, unlocked")
         check.tap()
         XCTAssertTrue(any(app, "trueSizeReference").waitForExistence(timeout: 5))
@@ -620,7 +627,7 @@ final class CalipicUITests: XCTestCase {
         app.buttons["diagnosisClose"].tap()
         XCTAssertTrue(app.buttons["diagnosisClose"].waitForNonExistence(timeout: 5))
         XCTAssertTrue(check.waitForExistence(timeout: 5))
-        reveal(check, in: app)
+        reveal(check, in: app, bottomClearance: 240)
         check.tap()
         XCTAssertTrue(app.buttons["checkMatches"].waitForExistence(timeout: 5))
         app.buttons["checkMatches"].tap()
@@ -634,10 +641,10 @@ final class CalipicUITests: XCTestCase {
     @MainActor
     func testShopPrintOffersTheCheck() throws {
         let app = launchToUnlockedPrint()
-        app.segmentedControls["printRoutePicker"].buttons.element(boundBy: 1).tap()
+        app.buttons["routeShop"].tap()
         XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 10))
         let check = app.buttons["checkPrintButton"]
-        reveal(check, in: app)
+        reveal(check, in: app, bottomClearance: 240)
         check.tap()
         XCTAssertTrue(any(app, "trueSizeReference").waitForExistence(timeout: 5))
         app.buttons["checkNoMatch"].tap()
@@ -721,6 +728,8 @@ final class CalipicUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter().wait(for: [hittable], timeout: 5), .completed)
         attach(app, "Print at accessibility text size")
         app.buttons["unlockAndPrint"].tap()
+        reveal(app.buttons["routeHome"], in: app, attempts: 10)
+        app.buttons["routeHome"].tap()
         XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
         reveal(app.buttons["printAtHome"], in: app, attempts: 10)
         XCTAssertTrue(app.buttons["printAtHome"].isHittable)
