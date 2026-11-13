@@ -620,6 +620,11 @@ final class CalipicUITests: XCTestCase {
         app.buttons["outputPrint"].tap()
         let summary = app.staticTexts["layoutSummary"]
         XCTAssertTrue(app.buttons["fillPages"].waitForExistence(timeout: 10))
+        // A part-filled page outlines its free slots and says how many more fit.
+        XCTAssertTrue(summary.waitForExistence(timeout: 10))
+        XCTAssertTrue(summary.label.contains("Room for"), summary.label)
+        sleep(2)
+        attachBothAppearances(app, "Your sheet, free slots")
         app.buttons["fillPages"].tap()
         let twoPages = app.buttons.matching(NSPredicate(format: "label BEGINSWITH '2 pages'")).firstMatch
         XCTAssertTrue(twoPages.waitForExistence(timeout: 5))

@@ -13,6 +13,10 @@ struct PrintView: View {
     @State private var showFormats = false
     @State private var showCredits = false
     @State private var showCheck = false
+    /// The photo was unlocked on this screen with no route chosen: the cards are scrolled into view and outlined.
+    @State private var promptRoute = false
+    /// Opacity of the one-time 2 pt pulse around the route cards.
+    @State private var pulseOpacity = 0.0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
@@ -26,15 +30,21 @@ struct PrintView: View {
     private var isWorking: Bool { model.activity == .exporting }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
-                header
-                steps
-                if locked == 0, route != nil { checkRow }
-                if dynamicTypeSize.isAccessibilitySize { actions }
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
+                    header
+                    steps
+                    if locked == 0, route != nil { checkRow }
+                    if dynamicTypeSize.isAccessibilitySize { actions }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, Design.Spacing.text)
             }
-            .padding(.horizontal)
-            .padding(.vertical, Design.Spacing.text)
+            .onChange(of: locked) { old, new in
+                guard old > 0, new == 0, canPrintAtHome, chosenRoute == nil else { return }
+                promptRouteChoice(proxy)
+            }
         }
         .background(Design.Surface.screen)
         .safeAreaInset(edge: .bottom) {
@@ -153,6 +163,7 @@ struct PrintView: View {
                 }
                 .fixedSize(horizontal: false, vertical: true) // both cards as tall as the taller one
                 .padding(.bottom, Design.Spacing.text)
+                .id(Self.routeSectionID)
             }
             Text("Before you print")
                 .font(Design.Typography.note.weight(.semibold)).foregroundStyle(.secondary)
@@ -190,6 +201,25 @@ struct PrintView: View {
         }
     }
 
+    private static let routeSectionID = "routeSection"
+
+    /// Shown while the photo is unlocked and the person has not yet chosen where to print.
+    private var routeIsRequired: Bool { canPrintAtHome && locked == 0 && chosenRoute == nil }
+
+    /// Right after unlocking: bring the cards into view and pulse their outline once (no pulse under Reduce Motion;
+    /// the static outline of `routeIsRequired` stays until a route is chosen).
+    private func promptRouteChoice(_ proxy: ScrollViewProxy) {
+        promptRoute = true
+        withAnimation(reduceMotion ? nil : .smooth) { proxy.scrollTo(Self.routeSectionID, anchor: .center) }
+        guard !reduceMotion else { return }
+        Task {
+            try? await Task.sleep(for: .milliseconds(250))
+            withAnimation(.easeInOut(duration: 0.45)) { pulseOpacity = 1 }
+            try? await Task.sleep(for: .milliseconds(450))
+            withAnimation(.easeInOut(duration: 0.45)) { pulseOpacity = 0 }
+        }
+    }
+
     /// One of the two places to print, as a large selectable card: the choice has to be obvious.
     private func routeCard(_ value: PrintCheckView.PrintRoute, title: LocalizedStringKey, detail: LocalizedStringKey,
                            symbol: String) -> some View {
@@ -217,7 +247,16 @@ struct PrintView: View {
             .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
             .overlay {
                 RoundedRectangle(cornerRadius: Design.Radius.group)
-                    .strokeBorder(selected ? Color.brandAccent : Color(.separator), lineWidth: selected ? 2 : 1)
+                    .strokeBorder(selected ? Color.brandAccent
+                                  : routeIsRequired ? Color.brandAccent.opacity(0.5) : Color(.separator),
+                                  lineWidth: selected ? 2 : 1)
+            }
+            .overlay {
+                // One pulse, or a static stroke under Reduce Motion, until a route is chosen.
+                RoundedRectangle(cornerRadius: Design.Radius.group)
+                    .strokeBorder(Color.brandAccent, lineWidth: 2)
+                    .opacity(routeIsRequired && promptRoute ? (reduceMotion ? 1 : pulseOpacity) : 0)
+                    .allowsHitTesting(false)
             }
             .contentShape(RoundedRectangle(cornerRadius: Design.Radius.group))
         }
@@ -307,8 +346,10 @@ struct PrintView: View {
             } else {
                 if route == nil {
                     // The choice comes first; the button says so instead of guessing.
-                    Button {} label: { Text("Choose where to print").frame(maxWidth: .infinity) }
-                        .brandProminentButtonStyle()
+                    Button {} label: {
+                        Text("Choose where to print").foregroundStyle(.secondary).frame(maxWidth: .infinity)
+                    }
+                        .buttonStyle(.bordered)
                         .controlSize(.large)
                         .disabled(true)
                         .accessibilityIdentifier("chooseRouteFirst")

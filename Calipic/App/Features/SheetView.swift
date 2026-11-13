@@ -110,8 +110,8 @@ struct SheetView: View {
         Text(summary(layout))
             .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
             .monospacedDigit()
-            .contentTransition(.numericText())
-            .animation(reduceMotion ? nil : .default, value: summary(layout))
+            .contentTransition(.numericText(value: Double(layout.placedCount * 100 + layout.pages.count)))
+            .animation(reduceMotion ? nil : .snappy, value: summary(layout))
             .accessibilityIdentifier("layoutSummary")
     }
 
@@ -170,8 +170,8 @@ struct SheetView: View {
                 Text("\(sizes) · ^[\(copies) copy](inflect: true)")
                     .font(Design.Typography.note).foregroundStyle(.secondary)
             }
-            .contentTransition(.numericText())
-            .animation(reduceMotion ? nil : .default, value: copies)
+            .contentTransition(.numericText(value: Double(copies)))
+            .animation(reduceMotion ? nil : .snappy, value: copies)
             .accessibilityElement(children: .combine)
             Spacer()
             Button { path.append(.check(person.id)) } label: {
@@ -204,8 +204,8 @@ struct SheetView: View {
                         .frame(minWidth: 22, minHeight: 22)
                         .background(Color.brandAccentFill, in: Capsule())
                         .offset(x: 6, y: -6)
-                        .contentTransition(.numericText())
-                        .animation(reduceMotion ? nil : .default, value: copies)
+                        .contentTransition(.numericText(value: Double(copies)))
+                        .animation(reduceMotion ? nil : .snappy, value: copies)
                 }
         }
         .buttonStyle(.plain)
@@ -350,7 +350,11 @@ struct SheetView: View {
 
     private func summary(_ layout: PrintLayout) -> String {
         // AttributedString applies the ^[…](inflect: true) grammar; String(localized:) would show the markup.
-        String(AttributedString(localized: "^[\(layout.placedCount) copy](inflect: true) · ^[\(layout.pages.count) page](inflect: true)").characters)
+        let base = String(AttributedString(localized: "^[\(layout.placedCount) copy](inflect: true) · ^[\(layout.pages.count) page](inflect: true)").characters)
+        // The last page's empty slots, outlined on the paper: copies that cost no extra paper (capped by the stepper).
+        var room = layout.pages.last?.freeSlots.count ?? 0
+        if model.printJob.items.count == 1, let copies = model.printJob.items.first?.copies { room = min(room, 50 - copies) }
+        return room > 0 ? base + " · " + String(localized: "Room for \(room) more") : base
     }
 }
 
@@ -586,7 +590,18 @@ struct SheetPreview: View {
     /// The page in the middle of the strip. It follows new pages as copies are added (founder, 0.20.9: pages 3–5 were
     /// never brought into view).
     @State private var focusedPage: Int?
+    /// Pages from this index on arrived with the last change and are still filling; nil when none are.
+    @State private var arrivingFrom: Int?
+    /// Rows shown so far on the arriving pages.
+    @State private var arrivingRows = 0
+    @State private var arrival: Task<Void, Never>?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private func rows(onPage index: Int) -> Int? {
+        if index == 0, let revealedRows { return revealedRows }
+        if let arrivingFrom, index >= arrivingFrom { return arrivingRows }
+        return nil
+    }
 
     var body: some View {
         let pages = compact ? Array(layout.pages.prefix(1)) : layout.pages
@@ -606,7 +621,7 @@ struct SheetPreview: View {
                         let width = min(pageBox.width, pageBox.height * aspect)
                         VStack(spacing: Design.Spacing.tight) {
                             UprightPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion,
-                                            revealedRows: index == 0 ? revealedRows : nil)
+                                            revealedRows: rows(onPage: index), showsEmptySlots: true)
                                 .frame(width: width, height: width / aspect)
                                 .paperDimmedInDark()
                                 .paperShadow()
@@ -635,10 +650,39 @@ struct SheetPreview: View {
             .onChange(of: layout.pages.count) { old, new in
                 // A new page appears where the new copies went: bring it into view. Fewer pages: stay in range.
                 let animation: Animation? = reduceMotion ? nil : .smooth(duration: 0.4)
-                if new > old { withAnimation(animation) { focusedPage = new - 1 } }
-                else if let focusedPage, focusedPage >= new { withAnimation(animation) { self.focusedPage = max(0, new - 1) } }
+                if new > old {
+                    withAnimation(animation) { focusedPage = new - 1 }
+                    fill(newPagesFrom: old)
+                } else {
+                    if let focusedPage, focusedPage >= new { withAnimation(animation) { self.focusedPage = max(0, new - 1) } }
+                    if let arrivingFrom, arrivingFrom >= new { arrival?.cancel(); self.arrivingFrom = nil }
+                }
             }
             .accessibilityIdentifier("sheetPreview")
+        }
+    }
+}
+
+extension SheetPreview {
+    /// New pages slide in empty, showing only their outlined slots, then their copies drop in row by row, as on the
+    /// first page after Photo Check (founder's recording, 0.20.11: a new page arrived already full). Not under
+    /// Reduce Motion.
+    fileprivate func fill(newPagesFrom first: Int) {
+        arrival?.cancel()
+        guard !reduceMotion, !compact else { return }
+        let rowCount = layout.pages.dropFirst(first).map(\.displayRows.count).max() ?? 0
+        guard rowCount > 0 else { return }
+        arrivingRows = 0
+        arrivingFrom = first
+        arrival = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(450))
+            for row in 1...rowCount {
+                guard !Task.isCancelled else { return }
+                withAnimation(.spring(duration: 0.35, bounce: 0.2)) { arrivingRows = row }
+                try? await Task.sleep(for: .milliseconds(90))
+            }
+            guard !Task.isCancelled else { return }
+            arrivingFrom = nil
         }
     }
 }
@@ -647,7 +691,9 @@ extension PrintPage {
     /// True when most photos lie sideways on the paper (rotated to fit more copies). Such a page is shown turned a
     /// quarter anticlockwise so the faces stand upright; the printed page is unchanged (founder, 0.20 review).
     var displaysTurned: Bool {
-        placements.filter(\.rotated).count * 2 > placements.count
+        // The empty slots count too, so a page keeps its turn while it fills.
+        let rotated = placements.filter(\.rotated).count + freeSlots.filter(\.rotated).count
+        return rotated * 2 > placements.count + freeSlots.count
     }
 
     /// Width over height of the page as shown on screen.
@@ -660,11 +706,13 @@ struct UprightPageView: View {
     let thumbnails: [UUID: CGImage]
     var animated = true
     var revealedRows: Int?
+    var showsEmptySlots = false
 
     var body: some View {
         GeometryReader { geometry in
             let turned = page.displaysTurned
-            SheetPageView(page: page, thumbnails: thumbnails, animated: animated, revealedRows: revealedRows)
+            SheetPageView(page: page, thumbnails: thumbnails, animated: animated, revealedRows: revealedRows,
+                          showsEmptySlots: showsEmptySlots)
                 .frame(width: turned ? geometry.size.height : geometry.size.width,
                        height: turned ? geometry.size.width : geometry.size.height)
                 .rotationEffect(.degrees(turned ? -90 : 0))
@@ -679,6 +727,8 @@ struct SheetPageView: View {
     var animated = true
     /// Rows (as seen on screen) to show; the rest wait, invisible, to appear in turn. nil shows all.
     var revealedRows: Int?
+    /// Outlines where more copies fit (and where waiting copies will land). Never on cutting guides or prints.
+    var showsEmptySlots = false
 
     private struct Key: Hashable { let item: UUID; let copy: Int }
     private struct Keyed: Identifiable { let id: Key; let placement: Placement }
@@ -692,6 +742,9 @@ struct SheetPageView: View {
               // The paper stays put; only the photos cross-fade. With the paper inside the fading layer, the mat
               // showed through for a moment and the page flashed dark on every added copy (founder, 0.20.9).
               Color.white
+              if showsEmptySlots {
+                  emptySlots(hidden: hidden, scale: scale)
+              }
               ZStack(alignment: .topLeading) {
                 ForEach(keyed) { item in
                     let placement = item.placement
@@ -733,6 +786,23 @@ struct SheetPageView: View {
         }
         .overlay(Rectangle().strokeBorder(.secondary, lineWidth: Design.Stroke.hairline))
         .clipped()
+    }
+
+    /// Faint dashed outlines on the white paper: the free grid positions and the copies still waiting to appear.
+    private func emptySlots(hidden: Set<Key>, scale: CGFloat) -> some View {
+        let waiting = page.placements.filter { hidden.contains(Key(item: $0.itemID, copy: $0.copyIndex)) }.map(\.trim)
+        let rects = page.freeSlots.map(\.trim) + waiting
+        return Canvas { context, _ in
+            var path = Path()
+            for rect in rects {
+                path.addRect(CGRect(x: rect.x * scale, y: rect.y * scale, width: rect.width * scale, height: rect.height * scale))
+            }
+            // The paper is white in both appearances, so the outline is always dark.
+            context.stroke(path, with: .color(.black.opacity(0.28)),
+                           style: StrokeStyle(lineWidth: Design.Stroke.hairline, dash: [3, 2]))
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     private var layoutSignature: String {

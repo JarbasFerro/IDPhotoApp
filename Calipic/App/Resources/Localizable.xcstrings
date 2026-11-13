@@ -5878,6 +5878,22 @@
         }
       }
     },
+    "Room for %lld more" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espacio para %lld más"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Espaço para mais %lld"
+          }
+        }
+      }
+    },
     "Safety margin around each photo" : {
       "localizations" : {
         "es" : {

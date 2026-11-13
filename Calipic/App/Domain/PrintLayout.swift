@@ -124,12 +124,22 @@ struct CalibrationBar: Sendable, Hashable {
     let lengthMM: Double
 }
 
+/// A position in a page's grid with no photo in it yet. Never printed; shown on screen so people see that more
+/// copies fit on the paper they are already using.
+struct Slot: Sendable, Hashable {
+    let trim: MillimeterRect
+    let bleed: MillimeterRect
+    let rotated: Bool
+}
+
 struct PrintPage: Sendable, Hashable {
     let widthMM: Double
     let heightMM: Double
     let bleedMM: Double
     let placements: [Placement]
     let calibrationBar: CalibrationBar?
+    /// The grid's empty positions, in the order copies would fill them.
+    var freeSlots: [Slot] = []
 
     var utilisation: Double {
         placements.reduce(0) { $0 + $1.trim.width * $1.trim.height } / (widthMM * heightMM)
@@ -186,6 +196,12 @@ enum PrintLayoutSolver {
             orientations = portraitSize.w == portraitSize.h ? [portraitSize] : [portraitSize, (portraitSize.h, portraitSize.w)]
         case .portrait: orientations = [portraitSize]
         case .landscape: orientations = [(portraitSize.h, portraitSize.w)]
+        }
+
+        let active = demand.indices.filter { demand[$0] > 0 }
+        if active.count == 1 {
+            return solveGrid(job: job, itemIndex: active[0], orientations: orientations, bleeds: bleeds,
+                             barChoices: barChoices, margin: margin, gutter: gutter)
         }
 
         var pages: [PrintPage] = []
@@ -253,7 +269,8 @@ enum PrintLayoutSolver {
     }
 
     private static func bestPlan(demand: [Int], items: [PrintItem], bleed: Int, availableWidth: Int,
-                                 availableHeight: Int, gutter: Int, strategy: FillStrategy) -> PagePlan? {
+                                 availableHeight: Int, gutter: Int, strategy: FillStrategy,
+                                 allowMixed: Bool = true) -> PagePlan? {
         guard availableWidth > 0, availableHeight > 0 else { return nil }
         let active = demand.indices.filter { demand[$0] > 0 }
         var best: (key: [Int], plan: PagePlan)?
@@ -261,7 +278,7 @@ enum PrintLayoutSolver {
             // The row-by-row fill picks whichever way up fits more in each row, so it can mix upright and sideways
             // photos where one orientation alone would place as many. Each orientation is also tried on its own.
             for transposed in [false, true] {
-                for only in [Bool?.none, false, true] {
+                for only in allowMixed ? [Bool?.none, false, true] : [false, true] {
                     let width = transposed ? availableHeight : availableWidth
                     let height = transposed ? availableWidth : availableHeight
                     let cells = items.indices.map { index -> [Cell] in
@@ -331,6 +348,113 @@ enum PrintLayoutSolver {
             }
         }
         return plan
+    }
+
+    // MARK: - One photo: a fixed grid filled slot by slot
+
+    /// With a single photo, every page uses one full-page grid and copies fill its slots in reading order (as seen
+    /// on screen), so adding a copy only adds a photo: nothing moves, the page never changes shape, and every page
+    /// cuts the same way (founder's recording, 0.20.11: the page flipped between portrait and landscape and the
+    /// photos re-centred at every copy). On one page the grid is the best-scoring one that holds every copy, so it
+    /// changes at most where a smaller margin is needed to stay on one page; beyond one page it is the fullest grid.
+    private static func solveGrid(job: PrintJob, itemIndex: Int, orientations: [(w: Int, h: Int)], bleeds: [Int],
+                                  barChoices: [Bool], margin: Int, gutter: Int) -> PrintLayout {
+        let items = job.items
+        let copies = max(0, items[itemIndex].copies)
+        let maxPages = max(1, job.options.maxPages)
+        var full = Array(repeating: 0, count: items.count)
+        full[itemIndex] = 100_000
+        struct Grid { let plan: PagePlan; let pageW: Int; let pageH: Int; let bleed: Int; let bar: Bool; let index: Int }
+        var grids: [Grid] = []
+        for (index, size) in orientations.enumerated() {
+            for bleed in bleeds {
+                for bar in barChoices {
+                    let reserve = bar ? calibrationReserve + gutter : 0
+                    for allowMixed in [true, false] {
+                        guard let plan = bestPlan(demand: full, items: items, bleed: bleed,
+                                                  availableWidth: size.w - 2 * margin,
+                                                  availableHeight: size.h - 2 * margin - reserve,
+                                                  gutter: gutter, strategy: job.options.fillStrategy,
+                                                  allowMixed: allowMixed), plan.placed > 0 else { continue }
+                        grids.append(Grid(plan: plan, pageW: size.w, pageH: size.h, bleed: bleed, bar: bar, index: index))
+                    }
+                }
+            }
+        }
+        guard let largest = grids.map(\.plan.placed).max(), copies > 0 else {
+            return PrintLayout(pages: [], unplaced: copies > 0 ? [items[itemIndex].id: copies] : [:])
+        }
+        // Copies that fit on one page may use any grid that holds them all. Beyond one page, only the fullest grid:
+        // otherwise the margin would switch back and forth at every page boundary.
+        let chosen = grids
+            .filter { copies <= largest ? $0.plan.placed >= copies : $0.plan.placed == largest }
+            .max { a, b in
+                func key(_ g: Grid) -> [Int] {
+                    [g.bleed > 0 ? 1 : 0, g.bar ? 1 : 0, -g.plan.orientationCount, g.bleed, g.plan.placed,
+                     -g.plan.distinctHeights, -g.index]
+                }
+                return key(a).lexicographicallyPrecedes(key(b))
+            }!
+        let slots = readingOrder(slots(plan: chosen.plan, margin: margin, gutter: gutter, bleed: chosen.bleed),
+                                 pageWidthMM: millimeters(chosen.pageW))
+        let calibration = calibrationBar(chosen.bar, pageW: chosen.pageW, pageH: chosen.pageH, margin: margin)
+        let item = items[itemIndex]
+        var pages: [PrintPage] = []
+        var next = 0
+        while next < copies, pages.count < maxPages {
+            let count = min(slots.count, copies - next)
+            let placements = slots.prefix(count).enumerated().map { offset, slot in
+                Placement(itemID: item.id, copyIndex: next + offset, trim: slot.trim, bleed: slot.bleed, rotated: slot.rotated)
+            }
+            pages.append(PrintPage(widthMM: millimeters(chosen.pageW), heightMM: millimeters(chosen.pageH),
+                                   bleedMM: millimeters(chosen.bleed), placements: placements,
+                                   calibrationBar: calibration, freeSlots: Array(slots.dropFirst(count))))
+            next += count
+        }
+        return PrintLayout(pages: pages, unplaced: copies > next ? [item.id: copies - next] : [:])
+    }
+
+    /// Every position of a plan, in page millimetres.
+    private static func slots(plan: PagePlan, margin: Int, gutter: Int, bleed: Int) -> [Slot] {
+        var result: [Slot] = []
+        var sy = (plan.availableHeight - plan.usedLength) / 2
+        for row in plan.rows {
+            let rowWidth = row.count * row.cell.width + (row.count - 1) * gutter
+            let startX = (plan.availableWidth - rowWidth) / 2
+            for column in 0..<row.count {
+                let sx = startX + column * (row.cell.width + gutter)
+                let x = margin + (plan.transposed ? sy : sx)
+                let y = margin + (plan.transposed ? sx : sy)
+                let w = plan.transposed ? row.cell.height : row.cell.width
+                let h = plan.transposed ? row.cell.width : row.cell.height
+                let bleedRect = MillimeterRect(x: millimeters(x), y: millimeters(y), width: millimeters(w), height: millimeters(h))
+                result.append(Slot(trim: bleedRect.insetBy(millimeters(bleed)), bleed: bleedRect, rotated: row.cell.rotated))
+            }
+            sy += row.cell.height + gutter
+        }
+        return result
+    }
+
+    /// Top-left first, row by row, as the page is shown: a page whose photos mostly lie sideways is shown turned a
+    /// quarter anticlockwise (`PrintPage.displaysTurned`), so its reading order follows the turned page.
+    static func readingOrder(_ slots: [Slot], pageWidthMM: Double) -> [Slot] {
+        let turned = slots.filter(\.rotated).count * 2 > slots.count
+        let keyed = slots.map { slot -> (slot: Slot, x: Double, y: Double) in
+            let midX = slot.trim.x + slot.trim.width / 2, midY = slot.trim.y + slot.trim.height / 2
+            return (slot, turned ? midY : midX, turned ? pageWidthMM - midX : midY)
+        }
+        var rows: [[(slot: Slot, x: Double, y: Double)]] = []
+        for item in keyed.sorted(by: { $0.y < $1.y }) {
+            if let first = rows.last?.first, abs(first.y - item.y) < 1 { rows[rows.count - 1].append(item) } else { rows.append([item]) }
+        }
+        return rows.flatMap { $0.sorted { $0.x < $1.x }.map(\.slot) }
+    }
+
+    private static func calibrationBar(_ bar: Bool, pageW: Int, pageH: Int, margin: Int) -> CalibrationBar? {
+        guard bar, pageW - 2 * margin >= micrometers(calibrationBarLengthMM) else { return nil }
+        return CalibrationBar(x: millimeters((pageW - micrometers(calibrationBarLengthMM)) / 2),
+                              y: millimeters(pageH - margin - calibrationReserve / 2),
+                              lengthMM: calibrationBarLengthMM)
     }
 
     private static func makePage(plan: PagePlan, items: [PrintItem], startCopyIndex: [Int], pageW: Int, pageH: Int,

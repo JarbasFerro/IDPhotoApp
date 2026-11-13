@@ -61,6 +61,49 @@ struct PrintLayoutSolverTests {
         #expect(PrintLayoutSolver.solve(job) == PrintLayoutSolver.solve(job))
     }
 
+    /// Founder's recording (0.20.11): each added copy re-planned the page, so it flipped between portrait and
+    /// landscape and every photo moved. One photo now fills a fixed grid slot by slot.
+    @Test func addingACopyOnlyAddsAPhoto() {
+        var previous: PrintLayout?
+        var regrids = 0
+        for copies in 1...40 {
+            let layout = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, copies)]))
+            #expect(layout.placedCount == copies)
+            let first = try! #require(layout.pages.first)
+            // Every page uses the same grid: placed plus free slots is the full page, and only the last has free slots.
+            let capacity = first.placements.count + first.freeSlots.count
+            for (index, page) in layout.pages.enumerated() {
+                #expect(page.placements.count + page.freeSlots.count == capacity)
+                #expect(page.widthMM == first.widthMM && page.heightMM == first.heightMM)
+                if index < layout.pages.count - 1 { #expect(page.freeSlots.isEmpty) }
+            }
+            if let previous, let old = previous.pages.first {
+                if old.bleedMM == first.bleedMM && old.widthMM == first.widthMM {
+                    // Same grid: the old copies keep their exact places.
+                    let before = previous.pages.flatMap(\.placements).map(\.trim)
+                    let after = layout.pages.flatMap(\.placements).map(\.trim)
+                    #expect(Array(after.prefix(before.count)) == before, "copies \(copies)")
+                } else {
+                    regrids += 1
+                }
+            }
+            previous = layout
+        }
+        // The grid may change only where the next copy would otherwise need another page.
+        #expect(regrids <= 2)
+    }
+
+    @Test func gridFillsTopLeftFirstAsShown() throws {
+        let layout = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 2)]))
+        let page = try #require(layout.pages.first)
+        let rows = page.displayRows
+        // Both copies sit in the first row seen on screen, starting at its left.
+        #expect(rows.first == [0, 1])
+        #expect(!page.freeSlots.isEmpty)
+        let all = page.placements.map(\.trim) + page.freeSlots.map(\.trim)
+        for (i, a) in all.enumerated() { for b in all[(i + 1)...] { #expect(!a.overlaps(b)) } }
+    }
+
     @Test func adaptiveBleedKeepsCountAndFixedBleedCosts() {
         let adaptive = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 6)]))
         #expect(adaptive.pages.count == 1)
@@ -68,7 +111,7 @@ struct PrintLayoutSolverTests {
         let fixed = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 6)], options: {
             var options = PrintOptions(); options.bleed = .fixed(mm: 1); return options
         }()))
-        // Two upright rows of two plus one rotated copy in the 44 mm strip below them.
+        // Beyond one page the fullest grid is used: two upright rows of two plus one rotated copy in the 44 mm strip.
         #expect(fixed.pages[0].placements.count == 5)
         #expect(fixed.pages.count == 2)
         let full = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 12)]))

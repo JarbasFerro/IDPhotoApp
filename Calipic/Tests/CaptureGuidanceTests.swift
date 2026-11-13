@@ -47,6 +47,27 @@ struct CaptureGuidanceTests {
         #expect(feed(&tracker, face(height: 0.18), times: 5) == .holdStill)
     }
 
+    @Test func tooCloseOutranksHoldStillWhileTheFaceMoves() {
+        var tracker = GuidanceTracker()
+        _ = feed(&tracker, face(height: 0.3), times: 5)
+        #expect(tracker.hint == .holdStill)
+        // The face swells past the band and wobbles (blurred, moving): move back, never hold still.
+        for i in 0..<12 {
+            let hint = tracker.update(face(height: 0.52 + Double(i % 3) * 0.02, centerX: 0.5 + Double(i % 2) * 0.03))
+            #expect(hint != .ready)
+        }
+        #expect(tracker.hint == .moveBack)
+        #expect(tracker.correction == .farther)
+        // A large face running off the edge reports a box inside the band but is still too close.
+        tracker = GuidanceTracker()
+        #expect(feed(&tracker, face(height: 0.4, centerY: 0.2), times: 8) == .moveBack)
+        // A close distance estimate wins over hold still as well.
+        tracker = GuidanceTracker()
+        var near = face(height: 0.3)
+        near.distanceCM = 20
+        #expect(feed(&tracker, near, times: 8) == .tooClose)
+    }
+
     @Test func eachConditionHasItsOwnHintInPriorityOrder() {
         var tracker = GuidanceTracker()
         #expect(feed(&tracker, face(height: 0.3, count: 2), times: 5) == .multipleFaces)

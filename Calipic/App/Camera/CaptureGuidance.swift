@@ -231,7 +231,7 @@ struct GuidanceTracker: Sendable, Hashable {
         let minHeight = t.minFaceHeight + (hint == .moveCloser ? t.sizeHysteresis : 0)
         let maxHeight = t.maxFaceHeight - (hint == .moveBack ? t.sizeHysteresis : 0)
         if box.height < minHeight { return .moveCloser }
-        if box.height > maxHeight { return .moveBack }
+        if box.height > maxHeight || Self.isClippedAndLarge(box, maxHeight: t.maxFaceHeight) { return .moveBack }
         let centerX = box.x + box.width / 2, centerY = box.y + box.height / 2
         if abs(centerX - 0.5) > t.horizontalTolerance || abs(centerY - t.targetCenterY) > t.verticalTolerance { return .centerFace }
         let minDistance = t.minDistanceCM + (hint == .tooClose ? t.distanceHysteresisCM : 0)
@@ -253,6 +253,14 @@ struct GuidanceTracker: Sendable, Hashable {
         return .ready
     }
 
+    /// A big face running past the edge of the preview reports a box smaller than the real head, so the height
+    /// alone can still pass the band while the face fills the frame ("Hold still" over a face that is too close).
+    private static func isClippedAndLarge(_ box: NormalizedCrop, maxHeight: Double) -> Bool {
+        let slack = 0.005
+        let clipped = box.x <= slack || box.y <= slack || box.x + box.width >= 1 - slack || box.y + box.height >= 1 - slack
+        return clipped && box.height > maxHeight * 0.8
+    }
+
     /// One-sided light is worth a tip, not a block: the tip appears only while the frame is otherwise good.
     private mutating func updateAdvisory(for frame: FaceFrameSummary, raw: CaptureHint) {
         var next: CaptureHint?
@@ -268,6 +276,7 @@ struct GuidanceTracker: Sendable, Hashable {
         var result = CaptureReadiness()
         if frame.faceCount == 1, let box = frame.bounds {
             let sizeOK = box.height >= t.minFaceHeight && box.height <= t.maxFaceHeight
+                && !Self.isClippedAndLarge(box, maxHeight: t.maxFaceHeight)
             let centreOK = abs(box.x + box.width / 2 - 0.5) <= t.horizontalTolerance
                 && abs(box.y + box.height / 2 - t.targetCenterY) <= t.verticalTolerance
             result.framing = sizeOK && centreOK ? .ok : .attention
