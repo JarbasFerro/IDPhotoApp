@@ -11,6 +11,7 @@ struct PrintView: View {
     @State private var showCredits = false
     @State private var showCheck = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     enum Action { case home, shop, formats }
 
@@ -79,7 +80,7 @@ struct PrintView: View {
 
     private var header: some View {
         let layout = model.layout
-        let landscape = layout.pages.first.map { $0.widthMM > $0.heightMM } ?? false
+        let landscape = layout.pages.first.map { $0.displayAspect > 1 } ?? false
         return VStack(alignment: .leading, spacing: Design.Spacing.group) {
             // The page lies on the mat; the words sit below, on the plain screen.
             SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: landscape ? 110 : 170)
@@ -186,6 +187,7 @@ struct PrintView: View {
         VStack(spacing: Design.Spacing.text) {
             if locked > 0 {
                 UnlockCard(photos: locked, balance: model.credits.balance)
+                    .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.9, anchor: .bottom))))
                 if model.credits.canAfford(locked) {
                     Button { unlockAndPrint() } label: {
                         Text(canPrintAtHome ? "Unlock and Print" : "Unlock and Continue").frame(maxWidth: .infinity)
@@ -235,7 +237,10 @@ struct PrintView: View {
     }
 
     private func unlockAndPrint() {
-        guard model.unlockAll() else { showCredits = true; return }
+        // The unlock card folds away and the print buttons take its place (U4); the success tap is on `locked`.
+        var unlocked = false
+        withAnimation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { unlocked = model.unlockAll() }
+        guard unlocked else { showCredits = true; return }
         run(canPrintAtHome ? .home : .shop)
     }
 

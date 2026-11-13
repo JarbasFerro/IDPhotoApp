@@ -74,14 +74,14 @@ struct FinishedView: View {
     private func pageDrawing(_ page: PrintPage, layout: PrintLayout) -> some View {
         let plan = CutPlan(page: page)
         // Fit the page in a 300 × 280 pt box so a landscape page never runs off a narrow screen.
-        let aspect = page.widthMM / page.heightMM
+        let aspect = page.displayAspect
         let width = min(300, 280 * aspect)
         let height = width / aspect
         let samePlans = layout.pages.dropFirst().allSatisfy { CutPlan(page: $0).cuts.count == plan.cuts.count }
         return VStack(spacing: Design.Spacing.control) {
             // The page lies on the mat; the note sits below it.
             ZStack {
-                SheetPageView(page: page, thumbnails: model.sheetThumbnails, animated: false)
+                UprightPageView(page: page, thumbnails: model.sheetThumbnails, animated: false)
                     .frame(width: width, height: height)
                     .paperDimmedInDark()
                     .paperShadow()
@@ -104,7 +104,7 @@ struct FinishedView: View {
 
     private var tips: some View {
         VStack(spacing: 0) {
-            tip(1, title: Text("Cut the rows apart first"),
+            tip(1, title: Text("Cut the strips apart first"),
                 detail: Text("Follow the marks at the corners, not the edge of the photo"))
             Divider().padding(.leading, 56)
             tip(2, title: Text("Then cut each photo out"),
@@ -154,8 +154,14 @@ private struct CutOverlay: View {
     var body: some View {
         Canvas { context, size in
             let inset = Self.margin
-            let scale = min((size.width - 2 * inset) / page.widthMM, (size.height - 2 * inset) / page.heightMM)
-            func point(_ p: MillimeterPoint) -> CGPoint { CGPoint(x: inset + p.x * scale, y: inset + p.y * scale) }
+            // The page may be shown turned a quarter anticlockwise (UprightPageView); map page millimetres the same way.
+            let turned = page.displaysTurned
+            let shownWidth = turned ? page.heightMM : page.widthMM, shownHeight = turned ? page.widthMM : page.heightMM
+            let scale = min((size.width - 2 * inset) / shownWidth, (size.height - 2 * inset) / shownHeight)
+            func point(_ p: MillimeterPoint) -> CGPoint {
+                let x = turned ? p.y : p.x, y = turned ? page.widthMM - p.x : p.y
+                return CGPoint(x: inset + x * scale, y: inset + y * scale)
+            }
             for cut in plan.cuts {
                 var path = Path()
                 path.move(to: point(cut.from))
@@ -169,8 +175,15 @@ private struct CutOverlay: View {
                 context.fill(Path(ellipseIn: rect), with: .color(.brandAccent))
                 context.draw(Text(verbatim: "\(number)").font(.caption2.weight(.bold)).foregroundStyle(.white), at: centre)
             }
-            if let rows = plan.firstCut(of: .rows) { badge(1, at: CGPoint(x: inset / 2, y: point(rows.from).y)) }
-            if let columns = plan.firstCut(of: .columns) { badge(2, at: CGPoint(x: point(columns.from).x, y: inset / 2)) }
+            // Each badge sits in the margin at the end of its first cut: left of a horizontal line, above a vertical one,
+            // whichever way the page is turned on screen.
+            func badgePoint(_ cut: Cut) -> CGPoint {
+                let start = point(cut.from), end = point(cut.to)
+                if abs(start.x - end.x) > abs(start.y - end.y) { return CGPoint(x: inset / 2, y: start.y) }
+                return CGPoint(x: start.x, y: inset / 2)
+            }
+            if let rows = plan.firstCut(of: .rows) { badge(1, at: badgePoint(rows)) }
+            if let columns = plan.firstCut(of: .columns) { badge(2, at: badgePoint(columns)) }
         }
         .allowsHitTesting(false)
     }

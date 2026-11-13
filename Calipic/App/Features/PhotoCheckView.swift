@@ -20,6 +20,9 @@ struct PhotoCheckView: View {
     /// Bumped once when a verdict appears or changes; drives the symbol bounce.
     @State private var verdictBounce = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.zoomNamespace) private var zoomNamespace
+    /// Where this screen sits in the path; the screens it opens are pushed right after it.
+    private var nextIndex: Int { (path.firstIndex(of: .check(photoID)) ?? path.count - 1) + 1 }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Developer details (long press on the version line) also switch on the L19-017 capture-protection test.
     @AppStorage(DeveloperMode.key) private var developerMode = false
@@ -156,6 +159,9 @@ struct PhotoCheckView: View {
                 .accessibilityHint("Press and hold to compare with the original.")
                 .accessibilityAction(named: Text("Compare with original")) { comparing.toggle() }
                 .accessibilityIdentifier("portrait")
+                // The photo is what Your sheet and Digital Photo zoom out of (U4).
+                .zoomSource(.sheet, at: nextIndex, in: zoomNamespace)
+                .zoomSource(.digital(photoID), at: nextIndex, in: zoomNamespace)
                 .overlay {
                     if let measurement = measurement(for: entry), landed, !comparing, !entry.isAnalyzing {
                         MeasurementOverlay(measurement: measurement, showsRange: model.document.statesHeadHeight,

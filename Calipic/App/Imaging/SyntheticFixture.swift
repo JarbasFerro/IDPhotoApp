@@ -46,8 +46,9 @@ enum SyntheticFixture {
     }
 }
 
-/// A real portrait kept outside git (`test_data/local/`, ignored), so looks can be judged with a face on a simulator.
-/// Simulator builds on the developer's Mac only: nothing here reaches a device or a release build.
+/// A portrait for simulator UI tests, so looks can be judged with a face: the developer's own in `test_data/local/`
+/// (ignored by git) when present, otherwise the public sample in `test_data/sample/` (a generated person who does not
+/// exist). Simulator builds only: nothing here reaches a device or a release build.
 enum LocalPortrait {
     /// Face landmarks for the portrait, read from `portrait.json` beside it, because Vision cannot run on a simulator.
     /// Points are normalized with a top-left origin. `leftEye` is the subject's left, on the image's right.
@@ -63,7 +64,8 @@ enum LocalPortrait {
         // .../Calipic/App/Imaging/SyntheticFixture.swift -> the repository root.
         var root = URL(fileURLWithPath: #filePath)
         for _ in 0..<4 { root.deleteLastPathComponent() }
-        return root.appendingPathComponent("test_data/local")
+        return ["test_data/local", "test_data/sample"].map { root.appendingPathComponent($0) }
+            .first { FileManager.default.isReadableFile(atPath: $0.appendingPathComponent("portrait.jpg").path) }
         #else
         return nil
         #endif

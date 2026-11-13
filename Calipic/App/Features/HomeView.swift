@@ -18,6 +18,7 @@ struct HomeView: View {
     @AppStorage(DocumentStore.promptShownKey) private var documentPromptShown = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.zoomNamespace) private var zoomNamespace
     private static let signposter = OSSignposter(subsystem: "com.jarbasferro.calipic", category: "App")
 
     private enum Removal: Equatable { case one(UUID), all }
@@ -101,38 +102,58 @@ struct HomeView: View {
 
     // MARK: - Hero
 
-    /// One photo and the sheet of copies it becomes. A sample until the person has a photo, then their own.
+    /// The whole job in one picture: a selfie, the ID photo made from it, and the sheet of copies (U10).
+    /// A sample person until the person has a photo, then their own original, photo, and copies.
     private var hero: some View {
         let entry = model.entries.last
         return ZStack {
             RoundedRectangle(cornerRadius: Design.Radius.group).fill(Design.Surface.stage)
+            // The selfie, as taken: a phone photo at the back.
+            heroSelfie(entry)
+                .frame(width: 150, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(.white, lineWidth: 3))
+                .paperDimmedInDark()
+                .paperShadow()
+                .rotationEffect(.degrees(-6))
+                .offset(x: -84, y: -50)
             Grid(horizontalSpacing: 6, verticalSpacing: 6) {
                 ForEach(0..<2, id: \.self) { _ in
                     GridRow {
                         ForEach(0..<4, id: \.self) { _ in
-                            heroPhoto(entry).frame(width: 36)
+                            heroPhoto(entry).frame(width: 34)
                         }
                     }
                 }
             }
-            .padding(.horizontal, 16).padding(.vertical, 13)
+            .padding(.horizontal, 14).padding(.vertical, 12)
             .background(.white, in: RoundedRectangle(cornerRadius: 3))
             .paperDimmedInDark()
             .paperShadow()
             .rotationEffect(.degrees(3))
-            .offset(x: 46, y: -8)
+            .offset(x: 66, y: 14)
+            // The ID photo, in front: what the selfie becomes.
             heroPhoto(entry)
-                .frame(width: 100)
+                .frame(width: 96)
                 .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))
                 .paperDimmedInDark()
                 .paperShadow()
-                .rotationEffect(.degrees(-4))
-                .offset(x: -98, y: 38)
+                .rotationEffect(.degrees(-3))
+                .offset(x: -58, y: 44)
         }
         .frame(height: 236)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(entry == nil ? Text("Example: one photo and a printed sheet of copies") : Text("Your photo and its printed sheet"))
+        .accessibilityLabel(entry == nil ? Text("Example: a selfie, the ID photo made from it, and a printed sheet of copies")
+                                         : Text("Your photo and its printed sheet"))
         .accessibilityIdentifier("homeHero")
+    }
+
+    @ViewBuilder private func heroSelfie(_ entry: PhotoEntry?) -> some View {
+        if let entry {
+            Image(decorative: entry.photo.preview, scale: 1).resizable().scaledToFill()
+        } else {
+            Image("SampleSelfie").resizable().scaledToFill()
+        }
     }
 
     @ViewBuilder private func heroPhoto(_ entry: PhotoEntry?) -> some View {
@@ -178,6 +199,7 @@ struct HomeView: View {
             .accessibilityLabel(Text("Your sheet: \(model.entries.count) people, \(model.layout.placedCount) copies"))
             .accessibilityHint("Opens the print sheet.")
             .accessibilityIdentifier("yourSheet")
+            .zoomSource(.sheet, at: 0, in: zoomNamespace)
             // Removing a photo from here, without opening Photo Check (founder, 0.20 review).
             Menu {
                 ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in

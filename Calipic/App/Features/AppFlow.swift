@@ -20,6 +20,7 @@ struct RootView: View {
     @Bindable var model: PhotoWorkflow
     var promptForDocument = false
     @State private var path: [Route] = []
+    @Namespace private var zoom
     @State private var showCamera = false
     @State private var showPicker = false
     @State private var pendingAcquisition: PendingAcquisition?
@@ -34,18 +35,22 @@ struct RootView: View {
         NavigationStack(path: $path) {
             HomeView(model: model, path: $path, acquire: acquire, promptForDocument: promptForDocument)
                 .navigationDestination(for: Route.self) { route in
-                    switch route {
-                    case .check(let id):
-                        PhotoCheckView(model: model, photoID: id, path: $path, acquire: acquire)
-                    case .digital(let id):
-                        DigitalShareView(model: model, photoID: id, path: $path)
-                    case .sheet:
-                        SheetView(model: model, path: $path, acquire: acquire)
-                    case .share:
-                        PrintView(model: model, path: $path)
+                    Group {
+                        switch route {
+                        case .check(let id):
+                            PhotoCheckView(model: model, photoID: id, path: $path, acquire: acquire)
+                        case .digital(let id):
+                            DigitalShareView(model: model, photoID: id, path: $path)
+                        case .sheet:
+                            SheetView(model: model, path: $path, acquire: acquire)
+                        case .share:
+                            PrintView(model: model, path: $path)
+                        }
                     }
+                    .zoomDestination(route, at: path.firstIndex(of: route) ?? 0, in: zoom)
                 }
         }
+        .environment(\.zoomNamespace, zoom)
         .sheet(item: $pendingAcquisition, onDismiss: startApprovedAcquisition) {
             pending in
             PreparationView(source: pending.source, document: model.document, onContinue: { selectedSource in

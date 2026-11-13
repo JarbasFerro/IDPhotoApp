@@ -44,7 +44,7 @@ The decisions that are in force, one short entry each. ADR numbers are kept beca
 | 010 | Official outputs are deterministic: the same inputs give the same file | Accepted |
 | 011, 038 | No change to the person's identity: no retouching, reshaping, or generated content. Document Tone is one global, reversible correction of exposure and colour | Accepted |
 | 026 | Print accuracy is proven by measuring real prints, not by math alone | Accepted; printer round not done |
-| 027 | No private or family face photos in the repository. Fixtures are synthetic, licensed, or consented | Accepted |
+| 027 | No private or family face photos in the repository. Fixtures are synthetic (including generated people who do not exist, D-9), licensed, or consented | Accepted |
 | 036 | Print sheet: paper catalog plus custom paper; deterministic row solver; 0–1 mm adaptive safety margin, 4 mm page margin, 2 mm gutter, corner marks, 50 mm check line; zero-gutter "as many as possible" is opt-in | Accepted in practice |
 | 037 | The replacement background colour comes from the profile | Accepted in practice |
 | 039 | Crop solving: eye line and chin from landmarks; the crown is an estimate from the mask top and face proportions; level the eyes, scale to the head-height target, place by the eye-line and top-margin bands | Accepted in practice; calibration open |
@@ -91,6 +91,7 @@ The open questions left by the documentation cleanup, answered one by one.
 | D-6 | Minimum iOS | **iOS 27 only** (ADR-024 above). Not the recommendation (iOS 26): simpler code and the newest APIs were preferred over reach to iPhones that have not updated |
 | D-7 | Draft retention | **Paid photos kept until deleted; locked drafts 30 days unused** (ADR-049 above). Not the recommendation (30 days for all): a paid photo must never be lost |
 | D-8 | British or American English | **American** |
+| D-9 | Faces in the public repository | **AI-generated people who do not exist are allowed** (founder, 2026-11-13) for the Home sample and the public test photo (`test_data/sample/`). Real people's photos stay out (ADR-027); the founder's own portrait is local only |
 
 ## Open decisions for the founder
 

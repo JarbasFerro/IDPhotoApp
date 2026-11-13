@@ -11,6 +11,10 @@ struct SheetView: View {
     @State private var showCutting = false
     /// Counts the person's own taps on the copies stepper, so switching person does not tick it.
     @State private var copiesTick = 0
+    /// Rows of the first page shown so far while the copies appear after Photo Check; nil shows every row.
+    @State private var revealedRows: Int?
+    @State private var hasRevealed = false
+    @Environment(\.zoomNamespace) private var zoomNamespace
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -65,12 +69,34 @@ struct SheetView: View {
         .sheet(isPresented: $showOptions) { SheetOptionsView(model: model) }
         .sheet(isPresented: $showCutting) { CuttingOptionsView(model: model) }
         .task { model.refreshSheetThumbnails() }
+        .task { await revealCopies() }
+        .sensoryFeedback(.impact(weight: .light), trigger: revealedRows) { _, new in (new ?? 0) > 0 }
         .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
     }
 
     private func matPreview(_ layout: PrintLayout, box: CGSize) -> some View {
         // Page captions are left to the accessibility label here: bare text may not sit on the mat's grid.
-        SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, captions: false, pageBox: box)
+        SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, captions: false, pageBox: box,
+                     revealedRows: revealedRows)
+            // Print zooms out of the page (U4).
+            .zoomSource(.share, at: (path.firstIndex(of: .sheet) ?? 0) + 1, in: zoomNamespace)
+    }
+
+    /// Arriving from Photo Check, the photo has just zoomed into the page; its copies then appear one row after
+    /// another with a light tap each (U4). Once per visit, never under Reduce Motion.
+    private func revealCopies() async {
+        guard !hasRevealed else { return }
+        hasRevealed = true
+        guard !reduceMotion, let index = path.firstIndex(of: .sheet), index > 0, case .check = path[index - 1],
+              let rows = model.layout.pages.first?.displayRows.count, rows > 1 else { return }
+        revealedRows = 0
+        try? await Task.sleep(for: .milliseconds(450))
+        for row in 1...rows {
+            guard !Task.isCancelled else { break }
+            withAnimation(.spring(duration: 0.35, bounce: 0.2)) { revealedRows = row }
+            try? await Task.sleep(for: .milliseconds(110))
+        }
+        revealedRows = nil
     }
 
     private func summaryLine(_ layout: PrintLayout) -> some View {
@@ -473,13 +499,15 @@ struct SheetPreview: View {
     var captions = true
     /// The space each full page is fitted into, keeping the paper's proportions.
     var pageBox = CGSize(width: 260, height: 260)
+    /// Rows of the first page to show; nil shows them all.
+    var revealedRows: Int?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let pages = compact ? Array(layout.pages.prefix(1)) : layout.pages
         if compact, let page = pages.first {
-            SheetPageView(page: page, thumbnails: thumbnails, animated: false)
-                .aspectRatio(page.widthMM / page.heightMM, contentMode: .fit)
+            UprightPageView(page: page, thumbnails: thumbnails, animated: false)
+                .aspectRatio(page.displayAspect, contentMode: .fit)
                 .frame(height: compactHeight)
                 .paperDimmedInDark()
                 .paperShadow()
@@ -489,10 +517,11 @@ struct SheetPreview: View {
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: Design.Spacing.group) {
                     ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                        let aspect = page.widthMM / page.heightMM
+                        let aspect = page.displayAspect
                         let width = min(pageBox.width, pageBox.height * aspect)
                         VStack(spacing: Design.Spacing.tight) {
-                            SheetPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion)
+                            UprightPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion,
+                                            revealedRows: index == 0 ? revealedRows : nil)
                                 .frame(width: width, height: width / aspect)
                                 .paperDimmedInDark()
                                 .paperShadow()
@@ -520,10 +549,42 @@ struct SheetPreview: View {
     }
 }
 
+extension PrintPage {
+    /// True when most photos lie sideways on the paper (rotated to fit more copies). Such a page is shown turned a
+    /// quarter anticlockwise so the faces stand upright; the printed page is unchanged (founder, 0.20 review).
+    var displaysTurned: Bool {
+        placements.filter(\.rotated).count * 2 > placements.count
+    }
+
+    /// Width over height of the page as shown on screen.
+    var displayAspect: Double { displaysTurned ? heightMM / widthMM : widthMM / heightMM }
+}
+
+/// A page as shown on screen: turned when its photos lie sideways, so faces are always upright.
+struct UprightPageView: View {
+    let page: PrintPage
+    let thumbnails: [UUID: CGImage]
+    var animated = true
+    var revealedRows: Int?
+
+    var body: some View {
+        GeometryReader { geometry in
+            let turned = page.displaysTurned
+            SheetPageView(page: page, thumbnails: thumbnails, animated: animated, revealedRows: revealedRows)
+                .frame(width: turned ? geometry.size.height : geometry.size.width,
+                       height: turned ? geometry.size.width : geometry.size.height)
+                .rotationEffect(.degrees(turned ? -90 : 0))
+                .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+    }
+}
+
 struct SheetPageView: View {
     let page: PrintPage
     let thumbnails: [UUID: CGImage]
     var animated = true
+    /// Rows (as seen on screen) to show; the rest wait, invisible, to appear in turn. nil shows all.
+    var revealedRows: Int?
 
     private struct Key: Hashable { let item: UUID; let copy: Int }
     private struct Keyed: Identifiable { let id: Key; let placement: Placement }
@@ -532,11 +593,15 @@ struct SheetPageView: View {
     var body: some View {
         GeometryReader { geometry in
             let scale = min(geometry.size.width / page.widthMM, geometry.size.height / page.heightMM)
+            let hidden = hiddenPlacements
             ZStack(alignment: .topLeading) {
                 Color.white
                 ForEach(keyed) { item in
                     let placement = item.placement
+                    let waiting = hidden.contains(item.id)
                     placementView(placement, scale: scale)
+                        .opacity(waiting ? 0 : 1)
+                        .scaleEffect(waiting ? 0.6 : 1)
                         .frame(width: placement.bleed.width * scale, height: placement.bleed.height * scale)
                         .position(x: (placement.bleed.x + placement.bleed.width / 2) * scale,
                                   y: (placement.bleed.y + placement.bleed.height / 2) * scale)
@@ -563,6 +628,12 @@ struct SheetPageView: View {
         }
         .overlay(Rectangle().strokeBorder(.secondary, lineWidth: Design.Stroke.hairline))
         .clipped()
+    }
+
+    private var hiddenPlacements: Set<Key> {
+        guard let revealedRows else { return [] }
+        let waiting = page.displayRows.dropFirst(revealedRows).flatMap { $0 }
+        return Set(waiting.map { Key(item: page.placements[$0].itemID, copy: page.placements[$0].copyIndex) })
     }
 
     @ViewBuilder private func placementView(_ placement: Placement, scale: CGFloat) -> some View {

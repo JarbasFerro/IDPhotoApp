@@ -2244,6 +2244,22 @@
         }
       }
     },
+    "Cut the strips apart first" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corta primero las tiras"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corte primeiro as tiras"
+          }
+        }
+      }
+    },
     "Cutting options" : {
       "localizations" : {
         "es" : {
@@ -2518,6 +2534,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tudo o que podemos medir está certo. Confira também a olho: expressão neutra, olhos abertos, sem reflexo nos óculos."
+          }
+        }
+      }
+    },
+    "Example: a selfie, the ID photo made from it, and a printed sheet of copies" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ejemplo: un selfi, la foto de carnet hecha con él y una hoja impresa con copias"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exemplo: uma selfie, a foto para documento feita a partir dela e uma folha impressa com cópias"
           }
         }
       }
@@ -9145,22 +9177,6 @@
         }
       }
     },
-    "Example: one photo and a printed sheet of copies" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ejemplo: una foto y una hoja impresa con copias"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exemplo: uma foto e uma folha impressa com cópias"
-          }
-        }
-      }
-    },
     "Your photo and its printed sheet" : {
       "localizations" : {
         "es" : {
@@ -10421,22 +10437,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrando a página 1."
-          }
-        }
-      }
-    },
-    "Cut the rows apart first" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corta primero las filas"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corte primeiro as fileiras"
           }
         }
       }

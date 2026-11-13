@@ -20,7 +20,7 @@ The roadmap is ambitious on purpose, and **nothing in it is final**. If a better
 | **0.17** | The ending | A print they can check against the screen, a cutting guide, a finished moment; controls that respond to touch | U1, U6, P1 |
 | **0.18** | Shorter and measured | Five screens instead of eight; the app visibly measures the photo; results appear almost at once | U2, U3, P2, U15 |
 | **0.19** | Calipic becomes the app | Nothing visible: the spike becomes the production project, with Swift tests in CI | E1 |
-| **0.20** | The look (stage, paper, readouts **done in 0.20.0**; transitions and real faces open) | A recognisable Calipic: the cutting mat, real paper, one continuous photo from shutter to sheet, real faces on Home | U5, U4, U10 |
+| **0.20** | The look (stage, paper, readouts **done in 0.20.0**; transitions and real faces **done in 0.20.5**) | A recognisable Calipic: the cutting mat, real paper, one continuous photo from shutter to sheet, real faces on Home | U5, U4, U10 |
 | **0.21** | Keep my work | Close the app and continue later; reprint for free; delete everything in one tap | E2, U9 |
 | **0.22** | Real credits | Buying a pack works; the balance survives a reinstall | E3, U12 |
 | **0.23** | Tools | An editor and a sheet that feel like instruments; every unhappy path designed | U7, U8, U13, U14, P4, P5 |
@@ -75,13 +75,13 @@ Specified in [03-design.md §7](03-design.md).
 | U1 | Print check with true size on screen; Finished; cutting guide | L | 0.17 |
 | U2 | Shorter path: no *Choose result*, preflight once, one review, step marker | M | 0.18 |
 | U3 | Show the measuring: lines and millimetres, checks one by one, actual size | M | 0.18 |
-| U4 | One continuous object: zoom transitions, the photo becomes its copies | M | 0.20 |
+| U4 | One continuous object: zoom transitions, the photo becomes its copies (**done in 0.20.5**) | M | 0.20 |
 | U5 | The look: stage, paper in Dark, type and number roles, one shadow | M | 0.20 |
 | U6 | Feedback map: haptics, symbol effects, numeric transitions | S–M | 0.17 |
 | U7 | Adjust as a tool: full-height photo, dial, band on the zoom scale, swatches | L | 0.23 |
 | U8 | Your sheet as a cutting mat: tap to select, pinch, copies fly in, informed paper chips | M | 0.23 |
 | U9 | Home as the studio table with a Continue shelf | M | 0.21 |
-| U10 | Real faces: private review set, licensed public portraits | M (people) | 0.20 |
+| U10 | Real faces: private review set, public portraits (**Home sample and test photo done in 0.20.5**, a generated person, D-9; the varied review set is still open) | M (people) | 0.20 |
 | U11 | Camera: helper mode, find a good spot, later best frame | M–L | 0.30 |
 | U12 | Credits with StoreKit views | S | 0.22 |
 | U13 | Choose document: your country first, recents, size glyphs, honest "not offered" | S | 0.23 |

@@ -39,7 +39,7 @@ Buttons: one prominent button per screen (`brandProminentButtonStyle()`, large),
 
 | # | Screen | What it does | Source |
 |---|---|---|---|
-| 1 | **Home** | Hero picture (a photo and the sheet it becomes; the person's own photo once they have one), the promise "Take it at home. Print it yourself.", the *Your sheet* card (with a menu to remove one photo or all of them, 0.20.2; on Your sheet, touch and hold a person) when a session exists, one card with the document and *Photo requirements*, **Take Photo**, **Choose from Library**, then the privacy line, the credits button, and the version | `HomeView.swift` |
+| 1 | **Home** | Hero picture: a selfie, the ID photo made from it, and the printed sheet (a generated sample person, D-9; the person's own original, photo and copies once they have one, 0.20.5), the promise "Take it at home. Print it yourself.", the *Your sheet* card (with a menu to remove one photo or all of them, 0.20.2; on Your sheet, touch and hold a person) when a session exists, one card with the document and *Photo requirements*, **Take Photo**, **Choose from Library**, then the privacy line, the credits button, and the version | `HomeView.swift` |
 | 2 | **Choose document** | Sheet with search; **Custom size** first, then profiles grouped by country, each country with its flag (also on the Home document card), with size and background. Custom size takes width and height in mm or inches and offers shortcuts | `DocumentPickerView.swift` |
 | 3 | **Photo requirements** | The document's rules from the catalog with official sources and the review date | `HomeView.swift` (`RequirementsView`) |
 | 4 | **Before your photo** | Three things to get right. Shown in full the first time for each document; after that the camera or picker opens directly (requirements stay in Home, Photo Check's More menu, and Camera Help) | `PreparationView.swift`, `AppFlow.swift` |
@@ -141,7 +141,10 @@ The signature Calipic moment, built from data the app already has (the face anal
 
 Done when: testers, asked what the app did, mention that it measured the photo.
 
-### U4 — One continuous object (M)
+### U4 — One continuous object (M) · Built in 0.20.5
+
+Built with the system zoom transition (`Transitions.swift`): Home's *Your sheet* card and Photo Check's photo open Your sheet; the photo opens Digital Photo; the page opens Print. Arriving from Photo Check, the copies on the first page appear row by row with a light tap each. Unlock folds the card away. Photo Check itself keeps the standard push, because it often opens after the camera, with nothing on screen to zoom from. Pages whose photos lie sideways on the paper are shown turned a quarter, so faces are always upright (Your sheet, Print, Finished); the printed page is unchanged.
+
 
 - Home hero or *Your sheet* card → the screen it opens: zoom transition (`matchedTransitionSource` with `.navigationTransition(.zoom)`).
 - Photo Check → Your sheet: the portrait travels to the page and **becomes its copies**, one after another, with a light haptic per row.
