@@ -66,3 +66,6 @@ Local.xcconfig
 
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Generated portraits dropped into the project before they are prepared (D-9); prepared copies live in test_data/sample
+**/Gemini_Generated_Image_*
