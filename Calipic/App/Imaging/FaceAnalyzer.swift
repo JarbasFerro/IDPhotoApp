@@ -14,6 +14,9 @@ struct FaceAnalysis: Sendable, Hashable {
     /// Eye outline height over width for each eye (`EyeOpenness`); nil when the outlines were not found.
     var eyeOpenness: (left: Double, right: Double)? = nil
 
+    /// Width of the person's outline around the head in inter-eye distances (`HeadOutline`); nil without a mask.
+    var headOutlineWidth: Double? = nil
+
     /// The eyes look closed or turned down (advisory, shown on the camera's review).
     var eyesLookClosed: Bool { eyeOpenness.map { EyeOpenness.looksClosed(left: $0.left, right: $0.right) } ?? false }
 
@@ -21,6 +24,7 @@ struct FaceAnalysis: Sendable, Hashable {
         lhs.faceCount == rhs.faceCount && lhs.geometry == rhs.geometry && lhs.solution == rhs.solution
             && lhs.visionRollDegrees == rhs.visionRollDegrees && lhs.lensSmudgeConfidence == rhs.lensSmudgeConfidence
             && lhs.eyeOpenness?.left == rhs.eyeOpenness?.left && lhs.eyeOpenness?.right == rhs.eyeOpenness?.right
+            && lhs.headOutlineWidth == rhs.headOutlineWidth
     }
 
     func hash(into hasher: inout Hasher) {
@@ -107,7 +111,9 @@ enum FaceAnalyzer {
         let eyes = openness(landmarks.leftEye).flatMap { left in openness(landmarks.rightEye).map { (left: left, right: $0) } }
         return FaceAnalysis(faceCount: faces.count, geometry: geometry, solution: solution,
                             visionRollDegrees: face.roll.converted(to: .degrees).value, lensSmudgeConfidence: smudge,
-                            eyeOpenness: eyes)
+                            eyeOpenness: eyes,
+                            headOutlineWidth: mask.flatMap { headOutlineWidth($0, eyeMidpoint: eyeMidPx, interEye: ied,
+                                                                               eyeToChin: eyeToChin, source: source) })
     }
 
     /// Accurate person mask, falling back to the balanced model and then to no mask.
@@ -120,6 +126,40 @@ enum FaceAnalyzer {
             }
         }
         return nil
+    }
+
+    /// Median width of the mask run through the eye midpoint on nine rows from the eye line up to 0.6 × eye-to-chin
+    /// above it, in inter-eye distances (`HeadOutline`). All lengths are in source pixels.
+    static func headOutlineWidth(_ mask: CGImage, eyeMidpoint: ImagePoint, interEye: Double, eyeToChin: Double,
+                                 source: SourcePixels) -> Double? {
+        guard interEye > 0 else { return nil }
+        let width = 384
+        let height = max(1, Int((Double(width) * Double(mask.height) / Double(mask.width)).rounded()))
+        var bytes = [UInt8](repeating: 0, count: width * height)
+        let drawn = bytes.withUnsafeMutableBytes { buffer -> Bool in
+            guard let space = CGColorSpace(name: CGColorSpace.linearGray),
+                  let context = CGContext(data: buffer.baseAddress, width: width, height: height, bitsPerComponent: 8,
+                                          bytesPerRow: width, space: space, bitmapInfo: CGImageAlphaInfo.none.rawValue)
+            else { return false }
+            context.interpolationQuality = .medium
+            context.draw(mask, in: CGRect(x: 0, y: 0, width: width, height: height))
+            return true
+        }
+        guard drawn else { return nil }
+        let cellW = Double(source.width) / Double(width), cellH = Double(source.height) / Double(height)
+        func on(_ x: Int, _ y: Int) -> Bool { bytes[y * width + x] >= 128 }
+        var widths: [Double] = []
+        let column = Int(eyeMidpoint.x / cellW)
+        for step in 0...8 {
+            let y = eyeMidpoint.y - Double(step) / 8 * 0.6 * eyeToChin
+            let row = Int(y / cellH)
+            guard row >= 0, row < height, column >= 0, column < width, on(column, row) else { continue }
+            var left = column, right = column
+            while left > 0, on(left - 1, row) { left -= 1 }
+            while right < width - 1, on(right + 1, row) { right += 1 }
+            widths.append(Double(right - left + 1) * cellW / interEye)
+        }
+        return HeadOutline.medianWidth(widths)
     }
 
     /// Farthest foreground pixel above the eyes along the head axis, within a band of `halfWidth` source pixels

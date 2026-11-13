@@ -133,8 +133,11 @@ struct SheetView: View {
                 .scrollIndicators(.hidden)
                 if let person, let copies = copiesBinding(for: person) {
                     if !fill.isEmpty { fillMenu(for: person) }
-                    Stepper("Copies", value: copies, in: 0...50)
+                    Stepper("Copies",
+                            onIncrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: true) },
+                            onDecrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: false) })
                         .labelsHidden()
+                        .accessibilityValue(Text("^[\(copies.wrappedValue) copy](inflect: true)"))
                         .sensoryFeedback(.selection, trigger: copiesTick)
                         .accessibilityIdentifier("copiesStepper")
                 }
@@ -320,6 +323,20 @@ struct SheetView: View {
         return choices
     }
 
+    /// Up to one full page the stepper moves one copy at a time; beyond it, a page at a time (to the next or previous
+    /// whole-page count), so 36 copies is three taps rather than twenty-four (founder's recording, 0.20.9).
+    private func steppedCopies(from copies: Int, up: Bool) -> Int {
+        let whole = fill.map(\.copies).sorted()
+        guard let onePage = whole.first else { return min(max(copies + (up ? 1 : -1), 0), 50) }
+        let next: Int
+        if up {
+            next = copies >= onePage ? (whole.first { $0 > copies } ?? copies + 1) : copies + 1
+        } else {
+            next = copies > onePage ? (whole.last { $0 < copies } ?? copies - 1) : copies - 1
+        }
+        return min(max(next, 0), 50)
+    }
+
     private func copiesBinding(for person: PhotoEntry) -> Binding<Int>? {
         guard let id = model.printItems(for: person.id).first?.id else { return nil }
         return Binding(get: { model.printJob.items.first { $0.id == id }?.copies ?? 0 },
@@ -477,7 +494,9 @@ struct CuttingOptionsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityIdentifier("cuttingDone") } }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.fraction(0.45), .large])
+        .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.45)))
+        .presentationContentInteraction(.scrolls)
     }
 
     private var bleedBinding: Binding<Bool> {

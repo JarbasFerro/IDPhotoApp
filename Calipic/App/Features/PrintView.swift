@@ -88,9 +88,12 @@ struct PrintView: View {
     private var header: some View {
         let layout = model.layout
         let landscape = layout.pages.first.map { $0.displayAspect > 1 } ?? false
+        let thumbHeight: CGFloat = landscape ? 110 : 170
+        let paper = PaperNames.short(for: model.printJob.paper)
         return VStack(alignment: .leading, spacing: Design.Spacing.group) {
             // The page lies on the mat; the words sit below, on the plain screen.
-            SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: landscape ? 110 : 170)
+            SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: thumbHeight)
+                .background(alignment: .topLeading) { pageStack(layout, height: thumbHeight) }
                 .padding(.vertical, Design.Spacing.group)
                 .frame(maxWidth: .infinity)
                 .onMat(bleed: 16)
@@ -100,11 +103,35 @@ struct PrintView: View {
                     .foregroundStyle(StatusStyle.pass)
                     .accessibilityHidden(true)
                 Text("Your sheet is ready").font(Design.Typography.screenTitle)
-                Text("^[\(layout.placedCount) copy](inflect: true) on \(PaperNames.short(for: model.printJob.paper)) paper")
-                    .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                Group {
+                    if layout.pages.count > 1 {
+                        Text("^[\(layout.placedCount) copy](inflect: true) on ^[\(layout.pages.count) page](inflect: true) of \(paper) paper")
+                    } else {
+                        Text("^[\(layout.placedCount) copy](inflect: true) on \(paper) paper")
+                    }
+                }
+                .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
             }
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("printHeader")
+        }
+    }
+
+    /// Two plain sheets peeking out behind the thumbnail when the print has several pages.
+    @ViewBuilder
+    private func pageStack(_ layout: PrintLayout, height: CGFloat) -> some View {
+        if layout.pages.count > 1, let aspect = layout.pages.first?.displayAspect {
+            ZStack(alignment: .topLeading) {
+                ForEach([12.0, 6.0], id: \.self) { offset in
+                    Rectangle().fill(.white)
+                        .aspectRatio(aspect, contentMode: .fit)
+                        .frame(height: height)
+                        .paperDimmedInDark()
+                        .paperShadow()
+                        .offset(x: offset, y: offset)
+                }
+            }
+            .accessibilityHidden(true)
         }
     }
 

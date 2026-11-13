@@ -608,6 +608,34 @@ final class CalipicUITests: XCTestCase {
         return app
     }
 
+    /// Two pages: Print shows a small stack and says how many pages (0.20.10); the stepper then moves by pages.
+    @MainActor
+    func testPrintShowsAStackForSeveralPages() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fixture"]
+        app.launchArguments.append("--uitesting-fresh")
+        app.launch()
+        XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        reveal(app.buttons["outputPrint"], in: app)
+        app.buttons["outputPrint"].tap()
+        let summary = app.staticTexts["layoutSummary"]
+        XCTAssertTrue(app.buttons["fillPages"].waitForExistence(timeout: 10))
+        app.buttons["fillPages"].tap()
+        let twoPages = app.buttons.matching(NSPredicate(format: "label BEGINSWITH '2 pages'")).firstMatch
+        XCTAssertTrue(twoPages.waitForExistence(timeout: 5))
+        twoPages.tap()
+        XCTAssertTrue(summary.label.contains("2 pages"), summary.label)
+        // Beyond a full page, minus goes back a whole page.
+        app.steppers["copiesStepper"].buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(summary.label.contains("1 page"), summary.label)
+        app.steppers["copiesStepper"].buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(summary.label.contains("2 pages"), summary.label)
+        app.buttons["continueToShare"].tap()
+        XCTAssertTrue(any(app, "printHeader").waitForExistence(timeout: 10))
+        XCTAssertTrue(any(app, "printHeader").label.contains("2 pages"), any(app, "printHeader").label)
+        attachBothAppearances(app, "Print, two pages")
+    }
+
     /// After printing, the person compares the print with the screen: a wrong size leads to the fix, a right size to Finished.
     @MainActor
     func testPrintCheckLeadsToTheFixOrToFinished() throws {

@@ -6,7 +6,7 @@ struct PhotoCheckSummary: Hashable, Sendable {
     enum Headline: Hashable, Sendable { case checking, good, review, retake }
 
     struct Row: Identifiable, Hashable, Sendable {
-        enum Topic: String, Hashable, Sendable { case face, framing, background, light, detail }
+        enum Topic: String, Hashable, Sendable { case face, framing, outline, background, light, detail }
         let topic: Topic
         let state: CheckState
         /// Short title, e.g. "Head size".
@@ -61,6 +61,11 @@ enum CheckPresentation {
             } else if let solution = analysis.solution {
                 rows.append(faceRow(solution))
                 rows.append(framingRow(solution))
+                // Something wide beside the head: headphones, a hood, or a headrest the background removal kept.
+                if let width = analysis.headOutlineWidth, HeadOutline.isWide(width) {
+                    rows.append(.init(topic: .outline, state: .warn, title: "Around your head",
+                                      detail: "Something is next to your head, like headphones, a hood or a seat. Remove it, or retake against a plain wall."))
+                }
             }
             if let smudge = analysis.lensSmudgeConfidence, smudge >= FaceAnalysis.smudgeThreshold {
                 rows.append(.init(topic: .detail, state: .warn, title: "Sharpness",
@@ -210,6 +215,7 @@ enum CheckPresentation {
         switch topic {
         case .face: "face.smiling"
         case .framing: "person.crop.rectangle"
+        case .outline: "headphones"
         case .background: "rectangle.fill"
         case .light: "sun.max"
         case .detail: "sparkles"

@@ -343,7 +343,8 @@ final class PhotoWorkflow {
         guard let geometry = analysis.geometry else { return analysis }
         return FaceAnalysis(faceCount: analysis.faceCount, geometry: geometry,
                             solution: CropSolver.solve(geometry: geometry, format: target.format, spec: target.spec),
-                            visionRollDegrees: analysis.visionRollDegrees, lensSmudgeConfidence: analysis.lensSmudgeConfidence)
+                            visionRollDegrees: analysis.visionRollDegrees, lensSmudgeConfidence: analysis.lensSmudgeConfidence,
+                            eyeOpenness: analysis.eyeOpenness, headOutlineWidth: analysis.headOutlineWidth)
     }
 
     // MARK: - Credits and unlocking (ADR-048)

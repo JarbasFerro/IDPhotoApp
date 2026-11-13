@@ -1375,6 +1375,22 @@
         }
       }
     },
+    "Around your head" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alrededor de la cabeza"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao redor da cabeça"
+          }
+        }
+      }
+    },
     "As many copies as possible" : {
       "localizations" : {
         "es" : {
@@ -5746,6 +5762,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra todas as verificações."
+          }
+        }
+      }
+    },
+    "Something is next to your head, like headphones, a hood or a seat. Remove it, or retake against a plain wall." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hay algo junto a tu cabeza, como auriculares, una capucha o un asiento. Quítalo o repite la foto delante de una pared lisa."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Há algo ao lado da sua cabeça, como fones, um capuz ou um banco. Tire-o ou tire outra foto em frente a uma parede lisa."
           }
         }
       }
@@ -10432,6 +10464,22 @@
         }
       }
     },
+    "^[%lld copy](inflect: true)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld copia](inflect: true)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld cópia](inflect: true)"
+          }
+        }
+      }
+    },
     "^[%lld copy](inflect: true) on %@ paper" : {
       "localizations" : {
         "es" : {
@@ -10444,6 +10492,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "^[%1$lld cópia](inflect: true) em papel %2$@"
+          }
+        }
+      }
+    },
+    "^[%lld copy](inflect: true) on ^[%lld page](inflect: true) of %@ paper" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%1$lld copia](inflect: true) en ^[%2$lld página](inflect: true) de papel %3$@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%1$lld cópia](inflect: true) em ^[%2$lld página](inflect: true) de papel %3$@"
           }
         }
       }

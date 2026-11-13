@@ -109,4 +109,16 @@ struct CheckPresentationTests {
         pending.isSegmenting = false
         #expect(CheckPresentation.summary(for: pending, whiteApplied: false, sourceIsSmall: false).headline != .checking)
     }
+
+    /// Headphones, a hood or a kept headrest widen the outline around the head; Photo Check says so (0.20.10).
+    @Test func wideOutlineAroundTheHeadIsAWarning() throws {
+        var wide = analysis(checks: [AlignmentCheck(kind: .headHeight, state: .pass, measured: 0.74)])
+        wide.headOutlineWidth = 2.85
+        var summary = CheckPresentation.summary(for: try entry(analysis: wide), whiteApplied: false, sourceIsSmall: false)
+        #expect(summary.rows.first { $0.topic == .outline }?.state == .warn)
+        #expect(summary.headline == .review)
+        wide.headOutlineWidth = 2.4
+        summary = CheckPresentation.summary(for: try entry(analysis: wide), whiteApplied: false, sourceIsSmall: false)
+        #expect(!summary.rows.contains { $0.topic == .outline })
+    }
 }
