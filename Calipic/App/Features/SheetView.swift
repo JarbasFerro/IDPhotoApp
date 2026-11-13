@@ -325,16 +325,10 @@ struct SheetView: View {
 
     /// Up to one full page the stepper moves one copy at a time; beyond it, a page at a time (to the next or previous
     /// whole-page count), so 36 copies is three taps rather than twenty-four (founder's recording, 0.20.9).
+    /// One copy per tap, always (founder, 0.20.12: a jump of a whole page at the 13th copy was unexpected). Whole
+    /// pages are the Fill menu's job.
     private func steppedCopies(from copies: Int, up: Bool) -> Int {
-        let whole = fill.map(\.copies).sorted()
-        guard let onePage = whole.first else { return min(max(copies + (up ? 1 : -1), 0), 50) }
-        let next: Int
-        if up {
-            next = copies >= onePage ? (whole.first { $0 > copies } ?? copies + 1) : copies + 1
-        } else {
-            next = copies > onePage ? (whole.last { $0 < copies } ?? copies - 1) : copies - 1
-        }
-        return min(max(next, 0), 50)
+        min(max(copies + (up ? 1 : -1), 0), 50)
     }
 
     private func copiesBinding(for person: PhotoEntry) -> Binding<Int>? {

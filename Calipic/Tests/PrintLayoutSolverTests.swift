@@ -89,8 +89,8 @@ struct PrintLayoutSolverTests {
             }
             previous = layout
         }
-        // The grid may change only where the next copy would otherwise need another page.
-        #expect(regrids <= 2)
+        // The grid never changes with the count (0.20.12: a change at the 10th copy read as a flash).
+        #expect(regrids == 0)
     }
 
     @Test func gridFillsTopLeftFirstAsShown() throws {

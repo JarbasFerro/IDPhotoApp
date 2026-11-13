@@ -355,8 +355,8 @@ enum PrintLayoutSolver {
     /// With a single photo, every page uses one full-page grid and copies fill its slots in reading order (as seen
     /// on screen), so adding a copy only adds a photo: nothing moves, the page never changes shape, and every page
     /// cuts the same way (founder's recording, 0.20.11: the page flipped between portrait and landscape and the
-    /// photos re-centred at every copy). On one page the grid is the best-scoring one that holds every copy, so it
-    /// changes at most where a smaller margin is needed to stay on one page; beyond one page it is the fullest grid.
+    /// photos re-centred at every copy). The grid is the fullest one (best-scoring among equals), so it never
+    /// changes with the number of copies.
     private static func solveGrid(job: PrintJob, itemIndex: Int, orientations: [(w: Int, h: Int)], bleeds: [Int],
                                   barChoices: [Bool], margin: Int, gutter: Int) -> PrintLayout {
         let items = job.items
@@ -384,10 +384,10 @@ enum PrintLayoutSolver {
         guard let largest = grids.map(\.plan.placed).max(), copies > 0 else {
             return PrintLayout(pages: [], unplaced: copies > 0 ? [items[itemIndex].id: copies] : [:])
         }
-        // Copies that fit on one page may use any grid that holds them all. Beyond one page, only the fullest grid:
-        // otherwise the margin would switch back and forth at every page boundary.
+        // Always the fullest grid, whatever the count: a roomier grid for a few copies had to be swapped for the
+        // full one at some count, and the swap read as a flash (founder, 0.20.12: at the 10th copy).
         let chosen = grids
-            .filter { copies <= largest ? $0.plan.placed >= copies : $0.plan.placed == largest }
+            .filter { $0.plan.placed == largest }
             .max { a, b in
                 func key(_ g: Grid) -> [Int] {
                     [g.bleed > 0 ? 1 : 0, g.bar ? 1 : 0, -g.plan.orientationCount, g.bleed, g.plan.placed,

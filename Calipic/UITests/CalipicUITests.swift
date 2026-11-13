@@ -630,11 +630,11 @@ final class CalipicUITests: XCTestCase {
         XCTAssertTrue(twoPages.waitForExistence(timeout: 5))
         twoPages.tap()
         XCTAssertTrue(summary.label.contains("2 pages"), summary.label)
-        // Beyond a full page, minus goes back a whole page.
+        // The stepper moves one copy at a time, also beyond a full page.
         app.steppers["copiesStepper"].buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(summary.label.contains("1 page"), summary.label)
+        XCTAssertTrue(summary.label.contains("23 copies") && summary.label.contains("2 pages"), summary.label)
         app.steppers["copiesStepper"].buttons.element(boundBy: 1).tap()
-        XCTAssertTrue(summary.label.contains("2 pages"), summary.label)
+        XCTAssertTrue(summary.label.contains("24 copies"), summary.label)
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(any(app, "printHeader").waitForExistence(timeout: 10))
         XCTAssertTrue(any(app, "printHeader").label.contains("2 pages"), any(app, "printHeader").label)
