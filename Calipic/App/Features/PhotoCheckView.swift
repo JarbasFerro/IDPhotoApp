@@ -10,9 +10,8 @@ struct PhotoCheckView: View {
     @State private var showRequirements = false
     @State private var confirmRemove = false
     @State private var comparing = false
-    /// nil follows the verdict: details open by themselves when something needs a look.
-    @State private var showMeasured: Bool?
-    @State private var showByEye = false
+    /// The full list of checks, in a sheet: the screen itself stays one page with the photo in view.
+    @State private var showDetails = false
     @State private var confirmEdit = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
     @State private var landed = false
@@ -97,6 +96,11 @@ struct PhotoCheckView: View {
         } message: { Text("Editing it locks it again. The changed photo will use another credit.") }
         .sheet(isPresented: $showAdjust) { AdjustSheet(model: model, photoID: photoID) }
         .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
+        .sheet(isPresented: $showDetails) {
+            if let entry {
+                CheckDetailsSheet(summary: summary(for: entry), byEye: model.document.byEyeChecks)
+            }
+        }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
         .task(id: photoID) {
             // Landing: show the uncropped photo first, wait for the push to settle and the check to finish, then frame it.
@@ -183,9 +187,13 @@ struct PhotoCheckView: View {
 
     // MARK: - Verdict and details (design 2a)
 
-    private func summaryBlock(_ entry: PhotoEntry) -> some View {
+    private func summary(for entry: PhotoEntry) -> PhotoCheckSummary {
         let whiteApplied: Bool = { if case .color = entry.adjustment.background { return true } else { return false } }()
-        let summary = CheckPresentation.summary(for: entry, whiteApplied: whiteApplied, sourceIsSmall: model.sourceIsSmall)
+        return CheckPresentation.summary(for: entry, whiteApplied: whiteApplied, sourceIsSmall: model.sourceIsSmall)
+    }
+
+    private func summaryBlock(_ entry: PhotoEntry) -> some View {
+        let summary = summary(for: entry)
         return VStack(alignment: .leading, spacing: Design.Spacing.group) {
             verdict(summary)
             if summary.headline != .checking {
@@ -239,6 +247,9 @@ struct PhotoCheckView: View {
             Group {
                 if summary.headline == .good {
                     Text("Framed for \(DocumentPresentation.name(model.document))")
+                } else if summary.attention.count == 1, let only = summary.attention.first {
+                    // One thing to look at: say it here, so nobody has to open the list to learn what it is.
+                    Text(only.detail)
                 } else {
                     Text(CheckPresentation.subtitle(for: summary.headline))
                 }
@@ -251,8 +262,9 @@ struct PhotoCheckView: View {
         .accessibilityIdentifier("checkHeadline")
     }
 
+    /// Two short rows that open the full list in a sheet. The list used to unfold in place and pushed the photo
+    /// and the buttons off the screen (founder, 0.20 review).
     private func detailsCard(_ summary: PhotoCheckSummary) -> some View {
-        let measuredOpen = showMeasured ?? (summary.headline != .good)
         let byEye = model.document.byEyeChecks
         let worst = summary.worstState
         return VStack(spacing: 0) {
@@ -261,50 +273,29 @@ struct PhotoCheckView: View {
                               title: summary.attention.isEmpty
                                   ? Text("Everything measured looks fine")
                                   : Text("^[\(summary.attention.count) thing](inflect: true) to look at"),
-                              subtitle: nil, isOpen: measuredOpen, identifier: "measuredRow") {
-                    showMeasured = !measuredOpen
-                }
-                if measuredOpen {
-                    VStack(alignment: .leading, spacing: Design.Spacing.control) {
-                        ForEach(summary.rows) { row in measuredRow(row) }
-                    }
-                    .padding(.horizontal).padding(.bottom, Design.Spacing.cardContent)
-                }
+                              subtitle: Text(verbatim: (summary.attention.isEmpty ? summary.rows : summary.attention)
+                                  .map { String(localized: $0.title) }.joined(separator: " · ")),
+                              identifier: "measuredRow") { showDetails = true }
             }
             if !byEye.isEmpty {
                 if !summary.rows.isEmpty { Divider().padding(.leading) }
                 disclosureRow(symbol: StatusStyle.symbol(for: .manualCheck), color: StatusStyle.color(for: .manualCheck),
                               title: Text("^[\(byEye.count) thing](inflect: true) to check by eye"),
                               subtitle: Text(verbatim: byEye.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
-                              isOpen: showByEye, identifier: "byEyeRow") {
-                    showByEye.toggle()
-                }
-                if showByEye {
-                    VStack(alignment: .leading, spacing: Design.Spacing.row) {
-                        ForEach(byEye, id: \.self) { id in
-                            Label { Text(DocumentPresentation.check(id)) } icon: {
-                                Image(systemName: "circle").foregroundStyle(.tertiary)
-                            }
-                        }
-                        Text("The office that receives the photo decides whether to accept it.")
-                            .font(Design.Typography.note).foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal).padding(.bottom, Design.Spacing.cardContent)
-                }
+                              identifier: "byEyeRow") { showDetails = true }
             }
         }
         .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
     }
 
-    private func disclosureRow(symbol: String, color: Color, title: Text, subtitle: Text?, isOpen: Bool,
-                               identifier: String, toggle: @escaping () -> Void) -> some View {
-        Button(action: { withAnimation(reduceMotion ? nil : .default) { toggle() } }) {
+    private func disclosureRow(symbol: String, color: Color, title: Text, subtitle: Text?,
+                               identifier: String, open: @escaping () -> Void) -> some View {
+        Button(action: open) {
             HStack(spacing: Design.Spacing.control) {
                 Image(systemName: symbol).foregroundStyle(color).frame(width: 24)
                 VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                     title.foregroundStyle(.primary)
-                    if let subtitle, !isOpen {
+                    if let subtitle {
                         subtitle.font(Design.Typography.note).foregroundStyle(.secondary).lineLimit(1)
                     }
                 }
@@ -312,7 +303,6 @@ struct PhotoCheckView: View {
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
-                    .rotationEffect(.degrees(isOpen ? 90 : 0))
             }
             .padding(.horizontal)
             .frame(minHeight: 54)
@@ -321,22 +311,8 @@ struct PhotoCheckView: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isButton)
-        .accessibilityValue(isOpen ? Text("Expanded") : Text("Collapsed"))
+        .accessibilityHint("Shows every check.")
         .accessibilityIdentifier(identifier)
-    }
-
-    private func measuredRow(_ row: PhotoCheckSummary.Row) -> some View {
-        HStack(alignment: .top, spacing: Design.Spacing.control) {
-            Image(systemName: StatusStyle.symbol(for: row.state))
-                .foregroundStyle(StatusStyle.color(for: row.state))
-                .frame(width: 24)
-            VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                Text(row.title).font(Design.Typography.rowTitle)
-                Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: "\(String(localized: row.title)), \(String(localized: StatusStyle.name(for: row.state))). \(String(localized: row.detail))"))
     }
 
     /// Honest editing (ADR-051): when the document's own rules ask for an unedited photo, say what Calipic changed
@@ -353,27 +329,28 @@ struct PhotoCheckView: View {
         .padding(.horizontal, Design.Spacing.tight)
     }
 
+    /// The main output on its own line; the other output and Adjust share the next one, so the buttons take two
+    /// lines instead of three. At accessibility text sizes they stack.
     private var actions: some View {
         let outputs = model.document.availableOutputs
+        let secondary = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
         return VStack(spacing: Design.Spacing.control) {
-            ForEach(Array(outputs.enumerated()), id: \.element) { index, output in
-                if index == 0 {
-                    outputButton(output).brandProminentButtonStyle()
-                } else {
+            if let first = outputs.first { outputButton(first).brandProminentButtonStyle() }
+            secondary {
+                ForEach(Array(outputs.dropFirst()), id: \.self) { output in
                     outputButton(output).buttonStyle(.bordered)
                 }
+                Button {
+                    // An unlocked photo is final (ADR-048 §5): warn before it is locked again.
+                    if model.entries.first(where: { $0.id == photoID })?.isUnlocked == true { confirmEdit = true } else { showAdjust = true }
+                } label: {
+                    Label("Adjust", systemImage: "slider.horizontal.3").lineLimit(1).frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .accessibilityIdentifier("adjust")
             }
-            Button {
-                // An unlocked photo is final (ADR-048 §5): warn before it is locked again.
-                if model.entries.first(where: { $0.id == photoID })?.isUnlocked == true { confirmEdit = true } else { showAdjust = true }
-            } label: {
-                Text("Adjust").frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(Color.brandAccent)
-            .controlSize(.large)
-            .frame(minHeight: Design.Size.minimumTarget)
-            .accessibilityIdentifier("adjust")
         }
     }
 
@@ -382,6 +359,7 @@ struct PhotoCheckView: View {
             path.append(output == .print ? .sheet : .digital(photoID))
         } label: {
             Label(output == .print ? "Print" : "Digital Photo", systemImage: output == .print ? "printer" : "photo")
+                .lineLimit(1).minimumScaleFactor(0.85)
                 .frame(maxWidth: .infinity)
         }
         .controlSize(.large)

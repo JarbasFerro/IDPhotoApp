@@ -282,13 +282,16 @@ final class CalipicUITests: XCTestCase {
         reveal(app.buttons["adjust"], in: app)
         app.buttons["adjust"].tap()
         XCTAssertTrue(app.otherElements["cropPreview"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.segmentedControls["framingPicker"].exists)
+        app.buttons["tool-crop"].tap()
+        XCTAssertTrue(app.segmentedControls["framingPicker"].waitForExistence(timeout: 5))
+        app.buttons["tool-background"].tap()
         let background = app.segmentedControls["backgroundPicker"]
+        XCTAssertTrue(background.waitForExistence(timeout: 5))
         XCTAssertTrue(background.buttons["White"].exists)
         XCTAssertTrue(background.buttons["Light grey"].exists)
+        app.buttons["tool-light"].tap()
         let mono = app.switches["monochromeToggle"]
-        reveal(mono, in: app)
-        XCTAssertTrue(mono.exists)
+        XCTAssertTrue(mono.waitForExistence(timeout: 5))
         for (appearance, name) in [(XCUIDevice.Appearance.light, "Adjust, custom size, light"),
                                    (XCUIDevice.Appearance.dark, "Adjust, custom size, dark")] {
             XCUIDevice.shared.appearance = appearance
@@ -333,25 +336,26 @@ final class CalipicUITests: XCTestCase {
         byEye.tap()
         let eyesOpen = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Eyes open")).firstMatch
         XCTAssertTrue(eyesOpen.waitForExistence(timeout: 5), app.debugDescription)
+        attach(app, "Photo Check, checks")
+        app.buttons["checkDetailsDone"].tap()
+        XCTAssertTrue(app.buttons["checkDetailsDone"].waitForNonExistence(timeout: 5))
         // Adjust: direct manipulation plus the details sliders.
         reveal(app.buttons["adjust"], in: app)
         app.buttons["adjust"].tap()
         XCTAssertTrue(app.otherElements["cropPreview"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.segmentedControls["backgroundPicker"].exists)
+        app.buttons["tool-background"].tap()
+        XCTAssertTrue(app.segmentedControls["backgroundPicker"].waitForExistence(timeout: 5))
         let adjustTopScreenshot = XCTAttachment(screenshot: app.screenshot())
         adjustTopScreenshot.name = "Adjust, top"
         adjustTopScreenshot.lifetime = .keepAlways
         add(adjustTopScreenshot)
-        reveal(app.buttons["positionControls"], in: app)
-        app.buttons["positionControls"].tap()
+        app.buttons["tool-crop"].tap()
         XCTAssertTrue(app.buttons["Zoom In"].waitForExistence(timeout: 5))
         app.buttons["Zoom In"].tap()
-        reveal(app.buttons["details"], in: app)
-        app.buttons["details"].tap()
         let zoom = app.sliders["Zoom"]
         XCTAssertTrue(zoom.waitForExistence(timeout: 5))
-        // A slider at the bottom edge turns the drag into the system's go-home swipe and backgrounds the app.
-        reveal(zoom, in: app, bottomClearance: 150)
+        // A slider in the bottom band turns the drag into the system's go-home swipe and backgrounds the app.
+        XCTAssertLessThan(zoom.frame.maxY, app.frame.height - 150)
         zoom.adjust(toNormalizedSliderPosition: 0.3)
         let adjustScreenshot = XCTAttachment(screenshot: app.screenshot())
         adjustScreenshot.name = "Adjust"

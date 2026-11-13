@@ -12,11 +12,15 @@ struct HomeView: View {
     @State private var showDocuments = false
     @State private var showSettings = false
     @State private var showCredits = false
+    /// The photo about to be removed from Home, or all of them; drives the confirmation.
+    @State private var pendingRemoval: Removal?
     @State private var appIcon = AppIconController()
     @AppStorage(DocumentStore.promptShownKey) private var documentPromptShown = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private static let signposter = OSSignposter(subsystem: "com.jarbasferro.calipic", category: "App")
+
+    private enum Removal: Equatable { case one(UUID), all }
 
     private var isBusy: Bool { !model.isInitialized || model.activity != nil || !model.canAddPhoto }
 
@@ -69,6 +73,24 @@ struct HomeView: View {
         .sheet(isPresented: $showDocuments) { DocumentPickerView(model: model) }
         .sheet(isPresented: $showSettings) { SettingsView(appIcon: appIcon, credits: model.credits) }
         .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
+        .confirmationDialog(pendingRemoval == .all ? Text("Remove all photos and their copies on the sheet?")
+                                                   : Text("Remove this photo and its copies on the sheet?"),
+                            isPresented: Binding(get: { pendingRemoval != nil }, set: { if !$0 { pendingRemoval = nil } }),
+                            titleVisibility: .visible, presenting: pendingRemoval) { removal in
+            Button(removal == .all ? LocalizedStringKey("Remove All Photos") : LocalizedStringKey("Remove Photo"), role: .destructive) {
+                switch removal {
+                case .one(let id):
+                    model.selectedID = id
+                    model.removePhoto()
+                case .all:
+                    for id in model.entries.map(\.id) {
+                        model.selectedID = id
+                        model.removePhoto()
+                    }
+                }
+            }
+            .accessibilityIdentifier("confirmRemovePhoto")
+        } message: { _ in Text("The original in your photo library is kept.") }
         .task {
             guard promptForDocument, !documentPromptShown else { return }
             documentPromptShown = true
@@ -127,36 +149,59 @@ struct HomeView: View {
 
     /// People already in the session: faces, copies, and the way back into the sheet.
     private var sessionCard: some View {
-        Button { path.append(.sheet) } label: {
-            HStack(spacing: Design.Spacing.cardContent) {
-                HStack(spacing: -10) {
-                    ForEach(Array(model.entries.prefix(4).enumerated()), id: \.element.id) { index, entry in
-                        Image(decorative: entry.photo.preview, scale: 1)
-                            .resizable().scaledToFill()
-                            .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
-                            .clipShape(Circle())
-                            .overlay(Circle().strokeBorder(Design.Surface.card, lineWidth: Design.Stroke.separation))
-                            .accessibilityIdentifier("face-\(index + 1)")
+        HStack(spacing: 0) {
+            Button { path.append(.sheet) } label: {
+                HStack(spacing: Design.Spacing.cardContent) {
+                    HStack(spacing: -10) {
+                        ForEach(Array(model.entries.prefix(4).enumerated()), id: \.element.id) { index, entry in
+                            Image(decorative: entry.photo.preview, scale: 1)
+                                .resizable().scaledToFill()
+                                .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
+                                .clipShape(Circle())
+                                .overlay(Circle().strokeBorder(Design.Surface.card, lineWidth: Design.Stroke.separation))
+                                .accessibilityIdentifier("face-\(index + 1)")
+                        }
+                    }
+                    VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
+                        Text("Your sheet").font(Design.Typography.cardTitle)
+                        Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.name(for: model.printJob.paper))")
+                            .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.leading).padding(.vertical)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityLabel(Text("Your sheet: \(model.entries.count) people, \(model.layout.placedCount) copies"))
+            .accessibilityHint("Opens the print sheet.")
+            .accessibilityIdentifier("yourSheet")
+            // Removing a photo from here, without opening Photo Check (founder, 0.20 review).
+            Menu {
+                ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
+                    Button(role: .destructive) { pendingRemoval = .one(entry.id) } label: {
+                        Label(model.entries.count > 1 ? LocalizedStringKey("Remove Photo \(index + 1)") : LocalizedStringKey("Remove Photo"),
+                              systemImage: "trash")
                     }
                 }
-                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    Text("Your sheet").font(Design.Typography.cardTitle)
-                    Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.name(for: model.printJob.paper))")
-                        .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                if model.entries.count > 1 {
+                    Button(role: .destructive) { pendingRemoval = .all } label: {
+                        Label("Remove All Photos", systemImage: "trash.slash")
+                    }
                 }
-                Spacer()
-                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.body.weight(.semibold)).foregroundStyle(.secondary)
+                    .frame(width: Design.Size.minimumTarget + 8, height: Design.Size.minimumTarget + 8)
+                    .contentShape(Rectangle())
             }
-            .padding()
-            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
-            .contentShape(Rectangle())
+            .disabled(model.activity != nil)
+            .accessibilityLabel(Text("Photo options"))
+            .accessibilityIdentifier("sessionMenu")
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityLabel(Text("Your sheet: \(model.entries.count) people, \(model.layout.placedCount) copies"))
-        .accessibilityHint("Opens the print sheet.")
-        .accessibilityIdentifier("yourSheet")
+        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
     }
 
     /// The document the photo is for, and its requirements, as one grouped card.

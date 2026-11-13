@@ -160,6 +160,15 @@ struct SheetView: View {
                 }
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button { path.append(.check(entry.id)) } label: { Label("Check Photo", systemImage: "checkmark.circle") }
+            Button(role: .destructive) {
+                model.selectedID = entry.id
+                model.removePhoto()
+                if model.entries.isEmpty { path.removeAll() }
+            } label: { Label("Remove Photo", systemImage: "trash") }
+            .disabled(model.activity != nil)
+        }
         .sensoryFeedback(.selection, trigger: selectedPerson) { old, new in new == entry.id && old != new }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Photo \(index + 1): ^[\(copies) copy](inflect: true)"))

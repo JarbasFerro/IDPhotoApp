@@ -2,7 +2,7 @@
 
 For whoever continues this project, human or model. Read this page, then [AGENTS.md](../AGENTS.md) (the rules), then [02-roadmap.md](02-roadmap.md) (what to do next).
 
-**State:** tag `v0.20.1` (the cutting-mat look, refined after the iPhone review), 2026-11-13. The app is `Calipic/` (target, scheme, and module `Calipic`, bundle identifier `com.jarbasferro.calipic`). All tests pass on the iOS 27 simulator. CI has a Swift tests job, but GitHub's runner has no Xcode 27 yet, so it skips with a warning: run `scripts/test.sh auto` before every app commit. The app runs on the founder's iPhone.
+**State:** tag `v0.20.2` (the cutting-mat look; Adjust as an editor, compact Photo Check, new step marker, remove photos from Home), 2026-11-13. The founder's own portrait for local testing is at `test_data/local/founder-portrait.jpg` (ignored by git; never commit it or screenshots of it). The app is `Calipic/` (target, scheme, and module `Calipic`, bundle identifier `com.jarbasferro.calipic`). All tests pass on the iOS 27 simulator. CI has a Swift tests job, but GitHub's runner has no Xcode 27 yet, so it skips with a warning: run `scripts/test.sh auto` before every app commit. The app runs on the founder's iPhone.
 
 ## 1. What this is
 
