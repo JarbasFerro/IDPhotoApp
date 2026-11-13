@@ -45,4 +45,43 @@ enum SyntheticFixture {
         return result
     }
 }
+
+/// A real portrait kept outside git (`test_data/local/`, ignored), so looks can be judged with a face on a simulator.
+/// Simulator builds on the developer's Mac only: nothing here reaches a device or a release build.
+enum LocalPortrait {
+    /// Face landmarks for the portrait, read from `portrait.json` beside it, because Vision cannot run on a simulator.
+    /// Points are normalized with a top-left origin. `leftEye` is the subject's left, on the image's right.
+    struct Face: Decodable, Sendable {
+        let leftEye: [Double]
+        let rightEye: [Double]
+        let chin: [Double]
+        let crown: [Double]
+    }
+
+    private static var folder: URL? {
+        #if targetEnvironment(simulator)
+        // .../Calipic/App/Imaging/SyntheticFixture.swift -> the repository root.
+        var root = URL(fileURLWithPath: #filePath)
+        for _ in 0..<4 { root.deleteLastPathComponent() }
+        return root.appendingPathComponent("test_data/local")
+        #else
+        return nil
+        #endif
+    }
+
+    static var url: URL? {
+        guard !ProcessInfo.processInfo.arguments.contains("--uitesting-synthetic-only"),
+              let url = folder?.appendingPathComponent("portrait.jpg"),
+              FileManager.default.isReadableFile(atPath: url.path) else { return nil }
+        return url
+    }
+
+    static var face: Face? {
+        guard url != nil, let file = folder?.appendingPathComponent("portrait.json"),
+              let data = try? Data(contentsOf: file),
+              let face = try? JSONDecoder().decode(Face.self, from: data),
+              [face.leftEye, face.rightEye, face.chin, face.crown].allSatisfy({ $0.count == 2 }) else { return nil }
+        return face
+    }
+}
 #endif

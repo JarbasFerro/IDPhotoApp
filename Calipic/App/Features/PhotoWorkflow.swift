@@ -156,6 +156,29 @@ final class PhotoWorkflow {
     /// so the measuring lines and the framed result can be reviewed in screenshots. Never used in release builds.
     var debugSyntheticFace = false
 
+    /// Landmarks of the local test portrait; used in place of the centred synthetic face when present.
+    var debugLocalFace: LocalPortrait.Face?
+
+    static func syntheticAnalysis(for source: SourcePixels, face: LocalPortrait.Face) -> FaceAnalysis {
+        let w = Double(source.width), h = Double(source.height)
+        func pixels(_ p: [Double]) -> ImagePoint { ImagePoint(x: p[0] * w, y: p[1] * h) }
+        let left = pixels(face.leftEye), right = pixels(face.rightEye), chin = pixels(face.chin)
+        let iedPx = hypot(left.x - right.x, left.y - right.y)
+        let frame = HeadFrame(center: ImagePoint(x: (left.x + right.x) / 2, y: (left.y + right.y) / 2),
+                              angleRadians: atan2(left.y - right.y, left.x - right.x))
+        let eyeToChin = frame.toAligned(chin).y
+        let crown = CrownEstimator.estimate(eyeToChin: eyeToChin, maskAboveEyes: -frame.toAligned(pixels(face.crown)).y,
+                                            interEyeDistancePixels: iedPx)
+        let box = NormalizedCrop(x: (frame.center.x - iedPx) / w, y: (frame.center.y - 0.7 * iedPx) / h,
+                                 width: 2 * iedPx / w, height: (0.7 * iedPx + eyeToChin) / h)
+        let geometry = FaceGeometry(source: source, faceCount: 1, faceBox: box,
+                                    leftEye: ImagePoint(x: face.leftEye[0], y: face.leftEye[1]),
+                                    rightEye: ImagePoint(x: face.rightEye[0], y: face.rightEye[1]),
+                                    chin: ImagePoint(x: face.chin[0], y: face.chin[1]), crown: crown, eyeToChinPixels: eyeToChin,
+                                    yawDegrees: 0, pitchDegrees: 0)
+        return FaceAnalysis(faceCount: 1, geometry: geometry, solution: nil, visionRollDegrees: frame.rollDegrees)
+    }
+
     static func syntheticAnalysis(for source: SourcePixels) -> FaceAnalysis {
         let w = Double(source.width), h = Double(source.height)
         let iedPx = 0.16 * w, eyeToChin = 1.25 * iedPx
@@ -270,7 +293,14 @@ final class PhotoWorkflow {
             var measured: FaceAnalysis?
             if let premeasured { measured = premeasured } else { measured = try? await pipeline.analyze(photo: photo) }
             #if DEBUG
-            if debugSyntheticFace { measured = Self.syntheticAnalysis(for: photo.pixels) }
+            if debugSyntheticFace {
+                // The portrait's landmarks belong to the first photo only.
+                if let face = debugLocalFace, entries.first?.id == photo.id {
+                    measured = Self.syntheticAnalysis(for: photo.pixels, face: face)
+                } else {
+                    measured = Self.syntheticAnalysis(for: photo.pixels)
+                }
+            }
             #endif
             guard !Task.isCancelled, index(of: photo.id) != nil else { signposter.endInterval("Verdict", verdictInterval); return }
             // Solve for the document chosen now, not when the analysis started (it may have changed meanwhile).

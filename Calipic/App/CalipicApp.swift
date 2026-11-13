@@ -53,7 +53,13 @@ struct CalipicApp: App {
                         for index in 0..<fixtures {
                             let palette: [CGColor] = index == 0 ? SyntheticFixture.defaultPalette
                                 : Array(repeating: CGColor(red: 1, green: 0, blue: 1, alpha: 1), count: 4)
-                            model.importPhoto(mode: .add) { try await SyntheticFixture.staged(palette: palette) }
+                            // The first person is the local portrait when one exists (never in git); otherwise colour blocks.
+                            if index == 0, let portrait = LocalPortrait.url {
+                                model.debugLocalFace = LocalPortrait.face
+                                model.importPhoto(mode: .add) { try await StagedPhoto.stage(portrait) }
+                            } else {
+                                model.importPhoto(mode: .add) { try await SyntheticFixture.staged(palette: palette) }
+                            }
                             while model.activity == .importing { try? await Task.sleep(for: .milliseconds(20)) }
                         }
                         #endif
