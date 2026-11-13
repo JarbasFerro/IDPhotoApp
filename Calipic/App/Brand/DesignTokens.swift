@@ -49,6 +49,9 @@ enum Design {
     enum Surface {
         static let screen = Color(.systemGroupedBackground)
         static let card = Color(.secondarySystemGroupedBackground)
+        /// The action tray at the bottom of Your sheet and Print: white in Light, one step lighter than cards in Dark,
+        /// so it reads as a panel over the content (founder, 0.20 review).
+        static let tray = Color(.tertiarySystemBackground)
         /// A quiet stage behind a photo shown as an object.
         static let stage = Color(.tertiarySystemFill)
     }

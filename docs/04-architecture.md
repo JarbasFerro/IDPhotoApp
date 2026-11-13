@@ -149,6 +149,8 @@ Found while building; keep them in mind before changing these areas.
 
 - Capacity per page with default options, for orientation: 10 × 15 cm holds 12 photos of 26 × 32 mm or 6 of 35 × 45 mm; A4 holds 60 or 30.
 - Home printers may substitute the nearest paper they offer; the print panel prefers bordered papers. Borderless and Fit to Page are the usual causes of a wrong size.
+- The row-by-row fill picks whichever way up fits more photos in each row, so on its own it mixed upright and sideways photos (8 copies on 10 × 15 cm with no margin or check bar: 5 sideways, 3 upright, although 9 upright fit). Since 0.20.6 each orientation is also tried alone, and at equal copies, safety margin and check bar one orientation wins. A mix stays only where it fits more copies.
+- A page whose photos are mostly sideways is shown turned a quarter on screen (`PrintPage.displaysTurned`), so faces stand upright; the printed page is unchanged.
 
 **Testing**
 

@@ -173,4 +173,17 @@ struct PrintLayoutSolverTests {
             #expect(page.utilisation <= 1)
         }
     }
+
+    /// Founder's recording (0.20.6): 8 copies with no safety margin and no check bar came out as 5 sideways and
+    /// 3 upright, although 9 upright fit. At equal copies, one orientation wins.
+    @Test func equalCountsPreferOneOrientation() {
+        var options = PrintOptions()
+        options.bleed = .none
+        options.calibrationBar = false
+        for copies in 1...9 {
+            let page = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, copies)], options: options)).pages[0]
+            #expect(page.placements.count == copies)
+            #expect(Set(page.placements.map(\.rotated)).count == 1, "\(copies) copies mix orientations")
+        }
+    }
 }

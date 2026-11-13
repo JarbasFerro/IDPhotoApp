@@ -703,8 +703,10 @@ final class CalipicUITests: XCTestCase {
         XCTAssertTrue(app.buttons["continueToShare"].isHittable)
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 20))
-        reveal(app.buttons["unlockAndPrint"], in: app, attempts: 10)
-        XCTAssertTrue(app.buttons["unlockAndPrint"].isHittable)
+        reveal(app.buttons["unlockAndPrint"], in: app, attempts: 20)
+        // The swipe may still be coasting; wait for the button to settle where it can be tapped.
+        let hittable = XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: app.buttons["unlockAndPrint"])
+        XCTAssertEqual(XCTWaiter().wait(for: [hittable], timeout: 5), .completed)
         attach(app, "Print at accessibility text size")
         app.buttons["unlockAndPrint"].tap()
         XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))

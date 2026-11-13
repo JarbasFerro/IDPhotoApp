@@ -49,7 +49,7 @@ struct SheetView: View {
                         .padding(.horizontal, 20).padding(.top, 18).padding(.bottom, Design.Spacing.text)
                         .background {
                             UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
-                                .fill(Design.Surface.card)
+                                .fill(Design.Surface.tray)
                                 .ignoresSafeArea(edges: .bottom)
                         }
                 }

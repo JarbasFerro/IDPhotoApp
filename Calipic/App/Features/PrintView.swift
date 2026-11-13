@@ -12,6 +12,7 @@ struct PrintView: View {
     @State private var showCheck = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
 
     enum Action { case home, shop, formats }
 
@@ -34,11 +35,18 @@ struct PrintView: View {
         .background(Design.Surface.screen)
         .safeAreaInset(edge: .bottom) {
             if !dynamicTypeSize.isAccessibilitySize {
+                // A raised tray, as on Your sheet, so it reads as a panel over the steps rather than more of the page
+                // (founder, 0.20 review: the unlock card blended into the screen).
                 actions
-                    .padding(.horizontal)
-                    .padding(.top, Design.Spacing.text)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                     .padding(.bottom, Design.Spacing.caption)
-                    .background(Design.Surface.screen)
+                    .background {
+                        UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+                            .fill(Design.Surface.tray)
+                            .shadow(color: .black.opacity(colorScheme == .dark ? 0.6 : 0.12), radius: 16, y: -4)
+                            .ignoresSafeArea(edges: .bottom)
+                    }
             }
         }
         .navigationTitle("Print")
@@ -186,11 +194,11 @@ struct PrintView: View {
     @ViewBuilder private var actions: some View {
         VStack(spacing: Design.Spacing.text) {
             if locked > 0 {
-                UnlockCard(photos: locked, balance: model.credits.balance)
+                UnlockCard(photos: locked, balance: model.credits.balance, inTray: !dynamicTypeSize.isAccessibilitySize)
                     .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.9, anchor: .bottom))))
                 if model.credits.canAfford(locked) {
-                    Button { unlockAndPrint() } label: {
-                        Text(canPrintAtHome ? "Unlock and Print" : "Unlock and Continue").frame(maxWidth: .infinity)
+                    Button { unlock() } label: {
+                        Label("Unlock", systemImage: "lock.open").frame(maxWidth: .infinity)
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
@@ -236,12 +244,14 @@ struct PrintView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func unlockAndPrint() {
+    /// Unlocking only unlocks: the person then chooses home or shop (founder, 0.20 review: opening the print panel
+    /// straight away skipped that choice). The files are prepared meanwhile, so either choice is quick.
+    private func unlock() {
         // The unlock card folds away and the print buttons take its place (U4); the success tap is on `locked`.
         var unlocked = false
         withAnimation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { unlocked = model.unlockAll() }
         guard unlocked else { showCredits = true; return }
-        run(canPrintAtHome ? .home : .shop)
+        if model.exported == nil, model.activity == nil { model.prepareExport() }
     }
 
     /// Files are made on demand, once, and only for unlocked photos (the export gate in `PhotoWorkflow`).

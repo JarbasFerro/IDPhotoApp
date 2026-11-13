@@ -199,7 +199,10 @@ enum PrintLayoutSolver {
                                                   availableWidth: size.w - 2 * margin,
                                                   availableHeight: size.h - 2 * margin - reserve,
                                                   gutter: gutter, strategy: options.fillStrategy) else { continue }
-                        let score = [plan.placed, bleed, bar ? 1 : 0, -plan.distinctHeights, -plan.usedLength, -index]
+                        // At equal copies, margin and check bar, every photo the same way up: a page mixing upright and
+                        // sideways photos is harder to cut and looks wrong (founder, 0.20 review).
+                        let score = [plan.placed, bleed, bar ? 1 : 0, -plan.orientationCount, -plan.distinctHeights,
+                                     -plan.usedLength, -index]
                         if best == nil || best!.score.lexicographicallyPrecedes(score) {
                             best = (score, plan, size.w, size.h, bleed, bar)
                         }
@@ -242,6 +245,8 @@ enum PrintLayoutSolver {
         var availableHeight: Int
         var gutter: Int
         var placed: Int { rows.reduce(0) { $0 + $1.count } }
+        /// 1 when every photo has the same rotation, 2 when upright and sideways photos are mixed.
+        var orientationCount: Int { Set(rows.map(\.cell.rotated)).count }
         var usedLength: Int { rows.reduce(0) { $0 + $1.cell.height } + max(0, rows.count - 1) * gutter }
         var distinctHeights: Int { Set(rows.map(\.cell.height)).count }
     }
@@ -252,25 +257,30 @@ enum PrintLayoutSolver {
         let active = demand.indices.filter { demand[$0] > 0 }
         var best: (key: [Int], plan: PagePlan)?
         for (orderIndex, ordering) in permutations(active).enumerated() {
+            // The row-by-row fill picks whichever way up fits more in each row, so it can mix upright and sideways
+            // photos where one orientation alone would place as many. Each orientation is also tried on its own.
             for transposed in [false, true] {
-                let width = transposed ? availableHeight : availableWidth
-                let height = transposed ? availableWidth : availableHeight
-                let cells = items.indices.map { index -> [Cell] in
-                    let item = items[index]
-                    let w = micrometers(item.trimWidthMM) + 2 * bleed
-                    let h = micrometers(item.trimHeightMM) + 2 * bleed
-                    // In column-major (transposed) solving the S-width axis is the page's height axis, so an
-                    // upright photo has S-width = trim height. `rotated` describes the photo on the page.
-                    var result = [Cell(itemIndex: index, rotated: false, width: transposed ? h : w, height: transposed ? w : h)]
-                    if item.allowsRotation, w != h {
-                        result.append(Cell(itemIndex: index, rotated: true, width: transposed ? w : h, height: transposed ? h : w))
+                for only in [Bool?.none, false, true] {
+                    let width = transposed ? availableHeight : availableWidth
+                    let height = transposed ? availableWidth : availableHeight
+                    let cells = items.indices.map { index -> [Cell] in
+                        let item = items[index]
+                        let w = micrometers(item.trimWidthMM) + 2 * bleed
+                        let h = micrometers(item.trimHeightMM) + 2 * bleed
+                        // In column-major (transposed) solving the S-width axis is the page's height axis, so an
+                        // upright photo has S-width = trim height. `rotated` describes the photo on the page.
+                        var result = [Cell(itemIndex: index, rotated: false, width: transposed ? h : w, height: transposed ? w : h)]
+                        if item.allowsRotation, w != h {
+                            result.append(Cell(itemIndex: index, rotated: true, width: transposed ? w : h, height: transposed ? h : w))
+                        }
+                        return result.filter { $0.width <= width && $0.height <= height && (only == nil || $0.rotated == only) }
                     }
-                    return result.filter { $0.width <= width && $0.height <= height }
+                    let plan = fill(ordering: ordering, demand: demand, cells: cells, width: width, height: height,
+                                    gutter: gutter, strategy: strategy, transposed: transposed)
+                    let key = [plan.placed, -plan.orientationCount, -plan.distinctHeights, -plan.usedLength,
+                               transposed ? 0 : 1, only == nil ? 1 : 0, -orderIndex]
+                    if best == nil || best!.key.lexicographicallyPrecedes(key) { best = (key, plan) }
                 }
-                let plan = fill(ordering: ordering, demand: demand, cells: cells, width: width, height: height,
-                                gutter: gutter, strategy: strategy, transposed: transposed)
-                let key = [plan.placed, -plan.distinctHeights, -plan.usedLength, transposed ? 0 : 1, -orderIndex]
-                if best == nil || best!.key.lexicographicallyPrecedes(key) { best = (key, plan) }
             }
         }
         return best?.plan

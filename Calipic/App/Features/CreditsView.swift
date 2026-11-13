@@ -62,6 +62,8 @@ struct CreditBadge: View {
 struct UnlockCard: View {
     let photos: Int
     let balance: Int
+    /// In Print's tray the tray is the card; elsewhere the card draws its own background.
+    var inTray = false
 
     private var title: Text {
         photos == 1 ? Text("Unlock your photo") : Text("Unlock \(CreditsPresentation.photos(photos))")
@@ -82,8 +84,8 @@ struct UnlockCard: View {
                 Label("After this, framing and edits are final.", systemImage: "lock")
                     .font(Design.Typography.note).foregroundStyle(.secondary)
             }
-            .padding()
-            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
+            .padding(inTray ? 0 : Design.Spacing.group)
+            .background(inTray ? Color.clear : Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
             Group {
                 if balance >= photos {
                     Text("You have \(CreditsPresentation.count(balance)). After this: \(CreditsPresentation.count(balance - photos)).")

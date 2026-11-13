@@ -5631,6 +5631,22 @@
         }
       }
     },
+    "Unlock" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear"
+          }
+        }
+      }
+    },
     "Unlock %@" : {
       "localizations" : {
         "es" : {
@@ -10181,38 +10197,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta foto é definitiva"
-          }
-        }
-      }
-    },
-    "Unlock and Continue" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquear y continuar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquear e continuar"
-          }
-        }
-      }
-    },
-    "Unlock and Print" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquear e imprimir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquear e imprimir"
           }
         }
       }
