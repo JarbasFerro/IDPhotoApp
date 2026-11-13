@@ -15,6 +15,9 @@ struct HomeView: View {
     /// The photo about to be removed from Home, or all of them; drives the confirmation.
     @State private var pendingRemoval: Removal?
     @State private var appIcon = AppIconController()
+    /// Which sample person the hero shows; a tap on the sample brings the next one (easter egg).
+    @State private var sampleIndex = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage(DocumentStore.promptShownKey) private var documentPromptShown = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -102,10 +105,21 @@ struct HomeView: View {
 
     // MARK: - Hero
 
+    /// Generated sample people (D-9): a selfie card and an ID photo each. The first is the default.
+    private static let samples: [(selfie: String, portrait: String)] =
+        [("SampleSelfie", "SamplePortrait")] + (1...8).map { ("SampleSelfie-\($0)", "SamplePortrait-\($0)") }
+
+    /// Resting angles and offsets for the three papers, one set per sample, so each swap lands them slightly
+    /// differently on the mat (selfie, sheet, photo).
+    private static let poses: [(selfie: Double, sheet: Double, photo: Double, nudge: CGFloat)] = [
+        (-6, 3, -3, 0), (-3, 5, -6, 4), (-8, 2, -1, -3), (-4, 4, -5, 2), (-7, 1, -2, -4),
+        (-2, 4, -4, 3), (-5, 2, -7, -2), (-9, 3, -2, 1), (-3, 1, -5, -1)]
+
     /// The whole job in one picture: a selfie, the ID photo made from it, and the sheet of copies (U10).
     /// A sample person until the person has a photo, then their own original, photo, and copies.
     private var hero: some View {
         let entry = model.entries.last
+        let pose = Self.poses[entry == nil ? sampleIndex % Self.poses.count : 0]
         return ZStack {
             RoundedRectangle(cornerRadius: Design.Radius.group).fill(Design.Surface.stage)
             // The selfie, as taken: a phone photo at the back.
@@ -115,8 +129,8 @@ struct HomeView: View {
                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(.white, lineWidth: 3))
                 .paperDimmedInDark()
                 .paperShadow()
-                .rotationEffect(.degrees(-6))
-                .offset(x: -84, y: -50)
+                .rotationEffect(.degrees(pose.selfie))
+                .offset(x: -84 + pose.nudge, y: -50)
             Grid(horizontalSpacing: 6, verticalSpacing: 6) {
                 ForEach(0..<2, id: \.self) { _ in
                     GridRow {
@@ -130,29 +144,42 @@ struct HomeView: View {
             .background(.white, in: RoundedRectangle(cornerRadius: 3))
             .paperDimmedInDark()
             .paperShadow()
-            .rotationEffect(.degrees(3))
-            .offset(x: 66, y: 14)
+            .rotationEffect(.degrees(pose.sheet))
+            .offset(x: 66 - pose.nudge / 2, y: 14)
             // The ID photo, in front: what the selfie becomes.
             heroPhoto(entry)
                 .frame(width: 96)
                 .clipShape(RoundedRectangle(cornerRadius: Design.Radius.photo))
                 .paperDimmedInDark()
                 .paperShadow()
-                .rotationEffect(.degrees(-3))
-                .offset(x: -58, y: 44)
+                .rotationEffect(.degrees(pose.photo))
+                .offset(x: -58 - pose.nudge, y: 44)
         }
         .frame(height: 236)
+        .contentShape(Rectangle())
+        .onTapGesture { if entry == nil { nextSample() } }
+        .sensoryFeedback(.impact(weight: .light), trigger: sampleIndex)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(entry == nil ? Text("Example: a selfie, the ID photo made from it, and a printed sheet of copies")
                                          : Text("Your photo and its printed sheet"))
+        .accessibilityAction(named: Text("Show another example")) { if entry == nil { nextSample() } }
         .accessibilityIdentifier("homeHero")
+    }
+
+    /// Easter egg: the papers shuffle a little on the mat while the next sample person fades in.
+    private func nextSample() {
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.3) : .spring(duration: 0.55, bounce: 0.35)) {
+            sampleIndex = (sampleIndex + 1) % Self.samples.count
+        }
     }
 
     @ViewBuilder private func heroSelfie(_ entry: PhotoEntry?) -> some View {
         if let entry {
             Image(decorative: entry.photo.preview, scale: 1).resizable().scaledToFill()
         } else {
-            Image("SampleSelfie").resizable().scaledToFill()
+            Image(Self.samples[sampleIndex].selfie).resizable().scaledToFill()
+                .id(sampleIndex)
+                .transition(.opacity)
         }
     }
 
@@ -162,7 +189,9 @@ struct HomeView: View {
             PortraitView(entry: entry, format: format)
         } else {
             // The sample keeps its own proportions (26:32); it is an example, not the chosen document.
-            Image("SamplePortrait").resizable().aspectRatio(488.0 / 600.0, contentMode: .fit)
+            Image(Self.samples[sampleIndex].portrait).resizable().aspectRatio(488.0 / 600.0, contentMode: .fit)
+                .id(sampleIndex)
+                .transition(.opacity)
         }
     }
 

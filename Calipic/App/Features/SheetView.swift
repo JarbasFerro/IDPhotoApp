@@ -14,6 +14,8 @@ struct SheetView: View {
     /// Rows of the first page shown so far while the copies appear after Photo Check; nil shows every row.
     @State private var revealedRows: Int?
     @State private var hasRevealed = false
+    /// "Fill" menu choices for the selected person, worked out off the main actor whenever the sheet changes.
+    @State private var fill: [FillChoice] = []
     @Environment(\.zoomNamespace) private var zoomNamespace
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -70,6 +72,11 @@ struct SheetView: View {
         .sheet(isPresented: $showCutting) { CuttingOptionsView(model: model) }
         .task { model.refreshSheetThumbnails() }
         .task { await revealCopies() }
+        .task(id: "\(model.printJob.hashValue)-\(person?.id.uuidString ?? "")") {
+            guard let person, let itemID = model.printItems(for: person.id).first?.id else { fill = []; return }
+            let choices = await Self.fillChoices(job: model.printJob, itemID: itemID)
+            if !Task.isCancelled { fill = choices }
+        }
         .sensoryFeedback(.impact(weight: .light), trigger: revealedRows) { _, new in (new ?? 0) > 0 }
         .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
     }
@@ -125,6 +132,7 @@ struct SheetView: View {
                 }
                 .scrollIndicators(.hidden)
                 if let person, let copies = copiesBinding(for: person) {
+                    if !fill.isEmpty { fillMenu(for: person) }
                     Stepper("Copies", value: copies, in: 0...50)
                         .labelsHidden()
                         .sensoryFeedback(.selection, trigger: copiesTick)
@@ -260,6 +268,56 @@ struct SheetView: View {
             .tint(selected ? Color.brandAccent : Color.gray)
             .accessibilityAddTraits(selected ? .isSelected : [])
             .accessibilityIdentifier("paper-\(paper.id)")
+    }
+
+    /// Whole pages in one choice: "2 pages · 24 copies" instead of many taps on +. The counts come from the layout
+    /// solver for the current paper, options and other people (founder's recording: 22 taps to reach 30 copies).
+    private func fillMenu(for person: PhotoEntry) -> some View {
+        Menu {
+            ForEach(fill, id: \.pages) { choice in
+                Button {
+                    if let copies = copiesBinding(for: person) { copies.wrappedValue = choice.copies }
+                } label: {
+                    Text("^[\(choice.pages) page](inflect: true) · ^[\(choice.copies) copy](inflect: true)")
+                }
+            }
+        } label: {
+            Label("Fill", systemImage: "square.grid.3x3")
+                .font(.subheadline.weight(.medium))
+        }
+        .buttonStyle(.bordered).buttonBorderShape(.capsule).tint(.gray)
+        .foregroundStyle(Color.primary)
+        .accessibilityLabel(Text("Fill pages"))
+        .accessibilityIdentifier("fillPages")
+    }
+
+    struct FillChoice: Sendable { let pages: Int; let copies: Int }
+
+    /// For 1–3 pages, the most copies of item `itemID` that fit with everything else on the sheet unchanged.
+    /// Pure layout work, so it runs off the main actor.
+    @concurrent
+    static func fillChoices(job: PrintJob, itemID: UUID) async -> [FillChoice] {
+        var job = job
+        guard let index = job.items.firstIndex(where: { $0.id == itemID }) else { return [] }
+        var choices: [FillChoice] = []
+        var copies = 1
+        for pages in 1...3 {
+            // Grow until one more copy would need another page.
+            while copies < 200 {
+                if Task.isCancelled { return [] }
+                job.items[index].copies = copies + 1
+                let layout = PrintLayoutSolver.solve(job)
+                guard layout.isComplete, layout.pages.count <= pages else { break }
+                copies += 1
+            }
+            job.items[index].copies = copies
+            let layout = PrintLayoutSolver.solve(job)
+            if layout.isComplete, layout.pages.count == pages, choices.last?.copies != copies {
+                choices.append(FillChoice(pages: pages, copies: copies))
+            }
+            copies += 1
+        }
+        return choices
     }
 
     private func copiesBinding(for person: PhotoEntry) -> Binding<Int>? {
@@ -595,6 +653,7 @@ struct SheetPageView: View {
             let scale = min(geometry.size.width / page.widthMM, geometry.size.height / page.heightMM)
             let hidden = hiddenPlacements
             ZStack(alignment: .topLeading) {
+              ZStack(alignment: .topLeading) {
                 Color.white
                 ForEach(keyed) { item in
                     let placement = item.placement
@@ -607,6 +666,12 @@ struct SheetPageView: View {
                                   y: (placement.bleed.y + placement.bleed.height / 2) * scale)
                         .transition(.opacity.combined(with: .scale(scale: 0.8)))
                 }
+              }
+              // When the grid re-flows (paper, margin, orientation, or a centred grid shifting), the page cross-fades
+              // instead of every photo flying to a new place (founder's recording, 0.20.8). A copy added into a free
+              // slot keeps the same grid and simply appears.
+              .id(layoutSignature)
+              .transition(.opacity)
                 Canvas { context, _ in
                     var ticks = Path()
                     for tick in page.cornerTicks {
@@ -630,6 +695,12 @@ struct SheetPageView: View {
         }
         .overlay(Rectangle().strokeBorder(.secondary, lineWidth: Design.Stroke.hairline))
         .clipped()
+    }
+
+    private var layoutSignature: String {
+        let rotation = page.placements.allSatisfy(\.rotated) ? "r" : page.placements.contains(where: \.rotated) ? "m" : "u"
+        let anchor = page.placements.first.map { "\(Int($0.trim.x * 10)),\(Int($0.trim.y * 10))" } ?? "-"
+        return "\(page.widthMM)x\(page.heightMM)-\(page.bleedMM)-\(rotation)-\(anchor)"
     }
 
     private var hiddenPlacements: Set<Key> {

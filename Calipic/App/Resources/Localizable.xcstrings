@@ -1995,6 +1995,29 @@
         }
       }
     },
+    "check.no-headphones" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No headphones or earbuds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin auriculares ni cascos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sem fones de ouvido"
+          }
+        }
+      }
+    },
     "Checking your photo…" : {
       "localizations" : {
         "es" : {
@@ -3482,6 +3505,22 @@
         }
       }
     },
+    "Keep your face inside the oval, without headphones" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantén la cara dentro del óvalo, sin auriculares"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantenha o rosto dentro do oval, sem fones de ouvido"
+          }
+        }
+      }
+    },
     "Keep your full head and shoulders in the photo" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3665,6 +3704,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Olhe para a lente"
+          }
+        }
+      }
+    },
+    "Look here" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mira aquí"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olhe aqui"
           }
         }
       }
@@ -5615,6 +5670,22 @@
         }
       }
     },
+    "Show another example" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar otro ejemplo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar outro exemplo"
+          }
+        }
+      }
+    },
     "Shows every check." : {
       "localizations" : {
         "es" : {
@@ -7329,6 +7400,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sua foto digital está pronta."
+          }
+        }
+      }
+    },
+    "Your eyes look closed or turned down" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parece que tienes los ojos cerrados o mirando abajo"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seus olhos parecem fechados ou olhando para baixo"
           }
         }
       }

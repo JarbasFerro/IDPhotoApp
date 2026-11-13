@@ -11,6 +11,22 @@ struct FaceAnalysis: Sendable, Hashable {
     let visionRollDegrees: Double?
     /// iOS 26 lens-smudge confidence 0...1; nil when the request is unavailable.
     var lensSmudgeConfidence: Double? = nil
+    /// Eye outline height over width for each eye (`EyeOpenness`); nil when the outlines were not found.
+    var eyeOpenness: (left: Double, right: Double)? = nil
+
+    /// The eyes look closed or turned down (advisory, shown on the camera's review).
+    var eyesLookClosed: Bool { eyeOpenness.map { EyeOpenness.looksClosed(left: $0.left, right: $0.right) } ?? false }
+
+    static func == (lhs: FaceAnalysis, rhs: FaceAnalysis) -> Bool {
+        lhs.faceCount == rhs.faceCount && lhs.geometry == rhs.geometry && lhs.solution == rhs.solution
+            && lhs.visionRollDegrees == rhs.visionRollDegrees && lhs.lensSmudgeConfidence == rhs.lensSmudgeConfidence
+            && lhs.eyeOpenness?.left == rhs.eyeOpenness?.left && lhs.eyeOpenness?.right == rhs.eyeOpenness?.right
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(faceCount); hasher.combine(geometry); hasher.combine(solution)
+        hasher.combine(eyeOpenness?.left); hasher.combine(eyeOpenness?.right)
+    }
 
     /// Above this, the source photo probably came through a dirty lens.
     static let smudgeThreshold = 0.75
@@ -85,8 +101,13 @@ enum FaceAnalyzer {
                                     yawDegrees: face.yaw.converted(to: .degrees).value,
                                     pitchDegrees: face.pitch.converted(to: .degrees).value)
         let solution = CropSolver.solve(geometry: geometry, format: format, spec: spec)
+        func openness(_ region: FaceObservation.Landmarks2D.Region) -> Double? {
+            EyeOpenness.ratio(region.pointsInImageCoordinates(size, origin: .upperLeft).map { (Double($0.x), Double($0.y)) })
+        }
+        let eyes = openness(landmarks.leftEye).flatMap { left in openness(landmarks.rightEye).map { (left: left, right: $0) } }
         return FaceAnalysis(faceCount: faces.count, geometry: geometry, solution: solution,
-                            visionRollDegrees: face.roll.converted(to: .degrees).value, lensSmudgeConfidence: smudge)
+                            visionRollDegrees: face.roll.converted(to: .degrees).value, lensSmudgeConfidence: smudge,
+                            eyeOpenness: eyes)
     }
 
     /// Accurate person mask, falling back to the balanced model and then to no mask.

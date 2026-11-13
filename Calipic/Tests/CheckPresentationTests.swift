@@ -5,7 +5,7 @@ import Testing
 
 struct CheckPresentationTests {
     private func entry(analysis: FaceAnalysis? = nil, unavailable: Bool = false, analyzing: Bool = false,
-                       segmentation: SegmentationResult? = nil, tone: ToneAssessment? = nil,
+                       segmentation: SegmentationResult? = nil, tone: ToneAssessment? = ToneAssessment(issues: []),
                        background: BackgroundChoice = .original) throws -> PhotoEntry {
         let space = try #require(CGColorSpace(name: CGColorSpace.sRGB))
         let context = try #require(CGContext(data: nil, width: 8, height: 10, bitsPerComponent: 8, bytesPerRow: 0,
@@ -81,7 +81,7 @@ struct CheckPresentationTests {
     }
 
     @Test func unavailableAnalysisIsManualNotFailure() throws {
-        let summary = CheckPresentation.summary(for: try entry(unavailable: true), whiteApplied: false, sourceIsSmall: true)
+        let summary = CheckPresentation.summary(for: try entry(unavailable: true, tone: nil), whiteApplied: false, sourceIsSmall: true)
         #expect(summary.headline == .review)
         #expect(summary.rows.map(\.topic) == [.face, .background, .detail])
         #expect(summary.rows.allSatisfy { $0.state == .manualCheck || $0.state == .warn })
@@ -96,5 +96,17 @@ struct CheckPresentationTests {
         #expect(summary.rows.first { $0.topic == .background }?.state == .warn)
         summary = CheckPresentation.summary(for: try entry(analysis: analysis(), segmentation: replaceable, background: .color(.white)), whiteApplied: true, sourceIsSmall: false)
         #expect(summary.rows.first { $0.topic == .background }?.state == .pass)
+    }
+
+    /// The verdict waits for background and light, so it never changes a moment after it appears (0.20.8 recording).
+    @Test func verdictWaitsForEveryCheck() throws {
+        let good = analysis(checks: [AlignmentCheck(kind: .headHeight, state: .pass, measured: 0.74)])
+        var pending = try entry(analysis: good, tone: nil)
+        #expect(CheckPresentation.summary(for: pending, whiteApplied: false, sourceIsSmall: false).headline == .checking)
+        pending.toneAssessment = ToneAssessment(issues: [])
+        pending.isSegmenting = true
+        #expect(CheckPresentation.summary(for: pending, whiteApplied: false, sourceIsSmall: false).headline == .checking)
+        pending.isSegmenting = false
+        #expect(CheckPresentation.summary(for: pending, whiteApplied: false, sourceIsSmall: false).headline != .checking)
     }
 }

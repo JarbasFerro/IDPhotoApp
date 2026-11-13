@@ -150,6 +150,8 @@ final class PhotoWorkflow {
         let task: Task<(photo: PreparedPhoto, measured: FaceAnalysis?)?, Never>
     }
     @ObservationIgnored private var ahead: Ahead?
+    /// The still under review looks like it caught closed or downturned eyes; the camera's review says so.
+    private(set) var aheadEyesLookClosed = false
 
     #if DEBUG
     /// UI tests on a simulator, where Vision cannot run: "--uitesting-measured" gives every photo this synthetic face
@@ -214,11 +216,18 @@ final class PhotoWorkflow {
             guard !Task.isCancelled else { await pipeline.discard(photoID: photo.id); return nil }
             return (photo, measured)
         }
-        ahead = Ahead(key: staged.directory, task: task)
+        let key = staged.directory
+        ahead = Ahead(key: key, task: task)
+        Task {
+            // Publish the eyes result only for the still still under review.
+            let closed = await task.value?.measured?.eyesLookClosed ?? false
+            if ahead?.key == key { aheadEyesLookClosed = closed }
+        }
     }
 
     /// Retake, Cancel, or the camera closing: the prepared copy is deleted.
     func discardAhead() {
+        aheadEyesLookClosed = false
         guard let pending = ahead else { return }
         ahead = nil
         pending.task.cancel()

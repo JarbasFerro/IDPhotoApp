@@ -42,7 +42,11 @@ enum CheckPresentation {
     ///   - whiteApplied: the crop uses the replaced white background.
     ///   - sourceIsSmall: the crop has fewer pixels than the output needs.
     static func summary(for entry: PhotoEntry, whiteApplied: Bool, sourceIsSmall: Bool) -> PhotoCheckSummary {
-        if entry.isAnalyzing { return .checking }
+        // No verdict until every check has finished: background and light used to arrive after the face checks and
+        // turn "Looks good" into "Review your photo" a moment later (founder's recording, 0.20.7). Light is measured
+        // right after the background, so a face analysis without a light result is still checking.
+        if entry.isAnalyzing || entry.isSegmenting { return .checking }
+        if entry.analysis != nil, entry.toneAssessment == nil { return .checking }
         var rows: [PhotoCheckSummary.Row] = []
 
         // Face and framing.

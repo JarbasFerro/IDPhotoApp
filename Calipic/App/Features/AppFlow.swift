@@ -78,7 +78,7 @@ struct RootView: View {
                onReviewChange: { staged in
                 // Analyse the still while the person looks at it, so Photo Check is ready on Use Photo (P2).
                 if let staged { model.prepareAhead(staged) } else { model.discardAhead() }
-            })
+            }, eyesLookClosed: model.aheadEyesLookClosed)
             .onAppear { model.warmUp() }
         }
         .onChange(of: selection) { _, item in

@@ -218,7 +218,8 @@ struct PhotoCheckHonestyTests {
 
     @Test func byEyeChecksComeFromTheProfileAndSkipPrintInstructions() throws {
         let australia = DocumentChoice.official(try #require(ProfileCatalog.bundled.profile("au.passport.standard")))
-        #expect(australia.byEyeChecks == ["neutral-expression"])
+        // The profile's own check, then the app's headphones check for every official document.
+        #expect(australia.byEyeChecks == ["neutral-expression", "no-headphones"])
         let us = DocumentChoice.official(try #require(ProfileCatalog.bundled.profile("us.passport.standard")))
         #expect(us.byEyeChecks.contains("no-glasses"))
         #expect(DocumentChoice.custom(widthMM: 30, heightMM: 40).byEyeChecks.isEmpty)

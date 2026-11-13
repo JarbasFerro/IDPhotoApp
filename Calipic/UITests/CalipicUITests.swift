@@ -67,6 +67,10 @@ final class CalipicUITests: XCTestCase {
         homeScreenshot.lifetime = .keepAlways
         add(homeScreenshot)
         XCTAssertTrue(any(app, "homeHero").exists)
+        // Easter egg: a tap on the sample brings another person.
+        any(app, "homeHero").tap()
+        Thread.sleep(forTimeInterval: 0.8)
+        attach(app, "Home, another sample")
         XCUIDevice.shared.appearance = .dark
         Thread.sleep(forTimeInterval: 1.5) // The appearance change is asynchronous.
         let darkScreenshot = XCTAttachment(screenshot: app.screenshot())
@@ -470,6 +474,15 @@ final class CalipicUITests: XCTestCase {
         // Copies change on the sheet itself.
         app.steppers["copiesStepper"].buttons.element(boundBy: 1).tap()
         XCTAssertNotEqual(summary.label, before)
+        // Whole pages in one choice.
+        XCTAssertTrue(app.buttons["fillPages"].waitForExistence(timeout: 5))
+        app.buttons["fillPages"].tap()
+        let twoPages = app.buttons.matching(NSPredicate(format: "label BEGINSWITH '2 pages'")).firstMatch
+        XCTAssertTrue(twoPages.waitForExistence(timeout: 5))
+        attach(app, "Fill pages")
+        twoPages.tap()
+        XCTAssertTrue(summary.label.contains("2 pages"), summary.label)
+        app.steppers["copiesStepper"].buttons.element(boundBy: 0).tap()
         let afterCopies = summary.label
         // A different paper is one tap away.
         app.buttons["paper-a4"].tap()

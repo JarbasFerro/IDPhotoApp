@@ -162,7 +162,12 @@ enum DocumentChoice: Sendable, Hashable, Identifiable {
     var officialRulesForbidEditing: Bool { profile?.background.officialEditingRule == "disallowed" }
 
     /// What only a person can judge, from the profile's own checks. Print instructions are not photo checks.
-    var byEyeChecks: [String] { profile?.checks.filter { $0.capability != "informational" }.map(\.id) ?? [] }
+    /// The profile's own by-eye checks, plus headphones for every official document: they are never acceptable in an
+    /// ID photo and the camera cannot see them (founder's recording, 0.20.8). App guidance, not a sourced rule.
+    var byEyeChecks: [String] {
+        guard let profile else { return [] }
+        return profile.checks.filter { $0.capability != "informational" }.map(\.id) + ["no-headphones"]
+    }
 
     /// Digital-only profiles (Saudi Absher) have no print route.
     var supportsPrint: Bool { profile.map { $0.printOutput != nil } ?? true }

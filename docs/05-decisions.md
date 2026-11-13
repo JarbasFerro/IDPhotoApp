@@ -92,6 +92,7 @@ The open questions left by the documentation cleanup, answered one by one.
 | D-7 | Draft retention | **Paid photos kept until deleted; locked drafts 30 days unused** (ADR-049 above). Not the recommendation (30 days for all): a paid photo must never be lost |
 | D-8 | British or American English | **American** |
 | D-9 | Faces in the public repository | **AI-generated people who do not exist are allowed** (founder, 2026-11-13) for the Home sample and the public test photo (`test_data/sample/`). Real people's photos stay out (ADR-027); the founder's own portrait is local only |
+| D-10 | Headphones and eyes | **App-level advice, not rules** (0.20.9): every official document lists "No headphones or earbuds" by eye (the camera cannot see them), and the camera review flags eyes that measure closed or turned down (eye outline height over width under 0.16 for either eye or 0.20 on average, calibrated on the founder's recording). Neither blocks; a headphones detector from the head outline is still open |
 
 ## Open decisions for the founder
 

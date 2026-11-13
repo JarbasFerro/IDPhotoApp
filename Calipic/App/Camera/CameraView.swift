@@ -48,6 +48,8 @@ struct CameraView: View {
     let onChoosePhoto: () -> Void
     /// The still under review (to prepare it early), or nil when it is thrown away (roadmap P2).
     var onReviewChange: (StagedPhoto?) -> Void = { _ in }
+    /// The still under review looks like it caught closed or downturned eyes (measured while the person reviews it).
+    var eyesLookClosed = false
     @State private var camera = CameraController()
     @State private var errorMessage: String?
     @State private var flash = false
@@ -242,19 +244,48 @@ struct CameraView: View {
         return ZStack {
             Circle().strokeBorder(.white, lineWidth: 3).frame(width: 82, height: 82)
             Circle().fill(.white).frame(width: 68, height: 68)
-            if let countdown {
-                Text("\(countdown)")
-                    .font(.system(size: 34, weight: .bold, design: .rounded)).monospacedDigit()
-                    .foregroundStyle(.black)
-                    .contentTransition(.numericText(countsDown: true))
-                    .animation(reduceMotion ? nil : .snappy, value: countdown)
-                    .accessibilityIdentifier("countdown")
-            } else if preparingReview {
+            if preparingReview {
                 Image(systemName: "checkmark").font(.title.weight(.bold)).foregroundStyle(.black)
                     .transition(.scale.combined(with: .opacity))
             }
         }
         .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: camera.isCapturing)
+    }
+
+    /// The one live instruction, at the top under the front camera: reading it keeps the eyes near the lens. At the
+    /// bottom it pulled them down, and auto-capture took the photo mid-read (founder's recording, 0.20.8).
+    private var hintCapsule: some View {
+        Group {
+            if camera.state == .interrupted {
+                Text("Camera paused. It resumes when the interruption ends.")
+                    .frame(maxWidth: .infinity)
+            } else if let countdown {
+                HStack(spacing: 10) {
+                    Label("Look here", systemImage: "arrow.up")
+                    Text(verbatim: "\(countdown)")
+                        .font(.title3.weight(.bold)).monospacedDigit()
+                        .contentTransition(.numericText(countsDown: true))
+                        .animation(reduceMotion ? nil : .snappy, value: countdown)
+                        .accessibilityIdentifier("countdown")
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("cameraHint")
+            } else if !helpTipSeen && !voiceOverEnabled && camera.guideCorrection == nil {
+                Label("Keep your face inside the oval, without headphones", systemImage: "person.crop.circle")
+                    .accessibilityIdentifier("cameraOptionalTip")
+            } else {
+                Label(CameraPresentation.text(for: camera.hint, correction: camera.guideCorrection),
+                      systemImage: CameraPresentation.symbol(for: camera.hint))
+                    .accessibilityIdentifier("cameraHint")
+            }
+        }
+        .font(.subheadline.weight(.medium))
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .frame(minHeight: 44)
+        .background(.black.opacity(0.48), in: Capsule())
+        .frame(maxWidth: .infinity)
     }
 
     private var overlayControls: some View {
@@ -276,6 +307,9 @@ struct CameraView: View {
             .font(.subheadline.weight(.semibold))
             .padding(.horizontal, 16)
             .padding(.top, 8)
+            hintCapsule
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
             if developerMode {
                 if let startup = camera.startupMilliseconds {
                     Text("start \(startup) ms" + (camera.lastCaptureMilliseconds.map { " · last capture \($0) ms" } ?? ""))
@@ -288,27 +322,6 @@ struct CameraView: View {
             }
             Spacer()
             VStack(spacing: Design.Spacing.control) {
-                Group {
-                    if camera.state == .interrupted {
-                        Text("Camera paused. It resumes when the interruption ends.")
-                            .frame(maxWidth: .infinity)
-                    } else if !helpTipSeen && !voiceOverEnabled && camera.guideCorrection == nil {
-                        Label("Keep your face inside the oval", systemImage: "person.crop.circle")
-                        .accessibilityIdentifier("cameraOptionalTip")
-                    } else {
-                        Label(countdown != nil ? LocalizedStringResource("Look at the lens")
-                              : CameraPresentation.text(for: camera.hint, correction: camera.guideCorrection),
-                              systemImage: countdown != nil ? "eye" : CameraPresentation.symbol(for: camera.hint))
-                            .accessibilityIdentifier("cameraHint")
-                    }
-                }
-                .font(.subheadline.weight(.medium))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .frame(minHeight: 44)
-                .background(.black.opacity(0.48), in: Capsule())
-                .frame(maxWidth: .infinity)
 
                 HStack {
                     Color.clear.frame(width: 52, height: 52)
@@ -454,12 +467,29 @@ struct CameraView: View {
                 Text("Review your photo")
                     .font(.headline)
                     .accessibilityAddTraits(.isHeader)
+                if eyesLookClosed {
+                    // Advisory: the eyes measured closed or turned down. Retake becomes the main choice.
+                    Label("Your eyes look closed or turned down", systemImage: "eye.slash")
+                        .font(.subheadline.weight(.medium))
+                        .padding(.horizontal, 14).padding(.vertical, 6)
+                        .background(.black.opacity(0.48), in: Capsule())
+                        .transition(.opacity)
+                        .accessibilityIdentifier("eyesClosedNote")
+                }
                 HStack(spacing: 12) {
-                    Button("Retake") { discardCapturedPhoto() }
-                        .buttonStyle(.glass)
-                        .tint(.white)
-                        .disabled(usingPhoto)
-                        .accessibilityIdentifier("cameraRetake")
+                    Group {
+                        if eyesLookClosed {
+                            Button("Retake") { discardCapturedPhoto() }
+                                .buttonStyle(.borderedProminent)
+                                .tint(Color.brandAccentFill)
+                        } else {
+                            Button("Retake") { discardCapturedPhoto() }
+                                .buttonStyle(.glass)
+                                .tint(.white)
+                        }
+                    }
+                    .disabled(usingPhoto)
+                    .accessibilityIdentifier("cameraRetake")
                     Button {
                         guard let capturedPhoto else { return }
                         self.capturedPhoto = nil
@@ -473,7 +503,7 @@ struct CameraView: View {
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(Color.brandAccentFill)
+                    .tint(eyesLookClosed ? Color.white.opacity(0.25) : Color.brandAccentFill)
                     .disabled(capturedPhoto == nil)
                     .accessibilityIdentifier("cameraUsePhoto")
                 }
@@ -488,6 +518,7 @@ struct CameraView: View {
             }
         }
         .foregroundStyle(.white)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: eyesLookClosed)
     }
 
     private func discardCapturedPhoto() {
