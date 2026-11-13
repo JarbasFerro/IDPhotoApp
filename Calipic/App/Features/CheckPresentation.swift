@@ -114,13 +114,18 @@ enum CheckPresentation {
         let pose = solution.checks.filter { [.roll, .yaw, .pitch].contains($0.kind) }
         if let bad = pose.first(where: { $0.state == .fail }) ?? pose.first(where: { $0.state == .warn }) {
             switch bad.kind {
-            case .roll: return .init(topic: .face, state: bad.state, title: "Head", detail: "Your head is tilted. Keep it straight and retake.")
+            case .roll:
+                // Levelled, but the tilt was large enough that the shoulders may look uneven.
+                let levelled = solution.adjustment.rotationDegrees != 0
+                return .init(topic: .face, state: bad.state, title: "Head",
+                             detail: levelled ? "Your head was tilted, so the photo was straightened. Retake with your head straight if it looks uneven."
+                                              : "Your head is tilted. Keep it straight and retake.")
             case .yaw: return .init(topic: .face, state: bad.state, title: "Head", detail: "Your head is turned. Look straight at the camera and retake.")
             default: return .init(topic: .face, state: bad.state, title: "Head", detail: "The camera was above or below your eyes. Hold it at eye level and retake.")
             }
         }
         let levelled = solution.checks.first { $0.kind == .roll }?.measured.map { abs($0) > 0.5 } ?? false
-        return .init(topic: .face, state: .pass, title: "Head", detail: levelled ? "Facing the camera. A small tilt was levelled." : "Facing the camera, straight and level.")
+        return .init(topic: .face, state: .pass, title: "Head", detail: levelled ? "Facing the camera. A tilt was levelled." : "Facing the camera, straight and level.")
     }
 
     private static func framingRow(_ solution: CropSolution) -> PhotoCheckSummary.Row {

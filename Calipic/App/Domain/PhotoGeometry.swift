@@ -70,7 +70,7 @@ struct CropAdjustment: Sendable, Hashable {
     /// Black and white output, offered for custom sizes only (ADR-018); applied after tone and background.
     var monochrome = false
 
-    static let rotationRange: ClosedRange<Double> = -15...15
+    static let rotationRange: ClosedRange<Double> = -30...30
 
     func clamped() -> Self {
         Self(zoom: Self.bound(zoom, 1...4), horizontal: Self.bound(horizontal, 0...1),

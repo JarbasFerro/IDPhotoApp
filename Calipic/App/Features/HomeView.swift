@@ -209,6 +209,9 @@ struct HomeView: View {
         VStack(spacing: 0) {
             Button { showDocuments = true } label: {
                 HStack(spacing: Design.Spacing.control) {
+                    if let profile = model.document.profile {
+                        Text(verbatim: DocumentPresentation.flag(profile)).font(.title2).accessibilityHidden(true)
+                    }
                     VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                         Text(DocumentPresentation.name(model.document)).foregroundStyle(.primary)
                         Text(DocumentPresentation.detail(model.document))

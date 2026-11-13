@@ -1,13 +1,14 @@
 import SwiftUI
 
 /// Step 3 (design 3b): the paper is the hero; people, copies and paper sit in one tray at thumb height.
-/// Extra sizes, custom paper and cutting options live in the options sheet.
+/// Extra sizes and custom paper live in the options sheet; cutting options open from the scissors in the bar.
 struct SheetView: View {
     @Bindable var model: PhotoWorkflow
     @Binding var path: [Route]
     let acquire: Acquire
     @State private var selectedPerson: UUID?
     @State private var showOptions = false
+    @State private var showCutting = false
     /// Counts the person's own taps on the copies stepper, so switching person does not tick it.
     @State private var copiesTick = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -53,8 +54,16 @@ struct SheetView: View {
         .background(Design.Surface.screen)
         .navigationTitle("Your sheet")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) } }
+        .toolbar {
+            ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) }
+            // Cutting options sat inside the paper list, where nobody looked for them (founder, 0.20 review).
+            ToolbarItem(placement: .primaryAction) {
+                Button { showCutting = true } label: { Label("Cutting options", systemImage: "scissors") }
+                    .accessibilityIdentifier("cuttingOptions")
+            }
+        }
         .sheet(isPresented: $showOptions) { SheetOptionsView(model: model) }
+        .sheet(isPresented: $showCutting) { CuttingOptionsView(model: model) }
         .task { model.refreshSheetThumbnails() }
         .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
     }
@@ -141,9 +150,12 @@ struct SheetView: View {
     private func personCircle(_ entry: PhotoEntry, index: Int) -> some View {
         let selected = entry.id == person?.id
         let copies = model.printItems(for: entry.id).reduce(0) { $0 + $1.copies }
+        // The miniature covers the whole circle whatever the photo's shape; a fitted one left bars at the sides.
+        let aspect = model.renderTarget.format.aspectRatio
+        let width = max(52, 52 * aspect)
         return Button { selectedPerson = entry.id } label: {
             PortraitView(entry: entry, format: model.renderTarget.format)
-                .frame(width: 52)
+                .frame(width: width, height: width / aspect)
                 .frame(width: 52, height: 52, alignment: .top)
                 .clipShape(Circle())
                 .overlay(Circle().strokeBorder(selected ? Color.brandAccent : Color(.separator), lineWidth: selected ? 3 : 1))
@@ -241,14 +253,13 @@ struct SheetView: View {
     }
 }
 
-/// Everything about the sheet that is not needed every time: extra sizes per person, any paper, cutting options.
+/// What is not needed every time: extra sizes per person and any paper.
 struct SheetOptionsView: View {
     @Bindable var model: PhotoWorkflow
     @Environment(\.dismiss) private var dismiss
     @State private var customWidth = 100.0
     @State private var customHeight = 150.0
     @State private var customError = false
-    @State private var showCutting = false
     @State private var addingSizeFor: UUID?
 
     var body: some View {
@@ -301,26 +312,6 @@ struct SheetOptionsView: View {
                     }
                 }
 
-                Section {
-                    DisclosureGroup("Cutting options", isExpanded: $showCutting) {
-                        Picker("Orientation", selection: $model.printJob.options.orientation) {
-                            Text("Automatic").tag(PageOrientation.automatic)
-                            Text("Portrait").tag(PageOrientation.portrait)
-                            Text("Landscape").tag(PageOrientation.landscape)
-                        }
-                        Toggle("Safety margin around each photo", isOn: bleedBinding)
-                        Toggle("Corner cut marks", isOn: $model.printJob.options.cornerTicks)
-                        Toggle("50 mm check bar", isOn: $model.printJob.options.calibrationBar)
-                        Toggle("As many copies as possible", isOn: maximumCopiesBinding)
-                        Picker("Order on the page", selection: $model.printJob.options.fillStrategy) {
-                            Text("One size at a time").tag(FillStrategy.byType)
-                            Text("Mix sizes").tag(FillStrategy.interleave)
-                        }
-                    }
-                    .accessibilityIdentifier("cuttingOptions")
-                } footer: {
-                    Text("The safety margin lets a slightly off cut stay inside the photo. The check bar lets you confirm the print is at real size.")
-                }
             }
             .navigationTitle("Sheet options")
             .navigationBarTitleDisplayMode(.inline)
@@ -346,22 +337,6 @@ struct SheetOptionsView: View {
         })
     }
 
-    private var bleedBinding: Binding<Bool> {
-        Binding(get: { model.printJob.options.bleed != .none },
-                set: { model.printJob.options.bleed = $0 ? .adaptive(maxMM: 1) : .none })
-    }
-
-    private var maximumCopiesBinding: Binding<Bool> {
-        Binding(get: { model.printJob.options.gutterMM == 0 }, set: { on in
-            let keep = model.printJob.options
-            var next = on ? PrintOptions.maximumCopies : PrintOptions()
-            next.fillStrategy = keep.fillStrategy
-            next.orientation = keep.orientation
-            next.calibrationBar = keep.calibrationBar
-            model.printJob.options = next
-        })
-    }
-
     private func applyCustom() {
         do {
             model.printJob.paper = try PaperSize.custom(widthMM: customWidth, heightMM: customHeight)
@@ -383,6 +358,58 @@ struct SheetOptionsView: View {
 
     private func formatName(_ format: PhotoFormat) -> String {
         DocumentPresentation.size(widthMM: format.widthMM, heightMM: format.heightMM)
+    }
+}
+
+/// How the photos are laid out and marked for cutting.
+struct CuttingOptionsView: View {
+    @Bindable var model: PhotoWorkflow
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Toggle("Safety margin around each photo", isOn: bleedBinding)
+                    Toggle("Corner cut marks", isOn: $model.printJob.options.cornerTicks)
+                    Toggle("50 mm check bar", isOn: $model.printJob.options.calibrationBar)
+                } footer: {
+                    Text("The safety margin lets a slightly off cut stay inside the photo. The check bar lets you confirm the print is at real size.")
+                }
+                Section {
+                    Picker("Orientation", selection: $model.printJob.options.orientation) {
+                        Text("Automatic").tag(PageOrientation.automatic)
+                        Text("Portrait").tag(PageOrientation.portrait)
+                        Text("Landscape").tag(PageOrientation.landscape)
+                    }
+                    Toggle("As many copies as possible", isOn: maximumCopiesBinding)
+                    Picker("Order on the page", selection: $model.printJob.options.fillStrategy) {
+                        Text("One size at a time").tag(FillStrategy.byType)
+                        Text("Mix sizes").tag(FillStrategy.interleave)
+                    }
+                }
+            }
+            .navigationTitle("Cutting options")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityIdentifier("cuttingDone") } }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private var bleedBinding: Binding<Bool> {
+        Binding(get: { model.printJob.options.bleed != .none },
+                set: { model.printJob.options.bleed = $0 ? .adaptive(maxMM: 1) : .none })
+    }
+
+    private var maximumCopiesBinding: Binding<Bool> {
+        Binding(get: { model.printJob.options.gutterMM == 0 }, set: { on in
+            let keep = model.printJob.options
+            var next = on ? PrintOptions.maximumCopies : PrintOptions()
+            next.fillStrategy = keep.fillStrategy
+            next.orientation = keep.orientation
+            next.calibrationBar = keep.calibrationBar
+            model.printJob.options = next
+        })
     }
 }
 

@@ -72,7 +72,11 @@ struct CropSolverTests {
         #expect(mild.checks.first { $0.kind == .roll }?.state == .pass)
         let medium = CropSolver.solve(geometry: geometry(roll: 12))
         #expect(abs(medium.adjustment.rotationDegrees + 12) < 0.000_1)
-        #expect(medium.checks.first { $0.kind == .roll }?.state == .warn)
+        #expect(medium.checks.first { $0.kind == .roll }?.state == .pass)
+        // A large tilt is still levelled, and reported so the person can look at the shoulders.
+        let large = CropSolver.solve(geometry: geometry(roll: 24))
+        #expect(abs(large.adjustment.rotationDegrees + 24) < 0.000_1)
+        #expect(large.checks.first { $0.kind == .roll }?.state == .warn)
         let strong = CropSolver.solve(geometry: geometry(roll: 35))
         #expect(strong.adjustment.rotationDegrees == 0)
         #expect(strong.checks.first { $0.kind == .roll }?.state == .warn)
@@ -125,7 +129,7 @@ struct CropSolverTests {
     }
 
     @Test func rotationIsClampedAndDefaultsToZeroForInvalidValues() {
-        #expect(CropAdjustment(rotationDegrees: 20).clamped().rotationDegrees == 15)
+        #expect(CropAdjustment(rotationDegrees: 40).clamped().rotationDegrees == 30)
         #expect(CropAdjustment(rotationDegrees: .nan).clamped().rotationDegrees == 0)
         #expect(CropAdjustment().rotationDegrees == 0)
     }

@@ -134,7 +134,7 @@ Found while building; keep them in mind before changing these areas.
 - The roll that matters for the crop comes from the eye line, not from Vision's roll value (they differ by up to 4°).
 - Yaw and pitch are noisy. They stay advisory.
 - The chin landmark sits slightly low; the crown is an estimate. Crown to chin is modelled as 1.8 × eye line to chin, which held on the portraits tried so far (adults, short hair). Children, tall hair, and headwear are not validated.
-- Tilts up to 15° are levelled; above that the app reports the tilt and asks for a retake, because levelling would rotate the whole scene.
+- Tilts up to 30° are levelled (0.20.4; was 15°), and the crop is kept inside the source so levelling pulls in no blank corners when there is room. Up to 15° this passes without comment; from 15° to 30° the photo is levelled and Photo Check says so, because the shoulders may look uneven; above 30° the app reports the tilt and asks for a retake.
 - Rotation can reveal blank corners when the crop touches the edge of the source.
 
 **Background**

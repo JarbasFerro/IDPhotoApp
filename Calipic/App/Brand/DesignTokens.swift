@@ -91,6 +91,8 @@ enum Design {
         static let statusTitle = Font.title3.weight(.semibold)
         /// The one-line promise on Home and the verdict on Photo Check.
         static let hero = Font.title.weight(.bold)
+        /// The credit balance on the Credits sheet.
+        static let balance = Font.system(.largeTitle, design: .rounded).weight(.bold)
         /// Large status or card glyph next to a title.
         static let titleGlyph = Font.title2
         /// Card and section titles.

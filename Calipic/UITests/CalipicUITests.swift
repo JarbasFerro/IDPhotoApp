@@ -339,6 +339,13 @@ final class CalipicUITests: XCTestCase {
         attach(app, "Photo Check, checks")
         app.buttons["checkDetailsDone"].tap()
         XCTAssertTrue(app.buttons["checkDetailsDone"].waitForNonExistence(timeout: 5))
+        // The measured row opens its own list, not the by-eye one.
+        any(app, "measuredRow").tap()
+        XCTAssertTrue(app.buttons["checkDetailsDone"].waitForExistence(timeout: 5))
+        XCTAssertFalse(eyesOpen.exists)
+        attach(app, "Photo Check, measured list")
+        app.buttons["checkDetailsDone"].tap()
+        XCTAssertTrue(app.buttons["checkDetailsDone"].waitForNonExistence(timeout: 5))
         // Adjust: direct manipulation plus the details sliders.
         reveal(app.buttons["adjust"], in: app)
         app.buttons["adjust"].tap()
@@ -467,6 +474,12 @@ final class CalipicUITests: XCTestCase {
         // A different paper is one tap away.
         app.buttons["paper-a4"].tap()
         XCTAssertTrue(app.buttons["paper-a4"].isSelected)
+        // Cutting options open from the scissors in the bar.
+        app.buttons["cuttingOptions"].tap()
+        XCTAssertTrue(app.buttons["cuttingDone"].waitForExistence(timeout: 5))
+        attach(app, "Cutting options")
+        app.buttons["cuttingDone"].tap()
+        XCTAssertTrue(app.buttons["cuttingDone"].waitForNonExistence(timeout: 5))
         // Extra sizes live in the options sheet.
         app.buttons["moreOptions"].tap()
         let addSize = app.buttons["addSize-1"]

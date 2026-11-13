@@ -53,6 +53,14 @@ enum DocumentPresentation {
         return String(localized: "Schengen area")
     }
 
+    /// The country's flag as an emoji (two regional-indicator letters); the EU flag for the Schengen area.
+    static func flag(_ profile: DocumentProfile) -> String {
+        let code = (profile.jurisdiction.countryCode ?? "EU").uppercased()
+        let letters = code.unicodeScalars.compactMap { UnicodeScalar(0x1F1E6 + $0.value - 65) }
+        guard letters.count == 2, code.unicodeScalars.allSatisfy({ (65...90).contains($0.value) }) else { return "" }
+        return String(String.UnicodeScalarView(letters))
+    }
+
     /// The key is built as a plain String first: an interpolated literal would look up "check.%@" instead.
     static func check(_ id: String) -> String {
         let key = "check." + id
@@ -102,7 +110,7 @@ struct DocumentPickerView: View {
                     }
                 }
                 ForEach(groups, id: \.name) { group in
-                    Section(group.name) {
+                    Section {
                         ForEach(group.profiles) { profile in
                             let choice = DocumentChoice.official(profile)
                             Button {
@@ -114,6 +122,13 @@ struct DocumentPickerView: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("profile-\(profile.profileId)")
+                        }
+                    } header: {
+                        HStack(spacing: Design.Spacing.caption) {
+                            Text(verbatim: group.profiles.first.map(DocumentPresentation.flag) ?? "")
+                                .font(.title3)
+                                .accessibilityHidden(true)
+                            Text(group.name)
                         }
                     }
                 }

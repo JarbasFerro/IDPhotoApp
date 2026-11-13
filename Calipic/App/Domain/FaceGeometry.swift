@@ -145,10 +145,11 @@ struct CompositionSpec: Sendable, Hashable {
     var eyeLineRange: ClosedRange<Double> = 0.30...0.50
     var eyeLineTarget = 0.42
     var horizontalTolerance = 0.05
-    /// ICAO roll limit for the finished portrait; larger measured tilts are reported.
-    var maxRollDegrees = 8.0
+    /// Tilts up to this are levelled without comment. A larger tilt is still levelled (up to `maxAutoLevelDegrees`)
+    /// but reported, because the shoulders and neck then sit visibly askew in the finished photo.
+    var maxRollDegrees = 15.0
     /// Tilts up to this are levelled automatically; beyond it the photo is measured but not rotated.
-    var maxAutoLevelDegrees = 15.0
+    var maxAutoLevelDegrees = 30.0
     var maxYawDegrees = 5.0
     var maxPitchDegrees = 5.0
     var minimumInterEyePixels = 90.0
@@ -233,6 +234,13 @@ enum CropSolver {
         let center = levels ? g.headFrame.toImage(alignedCenter)
                             : ImagePoint(x: g.eyeMidpointPixels.x, y: g.eyeMidpointPixels.y + alignedCenter.y)
         var x = center.x - cropW / 2, y = center.y - cropH / 2
+        // A levelled crop is a rotated rectangle in the source: keep its corners inside when there is room,
+        // so levelling does not pull blank wedges into the photo.
+        let radians = rotation * .pi / 180
+        let halfW = (cropW * abs(cos(radians)) + cropH * abs(sin(radians))) / 2
+        let halfH = (cropW * abs(sin(radians)) + cropH * abs(cos(radians))) / 2
+        if 2 * halfW <= width { x = min(max(center.x, halfW), width - halfW) - cropW / 2 }
+        if 2 * halfH <= height { y = min(max(center.y, halfH), height - halfH) - cropH / 2 }
         x = min(max(x, 0), max(0, width - cropW))
         y = min(max(y, 0), max(0, height - cropH))
 

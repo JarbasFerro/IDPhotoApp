@@ -1,21 +1,27 @@
 import SwiftUI
 
-/// Every check for one photo: what the app measured, then what only a person can judge. Opened from the two
-/// short rows on Photo Check, at half height so the photo stays in view above it.
+/// One side of the checks for a photo: what the app measured, or what only a person can judge. Each short row on
+/// Photo Check opens its own list, at half height so the photo stays in view above it.
 struct CheckDetailsSheet: View {
+    enum Focus: String, Identifiable { case measured, byEye; var id: String { rawValue } }
     let summary: PhotoCheckSummary
     let byEye: [String]
+    let focus: Focus
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
-                if !summary.rows.isEmpty {
-                    Section("Measured") {
-                        ForEach(summary.rows) { row in measuredRow(row) }
+                if focus == .measured {
+                    // What needs attention first; the checks that passed follow.
+                    let passed = summary.rows.filter { $0.state == .pass }
+                    if !summary.attention.isEmpty {
+                        Section("To look at") { ForEach(summary.attention) { row in measuredRow(row) } }
                     }
-                }
-                if !byEye.isEmpty {
+                    if !passed.isEmpty {
+                        Section("Looks fine") { ForEach(passed) { row in measuredRow(row) } }
+                    }
+                } else if !byEye.isEmpty {
                     Section {
                         ForEach(byEye, id: \.self) { id in
                             Label { Text(DocumentPresentation.check(id)) } icon: {
@@ -23,14 +29,12 @@ struct CheckDetailsSheet: View {
                                     .foregroundStyle(StatusStyle.color(for: .manualCheck))
                             }
                         }
-                    } header: {
-                        Text("Check by eye")
                     } footer: {
                         Text("The office that receives the photo decides whether to accept it.")
                     }
                 }
             }
-            .navigationTitle("Checks")
+            .navigationTitle(focus == .measured ? Text("Measured") : Text("Check by eye"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

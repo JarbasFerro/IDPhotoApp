@@ -11,7 +11,7 @@ struct PhotoCheckView: View {
     @State private var confirmRemove = false
     @State private var comparing = false
     /// The full list of checks, in a sheet: the screen itself stays one page with the photo in view.
-    @State private var showDetails = false
+    @State private var detailsFocus: CheckDetailsSheet.Focus?
     @State private var confirmEdit = false
     /// False until the screen has settled and the check has finished; the portrait then springs into its frame.
     @State private var landed = false
@@ -96,9 +96,9 @@ struct PhotoCheckView: View {
         } message: { Text("Editing it locks it again. The changed photo will use another credit.") }
         .sheet(isPresented: $showAdjust) { AdjustSheet(model: model, photoID: photoID) }
         .sheet(isPresented: $showRequirements) { RequirementsView(document: model.document) }
-        .sheet(isPresented: $showDetails) {
+        .sheet(item: $detailsFocus) { focus in
             if let entry {
-                CheckDetailsSheet(summary: summary(for: entry), byEye: model.document.byEyeChecks)
+                CheckDetailsSheet(summary: summary(for: entry), byEye: model.document.byEyeChecks, focus: focus)
             }
         }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
@@ -275,14 +275,14 @@ struct PhotoCheckView: View {
                                   : Text("^[\(summary.attention.count) thing](inflect: true) to look at"),
                               subtitle: Text(verbatim: (summary.attention.isEmpty ? summary.rows : summary.attention)
                                   .map { String(localized: $0.title) }.joined(separator: " · ")),
-                              identifier: "measuredRow") { showDetails = true }
+                              identifier: "measuredRow") { detailsFocus = .measured }
             }
             if !byEye.isEmpty {
                 if !summary.rows.isEmpty { Divider().padding(.leading) }
                 disclosureRow(symbol: StatusStyle.symbol(for: .manualCheck), color: StatusStyle.color(for: .manualCheck),
                               title: Text("^[\(byEye.count) thing](inflect: true) to check by eye"),
                               subtitle: Text(verbatim: byEye.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
-                              identifier: "byEyeRow") { showDetails = true }
+                              identifier: "byEyeRow") { detailsFocus = .byEye }
             }
         }
         .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
