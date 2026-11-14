@@ -38,7 +38,7 @@ Work that needs devices and people (track V) runs in parallel from now and feeds
 
 ### 0.21 — Refinement: one table, one tray · Next
 
-The specification is [03-design.md §9](03-design.md): the eleven problems and their fixes, the layout, type, buttons, status, each screen, the decisions made with the founder's free hand (§9.10), and the acceptance check. One pass at a time, each installed on the founder's iPhone before the next.
+The specification is [03-design.md §9](03-design.md): the eleven problems and their fixes, the layout, type, buttons, status, each screen, the moments that must survive and get stronger (§9.10), the decisions made with the founder's free hand (§9.11), and the acceptance check. One pass at a time, each installed on the founder's iPhone before the next.
 
 1. **Components and Photo Check.** `JourneyScreen`, `TrayRow`, `TrayActions`, `StatusMark`, the new tokens; Photo Check rebuilt on them (photo at least 45 % of the screen, verdict as the tray title, two rows, Adjust beside Print).
 2. **Print as one screen** (ADR-055) and Digital Photo. `SheetView` and `PrintView` merge: the page stays on the mat; the tray moves through layout, unlock, where, print. The first page is full by default. The unlock is one sentence and **Unlock · 1 credit**. The guide's tips and the UI tests follow. The largest pass.
@@ -49,7 +49,7 @@ The specification is [03-design.md §9](03-design.md): the eleven problems and t
 
 Also in this batch, because the screens are being rebuilt anyway: the two Print UI tests that fail on a 6.3-inch iPhone, and screenshots made optional in the UI tests.
 
-Done when: every journey screen passes the check in §9.9 in Light and Dark and in three languages, and the founder, using it on the iPhone, no longer says it needs refinement.
+Done when: every journey screen passes the check in §9.9 in Light and Dark and in three languages; all twelve moments of §9.10 work on the iPhone, the seven marked stronger included; and the founder, using it, no longer says it needs refinement.
 
 ### 0.24 — First testers
 

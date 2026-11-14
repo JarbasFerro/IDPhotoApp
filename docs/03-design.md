@@ -250,7 +250,7 @@ Lock the icon finish with dark and tinted variants and a layered version for Liq
 
 ## 9. Refinement: one table, one tray (U19, ADR-054)
 
-Chosen by the founder on 2026-11-14 (refinement round 1 in `docs/ui/explorations/`), after "it doesn't feel like a well designed app". An audit of all 61 scenes found no ugly screen and no system. This section is the system. The founder then gave a free hand ("complete freedom to change anything"); the choices made with it are listed in §9.10 and marked **(free hand)** where they appear. **Where it disagrees with §1 to §3, this section wins**; update those rows as each screen is rebuilt.
+Chosen by the founder on 2026-11-14 (refinement round 1 in `docs/ui/explorations/`), after "it doesn't feel like a well designed app". An audit of all 61 scenes found no ugly screen and no system. This section is the system. The founder then gave a free hand ("complete freedom to change anything"); the choices made with it are listed in §9.11 and marked **(free hand)** where they appear. **Where it disagrees with §1 to §3, this section wins**; update those rows as each screen is rebuilt.
 
 ### 9.1 What was wrong, and the fix for each
 
@@ -364,9 +364,30 @@ Build order, one pass each, each on the founder's iPhone before the next:
 5. **Finished** and the sheets (Check your print, then type and button rules in the rest).
 6. Review of the built screens against this section (Fable 5.2), then fixes.
 
-A pass is done when, in screenshots in Light and Dark, English, Spanish and Portuguese: the screen has one filled button; no text below the Secondary role except Home's version line; nothing is centred that §9.3 does not centre; no rounded box sits inside the tray; the object fills the stage; and the UI tests pass.
+A pass is done when, in screenshots in Light and Dark, English, Spanish and Portuguese: the screen has one filled button; no text below the Secondary role except Home's version line; nothing is centred that §9.3 does not centre; no rounded box sits inside the tray; the object fills the stage; the UI tests pass; **and every moment of §9.10 that lives on the screen has been watched working in a screen recording on the founder's iPhone**, with Reduce Motion on and off.
 
-### 9.10 Decisions made with the founder's free hand (2026-11-14)
+### 9.10 The moments (founder, 2026-11-14: "don't lose our wow moments")
+
+Refinement removes noise, never a moment. The quiet tray exists so that these stand out. Each one is listed with where it lives after 0.21; a pass that touches a screen must keep its moments working, and where the table says **stronger**, deliver that too.
+
+| # | Moment | Today | After 0.21 |
+|---|---|---|---|
+| 1 | **The shutter** | One bloom and one haptic, then a review screen | **Stronger:** the bloom carries the still onto Photo Check's mat with no screen in between |
+| 2 | **The landing** | The photo settles into its official frame on Photo Check (`Motion.landing`) | Kept, and larger: the photo is at least 45 % of the screen, so the move from the raw still to the framed photo is the first thing seen |
+| 3 | **The measuring** | Lines and the millimetre chip draw on the photo | Kept on the stage. **Stronger:** the lines draw while the title still says "Checking your photo…", then the verdict replaces it with its mark bouncing once and its haptic |
+| 4 | **Compare** | Press and hold to see the original | Kept (`Motion.compare`), now with a visible **Original** capsule so people find it |
+| 5 | **The photo becomes its copies** | From Photo Check the portrait travels to the page and the copies appear row by row, a light tap per row | Kept, and it is now the entrance to the one Print screen. **Stronger:** the first page is full by default, so every row fills |
+| 6 | **A copy at a time** | Each added copy drops into the next free slot; counts roll; a new page fills row by row; pages snap and follow | Kept exactly. The free-slot outlines stay |
+| 7 | **The unlock** | The page lifts slightly, the card folds away, one success haptic | **Stronger**, since the page no longer changes screens: the page lifts, one soft light sweeps across it, the success haptic fires, and the tray turns to "Where will you print?" |
+| 8 | **The print matches the screen** | Check your print: the 50 mm line at true size | Kept. **Stronger:** the line is drawn large; on "Yes, Same Size" it turns green with the seal and a success haptic before Finished opens |
+| 9 | **The cut order** | Finished draws the cuts on the person's own page | Kept. **Stronger:** the cut lines draw one after another in cutting order when the screen opens |
+| 10 | **The sample people** | A tap on Home's sample brings the next of nine people | Kept, on the mat |
+| 11 | **Every touch answers** | The feedback map of U6: ticks on the stepper and chips, rolling numbers, warning haptic with a reason | Kept exactly; the new rows and the tray's state changes join the same map |
+| 12 | **The guide** | Yellow bubbles pop in, the hand bounces, the ring breathes | Kept |
+
+Rules for all of them: one moment at a time; none repeats or loops; each respects Reduce Motion (the change happens without movement); a back swipe mid-way must work; none may delay a tap by more than 100 ms.
+
+### 9.11 Decisions made with the founder's free hand (2026-11-14)
 
 The founder said "you have complete freedom to change anything". These go beyond the chosen direction B; each is recorded in [05-decisions.md](05-decisions.md) and can be reversed by saying so.
 

@@ -234,7 +234,7 @@ Before considering work complete, ask:
 8. Is the behavior tested at rule/geometry boundaries?
 9. Does it behave well on the oldest iPhone that runs iOS 27?
 10. Does this feature make the ID-photo task better, or is it merely showcasing an API?
-11. Does every changed screen pass the check in `docs/03-design.md` §9.9 (one filled button, three text roles, nothing boxed inside the tray, the object fills the stage), in Light and Dark and in all three languages?
+11. Are the moments of `docs/03-design.md` §9.10 that live on the changed screens still working (watched, not assumed)? Does every changed screen pass the check in §9.9 (one filled button, three text roles, nothing boxed inside the tray, the object fills the stage), in Light and Dark and in all three languages?
 
 When the answer changes a foundational decision, update `docs/05-decisions.md` before quietly implementing a workaround.
 ## 19. Model tiering for AI agents
