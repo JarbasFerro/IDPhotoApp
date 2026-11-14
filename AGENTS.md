@@ -63,6 +63,7 @@ Third-party packages require an ADR or dependency review explaining why Apple AP
 - Use system typography, Dynamic Type, semantic colors/materials, and SF Symbols by default.
 - Motion and haptics must communicate state or cause/effect; avoid decorative motion/haptic noise.
 - Respect light/dark appearance and Reduce Motion. Other accessibility settings follow the 1.0 baseline in section 6.
+- **Building or changing a journey screen: follow `docs/03-design.md` §10** (components, each fix, each moment, identifiers) and its ground rules in §10.0.
 - **Journey screens follow one layout (ADR-054, `docs/03-design.md` §9):** the cutting mat edge to edge with the photo or page large on it, and one white tray below for everything that is read or tapped. Build them with `JourneyScreen`, `TrayRow`, `TrayActions` and `StatusMark`; do not add cards, tinted panels, or a second filled button.
 - Three text roles (title, body, secondary) plus the monospaced readout, left-aligned. No footnote-sized grey text on a journey screen: delete the line, make it a sentence, or move it behind a row.
 - One filled button per screen and at most one text button; rare actions go in the toolbar menu. Status is one inline `StatusMark` with words.
