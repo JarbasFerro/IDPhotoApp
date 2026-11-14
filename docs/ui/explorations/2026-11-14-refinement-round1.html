@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calipic — Refinement, round 1</title>
+<!-- Source of 2026-11-14-refinement-round1.png. Render on a Mac (system fonts):
+     Chrome --headless --force-device-scale-factor=2 --window-size=1330,1790 --screenshot=<png> <this file> -->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; background: #FAFAFB; color: #111; width: 1330px; padding: 40px; -webkit-font-smoothing: antialiased; }
+  h1 { font-size: 28px; letter-spacing: -0.02em; }
+  .sub { color: #5d6166; font-size: 15px; margin-top: 6px; max-width: 980px; line-height: 1.45; }
+  .row { display: grid; grid-template-columns: 250px repeat(3, 300px); gap: 30px; margin-top: 26px; padding-top: 24px; border-top: 1px solid #e3e4e7; }
+  .about .id { display: inline-block; font: 600 12px ui-monospace, Menlo, monospace; color: #0E6F7C; border: 1px solid #0E6F7C; border-radius: 5px; padding: 1px 6px; margin-bottom: 8px; }
+  .about h2 { font-size: 21px; letter-spacing: -0.01em; }
+  .about p, .about li { font-size: 13.5px; line-height: 1.45; color: #3c4045; margin-top: 8px; }
+  .about ul { padding-left: 16px; }
+  .cap { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #7a7f85; margin-bottom: 8px; }
+
+  .phone { width: 300px; height: 650px; border-radius: 40px; overflow: hidden; position: relative; background: #F2F2F7; color: #000;
+           box-shadow: 0 0 0 1px rgba(0,0,0,.14), 0 18px 40px rgba(0,0,0,.10); font-size: 15px; }
+  .status { height: 44px; display: flex; align-items: flex-end; padding: 0 26px 6px; font-weight: 600; font-size: 14px; }
+  .mat { background-color: #DCE8E6;
+         background-image: linear-gradient(rgba(14,111,124,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(14,111,124,.10) 1px, transparent 1px);
+         background-size: 12px 12px; }
+  .paper { background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.18), 0 6px 14px rgba(0,0,0,.16); }
+  .photo { background: url("../../../Calipic/App/Resources/Assets.xcassets/SamplePortrait.imageset/sample-portrait.jpg") center 18% / cover; }
+  .selfie { background: url("../../../Calipic/App/Resources/Assets.xcassets/SampleSelfie.imageset/sample-selfie.jpg") center / cover; }
+  .btn { height: 50px; border-radius: 25px; background: #0E6F7C; color: #fff; font-weight: 600; font-size: 17px; display: flex; align-items: center; justify-content: center; }
+  .link { height: 44px; display: flex; align-items: center; justify-content: center; color: #0E6F7C; font-weight: 600; font-size: 16px; }
+  .t1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; }
+  .t2 { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; }
+  .body { font-size: 16px; line-height: 1.3; }
+  .sec { font-size: 15px; color: rgba(60,60,67,.68); line-height: 1.3; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; white-space: nowrap; }
+  .line { display: flex; align-items: center; min-height: 50px; border-top: .5px solid rgba(60,60,67,.22); gap: 10px; }
+  .line:first-child { border-top: 0; }
+  .line .v { margin-left: auto; color: rgba(60,60,67,.68); }
+  .chev { color: rgba(60,60,67,.32); font-weight: 600; margin-left: 6px; }
+  .dot { width: 22px; height: 22px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex: none; }
+  .ok { background: #34C759; color: #fff; } .look { background: rgba(60,60,67,.14); color: #3c3c43; }
+  .nav { height: 44px; display: flex; align-items: center; padding: 0 16px; font-weight: 600; }
+  .nav .back { width: 36px; height: 36px; border-radius: 18px; background: rgba(255,255,255,.85); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 .5px rgba(0,0,0,.08); }
+  .steps { margin: 0 auto; display: flex; gap: 14px; font-size: 13px; color: rgba(60,60,67,.5); font-weight: 600; }
+  .steps b { color: #000; }
+  .tray { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 30px 30px 0 0; padding: 22px 20px 26px; box-shadow: 0 -8px 24px rgba(0,0,0,.08); }
+  .pad { padding: 0 20px; }
+  .bottom { position: absolute; left: 20px; right: 20px; bottom: 22px; }
+</style>
+</head>
+<body>
+<h1>Refinement, round 1</h1>
+<p class="sub">Why the app does not feel designed yet, drawn as two ways to fix it. Both keep every feature and the teal, the mat, and the paper. Both apply the same discipline: one alignment (left), three text sizes instead of seven, one primary button plus plain text for the rest, no small grey footnotes, one kind of status mark, and the photo as the largest thing on screen.</p>
+
+<!-- ======================= A ======================= -->
+<div class="row">
+  <div class="about">
+    <span class="id">A</span>
+    <h2>Tidy</h2>
+    <p>Today's screens, cleaned up. Same structure; the rules above are applied to each screen.</p>
+    <ul>
+      <li>White cards become plain rows on the background.</li>
+      <li>The mat stays a rounded panel, now also on Home.</li>
+      <li>Verdict and unlock say one thing in one line.</li>
+    </ul>
+    <p><b>For:</b> least work, least risk. <b>Against:</b> still five different page layouts; it will look cleaner, not distinctive.</p>
+  </div>
+
+  <div>
+    <div class="cap">Home</div>
+    <div class="phone">
+      <div class="status">9:41</div>
+      <div class="pad" style="display:flex;align-items:center;height:40px"><span style="font-weight:700;font-size:20px;letter-spacing:-.02em">Calipic</span><span style="margin-left:auto;color:rgba(60,60,67,.6);font-size:22px;letter-spacing:2px">···</span></div>
+      <div class="mat" style="margin:8px 8px 0;border-radius:24px;height:216px;position:relative">
+        <div class="paper selfie" style="position:absolute;left:40px;top:24px;width:122px;height:86px;border-radius:5px;transform:rotate(-5deg)"></div>
+        <div class="paper" style="position:absolute;left:120px;top:66px;width:100px;height:128px;padding:5px;transform:rotate(3deg)"><div class="photo" style="width:100%;height:100%"></div></div>
+      </div>
+      <div class="pad" style="margin-top:18px">
+        <div class="t1">Take it at home.<br>Print it yourself.</div>
+        <div style="margin-top:10px">
+          <div class="line"><span>🇪🇸</span><span class="body">Spain · DNI</span><span class="v mono">26 × 32 mm</span><span class="chev">›</span></div>
+          <div class="line"><span class="body">Photo requirements</span><span class="v"></span><span class="chev">›</span></div>
+        </div>
+      </div>
+      <div class="bottom"><div class="btn">Take Photo</div><div class="link">Choose from Library</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cap">Photo Check</div>
+    <div class="phone">
+      <div class="status">9:41</div>
+      <div class="nav"><div class="back">‹</div><div class="steps"><span>Photo</span><b>Check</b><span>Print</span></div><span style="color:#0E6F7C;font-weight:600">Retake</span></div>
+      <div class="mat" style="margin:6px 8px 0;border-radius:24px;height:306px;display:flex;align-items:center;justify-content:center">
+        <div class="paper photo" style="width:206px;height:254px;border-radius:5px"></div>
+      </div>
+      <div class="pad" style="margin-top:18px">
+        <div class="t2">Framed for Spain · DNI</div>
+        <div style="margin-top:10px">
+          <div class="line"><span class="dot ok">✓</span><span class="body">Head, light, sharpness</span><span class="chev" style="margin-left:auto">›</span></div>
+          <div class="line"><span class="dot look">4</span><span class="body">To check by eye</span><span class="v"></span><span class="chev">›</span></div>
+        </div>
+      </div>
+      <div class="bottom" style="display:flex;gap:6px;align-items:center"><div class="link" style="flex:1">Adjust</div><div class="btn" style="flex:2">Print</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cap">Print, before unlocking</div>
+    <div class="phone">
+      <div class="status">9:41</div>
+      <div class="nav"><div class="back">‹</div><div class="steps"><span>Photo</span><span>Check</span><b>Print</b></div><span style="width:36px"></span></div>
+      <div class="mat" style="margin:6px 8px 0;border-radius:24px;height:250px;display:flex;align-items:center;justify-content:center">
+        <div class="paper" style="width:146px;height:216px;padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;align-content:start">
+          <div class="photo" style="height:52px"></div><div class="photo" style="height:52px"></div><div class="photo" style="height:52px"></div>
+          <div class="photo" style="height:52px"></div><div class="photo" style="height:52px"></div><div class="photo" style="height:52px"></div>
+          <div class="photo" style="height:52px"></div><div class="photo" style="height:52px"></div>
+        </div>
+      </div>
+      <div class="pad" style="margin-top:18px">
+        <div class="t2">Your sheet is ready</div>
+        <div class="sec" style="margin-top:4px">8 copies on 10 × 15 cm paper</div>
+        <div style="margin-top:12px">
+          <div class="line" style="min-height:40px"><span class="body">Unlock this photo</span><span class="v">1 credit</span></div>
+          <div class="line" style="border-top:0;min-height:0"><span class="sec">Every print and the digital photo, as often as you like. Edits are final after that.</span></div>
+        </div>
+      </div>
+      <div class="bottom"><div class="btn">Unlock · 1 credit</div><div class="link">Keep Editing</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= B ======================= -->
+<div class="row">
+  <div class="about">
+    <span class="id">B</span>
+    <h2>One table, one tray <span style="font-size:13px;font-weight:600;color:#0E6F7C">· recommended</span></h2>
+    <p>Every screen of the journey has the same two parts: the <b>mat</b> fills the top edge to edge, with the photo or the page lying on it, large. Everything you read or tap is in <b>one white tray</b> below.</p>
+    <ul>
+      <li>Your sheet already works this way and is the screen that feels most finished.</li>
+      <li>Home, Photo Check, Print, Digital Photo and Finished all take the same shape, so it reads as one app and one journey.</li>
+      <li>No cards inside cards: the tray is the only container.</li>
+    </ul>
+    <p><b>For:</b> a recognisable Calipic layout; the photo gets 50 % of the screen. <b>Against:</b> more work (each journey screen is rebuilt); long content scrolls inside the tray.</p>
+  </div>
+
+  <div>
+    <div class="cap">Home</div>
+    <div class="phone mat">
+      <div class="status">9:41</div>
+      <div class="pad" style="display:flex;align-items:center;height:40px"><span style="font-weight:700;font-size:20px;letter-spacing:-.02em">Calipic</span><span style="margin-left:auto;width:36px;height:36px;border-radius:18px;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:18px;letter-spacing:1px">···</span></div>
+      <div style="position:relative;height:270px">
+        <div class="paper selfie" style="position:absolute;left:38px;top:26px;width:148px;height:104px;border-radius:5px;transform:rotate(-5deg)"></div>
+        <div class="paper" style="position:absolute;left:128px;top:86px;width:124px;height:158px;padding:6px;transform:rotate(3deg)"><div class="photo" style="width:100%;height:100%"></div></div>
+      </div>
+      <div class="tray" style="height:292px">
+        <div class="t1">Take it at home.<br>Print it yourself.</div>
+        <div class="line" style="margin-top:14px;border-top:0"><span>🇪🇸</span><span class="body">Spain · DNI</span><span class="v mono">26 × 32 mm</span><span class="chev">›</span></div>
+        <div class="btn" style="margin-top:10px">Take Photo</div>
+        <div class="link">Choose from Library</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cap">Photo Check</div>
+    <div class="phone mat">
+      <div class="status">9:41</div>
+      <div class="nav"><div class="back">‹</div><div class="steps"><span>Photo</span><b>Check</b><span>Print</span></div><span style="color:#0E6F7C;font-weight:600">Retake</span></div>
+      <div style="height:330px;display:flex;align-items:center;justify-content:center;position:relative">
+        <div class="paper photo" style="width:232px;height:286px;border-radius:5px"></div>
+        <div class="mono" style="position:absolute;right:14px;top:150px;background:#fff;border-radius:6px;padding:3px 6px;box-shadow:0 0 0 .5px rgba(0,0,0,.15)">23.7 mm</div>
+      </div>
+      <div class="tray" style="height:232px">
+        <div class="t2">Framed for Spain · DNI</div>
+        <div style="margin-top:6px">
+          <div class="line"><span class="dot ok">✓</span><span class="body">Head, light, sharpness</span><span class="chev" style="margin-left:auto">›</span></div>
+          <div class="line"><span class="dot look">4</span><span class="body">To check by eye</span><span class="chev" style="margin-left:auto">›</span></div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:8px"><div class="link" style="flex:1">Adjust</div><div class="btn" style="flex:2">Print</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="cap">Print, before unlocking</div>
+    <div class="phone mat">
+      <div class="status">9:41</div>
+      <div class="nav"><div class="back">‹</div><div class="steps"><span>Photo</span><span>Check</span><b>Print</b></div><span style="width:36px"></span></div>
+      <div style="height:300px;display:flex;align-items:center;justify-content:center">
+        <div class="paper" style="width:176px;height:262px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;align-content:start">
+          <div class="photo" style="height:66px"></div><div class="photo" style="height:66px"></div><div class="photo" style="height:66px"></div>
+          <div class="photo" style="height:66px"></div><div class="photo" style="height:66px"></div><div class="photo" style="height:66px"></div>
+          <div class="photo" style="height:66px"></div><div class="photo" style="height:66px"></div>
+        </div>
+      </div>
+      <div class="tray" style="height:262px">
+        <div class="t2">Your sheet is ready</div>
+        <div class="sec" style="margin-top:4px">8 copies on 10 × 15 cm paper</div>
+        <div class="sec" style="margin-top:12px;color:#000">Unlocking gives you every print and the digital photo, as often as you like. Edits are final after that.</div>
+        <div class="btn" style="margin-top:14px">Unlock · 1 credit</div>
+        <div class="link">Keep Editing</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
