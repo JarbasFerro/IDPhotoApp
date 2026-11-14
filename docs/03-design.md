@@ -10,6 +10,8 @@ Screenshots of every current screen: [ui/gallery/](ui/gallery/). Earlier design 
 
 ## 1. Design language
 
+> **From 0.21 the layout, type, buttons and status marks follow §9 (One table, one tray). Where this section, §2 or §3 says otherwise, §9 wins until the rows are rewritten screen by screen.**
+
 - **Native first.** System navigation, sheets, menus, steppers, pickers, and share and print panels. Liquid Glass comes from the SDK through standard controls. Custom drawing is kept for three things only: the photo, the paper, and the camera guide.
 - **The photo is the content.** Chrome stays quiet and neutral. Teal is for the main action, selection, and very few details. Never a teal field around a portrait.
 - **Paper is an object.** A photo or page is white, has 6 pt corners (pages have square corners), a hairline edge, and a soft shadow. It is white in Light and Dark.
@@ -245,3 +247,114 @@ Lock the icon finish with dark and tinted variants and a layered version for Liq
 3. The founder chooses. Record the choice in that folder's README and in Part A when built.
 4. Build it, then look at screenshots in Light and Dark **before committing**. Fix clipping, wrapping, and weak contrast first.
 5. Update Part A and the gallery in the same commit.
+
+## 9. Refinement: one table, one tray (U19, ADR-054)
+
+Chosen by the founder on 2026-11-14 (refinement round 1 in `docs/ui/explorations/`), after "it doesn't feel like a well designed app". An audit of all 61 scenes found no ugly screen and no system. This section is the system. **Where it disagrees with §1 to §3, this section wins**; update those rows as each screen is rebuilt.
+
+### 9.1 What was wrong, and the fix for each
+
+| # | Problem in 0.20.19 | Fix |
+|---|---|---|
+| 1 | About seven text sizes; a small grey footnote on almost every screen | Three text roles plus the readout (§9.3). Footnotes are deleted, promoted to a sentence, or moved behind a row (§9.4) |
+| 2 | Centred screens and left-aligned screens in one journey | Everything in the tray is left-aligned (§9.3) |
+| 3 | Five kinds of container, boxes inside boxes | Two surfaces on a journey screen: the mat and the tray. No cards (§9.2) |
+| 4 | Four button treatments, stacks of two or three full-width pills | One filled button, at most one text button, chips only for a set of choices (§9.5) |
+| 5 | The photo takes a third of Photo Check; the page is a thumbnail on Print | The object on the mat takes the whole stage, at least 45 % of the screen height (§9.2) |
+| 6 | Empty middles (Home, Photo Check, Digital Photo, Check your print) | The stage stretches and the tray hugs its content, so there is no middle to be empty |
+| 7 | A different page layout for each step | One layout for Home, Photo Check, Your sheet, Print, Digital Photo, Finished (§9.2) |
+| 8 | Status marks of three sizes; an orange alarm as the default; one eye icon for a problem and for a routine check | One status mark, inline with words (§9.6) |
+| 9 | Your sheet's tray: six control shapes in 150 pt | Labelled rows; rare actions move to the toolbar menu (§9.7) |
+
+### 9.2 Layout: stage and tray
+
+Every journey screen (Home, Photo Check, Your sheet, Print, Digital Photo, Finished, and the guide's welcome and "You're all set") is built from one component, `JourneyScreen(stage:tray:)`.
+
+- **Stage.** The mat (`Surface.mat`, with its grid) fills the screen from the top edge, under the status bar and a transparent navigation bar, down to behind the tray's top corners. It is no longer a rounded panel inset by 8 pt. The grouped grey background is never visible on a journey screen.
+- **The object.** One thing lies on the mat: the photo, the page, or Home's sample prints. It is centred in the free area between the navigation bar and the tray, with at least 20 pt to every edge, and scaled to fill that area. On Photo Check and Digital Photo it is at least 45 % of the screen height on a 6.1-inch iPhone at the default text size. Nothing else sits on the mat except the measuring layer (lines, the millimetre chip), page dots, and the compare control (§9.4).
+- **Tray.** One white panel (`Surface.tray`) at the bottom: top corners 30 pt (`Radius.tray`), a soft upward shadow, 20 pt side padding, 22 pt above the title, and the bottom safe area plus 8 pt below the actions. Its height is its content. It never takes more than 55 % of the screen: beyond that, the rows scroll inside the tray and the actions stay pinned at its bottom.
+- **The tray is the only container.** No white cards, no tinted panels, no nested rounded rectangles. Groups are separated by a hairline (rows) or by 20 pt of space (blocks).
+- **Tray order, always:** title, at most one supporting line, rows or controls, actions.
+- **Navigation bar.** Transparent over the mat. Back and menu buttons are the system glass circles. The centre holds the step marker as three words, the current one in the label colour and the others secondary: `Photo  Check  Print`. No dashes under it.
+- **Sheets are not journey screens.** Choose document, Photo requirements, Before your photo, Check details, Adjust, Cutting options, Sheet options, More formats, Check your print, Credits, Settings, and the app icon picker stay system sheets on the grouped background with standard inset lists. They follow §9.3 to §9.6 but keep their structure. The camera does not change.
+
+### 9.3 Type and alignment
+
+Three roles and the readout, mapped to the existing tokens:
+
+| Role | Token | Used for |
+|---|---|---|
+| Title | `Typography.hero` (title, bold) on Home, Finished, the welcome page and "You're all set"; `Typography.trayTitle` (title2, bold; new, replaces `screenTitle` and `statusTitle` on journey screens) everywhere else | The one line that names what the screen says. One per screen |
+| Body | `.body` | Row names, sentences the person must read, button-adjacent facts |
+| Secondary | `Typography.cardDetail` (subheadline, secondary colour) | At most one supporting line under the title; the value at the end of a row |
+| Readout | `Typography.readout` (monospaced) | Pure measurements: "26 × 32 mm", "23.7 mm" |
+
+- `Typography.note` and `Typography.caption` are not used on journey screens, with one exception: Home's last line with the credit balance and the version (AGENTS.md §17 keeps the version on the main screen). They remain for legal and privacy text in sheets.
+- `rowTitle` (semibold subheadline) is retired: a row name is body, regular weight.
+- Everything in the tray is left-aligned: titles, lines, rows. Centred: the object on the stage, a button's label, and a sheet's navigation title. Nothing else.
+
+### 9.4 What happens to each small grey line
+
+| Line today | Becomes |
+|---|---|
+| "Hold to compare with the original" | Deleted. A glass capsule **Original** sits at the stage's bottom-left corner; press and hold it (or the photo) to compare. The accessibility action stays |
+| "Your photos stay on your iPhone." (Home) | Deleted from Home. It stays in Settings › Privacy and on the welcome page |
+| "1 credit" and the version (Home) | One caption line at the bottom of Home's tray: the balance as a text button on the left, the version on the right |
+| "Fix these issues or continue after checking by eye." | Deleted. The rows say what there is to look at |
+| "Unlocked. Printing and sharing this photo is free." | The supporting line under the title, when unlocked |
+| "8 copies · 1 page · Room for 4 more" under the mat | The supporting line under the tray title on Your sheet |
+| The unlock card's three benefits, "After this, framing and edits are final.", "You have 1 credit. After this: 0 credits." | One body sentence: "Unlocking gives you every print and the digital photo, as often as you like. Edits are final after that." The cost is in the button: **Unlock · 1 credit**. The balance is said only when it is not enough: "You have no credits." with **Get Credits** as the button |
+| "Before you print" label, "Choose where you print to see the steps." | Deleted. The steps appear as rows once a place is chosen |
+| "Sized for online forms" | The supporting line under "Your digital photo is ready" |
+| "Never Fit to Page or borderless" under step 2 | Joined to its step: "Choose Actual Size, or 100 %. Never Fit to Page." |
+
+### 9.5 Buttons
+
+1. **Primary:** `brandProminentButtonStyle()`, large, full width, exactly one per screen, at the bottom of the tray.
+2. **Text button:** plain teal text, 44 pt tall, for the single alternative. Under the primary button when it is a way out ("Choose from Library", "Keep Editing", "Done"); to the left of it in a 1 : 2 row when the two are peers ("Adjust" beside "Print").
+3. **Chips:** only for one choice among several (paper sizes). Never for an action.
+4. **Toolbar:** system glass circles; everything a screen needs rarely (Retake, requirements, cutting options, add a person, more formats, remove) goes in its ••• menu.
+
+Removed: the pale-teal full-width buttons (`.bordered` Digital Photo, Adjust, No, Close, Done), the "Check" link on Your sheet (Back does that), and the Fill pill (§9.7). A primary button that cannot act yet stays in place, disabled, and says what is missing ("Choose where to print").
+
+### 9.6 Status
+
+One component, `StatusMark`: a 22 pt circle before the words it belongs to. `pass`: green with a check. `warn`: orange with "!". `fail`: red with "×". `manual_check`: neutral grey with the eye. It is used inline with a row or a title, never alone as a large icon above a centred title. The only large mark left is the seal on Finished and "You're all set".
+
+Photo Check's verdict logic does not change (ADR-007). Its presentation does: the verdict is the tray title with its mark in front (*Looks good*, *Review your photo*, *Better to retake*), followed by the supporting line "Framed for Spain · DNI". Two rows follow: **Measured** (the mark of its worst item, the head height as a readout at the end) and **To check by eye** (the neutral mark, the count at the end). While checking, the title is "Checking your photo…" with the system progress view in the mark's place.
+
+### 9.7 Each screen
+
+| Screen | Stage | Tray |
+|---|---|---|
+| **Home** | The sample selfie, photo and sheet lying on the mat (the person's own once they have one). The wordmark "Calipic" and the ••• button over the mat | Title "Take it at home. Print it yourself." · row: flag, document name, size as a readout, chevron (opens Choose document; Photo requirements moves into that sheet and the ••• menu) · **Take Photo** · "Choose from Library" · the caption line (credits, version). With photos in progress, a row per person above the document row |
+| **Photo Check** | The framed photo, at least 45 % of the screen, with the measuring lines on request and the **Original** capsule | Verdict title with its mark · "Framed for …" · rows Measured and To check by eye · "Adjust" beside **Print** (or **Digital Photo** when that is the main output; the other output is in the ••• menu) |
+| **Your sheet** | The page, as today, with page dots and free slots | Title "Your sheet" · supporting line "8 copies · 1 page · room for 4 more" · row **Copies** with the count and the stepper; under it the text button "Fill the page" when there is room · row **Paper** with the chips · with two or more people, a row of their circles above Copies · **Continue**. Add a person, add a size, and cutting options live in the toolbar menu (the scissors become •••) |
+| **Print, locked** | The page (or the stack), large | Title "Your sheet is ready" · "8 copies on 10 × 15 cm paper" · the unlock sentence · **Unlock · 1 credit** · "Keep Editing" |
+| **Print, unlocked** | The same page | Title "Where will you print?" · two rows, **At Home** and **At a Shop**, each with its symbol, one secondary line, and a check on the chosen one · once chosen, the numbered steps as rows and "Check Your Print" as the last row · **Print** or **Share Print Image** · "More Formats" in the ••• menu |
+| **Digital Photo** | The photo, at least 45 % | Locked: as Print, locked. Ready: title "Your digital photo is ready" with the pass mark · "Sized for online forms" · **Share Photo** · "Done" |
+| **Finished** | The page with the cut order drawn on it | The seal and title "Your photos are the right size" (left-aligned, the seal before the title) · the cut steps as rows · **Done** |
+| **Welcome, You're all set** | Welcome: the selfie becoming the photo. All set: the printed page | The same content as today, in the tray, under the rules above |
+| **Check your print** (sheet) | — | The 50 mm line drawn large in the upper half, with its readout; the question as a left-aligned title; **Yes, Same Size** and the text button "No" |
+
+### 9.8 Dark, large text, motion, the guide
+
+- **Dark:** the mat is `#0E2C2E`, the tray is the elevated system background, paper stays at 94 % white. Since the mat fills the screen, pure black no longer appears on a journey screen.
+- **Large text:** the tray scrolls inside its 55 % limit. At accessibility sizes the limit rises to 75 % and the stage shrinks; the object stays visible. The 1.0 baseline (ADR-050) still applies; no extra tuning.
+- **Motion:** the tray changes height with `Motion.rearrange`; its content cross-fades when the state changes (locked to unlocked, choosing where to print). The photo keeps its zoom transitions between screens (U4), now from stage to stage. Reduce Motion: no movement, the change still happens.
+- **The guide:** the yellow bubbles stay anchored to their controls and never cover the tray's actions unless they point at one (0.20.19 behaviour, unchanged).
+
+### 9.9 How it is built
+
+New pieces, all in `App/Brand` or `App/Features/Journey`: `JourneyScreen`, `TrayRow` (name, optional secondary line, trailing value, chevron or control), `TrayActions` (primary, optional text button, optional leading peer), `StatusMark`, `Radius.tray`, `Typography.trayTitle`. `Surface.card` and `Surface.stage` leave the journey screens.
+
+Build order, one screen per pass, each on the founder's iPhone before the next:
+
+1. The components, then **Photo Check**.
+2. **Print** (locked and unlocked) and **Digital Photo**.
+3. **Home**, the welcome page, "You're all set".
+4. **Your sheet**.
+5. **Finished** and the sheets (Check your print, then type and button rules in the rest).
+6. Review of the built screens against this section (Fable 5.2), then fixes.
+
+A pass is done when, in screenshots in Light and Dark, English, Spanish and Portuguese: the screen has one filled button; no text below the Secondary role except Home's caption line; nothing is centred that §9.3 does not centre; no rounded box sits inside the tray; the object fills the stage; and the UI tests pass with their identifiers unchanged.
