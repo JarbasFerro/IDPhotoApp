@@ -404,6 +404,9 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showAppIcons = false
     @State private var showCredits = false
+    @State private var language = AppLanguage.stored()
+    /// What was stored when the app started: a different choice applies the next time it opens.
+    @State private var launchLanguage = AppLanguage.stored()
     @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = Design.Size.settingsIcon
 
     var body: some View {
@@ -446,6 +449,26 @@ struct SettingsView: View {
                     .accessibilityElement(children: .combine)
                     .accessibilityAddTraits(.isButton)
                     .accessibilityIdentifier("settingsCredits")
+                }
+                Section {
+                    Picker(selection: $language) {
+                        Text("Same as iPhone").tag(AppLanguage.automatic)
+                        ForEach(AppLanguage.choices) { choice in
+                            Text(verbatim: choice.nativeName).tag(choice)
+                        }
+                    } label: {
+                        Label("Language", systemImage: "globe")
+                    }
+                    .pickerStyle(.menu)
+                    .accessibilityIdentifier("languagePicker")
+                    .onChange(of: language) { _, new in AppLanguage.store(new) }
+                } footer: {
+                    if language != launchLanguage {
+                        Text("Calipic changes language the next time it opens. Close it from the app switcher, then open it again.")
+                            .accessibilityIdentifier("languageRestartNote")
+                    } else {
+                        Text("Choose a language for Calipic, or use your iPhone's.")
+                    }
                 }
                 // Developer details only: walk the first-photo guide again on a device that already finished it.
                 if developerMode, let tutorial {

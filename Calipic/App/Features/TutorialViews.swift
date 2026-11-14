@@ -12,13 +12,13 @@ enum TutorialCopy {
         case .document: "Your photo is sized for this document. Tap it to choose another."
         case .takePhoto: "Stand facing a window, against a plain light wall. Then tap Take Photo."
         case .resume: "Your first photo is waiting. Tap Continue."
-        case .checkResult: "We framed your photo and checked it. Anything marked is worth a look."
+        case .checkResult: "Framed and checked. Look at anything marked."
         case .output: output == .print ? "Looks good? Tap Print. Retakes and fixes are free."
                                        : "Looks good? Tap here to continue. Retakes and fixes are free."
         case .paper: "Choose the paper you'll print on."
         case .copies: "Choose how many copies, or fill the free space on the page."
         case .continueSheet: "All set? Tap Continue."
-        case .unlock: "Your free credit unlocks this first photo."
+        case .unlock: "This is your one free photo. Unlocking it uses your free credit."
         case .route: "Choose where you'll print."
         case .printHome: "Load photo paper in your printer, then tap Print."
         case .share: output == .print ? "Send the image to your print shop."
@@ -47,19 +47,33 @@ enum GuideStyle {
 
 // MARK: - Anchors
 
-/// Where each guided control is on screen, collected for the screen's guide overlay.
+/// Where each guided control is on screen, and where the bottom controls start (a bubble placed below its control
+/// must not cover them), collected for the screen's guide overlay.
+struct GuideAnchors {
+    var tips: [GuideTip: Anchor<CGRect>] = [:]
+    var avoid: Anchor<CGRect>?
+}
+
 struct GuideAnchorKey: PreferenceKey {
-    static let defaultValue: [GuideTip: Anchor<CGRect>] = [:]
-    static func reduce(value: inout [GuideTip: Anchor<CGRect>], nextValue: () -> [GuideTip: Anchor<CGRect>]) {
-        value.merge(nextValue()) { $1 }
+    static let defaultValue = GuideAnchors()
+    static func reduce(value: inout GuideAnchors, nextValue: () -> GuideAnchors) {
+        let next = nextValue()
+        value.tips.merge(next.tips) { $1 }
+        value.avoid = next.avoid ?? value.avoid
     }
 }
 
 extension View {
+    /// Marks the screen's bottom controls: a guide bubble never sits on them unless it points at one.
+    func guideAvoid() -> some View {
+        // Merged, not set: the controls inside the bar carry their own anchors.
+        transformAnchorPreference(key: GuideAnchorKey.self, value: .bounds) { $0.avoid = $1 }
+    }
+
     /// Marks the control `tip` points at, and outlines it while that tip is shown.
     func guideTarget(_ tip: GuideTip, current: GuideTip?, cornerRadius: CGFloat = 100, ring: Bool = true) -> some View {
         coachTarget(ring && current == tip, cornerRadius: cornerRadius)
-            .anchorPreference(key: GuideAnchorKey.self, value: .bounds) { [tip: $0] }
+            .transformAnchorPreference(key: GuideAnchorKey.self, value: .bounds) { $0.tips[tip] = $1 }
     }
 
     /// Draws the current tip's bubble over the screen, next to its control, without moving anything (founder,
@@ -67,8 +81,9 @@ extension View {
     func guideOverlay(_ coach: TutorialCoach, current: GuideTip?, output: Output) -> some View {
         overlayPreferenceValue(GuideAnchorKey.self) { anchors in
             GeometryReader { proxy in
-                if let current, let anchor = anchors[current] {
-                    GuideCallout(tip: current, output: output, target: proxy[anchor], area: proxy.size) {
+                if let current, let anchor = anchors.tips[current] {
+                    GuideCallout(tip: current, output: output, target: proxy[anchor], area: proxy.size,
+                                 floor: anchors.avoid.map { proxy[$0].minY }) {
                         coach.pass(current)
                     }
                 }
@@ -86,22 +101,29 @@ private struct GuideCallout: View {
     let output: Output
     let target: CGRect
     let area: CGSize
+    /// Where the bottom controls start, when the screen marked them.
+    var floor: CGFloat?
     let next: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown = false
+    /// Measured, so a bubble goes below its control only when it fits there whole (longer languages wrap more).
+    @State private var height: CGFloat = 72
 
     private static let margin: CGFloat = 16
     private static let gap: CGFloat = 8
 
     var body: some View {
-        let roomBelow = area.height - target.maxY
-        let above = tip.prefersBelow && roomBelow > 96 ? false : target.minY > roomBelow
+        let bottom = floor.map { $0 > target.maxY ? $0 : area.height } ?? area.height
+        let roomBelow = bottom - target.maxY
+        let fitsBelow = roomBelow >= height + Self.gap
+        let above = tip.prefersBelow && fitsBelow ? false : target.minY > roomBelow
         let progress = TutorialFlow.progress(of: tip.step, output: output)
         let text = TutorialCopy.text(tip, output: output)
         let tailX = min(max(target.midX - Self.margin, 28), area.width - 2 * Self.margin - 28)
         GuideBubble(position: progress.position, count: progress.count, hint: Text(text), up: !above,
                     tailX: tailX, bounce: reduceMotion ? "" : tip.rawValue,
                     next: tip.isExplanation ? { withAnimation(reduceMotion ? nil : .smooth) { next() } } : nil)
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height = $0 }
             .allowsHitTesting(tip.isExplanation)
             .padding(.horizontal, Self.margin)
             .padding(above ? .bottom : .top, above ? area.height - target.minY + Self.gap : target.maxY + Self.gap)
@@ -266,13 +288,14 @@ struct TutorialWelcomeView: View {
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
                 }
+                // The free photo first, where it is seen without scrolling (founder, 2026-11-14).
+                creditNote
+                guidePreview
                 VStack(alignment: .leading, spacing: Design.Spacing.group) {
                     row("camera", "Take your photo", "Against a plain wall, with the camera guiding you.")
                     row("checkmark.seal", "We frame and check it", "Sized for your document, with anything to fix pointed out.")
                     row("printer", "Print it", "At home on photo paper, or at any print shop.")
                 }
-                guidePreview
-                creditNote
             }
             .padding(.horizontal)
             .padding(.top, Design.Spacing.block)
@@ -360,7 +383,7 @@ struct TutorialWelcomeView: View {
                 .foregroundStyle(Color.brandAccent)
                 .frame(width: 36, height: 36)
                 .accessibilityHidden(true)
-            Text("Your first photo is free, and you can print it again at no cost.")
+            Text("The guide gives you one free photo: this first one. You can print it again at no cost. After that, each photo uses one credit.")
                 .font(Design.Typography.cardDetail)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
@@ -409,7 +432,7 @@ struct TutorialDoneView: View {
                 if creditsLeft > 0 {
                     tip("creditcard", "^[\(creditsLeft) credit](inflect: true) left", "Each credit unlocks one person's photo, for every print and digital copy.")
                 } else {
-                    tip("creditcard", "Prints of this photo stay free", "A new person's photo uses one credit, for every print and digital copy.")
+                    tip("creditcard", "Your free photo is used", "Prints of this photo stay free. A new photo uses one credit, for every print and digital copy.")
                 }
                 tip("photo", "Need it for an online form?", "The digital photo is included: tap Digital Photo on Photo Check.")
             }

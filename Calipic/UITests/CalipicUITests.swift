@@ -57,7 +57,9 @@ final class CalipicUITests: XCTestCase {
     /// The guide line, found by what it says.
     @MainActor
     private func coach(_ app: XCUIApplication, _ text: String) -> XCUIElement {
-        app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
+        // In another language (screenshot runs with -testLanguage), any guide bubble will do.
+        guard Locale.preferredLanguages.first?.hasPrefix("en") ?? true else { return any(app, "coachLine") }
+        return app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
     }
 
     /// First-run tutorial (ADR-052): the welcome page, then the coach on Home for the document and the photo.
@@ -86,7 +88,7 @@ final class CalipicUITests: XCTestCase {
         XCTAssertTrue(any(app, "tutorialWelcome").waitForExistence(timeout: 10))
         app.buttons["tutorialStart"].tap()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
-        XCTAssertTrue(coach(app, "We framed your photo").waitForExistence(timeout: 10))
+        XCTAssertTrue(coach(app, "Framed and checked").waitForExistence(timeout: 10))
         sleep(2)
         attachBothAppearances(app, "Tutorial, check result")
         app.buttons["guideNext"].tap()
@@ -109,7 +111,7 @@ final class CalipicUITests: XCTestCase {
         sleep(1)
         attachBothAppearances(app, "Tutorial, continue")
         app.buttons["continueToShare"].tap()
-        XCTAssertTrue(coach(app, "free credit unlocks").waitForExistence(timeout: 10))
+        XCTAssertTrue(coach(app, "one free photo").waitForExistence(timeout: 10))
         attachBothAppearances(app, "Tutorial, unlock")
         app.buttons["unlockAndPrint"].tap()
         XCTAssertTrue(coach(app, "Choose where").waitForExistence(timeout: 10))
@@ -337,6 +339,18 @@ final class CalipicUITests: XCTestCase {
         screenshot.name = "AppIconPicker-\(name)"
         screenshot.lifetime = .keepAlways
         add(screenshot)
+    }
+
+    /// Settings has a language menu: the iPhone's language or one of the app's three.
+    @MainActor
+    func testSettingsLanguageMenu() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fresh"]
+        app.launch()
+        XCTAssertTrue(app.buttons["choosePhoto"].waitForExistence(timeout: 10))
+        app.buttons["settingsButton"].tap()
+        XCTAssertTrue(any(app, "languagePicker").waitForExistence(timeout: 5))
+        attachBothAppearances(app, "Settings, language")
     }
 
     /// Opens Settings from Home, taps "App Icon", and returns the icon buttons of the sheet.

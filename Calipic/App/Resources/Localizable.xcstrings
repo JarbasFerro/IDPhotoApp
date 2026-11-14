@@ -84,22 +84,6 @@
         }
       }
     },
-    "A new person's photo uses one credit, for every print and digital copy." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La foto de otra persona usa un crédito, para todas sus impresiones y copias digitales."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A foto de outra pessoa usa um crédito, para todas as impressões e cópias digitais."
-          }
-        }
-      }
-    },
     "A selfie becomes an ID photo" : {
       "localizations" : {
         "es" : {
@@ -164,6 +148,54 @@
         }
       }
     },
+    "Auto: Off" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto: no"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto: não"
+          }
+        }
+      }
+    },
+    "Auto: On" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto: sí"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto: sim"
+          }
+        }
+      }
+    },
+    "Calipic changes language the next time it opens. Close it from the app switcher, then open it again." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calipic cambiará de idioma la próxima vez que se abra. Ciérrala desde el selector de apps y vuelve a abrirla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O Calipic muda de idioma na próxima vez que abrir. Feche-o no seletor de apps e abra de novo."
+          }
+        }
+      }
+    },
     "Check the size" : {
       "localizations" : {
         "es" : {
@@ -176,6 +208,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confira o tamanho"
+          }
+        }
+      }
+    },
+    "Choose a language for Calipic, or use your iPhone's." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige un idioma para Calipic, o usa el de tu iPhone."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha um idioma para o Calipic, ou use o do seu iPhone."
           }
         }
       }
@@ -276,6 +324,22 @@
         }
       }
     },
+    "Framed and checked. Look at anything marked." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuadrada y revisada. Mira lo que esté marcado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadrada e verificada. Veja o que estiver marcado."
+          }
+        }
+      }
+    },
     "Guide · %lld of %lld" : {
       "localizations" : {
         "es" : {
@@ -319,7 +383,23 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aparece acima do próximo botão a tocar e some depois da sua primeira foto."
+            "value" : "Fica acima do próximo botão a tocar e some depois da sua primeira foto."
+          }
+        }
+      }
+    },
+    "Language" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma"
           }
         }
       }
@@ -420,6 +500,38 @@
         }
       }
     },
+    "Off" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desativada"
+          }
+        }
+      }
+    },
+    "On" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ativada"
+          }
+        }
+      }
+    },
     "Print it" : {
       "localizations" : {
         "es" : {
@@ -436,18 +548,18 @@
         }
       }
     },
-    "Prints of this photo stay free" : {
+    "Prints of this photo stay free. A new photo uses one credit, for every print and digital copy." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imprimir esta foto sigue siendo gratis"
+            "value" : "Imprimir esta foto sigue siendo gratis. Una foto nueva usa un crédito, para todas sus impresiones y copias digitales."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imprimir esta foto continua grátis"
+            "value" : "Imprimir esta foto continua grátis. Uma foto nova usa um crédito, para todas as impressões e cópias digitais."
           }
         }
       }
@@ -464,6 +576,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reiniciar o guia da primeira foto"
+          }
+        }
+      }
+    },
+    "Same as iPhone" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Igual que el iPhone"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Igual ao iPhone"
           }
         }
       }
@@ -580,6 +708,38 @@
         }
       }
     },
+    "The guide gives you one free photo: this first one. You can print it again at no cost. After that, each photo uses one credit." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La guía te regala una foto: esta primera. Puedes volver a imprimirla sin coste. Después, cada foto usa un crédito."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O guia dá a você uma foto grátis: esta primeira. Você pode imprimi-la de novo sem custo. Depois, cada foto usa um crédito."
+          }
+        }
+      }
+    },
+    "This is your one free photo. Unlocking it uses your free credit." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es tu foto gratis. Desbloquearla usa tu crédito gratis."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta é sua foto grátis. Desbloqueá-la usa seu crédito grátis."
+          }
+        }
+      }
+    },
     "This one time, a guide walks you through each step, from the photo to the print. It takes a few minutes." : {
       "localizations" : {
         "es" : {
@@ -612,18 +772,18 @@
         }
       }
     },
-    "We framed your photo and checked it. Anything marked is worth a look." : {
+    "When camera checks settle, a three-second countdown starts." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hemos encuadrado y revisado tu foto. Conviene mirar lo que esté marcado."
+            "value" : "Cuando las comprobaciones de la cámara se estabilizan, empieza una cuenta atrás de tres segundos."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enquadramos e verificamos sua foto. Vale a pena olhar o que estiver marcado."
+            "value" : "Quando as verificações da câmera se estabilizam, começa uma contagem regressiva de três segundos."
           }
         }
       }
@@ -676,22 +836,6 @@
         }
       }
     },
-    "Your first photo is free, and you can print it again at no cost." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu primera foto es gratis, y puedes volver a imprimirla sin coste."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sua primeira foto é grátis, e você pode imprimi-la de novo sem custo."
-          }
-        }
-      }
-    },
     "Your first photo is waiting. Tap Continue." : {
       "localizations" : {
         "es" : {
@@ -708,18 +852,18 @@
         }
       }
     },
-    "Your free credit unlocks this first photo." : {
+    "Your free photo is used" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu crédito gratis desbloquea esta primera foto."
+            "value" : "Has usado tu foto gratis"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seu crédito grátis desbloqueia esta primeira foto."
+            "value" : "Você usou sua foto grátis"
           }
         }
       }
@@ -2970,7 +3114,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível conferir. Veja se ele é liso e claro."
+            "value" : "Não deu para conferir. Veja se o fundo é liso e claro."
           }
         }
       }
@@ -4262,7 +4406,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mantén la cara dentro del óvalo, sin auriculares"
+            "value" : "Mantén la cara en el óvalo, sin auriculares"
           }
         },
         "pt-BR" : {
@@ -4595,13 +4739,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mezclar tamaños"
+            "value" : "Mezclar"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Misturar tamanhos"
+            "value" : "Misturar"
           }
         }
       }
@@ -6368,7 +6512,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tirar outra"
+            "value" : "Refazer"
           }
         }
       }
@@ -6571,13 +6715,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Espacio para %lld más"
+            "value" : "Caben %lld más"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Espaço para mais %lld"
+            "value" : "Cabem mais %lld"
           }
         }
       }
@@ -6879,13 +7023,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hacer una foto en su lugar"
+            "value" : "Hacer una foto"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tirar foto em vez disso"
+            "value" : "Tirar uma foto"
           }
         }
       }
@@ -9979,7 +10123,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mais aberto"
+            "value" : "Mais longe"
           }
         }
       }
@@ -10011,7 +10155,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mais próximo"
+            "value" : "Mais perto"
           }
         }
       }
@@ -10283,7 +10427,7 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "^[%lld coisa](inflect: true) para conferir a olho nu"
+            "value" : "^[%lld coisa](inflect: true) para você conferir"
           }
         }
       }
@@ -10645,13 +10789,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elige Tamaño real, o 100 %"
+            "value" : "Elige Tamaño real, o 100 %"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escolha Tamanho real, ou 100 %"
+            "value" : "Escolha Tamanho real, ou 100 %"
           }
         }
       }
@@ -10901,7 +11045,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nunca Ajustar a la página ni Sin bordes"
+            "value" : "No uses Ajustar a la página ni Sin bordes"
           }
         },
         "pt-BR" : {
@@ -10949,13 +11093,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir todas las fotos digitales"
+            "value" : "Compartir fotos digitales"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartilhar todas as fotos digitais"
+            "value" : "Compartilhar fotos digitais"
           }
         }
       }
@@ -10997,13 +11141,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir documento para imprimir"
+            "value" : "Compartir documento"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartilhar documento para impressão"
+            "value" : "Compartilhar documento"
           }
         }
       }
@@ -11013,13 +11157,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir imagen para imprimir"
+            "value" : "Compartir imagen"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartilhar imagem para impressão"
+            "value" : "Compartilhar imagem"
           }
         }
       }
@@ -11029,13 +11173,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir imágenes para imprimir"
+            "value" : "Compartir imágenes"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartilhar imagens para impressão"
+            "value" : "Compartilhar imagens"
           }
         }
       }
@@ -11765,13 +11909,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En las opciones de impresión, elige Tamaño real o 100 %, y desactiva Ajustar a la página."
+            "value" : "En las opciones de impresión, elige Tamaño real o 100 %, y desactiva Ajustar a la página."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nas opções de impressão, escolha Tamanho real ou 100 %, e desative Ajustar à página."
+            "value" : "Nas opções de impressão, escolha Tamanho real ou 100 %, e desative Ajustar à página."
           }
         }
       }
@@ -11797,13 +11941,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elige Tamaño real o 100 %, desactiva Ajustar a la página y Sin bordes, y elige el tamaño de papel que has cargado."
+            "value" : "Elige Tamaño real o 100 %, desactiva Ajustar a la página y Sin bordes, y elige el tamaño de papel que has cargado."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escolha Tamanho real ou 100 %, desative Ajustar à página e Sem bordas, e escolha o tamanho do papel que você colocou."
+            "value" : "Escolha Tamanho real ou 100 %, desative Ajustar à página e Sem bordas, e escolha o tamanho do papel que você colocou."
           }
         }
       }

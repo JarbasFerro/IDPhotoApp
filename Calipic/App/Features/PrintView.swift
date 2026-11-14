@@ -56,6 +56,7 @@ struct PrintView: View {
                 // A raised tray, as on Your sheet, so it reads as a panel over the steps rather than more of the page
                 // (founder, 0.20 review: the unlock card blended into the screen).
                 actions
+                    .guideAvoid()
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
                     .padding(.bottom, Design.Spacing.caption)

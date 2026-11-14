@@ -53,6 +53,7 @@ struct PhotoCheckView: View {
                             .padding(.top, 10)
                             .padding(.bottom, 6)
                             .background(Design.Surface.screen)
+                            .guideAvoid()
                     }
                 }
             } else {

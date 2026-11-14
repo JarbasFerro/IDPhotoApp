@@ -88,7 +88,8 @@ Specified in [03-design.md §7](03-design.md).
 | U14 | Designed unhappy paths | S–M | 0.23 |
 | U15 | Screenshot gallery per release | S | 0.18 |
 | U16 | Final icon with dark, tinted, and layered variants; App Store screenshots | M | 0.40 |
-| U17 | First-photo guide: welcome, coached real flow to the print, two free credits (ADR-052) | M | **done in 0.20.14**; guide line at the action, four phases, in 0.20.15; guide bubble, clearer welcome, one starting credit in 0.20.16; guide in highlighter yellow in 0.20.17; anchored bubbles, several per screen, in 0.20.18 |
+| U17 | First-photo guide: welcome, coached real flow to the print, two free credits (ADR-052) | M | **done in 0.20.14**; guide line at the action, four phases, in 0.20.15; guide bubble, clearer welcome, one starting credit in 0.20.16; guide in highlighter yellow in 0.20.17; anchored bubbles, several per screen, in 0.20.18; one free photo said up front, bubbles kept off the bottom controls, in 0.20.19 |
+| U18 | Language menu in Settings (ADR-053); Spanish and Portuguese checked on screen for fit | S | **done in 0.20.19** |
 
 ### P — Performance and feel
 

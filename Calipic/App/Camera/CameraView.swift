@@ -54,10 +54,10 @@ struct CameraView: View {
     @State private var errorMessage: String?
     @State private var flash = false
     @State private var countdown: Int?
-    /// New key on purpose: devices that ran 0.8 to 0.10.1 have the old key stored as true.
-    /// On by default since 0.20.7 (ADR-044 note): the photo is taken after a visible three-second countdown once the
-    /// checks settle. A new key, so an earlier "off" from when it was opt-in does not carry over.
-    @AppStorage("autoCaptureDefaultOn") private var autoCapture = true
+    /// Off by default again since 0.20.19 (founder, 2026-11-14), with its own button beside the shutter: when on, the
+    /// photo is taken after a visible three-second countdown once the checks settle. A new key, so the "on" that
+    /// 0.20.7 to 0.20.18 stored as the default does not carry over.
+    @AppStorage("autoCaptureOptIn") private var autoCapture = false
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
     @State private var showCameraHelp = false
@@ -288,6 +288,37 @@ struct CameraView: View {
         .frame(maxWidth: .infinity)
     }
 
+    /// Automatic capture, on or off, in the free place left of the shutter. On is a filled white circle, off a glass
+    /// one, and the word under it says which, so the state is never colour alone.
+    private var autoCaptureToggle: some View {
+        Button {
+            autoCapture.toggle()
+        } label: {
+            Image(systemName: "timer")
+                .font(.title2)
+                .foregroundStyle(autoCapture ? Color.black : Color.white)
+                .frame(width: 52, height: 52)
+                .background(autoCapture ? Color.white : Color.clear, in: Circle())
+                .glassEffect(autoCapture ? .identity : .regular.interactive(), in: Circle())
+        }
+        .buttonStyle(.plain)
+        .overlay(alignment: .bottom) {
+            Text(autoCapture ? "Auto: On" : "Auto: Off")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.white)
+                .fixedSize()
+                .shadow(color: .black.opacity(0.6), radius: 2)
+                .offset(y: 18)
+                .accessibilityHidden(true)
+        }
+        .sensoryFeedback(.selection, trigger: autoCapture)
+        .accessibilityLabel(Text("Automatic capture"))
+        .accessibilityValue(Text(autoCapture ? "On" : "Off"))
+        .accessibilityHint(Text("When camera checks settle, a three-second countdown starts."))
+        .accessibilityAddTraits(.isToggle)
+        .accessibilityIdentifier("autoCaptureToggle")
+    }
+
     private var overlayControls: some View {
         VStack(spacing: 0) {
             HStack {
@@ -324,7 +355,7 @@ struct CameraView: View {
             VStack(spacing: Design.Spacing.control) {
 
                 HStack {
-                    Color.clear.frame(width: 52, height: 52)
+                    autoCaptureToggle
                     Spacer()
                     Button(action: takePhoto) { shutter }
                         .disabled(camera.state != .running || preparingReview || camera.isCapturing)
