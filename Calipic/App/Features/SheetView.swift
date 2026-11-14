@@ -58,6 +58,10 @@ struct SheetView: View {
             }
         }
         .background(Design.Surface.screen)
+        .guideOverlay(model.tutorial, current: guideTip, output: .print)
+        // Using the control counts as reading its tip.
+        .onChange(of: model.printJob.paper.id) { model.tutorial.pass(.paper) }
+        .onChange(of: copiesTick) { model.tutorial.pass(.copies) }
         .navigationTitle("Your sheet")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -139,23 +143,24 @@ struct SheetView: View {
                         .labelsHidden()
                         .accessibilityValue(Text("^[\(copies.wrappedValue) copy](inflect: true)"))
                         .sensoryFeedback(.selection, trigger: copiesTick)
+                        .guideTarget(.copies, current: guideTip)
                         .accessibilityIdentifier("copiesStepper")
                 }
             }
             paperChips
                 .sensoryFeedback(.selection, trigger: model.printJob.paper.id)
+                .guideTarget(.paper, current: guideTip, cornerRadius: 24)
             if !layout.isComplete {
                 StatusLabel(text: "\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.", state: .warn)
                     .font(.subheadline)
             }
-            if model.tutorial.isActive { CoachLine(step: .sheet, output: .print).padding(.top, Design.Spacing.tight) }
             Button { path.append(.share) } label: {
                 Text("Continue").frame(maxWidth: .infinity)
             }
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(layout.pages.isEmpty || model.activity != nil)
-            .coachTarget(model.tutorial.isActive)
+            .guideTarget(.continueSheet, current: guideTip)
             .accessibilityIdentifier("continueToShare")
         }
     }
@@ -829,4 +834,9 @@ struct SheetPageView: View {
             }
         }
     }
+}
+
+extension SheetView {
+    /// The guide on Your sheet (ADR-052): the paper, the copies, then Continue.
+    fileprivate var guideTip: GuideTip? { model.tutorial.current([.paper, .copies, .continueSheet]) }
 }

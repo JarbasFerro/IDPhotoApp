@@ -132,6 +132,22 @@
         }
       }
     },
+    "All set? Tap Continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Todo listo? Toca Continuar."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tudo pronto? Toque em Continuar."
+          }
+        }
+      }
+    },
     "At home on photo paper, or at any print shop." : {
       "localizations" : {
         "es" : {
@@ -148,22 +164,6 @@
         }
       }
     },
-    "Check the document above, then take your photo." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa el documento de arriba y haz tu foto."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confira o documento acima e tire sua foto."
-          }
-        }
-      }
-    },
     "Check the size" : {
       "localizations" : {
         "es" : {
@@ -176,6 +176,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confira o tamanho"
+          }
+        }
+      }
+    },
+    "Choose how many copies, or fill the free space on the page." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige cuántas copias, o llena el espacio libre de la página."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha quantas cópias, ou preencha o espaço livre da página."
+          }
+        }
+      }
+    },
+    "Choose the paper you'll print on." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el papel en el que imprimirás."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha o papel em que vai imprimir."
           }
         }
       }
@@ -324,18 +356,18 @@
         }
       }
     },
-    "Looks good? Continue. Retakes and fixes are free." : {
+    "Looks good? Tap here to continue. Retakes and fixes are free." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Se ve bien? Continúa. Repetir y ajustar es gratis."
+            "value" : "¿Se ve bien? Toca aquí para continuar. Repetir y ajustar es gratis."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ficou bom? Continue. Refazer e ajustar é grátis."
+            "value" : "Ficou bom? Toque aqui para continuar. Refazer e ajustar é grátis."
           }
         }
       }
@@ -384,22 +416,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Precisa para um formulário online?"
-          }
-        }
-      }
-    },
-    "Pick the paper and copies, then tap Continue." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige el papel y las copias, y toca Continuar."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha o papel e as cópias, depois toque em Continuar."
           }
         }
       }
@@ -500,6 +516,22 @@
         }
       }
     },
+    "Stand facing a window, against a plain light wall. Then tap Take Photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponte frente a una ventana, delante de una pared lisa y clara. Luego toca Hacer foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fique de frente para uma janela, diante de uma parede lisa e clara. Depois toque em Tirar foto."
+          }
+        }
+      }
+    },
     "Start" : {
       "localizations" : {
         "es" : {
@@ -580,6 +612,22 @@
         }
       }
     },
+    "We framed your photo and checked it. Anything marked is worth a look." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hemos encuadrado y revisado tu foto. Conviene mirar lo que esté marcado."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enquadramos e verificamos sua foto. Vale a pena olhar o que estiver marcado."
+          }
+        }
+      }
+    },
     "You're all set" : {
       "localizations" : {
         "es" : {
@@ -644,18 +692,18 @@
         }
       }
     },
-    "Your first photo is waiting where you left it." : {
+    "Your first photo is waiting. Tap Continue." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu primera foto te espera donde la dejaste."
+            "value" : "Tu primera foto te espera. Toca Continuar."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sua primeira foto está esperando onde você parou."
+            "value" : "Sua primeira foto está esperando. Toque em Continuar."
           }
         }
       }
@@ -672,6 +720,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seu crédito grátis desbloqueia esta primeira foto."
+          }
+        }
+      }
+    },
+    "Your photo is sized for this document. Tap it to choose another." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu foto se ajusta a este documento. Tócalo para elegir otro."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua foto é dimensionada para este documento. Toque nele para escolher outro."
           }
         }
       }

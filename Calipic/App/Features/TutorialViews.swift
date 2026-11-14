@@ -5,29 +5,25 @@ import SwiftUI
 
 // MARK: - Copy
 
-/// What the guide says on each step: one short instruction. Kept beside the views: it is presentation, not rules.
+/// What the guide says in each bubble: one short sentence. Kept beside the views: it is presentation, not rules.
 enum TutorialCopy {
-    static func hint(_ step: TutorialStep, output: Output, hasPhoto: Bool, route: PrintCheckView.PrintRoute?) -> LocalizedStringResource {
-        switch step {
-        case .photo: hasPhoto ? "Your first photo is waiting where you left it."
-                              : "Check the document above, then take your photo."
-        case .check: output == .print ? "Looks good? Tap Print. Retakes and fixes are free."
-                                      : "Looks good? Continue. Retakes and fixes are free."
-        case .sheet: "Pick the paper and copies, then tap Continue."
+    static func text(_ tip: GuideTip, output: Output) -> LocalizedStringResource {
+        switch tip {
+        case .document: "Your photo is sized for this document. Tap it to choose another."
+        case .takePhoto: "Stand facing a window, against a plain light wall. Then tap Take Photo."
+        case .resume: "Your first photo is waiting. Tap Continue."
+        case .checkResult: "We framed your photo and checked it. Anything marked is worth a look."
+        case .output: output == .print ? "Looks good? Tap Print. Retakes and fixes are free."
+                                       : "Looks good? Tap here to continue. Retakes and fixes are free."
+        case .paper: "Choose the paper you'll print on."
+        case .copies: "Choose how many copies, or fill the free space on the page."
+        case .continueSheet: "All set? Tap Continue."
         case .unlock: "Your free credit unlocks this first photo."
-        case .finish:
-            switch (output, route) {
-            case (.digital, _): "Share it, or save it to Files for your online form."
-            case (_, .home?): "Load photo paper in your printer, then tap Print."
-            case (_, .shop?): "Send the image to your print shop."
-            case (_, nil): "Choose where you'll print."
-            }
+        case .route: "Choose where you'll print."
+        case .printHome: "Load photo paper in your printer, then tap Print."
+        case .share: output == .print ? "Send the image to your print shop."
+                                      : "Share it, or save it to Files for your online form."
         }
-    }
-
-    /// The control the hint is about is above it, in the content, rather than the button right below.
-    static func pointsUp(_ step: TutorialStep, output: Output, route: PrintCheckView.PrintRoute?) -> Bool {
-        step == .finish && output == .print && route == nil
     }
 }
 
@@ -49,36 +45,77 @@ enum GuideStyle {
     static let ink = Color(red: 0.11, green: 0.11, blue: 0.118)   // #1C1C1E
 }
 
-// MARK: - Guide bubble
+// MARK: - Anchors
 
-/// The guide: a filled speech bubble right above the control to use, its tail pointing at it (founder, 0.20.15: a
-/// plain line was easy to pass without noticing, and it should read as a temporary layer, not part of the app). The
-/// highlighter yellow sets it apart from the teal buttons it points at; it pops in at each new step.
-struct CoachLine: View {
-    let step: TutorialStep
+/// Where each guided control is on screen, collected for the screen's guide overlay.
+struct GuideAnchorKey: PreferenceKey {
+    static let defaultValue: [GuideTip: Anchor<CGRect>] = [:]
+    static func reduce(value: inout [GuideTip: Anchor<CGRect>], nextValue: () -> [GuideTip: Anchor<CGRect>]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
+
+extension View {
+    /// Marks the control `tip` points at, and outlines it while that tip is shown.
+    func guideTarget(_ tip: GuideTip, current: GuideTip?, cornerRadius: CGFloat = 100, ring: Bool = true) -> some View {
+        coachTarget(ring && current == tip, cornerRadius: cornerRadius)
+            .anchorPreference(key: GuideAnchorKey.self, value: .bounds) { [tip: $0] }
+    }
+
+    /// Draws the current tip's bubble over the screen, next to its control, without moving anything (founder,
+    /// 2026-11-14: a line in the bottom bar made the bar taller and hid the screen behind it).
+    func guideOverlay(_ coach: TutorialCoach, current: GuideTip?, output: Output) -> some View {
+        overlayPreferenceValue(GuideAnchorKey.self) { anchors in
+            GeometryReader { proxy in
+                if let current, let anchor = anchors[current] {
+                    GuideCallout(tip: current, output: output, target: proxy[anchor], area: proxy.size) {
+                        coach.pass(current)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Callout
+
+/// One bubble placed above or below its control (where there is more room), its tail on the control's centre. An
+/// explanation carries Next; a bubble about a button lets taps through to it.
+private struct GuideCallout: View {
+    let tip: GuideTip
     let output: Output
-    var hasPhoto = true
-    var route: PrintCheckView.PrintRoute?
+    let target: CGRect
+    let area: CGSize
+    let next: () -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown = false
 
+    private static let margin: CGFloat = 16
+    private static let gap: CGFloat = 8
+
     var body: some View {
-        let progress = TutorialFlow.progress(of: step, output: output)
-        let hint = TutorialCopy.hint(step, output: output, hasPhoto: hasPhoto, route: route)
-        let up = TutorialCopy.pointsUp(step, output: output, route: route)
-        let key = "\(step)\(route.map { "\($0)" } ?? "")\(hasPhoto)"
-        GuideBubble(position: progress.position, count: progress.count, hint: Text(hint), up: up,
-                    bounce: reduceMotion ? "" : key)
-        .scaleEffect(shown || reduceMotion ? 1 : 0.9, anchor: up ? .top : .bottom)
-        .opacity(shown ? 1 : 0)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("coachLine")
-        .onChange(of: key, initial: true) {
-            shown = false
-            withAnimation(reduceMotion ? .easeOut(duration: 0.2) : .spring(duration: 0.45, bounce: 0.35).delay(0.15)) { shown = true }
-            // Each new instruction is read out without moving VoiceOver's focus.
-            AccessibilityNotification.Announcement(String(localized: hint)).post()
-        }
+        let roomBelow = area.height - target.maxY
+        let above = tip.prefersBelow && roomBelow > 96 ? false : target.minY > roomBelow
+        let progress = TutorialFlow.progress(of: tip.step, output: output)
+        let text = TutorialCopy.text(tip, output: output)
+        let tailX = min(max(target.midX - Self.margin, 28), area.width - 2 * Self.margin - 28)
+        GuideBubble(position: progress.position, count: progress.count, hint: Text(text), up: !above,
+                    tailX: tailX, bounce: reduceMotion ? "" : tip.rawValue,
+                    next: tip.isExplanation ? { withAnimation(reduceMotion ? nil : .smooth) { next() } } : nil)
+            .allowsHitTesting(tip.isExplanation)
+            .padding(.horizontal, Self.margin)
+            .padding(above ? .bottom : .top, above ? area.height - target.minY + Self.gap : target.maxY + Self.gap)
+            .frame(width: area.width, height: area.height, alignment: above ? .bottom : .top)
+            .scaleEffect(shown || reduceMotion ? 1 : 0.92, anchor: above ? .bottom : .top)
+            .opacity(shown ? 1 : 0)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("coachLine")
+            .onChange(of: tip, initial: true) {
+                shown = false
+                withAnimation(reduceMotion ? .easeOut(duration: 0.2) : .spring(duration: 0.45, bounce: 0.3).delay(0.2)) { shown = true }
+                // Each new instruction is read out without moving VoiceOver's focus.
+                AccessibilityNotification.Announcement(String(localized: text)).post()
+            }
     }
 }
 
@@ -88,11 +125,15 @@ struct GuideBubble: View {
     let count: Int
     let hint: Text
     let up: Bool
+    /// The tail's centre from the bubble's leading edge; nil centres it.
+    var tailX: CGFloat?
     var bounce = ""
+    /// Shown as Next when the bubble is an explanation.
+    var next: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 0) {
-            if up { GuideTail(up: true) }
+            if up { tail }
             VStack(alignment: .leading, spacing: Design.Spacing.tight) {
                 HStack(spacing: Design.Spacing.text) {
                     Image(systemName: up ? "hand.point.up.left.fill" : "hand.point.down.fill")
@@ -111,18 +152,40 @@ struct GuideBubble: View {
                 }
                 .font(Design.Typography.caption.weight(.semibold))
                 .foregroundStyle(GuideStyle.ink.opacity(0.8))
-                hint
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(GuideStyle.ink)
-                    .fixedSize(horizontal: false, vertical: true)
+                HStack(alignment: .lastTextBaseline, spacing: Design.Spacing.control) {
+                    hint
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(GuideStyle.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if let next {
+                        Button(action: next) {
+                            Text("Next")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(GuideStyle.fill)
+                                .padding(.horizontal, Design.Spacing.control)
+                                .padding(.vertical, Design.Spacing.tight)
+                                .background(GuideStyle.ink, in: Capsule())
+                                .contentShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("guideNext")
+                    }
+                }
             }
             .padding(.horizontal, Design.Spacing.control)
             .padding(.vertical, Design.Spacing.text)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(GuideStyle.fill, in: RoundedRectangle(cornerRadius: 16))
-            if !up { GuideTail(up: false) }
+            if !up { tail }
         }
         .shadow(color: Color.black.opacity(0.18), radius: 10, y: 4)
+    }
+
+    private var tail: some View {
+        GuideTail(up: up)
+            .frame(maxWidth: .infinity, alignment: tailX == nil ? .center : .leading)
+            .padding(.leading, tailX.map { max(0, $0 - 9) } ?? 0)
     }
 }
 

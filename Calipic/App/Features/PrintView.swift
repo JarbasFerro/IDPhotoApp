@@ -67,6 +67,7 @@ struct PrintView: View {
                     }
             }
         }
+        .guideOverlay(model.tutorial, current: guideTip, output: .print)
         .navigationTitle("Print")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -108,6 +109,17 @@ struct PrintView: View {
     // MARK: - Tutorial (ADR-052)
 
     private var coaching: Bool { model.tutorial.isActive }
+
+    /// The guide on Print (ADR-052): unlock, then where, then the button that sends it.
+    private var guideTip: GuideTip? {
+        guard coaching else { return nil }
+        if locked > 0 { return .unlock }
+        switch route {
+        case nil: return .route
+        case .home?: return .printHome
+        case .shop?: return .share
+        }
+    }
 
 
     /// The photo left the app inside the tutorial: it is over.
@@ -186,6 +198,7 @@ struct PrintView: View {
                     routeCard(.shop, title: "At a Shop", detail: "A print shop or kiosk", symbol: "storefront")
                 }
                 .fixedSize(horizontal: false, vertical: true) // both cards as tall as the taller one
+                .guideTarget(.route, current: guideTip, ring: false)
                 .padding(.bottom, Design.Spacing.text)
                 .id(Self.routeSectionID)
             }
@@ -348,22 +361,16 @@ struct PrintView: View {
 
     @ViewBuilder private var actions: some View {
         VStack(spacing: Design.Spacing.text) {
-            if coaching, locked == 0 {
-                CoachLine(step: .finish, output: .print, route: route)
-                    .padding(.bottom, Design.Spacing.tight)
-            }
             if locked > 0 {
                 UnlockCard(photos: locked, balance: model.credits.balance, inTray: !dynamicTypeSize.isAccessibilitySize)
                     .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.9, anchor: .bottom))))
                 if model.credits.canAfford(locked) {
-                    // Right above the button it is about, below the card that explains the unlock.
-                    if coaching { CoachLine(step: .unlock, output: .print).padding(.top, Design.Spacing.tight) }
                     Button { unlock() } label: {
                         Label("Unlock", systemImage: "lock.open").frame(maxWidth: .infinity)
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
-                    .coachTarget(coaching)
+                    .guideTarget(.unlock, current: guideTip)
                     .accessibilityIdentifier("unlockAndPrint")
                 } else {
                     Button { showCredits = true } label: { Text("Get Credits").frame(maxWidth: .infinity) }
@@ -390,7 +397,7 @@ struct PrintView: View {
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
-                    .coachTarget(coaching)
+                    .guideTarget(.printHome, current: guideTip)
                     .accessibilityIdentifier("printAtHome")
                 } else if let result = model.exported {
                     // Straight to the share sheet: AirDrop to a kiosk, a print app, or a message to the shop. The
@@ -404,7 +411,7 @@ struct PrintView: View {
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
-                    .coachTarget(coaching)
+                    .guideTarget(.share, current: guideTip)
                     .accessibilityIdentifier("sharePages")
                 } else {
                     // The files are still being made after unlocking.

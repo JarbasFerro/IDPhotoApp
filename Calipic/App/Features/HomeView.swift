@@ -66,6 +66,7 @@ struct HomeView: View {
                     .background(Design.Surface.screen)
             }
         }
+        .guideOverlay(model.tutorial, current: guideTip, output: model.document.primaryOutput)
         .navigationTitle(Text(verbatim: "Calipic"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -112,6 +113,13 @@ struct HomeView: View {
 
     /// The guided first photo: Home always coaches taking the photo, or picking up the one in progress.
     private var coaching: Bool { model.tutorial.isActive }
+
+    /// The document first (until it is confirmed), then the photo; with a photo in progress, Continue.
+    private var guideTip: GuideTip? {
+        guard coaching else { return nil }
+        if !model.entries.isEmpty { return model.tutorial.current([.resume]) }
+        return model.tutorial.current(model.tutorial.state.documentConfirmed ? [.takePhoto] : [.document, .takePhoto])
+    }
 
     // MARK: - Hero
 
@@ -290,6 +298,7 @@ struct HomeView: View {
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Chooses the country and document, or a custom size.")
+            .guideTarget(.document, current: guideTip, cornerRadius: Design.Radius.group)
             .accessibilityIdentifier("documentCard")
             Divider().padding(.leading)
             Button { showRequirements = true } label: {
@@ -314,10 +323,6 @@ struct HomeView: View {
 
     private var actions: some View {
         VStack(spacing: Design.Spacing.tight) {
-            if coaching {
-                CoachLine(step: .photo, output: model.document.primaryOutput, hasPhoto: !model.entries.isEmpty)
-                    .padding(.bottom, Design.Spacing.tight)
-            }
             if coaching, let first = model.entries.first {
                 // Back on Home with the first photo in progress: one way on, to its Photo Check.
                 Button { path = [.check(first.id)] } label: {
@@ -325,7 +330,7 @@ struct HomeView: View {
                 }
                 .brandProminentButtonStyle()
                 .controlSize(.large)
-                .coachTarget(true)
+                .guideTarget(.resume, current: guideTip)
                 .accessibilityIdentifier("coachAction")
             } else {
                 photoButtons
@@ -344,7 +349,7 @@ struct HomeView: View {
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(isBusy)
-            .coachTarget(coaching)
+            .guideTarget(.takePhoto, current: guideTip)
             .accessibilityIdentifier("takePhoto")
             Button("Choose from Library") {
                 if model.tutorial.isActive { model.tutorial.confirmDocument() }

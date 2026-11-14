@@ -59,6 +59,7 @@ struct PhotoCheckView: View {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
             }
         }
+        .guideOverlay(model.tutorial, current: guideTip, output: model.document.primaryOutput)
         .navigationTitle(position.map { $0.1 > 1 ? String(localized: "Photo \($0.0) of \($0.1)") : String(localized: "Photo Check") } ?? String(localized: "Photo Check"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -211,6 +212,7 @@ struct PhotoCheckView: View {
                         .accessibilityIdentifier("unlockedNote")
                 }
                 detailsCard(summary)
+                    .guideTarget(.checkResult, current: guideTip, ring: false)
                 if !entry.isUnlocked, let note = CheckPresentation.editingNote(for: entry, document: model.document) {
                     editingNote(note)
                 }
@@ -343,8 +345,9 @@ struct PhotoCheckView: View {
         let secondary = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
         return VStack(spacing: Design.Spacing.control) {
-            if model.tutorial.isActive { CoachLine(step: .check, output: model.document.primaryOutput) }
-            if let first = outputs.first { outputButton(first).brandProminentButtonStyle().coachTarget(model.tutorial.isActive) }
+            if let first = outputs.first {
+                outputButton(first).brandProminentButtonStyle().guideTarget(.output, current: guideTip)
+            }
             secondary {
                 ForEach(Array(outputs.dropFirst()), id: \.self) { output in
                     outputButton(output).buttonStyle(.bordered)
@@ -426,3 +429,7 @@ struct PortraitView: View {
     }
 }
 
+extension PhotoCheckView {
+    /// The guide on Photo Check (ADR-052): what the check found, then the way on.
+    fileprivate var guideTip: GuideTip? { model.tutorial.current([.checkResult, .output]) }
+}

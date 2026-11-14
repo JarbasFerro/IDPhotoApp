@@ -39,7 +39,6 @@ struct DigitalShareView: View {
                     Text("Sized for online forms")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
-                    if coaching { CoachLine(step: .finish, output: .digital).padding(.top, Design.Spacing.text) }
                     // The system sheet directly, so a completed share can end the tutorial.
                     Button {
                         ShareController.present([result.jpeg]) { shared in
@@ -52,7 +51,7 @@ struct DigitalShareView: View {
                     }
                     .brandProminentButtonStyle()
                     .controlSize(.large)
-                    .coachTarget(coaching)
+                    .guideTarget(.share, current: coaching ? .share : nil)
                     .accessibilityIdentifier("shareDigitalJPEG")
                     Button { path.removeAll() } label: { Text("Done").frame(maxWidth: .infinity) }
                         .buttonStyle(.bordered)
@@ -63,14 +62,13 @@ struct DigitalShareView: View {
                     PortraitView(entry: entry, format: model.renderTarget.format, label: "Prepared photo")
                         .frame(maxWidth: 200)
                     UnlockCard(photos: 1, balance: model.credits.balance)
-                    if coaching { CoachLine(step: .unlock, output: .digital) }
                     if model.credits.canAfford(1) {
                         Button {
                             if model.unlock([photoID]) { model.prepareDigitalExport(for: photoID) }
                         } label: { Text("Unlock and Save").frame(maxWidth: .infinity) }
                         .brandProminentButtonStyle()
                         .controlSize(.large)
-                        .coachTarget(coaching)
+                        .guideTarget(.unlock, current: coaching ? .unlock : nil)
                         .accessibilityIdentifier("unlockDigital")
                     } else {
                         Button { showCredits = true } label: { Text("Get Credits").frame(maxWidth: .infinity) }
@@ -101,6 +99,8 @@ struct DigitalShareView: View {
         .sheet(isPresented: $showAllSet, onDismiss: { path.removeAll() }) {
             TutorialDoneView(output: .digital, route: nil, creditsLeft: model.credits.balance, done: { showAllSet = false })
         }
+        .guideOverlay(model.tutorial, current: coaching ? ((entry?.isUnlocked ?? false) ? .share : .unlock) : nil,
+                      output: .digital)
         .navigationTitle("Digital Photo")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .digital) } }

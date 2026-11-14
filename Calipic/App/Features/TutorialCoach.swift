@@ -29,7 +29,21 @@ final class TutorialCoach {
         return coach
     }
 
+    /// Explanations passed in this session. Not stored: after a relaunch the tips show again, which is harmless.
+    private(set) var seenTips: Set<GuideTip> = []
+
     var isActive: Bool { state.phase == .active }
+
+    /// The tip to show now among a screen's `tips`, or nil outside the guide.
+    func current(_ tips: [GuideTip]) -> GuideTip? {
+        isActive ? TutorialFlow.current(of: tips, seen: seenTips) : nil
+    }
+
+    func pass(_ tip: GuideTip) {
+        guard isActive, !seenTips.contains(tip) else { return }
+        seenTips.insert(tip)
+        if tip == .document { confirmDocument() }
+    }
     var needsWelcome: Bool { isActive && !state.welcomed }
 
     func welcomed() { update { $0.welcomed = true } }
@@ -37,7 +51,10 @@ final class TutorialCoach {
     func creditSpent() { if isActive { update { $0.creditSpent = true } } }
 
     /// Developer details: start over on a device that already finished it. Credits are left alone.
-    func restart() { update { $0 = .fresh } }
+    func restart() {
+        seenTips = []
+        update { $0 = .fresh }
+    }
 
     /// The photo has left the app (printed, shared, or saved): the tutorial is over.
     func complete() {

@@ -27,3 +27,5 @@ C. Spotlight: the screen dims except the target, with the caption beside it.
 Supporting changes for any option: four phases instead of six steps (Photo · Check · Sheet · Print), the document confirmed inside the photo step, Photo Check marks items as "worth a look" during the guide rather than a blocking warning, and the target is scrolled into view when a step starts.
 
 **Decision (founder, 2026-11-14):** A, the guide line on the action, with the four phases. Built in 0.20.15. Photo Check's own wording is unchanged; the line says retakes and fixes are free instead. No auto-scroll was needed once the top card was gone.
+
+**Revisited (founder, 2026-11-14, on device with 0.20.17):** the line in the bottom bar made the bar taller and hid the screen, and screens with several things to do (document and photo; paper, copies and Continue) need several tips. Switched to B, anchored bubbles over the screen, one tip at a time with Next on explanations; built in 0.20.18. Colour: highlighter yellow (guide colour round 1).

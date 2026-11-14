@@ -13,6 +13,32 @@ enum TutorialPhase: String, Sendable, CaseIterable {
     case photo, check, sheet, finish
 }
 
+/// One speech bubble of the guide, pointing at one control (founder, 2026-11-14: several things to do on one screen
+/// need several bubbles). A screen lists its tips in order; an explanation is passed with Next (or by using the
+/// control), and a tip about a button ends when the button is tapped and the screen changes.
+enum GuideTip: String, Sendable, CaseIterable {
+    case document, takePhoto, resume
+    case checkResult, output
+    case paper, copies, continueSheet
+    case unlock, route, printHome, share
+
+    var step: TutorialStep {
+        switch self {
+        case .document, .takePhoto, .resume: .photo
+        case .checkResult, .output: .check
+        case .paper, .copies, .continueSheet: .sheet
+        case .unlock: .unlock
+        case .route, .printHome, .share: .finish
+        }
+    }
+
+    /// An explanation the person reads and passes with Next, rather than a button they tap.
+    var isExplanation: Bool { [.document, .checkResult, .paper, .copies].contains(self) }
+
+    /// Shown below its control when there is room, because what is above matters (the verdict, the question).
+    var prefersBelow: Bool { [.checkResult, .route].contains(self) }
+}
+
 /// The screens that show a coach card.
 enum TutorialScreen: Sendable, Hashable {
     case home, check, sheet, print, digital
@@ -62,6 +88,11 @@ enum TutorialFlow {
         case .sheet: .sheet
         case .print, .digital: unlocked ? .finish : .unlock
         }
+    }
+
+    /// The tip to show among `tips` (in screen order), skipping explanations already passed.
+    static func current(of tips: [GuideTip], seen: Set<GuideTip>) -> GuideTip? {
+        tips.first { !seen.contains($0) }
     }
 
     /// At launch: photos are not kept between launches yet (ADR-049 drafts are not built), so a credit spent on a

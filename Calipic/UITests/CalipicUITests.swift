@@ -57,8 +57,7 @@ final class CalipicUITests: XCTestCase {
     /// The guide line, found by what it says.
     @MainActor
     private func coach(_ app: XCUIApplication, _ text: String) -> XCUIElement {
-        app.descendants(matching: .any)
-            .matching(NSPredicate(format: "identifier == 'coachLine' AND label CONTAINS %@", text)).firstMatch
+        app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
     }
 
     /// First-run tutorial (ADR-052): the welcome page, then the coach on Home for the document and the photo.
@@ -70,7 +69,11 @@ final class CalipicUITests: XCTestCase {
         XCTAssertTrue(any(app, "tutorialWelcome").waitForExistence(timeout: 10))
         attachBothAppearances(app, "Tutorial, welcome")
         app.buttons["tutorialStart"].tap()
-        XCTAssertTrue(coach(app, "take your photo").waitForExistence(timeout: 10))
+        XCTAssertTrue(coach(app, "sized for this document").waitForExistence(timeout: 10))
+        attachBothAppearances(app, "Tutorial, document")
+        app.buttons["guideNext"].tap()
+        XCTAssertTrue(coach(app, "Then tap Take Photo").waitForExistence(timeout: 5))
+        sleep(1)
         attachBothAppearances(app, "Tutorial, photo")
     }
 
@@ -83,6 +86,10 @@ final class CalipicUITests: XCTestCase {
         XCTAssertTrue(any(app, "tutorialWelcome").waitForExistence(timeout: 10))
         app.buttons["tutorialStart"].tap()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
+        XCTAssertTrue(coach(app, "We framed your photo").waitForExistence(timeout: 10))
+        sleep(2)
+        attachBothAppearances(app, "Tutorial, check result")
+        app.buttons["guideNext"].tap()
         XCTAssertTrue(coach(app, "Tap Print").waitForExistence(timeout: 5))
         // Only the way the tutorial continues is offered.
         XCTAssertFalse(app.buttons["outputDigital"].exists)
@@ -90,9 +97,17 @@ final class CalipicUITests: XCTestCase {
         attachBothAppearances(app, "Tutorial, Photo Check")
         reveal(app.buttons["outputPrint"], in: app)
         app.buttons["outputPrint"].tap()
-        XCTAssertTrue(coach(app, "Pick the paper").waitForExistence(timeout: 10))
+        XCTAssertTrue(coach(app, "paper you'll print on").waitForExistence(timeout: 10))
         sleep(2)
         attachBothAppearances(app, "Tutorial, sheet")
+        app.buttons["guideNext"].tap()
+        XCTAssertTrue(coach(app, "how many copies").waitForExistence(timeout: 5))
+        sleep(1)
+        attachBothAppearances(app, "Tutorial, copies")
+        app.buttons["guideNext"].tap()
+        XCTAssertTrue(coach(app, "All set? Tap Continue").waitForExistence(timeout: 5))
+        sleep(1)
+        attachBothAppearances(app, "Tutorial, continue")
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(coach(app, "free credit unlocks").waitForExistence(timeout: 10))
         attachBothAppearances(app, "Tutorial, unlock")
@@ -112,6 +127,7 @@ final class CalipicUITests: XCTestCase {
         app.buttons["tutorialCheckPrint"].tap()
         XCTAssertTrue(app.navigationBars.firstMatch.waitForExistence(timeout: 10))
         XCTAssertFalse(any(app, "coachLine").exists)
+        XCTAssertFalse(app.buttons["guideNext"].exists)
     }
 
     @MainActor
