@@ -1,476 +1,328 @@
 import SwiftUI
 
-/// Step 4 (designs 4a and 5d): the job here is printing. The three things that make a print come out right are the
-/// content of the screen; unlocking with credits happens in place, before any file is made.
+/// One page on the mat, with layout, unlock, route and send trays. Only this screen owns print navigation.
 struct PrintView: View {
     @Bindable var model: PhotoWorkflow
     @Binding var path: [Route]
-    @State private var pending: Action?
-    /// Home or shop: one choice drives the steps and the main button, so a shop print needs no extra sheet
-    /// (founder, 0.20 review: Print at a Shop opened a sheet whose button opened the share sheet).
-    /// Nothing is chosen at first: where to print is a decision the person makes (founder, 0.20.9).
-    @State private var chosenRoute: PrintCheckView.PrintRoute?
-    @State private var showFormats = false
-    @State private var showCredits = false
-    @State private var showCheck = false
-    /// The photo was unlocked on this screen with no route chosen: the cards are scrolled into view and outlined.
-    @State private var promptRoute = false
-    /// Opacity of the one-time 2 pt pulse around the route cards.
-    @State private var pulseOpacity = 0.0
-    /// The first-run tutorial ended here (ADR-052): "You're all set", then possibly Check Your Print.
-    @State private var showAllSet = false
-    @State private var checkAfterAllSet = false
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(\.colorScheme) private var colorScheme
+    let acquire: Acquire
+    @State var selectedPerson: UUID?
+    @State var showOptions = false
+    @State var showCutting = false
+    @State var copiesTick = 0
+    @State var revealedRows: Int?
+    @State var hasRevealed = false
+    @State var fill: [SheetChoices.FillChoice] = []
+    @State var layoutConfirmed = false
+    @State var chosenRoute: PrintCheckView.PrintRoute?
+    @State var pending: Action?
+    @State var showFormats = false
+    @State var showCredits = false
+    @State var showCheck = false
+    @State var printAfterCheck = false
+    @State var showAllSet = false
+    @State var checkAfterAllSet = false
+    @State var unlockTick = 0
+    @State var holdsUnlockTray = false
+    @State var unlockCost = 1
+    @State var balanceBeforeUnlock = 0
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     enum Action { case home, formats }
+    enum PrintStep { case layout, unlock, route, send }
+    var locked: Int { model.lockedCount }
+    var displayedUnlockCount: Int { holdsUnlockTray ? unlockCost : max(1, locked) }
+    var displayedBalance: Int { holdsUnlockTray ? balanceBeforeUnlock : model.credits.balance }
+    var canPrintAtHome: Bool { PrintController.isAvailable && !model.document.printIsShopOnly }
+    var route: PrintCheckView.PrintRoute? { canPrintAtHome ? chosenRoute : .shop }
+    var person: PhotoEntry? { model.entries.first { $0.id == selectedPerson } ?? model.entries.first }
+    var coaching: Bool { model.tutorial.isActive }
+    struct FillRequest: Hashable { let job: PrintJob; let itemID: UUID? }
+    var fillRequest: FillRequest { FillRequest(job: model.printJob, itemID: person.flatMap { model.printItems(for: $0.id).first?.id }) }
 
-    private var locked: Int { model.lockedCount }
-    private var shopOnly: Bool { model.document.printIsShopOnly }
-    private var canPrintAtHome: Bool { PrintController.isAvailable && !shopOnly }
-    private var route: PrintCheckView.PrintRoute? { canPrintAtHome ? chosenRoute : .shop }
-    private var isWorking: Bool { model.activity == .exporting }
+    var step: PrintStep {
+        if !layoutConfirmed { return .layout }
+        if locked > 0 || holdsUnlockTray { return .unlock }
+        return route == nil ? .route : .send
+    }
+    var guideTip: GuideTip? {
+        guard coaching else { return nil }
+        switch step {
+        case .layout: return model.tutorial.current([.copies, .paper, .continueSheet])
+        case .unlock: return .unlock
+        case .route: return .route
+        case .send: return route == .home ? .printHome : .share
+        }
+    }
+
+    init(model: PhotoWorkflow, path: Binding<[Route]>, acquire: @escaping Acquire) {
+        self.model = model; _path = path; self.acquire = acquire
+        let routes = path.wrappedValue
+        let arrivesFromCheck: Bool = {
+            guard let index = routes.lastIndex(of: .sheet), index > 0 else { return false }
+            if case .check = routes[index - 1] { return true }
+            return false
+        }()
+        _revealedRows = State(initialValue: arrivesFromCheck && !UIAccessibility.isReduceMotionEnabled ? 0 : nil)
+    }
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
-                    header
-                    steps
-                    if locked == 0, route != nil { checkRow }
-                    if dynamicTypeSize.isAccessibilitySize { actions }
-                }
-                .padding(.horizontal)
-                .padding(.vertical, Design.Spacing.text)
-            }
-            .onChange(of: locked) { old, new in
-                guard old > 0, new == 0, canPrintAtHome, chosenRoute == nil else { return }
-                promptRouteChoice(proxy)
-            }
-        }
-        .background(Design.Surface.screen)
-        .animation(reduceMotion ? nil : .smooth, value: locked)
-        .safeAreaInset(edge: .bottom) {
-            if !dynamicTypeSize.isAccessibilitySize {
-                // A raised tray, as on Your sheet, so it reads as a panel over the steps rather than more of the page
-                // (founder, 0.20 review: the unlock card blended into the screen).
-                actions
-                    .guideAvoid()
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    .padding(.bottom, Design.Spacing.caption)
-                    .background {
-                        UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
-                            .fill(Design.Surface.tray)
-                            .shadow(color: .black.opacity(colorScheme == .dark ? 0.6 : 0.12), radius: 16, y: -4)
-                            .ignoresSafeArea(edges: .bottom)
-                    }
-            }
+        JourneyScreen(reservedTrayFraction: 0.45) { size in
+            SheetPreview(layout: model.layout, thumbnails: model.sheetThumbnails, captions: false,
+                         pageBox: CGSize(width: size.width, height: max(0, size.height - 44)), revealedRows: revealedRows, unlockTrigger: unlockTick)
+                .frame(width: size.width, height: size.height)
+        } tray: {
+            tray.id(step).transition(.opacity)
+                .animation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion), value: step)
+        } actions: {
+            actions
         }
         .guideOverlay(model.tutorial, current: guideTip, output: .print)
         .navigationTitle("Print")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(step != .layout)
         .toolbar {
             ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) }
-            // In the tutorial the way out is printing or sharing (ADR-052); Back still works.
+            if step != .layout {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { goBack() } label: { Label("Back", systemImage: "chevron.backward") }
+                        .labelStyle(.iconOnly).accessibilityIdentifier("printBack")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) { printMenu }
             if locked == 0, !coaching {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { path.removeAll() }.accessibilityIdentifier("shareDone")
                 }
             }
         }
-        .sheet(isPresented: $showCheck) {
+        .sheet(isPresented: $showOptions) { SheetOptionsView(model: model) }
+        .sheet(isPresented: $showCutting) { CuttingOptionsView(model: model) }
+        .sheet(isPresented: $showCheck, onDismiss: {
+            if printAfterCheck { printAfterCheck = false; run(.home) }
+        }) {
             NavigationStack {
                 PrintCheckView(model: model, route: route ?? .home,
-                               onPrintAgain: route == .home ? { printAgain() } : nil,
-                               onFinished: { showCheck = false; path.removeAll() })
+                    onPrintAgain: route == .home ? { printAgain() } : nil,
+                    onFinished: { showCheck = false; path.removeAll() })
             }
         }
         .sheet(isPresented: $showAllSet, onDismiss: {
             if checkAfterAllSet { checkAfterAllSet = false; showCheck = true } else { path.removeAll() }
         }) {
             TutorialDoneView(output: .print, route: route, creditsLeft: model.credits.balance,
-                             checkPrint: route == .home ? { checkAfterAllSet = true; showAllSet = false } : nil,
-                             done: { showAllSet = false })
+                checkPrint: route == .home ? { checkAfterAllSet = true; showAllSet = false } : nil,
+                done: { showAllSet = false })
         }
         .sheet(isPresented: $showFormats) { if let result = model.exported { FormatsView(result: result) } }
         .sheet(isPresented: $showCredits) { CreditsView(credits: model.credits) }
-        .task { model.refreshSheetThumbnails() }
+        .task { model.refreshSheetThumbnails(); await revealCopies() }
+        .task(id: fillRequest) {
+            let request = fillRequest
+            guard let itemID = request.itemID else { fill = []; return }
+            let choices = await SheetChoices.fillChoices(job: request.job, itemID: itemID)
+            if !Task.isCancelled { fill = choices }
+        }
+        .task(id: step) {
+            if step == .send, model.exported == nil, model.activity == nil { model.prepareExport() }
+        }
+        .task(id: unlockTick) {
+            guard unlockTick > 0 else { return }
+            do { try await Task.sleep(for: .milliseconds(250)) } catch { holdsUnlockTray = false; return }
+            withAnimation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { holdsUnlockTray = false }
+        }
+        .onChange(of: locked) { old, new in
+            if old > 0, new == 0 { unlockTick += 1 }
+        }
+        .sensoryFeedback(.success, trigger: unlockTick)
+        .sensoryFeedback(.impact(weight: .light), trigger: revealedRows) { _, new in (new ?? 0) > 0 }
         .onChange(of: model.exported?.id) { _, _ in
             guard let result = model.exported, let action = pending else { return }
-            pending = nil
-            perform(action, result)
+            pending = nil; perform(action, result)
         }
         .onChange(of: model.errorMessage) { _, message in if message != nil { pending = nil } }
-        .onDisappear { model.finishExport() }
-        .sensoryFeedback(.success, trigger: locked == 0)
+        .onChange(of: model.printJob) { _, _ in if layoutConfirmed { returnToLayout() } }
+        .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)-\($0.trimWidthMM)-\($0.trimHeightMM)" }) { _, _ in model.refreshSheetThumbnails() }
+        .onChange(of: model.printJob.paper.id) { _, _ in model.tutorial.pass(.paper) }
+        .onChange(of: copiesTick) { _, _ in model.tutorial.pass(.copies) }
+        .onDisappear { pending = nil; model.finishExport() }
+        .alert("Unable to complete", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
+            Button("Try Again") { model.errorMessage = nil; if layoutConfirmed { model.prepareExport() } }
+            Button("OK", role: .cancel) { model.errorMessage = nil }
+        } message: { Text(model.errorMessage ?? "") }
     }
 
-    // MARK: - Tutorial (ADR-052)
-
-    private var coaching: Bool { model.tutorial.isActive }
-
-    /// The guide on Print (ADR-052): unlock, then where, then the button that sends it.
-    private var guideTip: GuideTip? {
-        guard coaching else { return nil }
-        if locked > 0 { return .unlock }
-        switch route {
-        case nil: return .route
-        case .home?: return .printHome
-        case .shop?: return .share
-        }
-    }
-
-
-    /// The photo left the app inside the tutorial: it is over.
-    private func finishTutorial() {
-        guard coaching else { return }
-        model.tutorial.complete()
-        showAllSet = true
-    }
-
-    // MARK: - Content
-
-    private var header: some View {
-        let layout = model.layout
-        let landscape = layout.pages.first.map { $0.displayAspect > 1 } ?? false
-        let thumbHeight: CGFloat = landscape ? 110 : 170
-        let paper = PaperNames.short(for: model.printJob.paper)
-        return VStack(alignment: .leading, spacing: Design.Spacing.group) {
-            // The page lies on the mat; the words sit below, on the plain screen.
-            SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, compact: true, compactHeight: thumbHeight)
-                .background(alignment: .topLeading) { pageStack(layout, height: thumbHeight) }
-                .padding(.vertical, Design.Spacing.group)
-                .frame(maxWidth: .infinity)
-                .onMat(bleed: 16)
-            VStack(alignment: .leading, spacing: Design.Spacing.tight) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(Design.Typography.titleGlyph)
-                    .foregroundStyle(StatusStyle.pass)
-                    .accessibilityHidden(true)
-                Text("Your sheet is ready").font(Design.Typography.screenTitle)
-                Group {
-                    if layout.pages.count > 1 {
-                        Text("^[\(layout.placedCount) copy](inflect: true) on ^[\(layout.pages.count) page](inflect: true) of \(paper) paper")
-                    } else {
-                        Text("^[\(layout.placedCount) copy](inflect: true) on \(paper) paper")
-                    }
-                }
-                .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+    var tray: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing.tray) {
+            VStack(alignment: .leading, spacing: 2) {
+                title.font(Design.Typography.trayTitle)
+                Text(summary(model.layout)).font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(model.layout.placedCount * 100 + model.layout.pages.count)))
+                    .animation(reduceMotion ? nil : .snappy, value: model.layout.placedCount)
+                    .accessibilityIdentifier(step == .layout ? "layoutSummary" : "printSummary")
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("printHeader")
-        }
-    }
-
-    /// Two plain sheets peeking out behind the thumbnail when the print has several pages.
-    @ViewBuilder
-    private func pageStack(_ layout: PrintLayout, height: CGFloat) -> some View {
-        if layout.pages.count > 1, let aspect = layout.pages.first?.displayAspect {
-            ZStack(alignment: .topLeading) {
-                ForEach([12.0, 6.0], id: \.self) { offset in
-                    Rectangle().fill(.white)
-                        .aspectRatio(aspect, contentMode: .fit)
-                        .frame(height: height)
-                        .paperDimmedInDark()
-                        .paperShadow()
-                        .offset(x: offset, y: offset)
+            .accessibilityElement(children: .contain)
+            switch step {
+            case .layout: layoutControls
+            case .unlock:
+                UnlockExplanation(photos: displayedUnlockCount, balance: displayedBalance)
+            case .route:
+                TrayRows {
+                    routeRow(.home, title: "At Home", detail: "Your printer and photo paper", symbol: "printer")
+                    routeRow(.shop, title: "At a Shop", detail: "A print shop or kiosk", symbol: "storefront")
                 }
-            }
-            .accessibilityHidden(true)
-        }
-    }
-
-    /// The instructions that decide whether the print comes out at the right size (docs/03-design.md §3), for printing
-    /// at home or ordering at a shop.
-    private var steps: some View {
-        let paper = PaperNames.short(for: model.printJob.paper)
-        let measure = model.printJob.options.calibrationBar
-            ? Text("Measure the 50 mm line before cutting") : Text("Measure one photo before cutting")
-        return VStack(alignment: .leading, spacing: Design.Spacing.text) {
-            if canPrintAtHome {
-                Text("Where will you print?")
-                    .font(Design.Typography.cardTitle)
-                    .padding(.horizontal, Design.Spacing.tight)
-                    .accessibilityAddTraits(.isHeader)
-                HStack(spacing: Design.Spacing.control) {
-                    routeCard(.home, title: "At Home", detail: "Your printer and photo paper", symbol: "printer")
-                    routeCard(.shop, title: "At a Shop", detail: "A print shop or kiosk", symbol: "storefront")
-                }
-                .fixedSize(horizontal: false, vertical: true) // both cards as tall as the taller one
                 .guideTarget(.route, current: guideTip, ring: false)
-                .padding(.bottom, Design.Spacing.text)
-                .id(Self.routeSectionID)
+            case .send: instructions
             }
-            Text("Before you print")
-                .font(Design.Typography.note.weight(.semibold)).foregroundStyle(.secondary)
-                .padding(.horizontal, Design.Spacing.tight)
-                .accessibilityAddTraits(.isHeader)
-            VStack(spacing: 0) {
-                if route == nil {
-                    Text("Choose where you print to see the steps.")
-                        .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal).padding(.vertical, Design.Spacing.control)
-                } else if route == .home {
-                    step(1, title: PaperNames.isPhotoPaper(model.printJob.paper)
-                            ? Text("Load \(paper) photo paper") : Text("Load \(paper) paper"), detail: nil)
-                    Divider().padding(.leading, 56)
-                    step(2, title: Text("Choose Actual Size, or 100 %"), detail: Text("Never Fit to Page or borderless"))
-                } else {
-                    step(1, title: Text("Order a standard print on \(paper) paper"), detail: nil)
-                    Divider().padding(.leading, 56)
-                    step(2, title: Text("Ask for no cropping and no Fit to Page"), detail: nil)
+        }
+    }
+
+    var title: some View {
+        Group {
+            switch step {
+            case .layout: Text("Your sheet")
+            case .unlock: displayedUnlockCount > 1 ? Text("Unlock \(CreditsPresentation.photos(displayedUnlockCount))") : Text("Unlock this photo")
+            case .route: Text("Where will you print?")
+            case .send: Text(route == .home ? "Print at home" : "Print at a shop")
+            }
+        }
+        .accessibilityIdentifier(step == .layout ? "layoutTitle" : "printHeader")
+    }
+
+    var actions: some View {
+        Group {
+            switch step {
+            case .layout:
+                TrayActions {
+                    Button { layoutConfirmed = true } label: { Text("Continue").frame(maxWidth: .infinity) }
+                        .disabled(model.layout.pages.isEmpty || !model.layout.isComplete || model.activity != nil)
+                        .guideTarget(.continueSheet, current: guideTip).accessibilityIdentifier("continueToShare")
                 }
-                if route != nil {
-                    Divider().padding(.leading, 56)
-                    step(3, title: measure, detail: nil)
+            case .unlock:
+                TrayActions {
+                    if displayedBalance >= displayedUnlockCount {
+                        Button { unlock() } label: {
+                            Label("Unlock · \(CreditsPresentation.count(displayedUnlockCount))", systemImage: "lock.open").frame(maxWidth: .infinity)
+                        }
+                        .disabled(holdsUnlockTray).guideTarget(.unlock, current: guideTip).accessibilityIdentifier("unlockAndPrint")
+                    } else {
+                        Button { showCredits = true } label: { Text("Get Credits").frame(maxWidth: .infinity) }
+                            .accessibilityIdentifier("getCredits")
+                    }
+                } secondary: {
+                    Button("Keep Editing") { returnToLayout() }.accessibilityIdentifier("keepEditing")
+                }
+            case .route:
+                TrayActions {
+                    Button {} label: { Text("Choose where to print").frame(maxWidth: .infinity) }
+                        .disabled(true).accessibilityIdentifier("chooseRouteFirst")
+                }
+            case .send:
+                TrayActions {
+                    if route == .home {
+                        Button { run(.home) } label: { actionLabel("Print", symbol: "printer", working: pending == .home) }
+                            .disabled(model.activity != nil && pending != nil)
+                            .guideTarget(.printHome, current: guideTip).accessibilityIdentifier("printAtHome")
+                    } else {
+                        Button {
+                            if let result = model.exported { ShareController.present(result.pages) { shared in if shared { finishTutorial() } } }
+                        } label: { actionLabel(model.exported?.pages.count == 1 ? "Share Print Image" : "Share Print Images", symbol: "square.and.arrow.up", working: model.exported == nil) }
+                            .disabled(model.exported == nil)
+                            .guideTarget(.share, current: guideTip)
+                            .accessibilityIdentifier(model.exported == nil ? "sharePagesPreparing" : "sharePages")
+                    }
+                } secondary: {
+                    Button("Change where") { if canPrintAtHome { chosenRoute = nil } else { returnToLayout() } }
+                        .accessibilityIdentifier("changeRoute")
                 }
             }
-            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
-            .animation(reduceMotion ? nil : .snappy, value: route)
-            if let note = model.document.printNoteKey {
-                Label(String(localized: String.LocalizationValue(note)), systemImage: "storefront")
-                    .font(Design.Typography.note)
-                    .padding(.horizontal, Design.Spacing.tight)
+        }
+    }
+
+    var instructions: some View {
+        let paper = PaperNames.short(for: model.printJob.paper)
+        return TrayRows {
+            TrayRow(title: route == .home
+                ? (PaperNames.isPhotoPaper(model.printJob.paper) ? Text("Load \(paper) photo paper") : Text("Load \(paper) paper"))
+                : Text("Order a standard print on \(paper) paper"), leading: { Text(1, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+            TrayRow(title: route == .home ? Text("Choose Actual Size, or 100 %. Never Fit to Page.")
+                       : Text("Ask for no cropping and no Fit to Page"), leading: { Text(2, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+            TrayRow(title: model.printJob.options.calibrationBar ? Text("Measure the 50 mm line before cutting") : Text("Measure one photo before cutting"),
+                    leading: { Text(3, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+            if route == .shop, let note = model.document.printNoteKey {
+                TrayRow(title: Text(String(localized: String.LocalizationValue(note))), leading: { Image(systemName: "storefront").foregroundStyle(Color.brandAccent) })
                     .accessibilityIdentifier("printRouteNote")
             }
+            TrayRow(title: Text("Check Your Print"), detail: Text(route == .home ? "Lay it on the screen to see it is the right size" : "When the prints are back, lay one on the screen"),
+                    chevron: true, action: { showCheck = true }, leading: { Image(systemName: "ruler").foregroundStyle(Color.brandAccent) })
+                .accessibilityIdentifier("checkPrintButton")
         }
     }
 
-    private static let routeSectionID = "routeSection"
-
-    /// Shown while the photo is unlocked and the person has not yet chosen where to print.
-    private var routeIsRequired: Bool { canPrintAtHome && locked == 0 && chosenRoute == nil }
-
-    /// Right after unlocking: bring the cards into view and pulse their outline once (no pulse under Reduce Motion;
-    /// the static outline of `routeIsRequired` stays until a route is chosen).
-    private func promptRouteChoice(_ proxy: ScrollViewProxy) {
-        promptRoute = true
-        withAnimation(reduceMotion ? nil : .smooth) { proxy.scrollTo(Self.routeSectionID, anchor: .center) }
-        guard !reduceMotion else { return }
-        Task {
-            try? await Task.sleep(for: .milliseconds(250))
-            withAnimation(.easeInOut(duration: 0.45)) { pulseOpacity = 1 }
-            try? await Task.sleep(for: .milliseconds(450))
-            withAnimation(.easeInOut(duration: 0.45)) { pulseOpacity = 0 }
-        }
+    func routeRow(_ value: PrintCheckView.PrintRoute, title: LocalizedStringKey, detail: LocalizedStringKey, symbol: String) -> some View {
+        TrayRow(title: Text(title), detail: Text(detail), chevron: true,
+                action: { chosenRoute = value }, leading: { Image(systemName: symbol).foregroundStyle(Color.brandAccent) })
+            .sensoryFeedback(.selection, trigger: chosenRoute) { old, new in old != new && new == value }
+            .accessibilityIdentifier(value == .home ? "routeHome" : "routeShop")
     }
 
-    /// One of the two places to print, as a large selectable card: the choice has to be obvious.
-    private func routeCard(_ value: PrintCheckView.PrintRoute, title: LocalizedStringKey, detail: LocalizedStringKey,
-                           symbol: String) -> some View {
-        let selected = chosenRoute == value
-        return Button {
-            withAnimation(reduceMotion ? nil : .snappy) { chosenRoute = value }
-        } label: {
-            VStack(alignment: .leading, spacing: Design.Spacing.caption) {
-                HStack(alignment: .top) {
-                    Image(systemName: symbol)
-                        .font(.title2)
-                        .foregroundStyle(Color.brandAccent)
-                    Spacer(minLength: 0)
-                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundStyle(selected ? Color.brandAccent : Color.secondary.opacity(0.5))
-                        .contentTransition(.symbolEffect(.replace))
-                }
-                Text(title).font(Design.Typography.rowTitle).foregroundStyle(.primary)
-                Text(detail).font(Design.Typography.note).foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+    var printMenu: some View {
+        Menu {
+            Button { returnToLayout(); showCutting = true } label: { Label("Cutting options", systemImage: "scissors") }.accessibilityIdentifier("cuttingOptions")
+            Menu {
+                Button { returnToLayout(); acquire(.camera, .add) } label: { Label("Take Photo", systemImage: "camera") }.accessibilityIdentifier("addPersonCamera")
+                Button { returnToLayout(); acquire(.library, .add) } label: { Label("Choose Photo", systemImage: "photo.on.rectangle") }.accessibilityIdentifier("addPersonLibrary")
+            } label: { Label("Add another person", systemImage: "person.badge.plus") }
+                .disabled(!model.canAddPhoto || model.activity != nil).accessibilityIdentifier("addPerson")
+            Button { returnToLayout(); showOptions = true } label: { Label("More sizes and paper", systemImage: "doc.on.doc") }.accessibilityIdentifier("moreOptions")
+            if locked == 0 {
+                Button { run(.formats) } label: { Label("More Formats", systemImage: "square.and.arrow.up") }
+                    .disabled(!layoutConfirmed || model.activity != nil).accessibilityIdentifier("moreFormats")
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .padding(Design.Spacing.cardContent)
-            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
-            .overlay {
-                RoundedRectangle(cornerRadius: Design.Radius.group)
-                    .strokeBorder(selected ? Color.brandAccent
-                                  : routeIsRequired ? Color.brandAccent.opacity(0.5) : Color(.separator),
-                                  lineWidth: selected ? 2 : 1)
-            }
-            .overlay {
-                // One pulse, or a static stroke under Reduce Motion, until a route is chosen.
-                RoundedRectangle(cornerRadius: Design.Radius.group)
-                    .strokeBorder(Color.brandAccent, lineWidth: 2)
-                    .opacity(routeIsRequired && promptRoute ? (reduceMotion ? 1 : pulseOpacity) : 0)
-                    .allowsHitTesting(false)
-            }
-            .contentShape(RoundedRectangle(cornerRadius: Design.Radius.group))
-        }
-        .buttonStyle(.plain)
-        .sensoryFeedback(.selection, trigger: selected) { _, now in now }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-        .accessibilityIdentifier(value == .home ? "routeHome" : "routeShop")
+        } label: { Label("More", systemImage: "ellipsis") }
+        .accessibilityIdentifier("printMenu")
     }
 
-    private func step(_ number: Int, title: Text, detail: Text?) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: Design.Spacing.control) {
-            Text(verbatim: "\(number)")
-                .font(.subheadline.weight(.bold)).monospacedDigit()
-                .foregroundStyle(Color.brandAccent)
-                .frame(width: 28, height: 28)
-                .background(Color.brandAccent.opacity(0.14), in: Circle())
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                title
-                if let detail { detail.font(Design.Typography.note).foregroundStyle(.secondary) }
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal).padding(.vertical, Design.Spacing.control)
-        .accessibilityElement(children: .combine)
+    func returnToLayout() {
+        pending = nil; layoutConfirmed = false; holdsUnlockTray = false
+        model.finishExport()
     }
 
-    /// After printing, compare the print with the screen (U1). Shown once the photos are unlocked.
-    private var checkRow: some View {
-        Button { showCheck = true } label: {
-            HStack(spacing: Design.Spacing.control) {
-                Image(systemName: "ruler")
-                    .font(.body.weight(.semibold)).foregroundStyle(Color.brandAccent)
-                    .frame(width: 28)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    Text("Check Your Print").foregroundStyle(.primary)
-                    Text(route == .home ? "Lay it on the screen to see it is the right size"
-                                        : "When the prints are back, lay one on the screen")
-                        .font(Design.Typography.note).foregroundStyle(.secondary)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
-            }
-            .padding(.horizontal).padding(.vertical, Design.Spacing.control)
-            .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("checkPrintButton")
+    func goBack() {
+        if step == .send, canPrintAtHome { chosenRoute = nil }
+        else { returnToLayout() }
     }
 
-    /// Closes the check, then opens the print panel once the sheet has gone.
-    private func printAgain() {
-        showCheck = false
-        Task {
-            try? await Task.sleep(for: .milliseconds(500))
-            run(.home)
-        }
-    }
-
-    // MARK: - Actions
-
-    @ViewBuilder private var actions: some View {
-        VStack(spacing: Design.Spacing.text) {
-            if locked > 0 {
-                UnlockCard(photos: locked, balance: model.credits.balance, inTray: !dynamicTypeSize.isAccessibilitySize)
-                    .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.9, anchor: .bottom))))
-                if model.credits.canAfford(locked) {
-                    Button { unlock() } label: {
-                        Label("Unlock", systemImage: "lock.open").frame(maxWidth: .infinity)
-                    }
-                    .brandProminentButtonStyle()
-                    .controlSize(.large)
-                    .guideTarget(.unlock, current: guideTip)
-                    .accessibilityIdentifier("unlockAndPrint")
-                } else {
-                    Button { showCredits = true } label: { Text("Get Credits").frame(maxWidth: .infinity) }
-                        .brandProminentButtonStyle()
-                        .controlSize(.large)
-                        .accessibilityIdentifier("getCredits")
-                }
-                Button("Keep Editing") { path.removeLast() }
-                    .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
-                    .accessibilityIdentifier("keepEditing")
-            } else {
-                if route == nil {
-                    // The choice comes first; the button says so instead of guessing.
-                    Button {} label: {
-                        Text("Choose where to print").foregroundStyle(.secondary).frame(maxWidth: .infinity)
-                    }
-                        .buttonStyle(.bordered)
-                        .controlSize(.large)
-                        .disabled(true)
-                        .accessibilityIdentifier("chooseRouteFirst")
-                } else if route == .home {
-                    Button { run(.home) } label: {
-                        label("Print", systemImage: "printer", working: pending == .home)
-                    }
-                    .brandProminentButtonStyle()
-                    .controlSize(.large)
-                    .guideTarget(.printHome, current: guideTip)
-                    .accessibilityIdentifier("printAtHome")
-                } else if let result = model.exported {
-                    // Straight to the share sheet: AirDrop to a kiosk, a print app, or a message to the shop. The
-                    // system sheet is presented directly so a completed share can end the tutorial.
-                    Button {
-                        ShareController.present(result.pages) { shared in if shared { finishTutorial() } }
-                    } label: {
-                        Label(result.pages.count == 1 ? "Share Print Image" : "Share Print Images",
-                              systemImage: "square.and.arrow.up")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .brandProminentButtonStyle()
-                    .controlSize(.large)
-                    .guideTarget(.share, current: guideTip)
-                    .accessibilityIdentifier("sharePages")
-                } else {
-                    // The files are still being made after unlocking.
-                    Button {} label: { label("Share Print Image", systemImage: "square.and.arrow.up", working: true) }
-                        .brandProminentButtonStyle()
-                        .controlSize(.large)
-                        .disabled(true)
-                        .accessibilityIdentifier("sharePagesPreparing")
-                }
-                Button { run(.formats) } label: { label("More Formats", systemImage: nil, working: pending == .formats) }
-                    .frame(minHeight: Design.Size.minimumTarget)
-                    .accessibilityIdentifier("moreFormats")
-            }
-        }
-        .disabled(isWorking && pending != nil)
-    }
-
-    private func label(_ title: LocalizedStringKey, systemImage: String?, working: Bool) -> some View {
-        HStack(spacing: Design.Spacing.text) {
-            if working { ProgressView() } else if let systemImage { Image(systemName: systemImage) }
-            Text(title)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    /// Unlocking only unlocks: the person then chooses home or shop (founder, 0.20 review: opening the print panel
-    /// straight away skipped that choice). The files are prepared meanwhile, so either choice is quick.
-    private func unlock() {
-        // The unlock card folds away and the print buttons take its place (U4); the success tap is on `locked`.
-        var unlocked = false
-        withAnimation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { unlocked = model.unlockAll() }
-        guard unlocked else { showCredits = true; return }
+    func unlock() {
+        unlockCost = locked
+        balanceBeforeUnlock = model.credits.balance
+        holdsUnlockTray = true
+        guard model.unlockAll() else { holdsUnlockTray = false; showCredits = true; return }
         if model.exported == nil, model.activity == nil { model.prepareExport() }
     }
 
-    /// Files are made on demand, once, and only for unlocked photos (the export gate in `PhotoWorkflow`).
-    private func run(_ action: Action) {
-        if let result = model.exported {
-            perform(action, result)
-        } else {
-            pending = action
-            if model.activity == nil { model.prepareExport() }
-        }
+    func actionLabel(_ title: LocalizedStringKey, symbol: String, working: Bool) -> some View {
+        HStack {
+            if working { ProgressView() } else { Image(systemName: symbol) }
+            Text(title)
+        }.frame(maxWidth: .infinity)
     }
 
-    private func perform(_ action: Action, _ result: PhotoExport) {
+    func printAgain() { printAfterCheck = true; showCheck = false }
+    func finishTutorial() { if coaching { model.tutorial.complete(); showAllSet = true } }
+    func run(_ action: Action) {
+        guard locked == 0 else { return }
+        if let result = model.exported { perform(action, result) }
+        else { pending = action; if model.activity == nil { model.prepareExport() } }
+    }
+    func perform(_ action: Action, _ result: PhotoExport) {
         switch action {
+        case .formats: showFormats = true
         case .home:
-            // UI tests cannot drive the system print panel; everything up to it is covered. In the tutorial they
-            // stand in for a finished job so "You're all set" can be tested.
             guard !PrintController.isSuppressedForUITests else { if coaching { finishTutorial() }; return }
             PrintController.shared.present(pdf: result.pdf, jobName: String(localized: "Calipic sheet")) { sent in
-                // A finished job leads straight to the check (after "You're all set" in the tutorial); a cancelled
-                // panel leaves Print as it was.
                 guard sent else { return }
                 if coaching { finishTutorial() } else { showCheck = true }
             }
-        case .formats: showFormats = true
         }
     }
 }

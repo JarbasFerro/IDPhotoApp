@@ -115,3 +115,60 @@ extension Design.Typography {
         .system(style, design: .rounded).weight(weight)
     }
 }
+
+extension View {
+    /// One light pass and a small lift at a real unlock. View-bound tasks cancel when the screen leaves.
+    func unlockCelebration(trigger: Int) -> some View {
+        modifier(UnlockLift(trigger: trigger)).lightSweep(trigger: trigger)
+    }
+
+    func lightSweep(trigger: Int) -> some View { modifier(UnlockLightSweep(trigger: trigger)) }
+}
+
+private struct UnlockLift: ViewModifier {
+    let trigger: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var lifted = false
+
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(lifted ? 1.03 : 1)
+            .shadow(color: .black.opacity(lifted ? 0.18 : 0), radius: 16, y: 8)
+            .task(id: trigger) {
+                guard trigger > 0, !reduceMotion else { return }
+                withAnimation(.spring(duration: 0.3, bounce: 0.15)) { lifted = true }
+                do { try await Task.sleep(for: .milliseconds(300)) } catch { lifted = false; return }
+                withAnimation(.spring(duration: 0.6, bounce: 0.25)) { lifted = false }
+            }
+    }
+}
+
+private struct UnlockLightSweep: ViewModifier {
+    let trigger: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var active = false
+    @State private var position: CGFloat = -1
+
+    func body(content: Content) -> some View {
+        content.overlay {
+            if active, !reduceMotion {
+                GeometryReader { geometry in
+                    LinearGradient(colors: [.clear, .white.opacity(0.55), .clear], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: geometry.size.width * 0.4, height: geometry.size.height * 2)
+                        .rotationEffect(.degrees(20))
+                        .offset(x: position * geometry.size.width, y: -geometry.size.height / 2)
+                }
+                .clipped().blendMode(.plusLighter).allowsHitTesting(false).accessibilityHidden(true)
+            }
+        }
+        .task(id: trigger) {
+            guard trigger > 0, !reduceMotion else { return }
+            position = -1
+            active = true
+            do { try await Task.sleep(for: .milliseconds(16)) } catch { active = false; return }
+            withAnimation(.easeInOut(duration: 0.7)) { position = 2 }
+            do { try await Task.sleep(for: .milliseconds(700)) } catch { active = false; return }
+            active = false
+        }
+    }
+}

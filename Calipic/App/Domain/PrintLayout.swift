@@ -180,6 +180,21 @@ enum PrintLayoutSolver {
     static func micrometers(_ mm: Double) -> Int { Int((mm * 1_000).rounded()) }
     static func millimeters(_ um: Int) -> Double { Double(um) / 1_000 }
 
+    /// Largest demand for this item that fits on one page with the other items unchanged.
+    /// The search shares the fill menu's bounded 200-copy limit; no UI or locale affects the result.
+    static func copiesFillingOnePage(job: PrintJob, itemID: UUID) -> Int? {
+        guard let index = job.items.firstIndex(where: { $0.id == itemID }) else { return nil }
+        var candidate = job
+        var best: Int?
+        for copies in 1...200 {
+            candidate.items[index].copies = copies
+            let layout = solve(candidate)
+            guard layout.isComplete, layout.pages.count == 1 else { break }
+            best = copies
+        }
+        return best
+    }
+
     static func solve(_ job: PrintJob) -> PrintLayout {
         let options = job.options
         let items = job.items

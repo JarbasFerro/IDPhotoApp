@@ -6,7 +6,6 @@ enum Route: Hashable {
     case check(UUID)
     case digital(UUID)
     case sheet
-    case share
 }
 
 private struct PendingAcquisition: Identifiable {
@@ -44,12 +43,10 @@ struct RootView: View {
                         case .digital(let id):
                             DigitalShareView(model: model, photoID: id, path: $path)
                         case .sheet:
-                            SheetView(model: model, path: $path, acquire: acquire)
-                        case .share:
-                            PrintView(model: model, path: $path)
+                            PrintView(model: model, path: $path, acquire: acquire)
                         }
                     }
-                    .zoomDestination(route, at: path.firstIndex(of: route) ?? 0, in: zoom)
+                    .zoomDestination(route, at: path.lastIndex(of: route) ?? 0, in: zoom)
                 }
         }
         .environment(\.zoomNamespace, zoom)
@@ -113,7 +110,7 @@ struct RootView: View {
         }
         .alert("Unable to complete", isPresented: Binding(get: {
             if case .digital = path.last { return false }
-            if case .share = path.last { return false }
+            if case .sheet = path.last { return false }
             return model.errorMessage != nil
         }, set: { if !$0 { model.errorMessage = nil } })) {
             if model.errorActivity == .importing {

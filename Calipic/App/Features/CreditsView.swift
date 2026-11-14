@@ -57,49 +57,6 @@ struct CreditBadge: View {
     }
 }
 
-/// What unlocking gives and what it costs, shown where the person is about to use a credit (design 5d, ADR-048 §4).
-/// The line about final edits is the point-of-no-return warning.
-struct UnlockCard: View {
-    let photos: Int
-    let balance: Int
-    /// In Print's tray the tray is the card; elsewhere the card draws its own background.
-    var inTray = false
-
-    private var title: Text {
-        photos == 1 ? Text("Unlock your photo") : Text("Unlock \(CreditsPresentation.photos(photos))")
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: Design.Spacing.text) {
-            VStack(alignment: .leading, spacing: Design.Spacing.control) {
-                HStack(alignment: .center) {
-                    title.font(Design.Typography.cardTitle)
-                    Spacer(minLength: Design.Spacing.text)
-                    CreditBadge(credits: photos)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("unlockCard")
-                UnlockBenefits()
-                Divider()
-                Label("After this, framing and edits are final.", systemImage: "lock")
-                    .font(Design.Typography.note).foregroundStyle(.secondary)
-            }
-            .padding(inTray ? 0 : Design.Spacing.group)
-            .background(inTray ? Color.clear : Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
-            Group {
-                if balance >= photos {
-                    Text("You have \(CreditsPresentation.count(balance)). After this: \(CreditsPresentation.count(balance - photos)).")
-                } else {
-                    Text("You have \(CreditsPresentation.count(balance)). You need \(CreditsPresentation.count(photos)).")
-                }
-            }
-            .font(Design.Typography.note).foregroundStyle(.secondary)
-            .padding(.horizontal, Design.Spacing.tight)
-            .accessibilityIdentifier("creditBalanceLine")
-        }
-    }
-}
-
 /// The balance and the packs. Until StoreKit (0.22) a pack is added without payment; the note says so.
 struct CreditsView: View {
     let credits: CreditStore

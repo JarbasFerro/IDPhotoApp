@@ -36,7 +36,7 @@ enum GuideTip: String, Sendable, CaseIterable {
     var isExplanation: Bool { [.document, .checkResult, .paper, .copies].contains(self) }
 
     /// Shown below its control when there is room, because what is above matters (the verdict, the question).
-    var prefersBelow: Bool { [.checkResult, .route].contains(self) }
+    var prefersBelow: Bool { self == .checkResult }
 }
 
 /// The screens that show a coach card.

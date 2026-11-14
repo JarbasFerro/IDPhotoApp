@@ -5,6 +5,8 @@ struct JourneyScreen<Stage: View, Tray: View, Actions: View>: View {
     /// Reserve the photo's minimum on standard text sizes; the tray scrolls when its words need more room.
     var minimumObjectHeightFraction: CGFloat = 0
     var stageBottomReserve: CGFloat = 0
+    /// Print reserves one tray footprint so the page keeps its position through layout, unlock and sending.
+    var reservedTrayFraction: CGFloat? = nil
     @ViewBuilder let stage: (CGSize) -> Stage
     @ViewBuilder let tray: () -> Tray
     @ViewBuilder let actions: () -> Actions
@@ -15,7 +17,7 @@ struct JourneyScreen<Stage: View, Tray: View, Actions: View>: View {
 
     var body: some View {
         GeometryReader { screen in
-            let fraction = dynamicTypeSize.isAccessibilitySize ? 0.75 : 0.55
+            let fraction = dynamicTypeSize.isAccessibilitySize ? 0.75 : (reservedTrayFraction ?? 0.55)
             let trayOverhead = actionsHeight + 22 + 8 + Design.Spacing.group
             let screenHeight = screen.size.height + screen.safeAreaInsets.top + screen.safeAreaInsets.bottom
             let minimumStage = dynamicTypeSize.isAccessibilitySize ? 0 :
@@ -35,11 +37,12 @@ struct JourneyScreen<Stage: View, Tray: View, Actions: View>: View {
                             .scrollBounceBehavior(.basedOnSize)
                             .scrollIndicatorsFlash(onAppear: true)
                     }
-                    .frame(height: min(contentHeight, limit), alignment: .top)
+                    .frame(height: reservedTrayFraction == nil ? min(contentHeight, limit) : limit, alignment: .top)
                     actions()
                         .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { actionsHeight = $0 }
                         .guideAvoid()
                 }
+                .frame(height: reservedTrayFraction == nil ? nil : max(0, screen.size.height * fraction - 30), alignment: .top)
                 .padding(.horizontal, Design.Spacing.tray)
                 .padding(.top, 22)
                 .padding(.bottom, 8)

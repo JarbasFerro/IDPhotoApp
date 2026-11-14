@@ -22,14 +22,14 @@ struct PhotoWorkflowTests {
         #expect(model.activity == nil)
     }
 
-    @Test func cancelledExportCannotPresentAFileAndIsDiscarded() async throws {
+    @Test(arguments: [false, true]) func cancelledExportCannotPresentAFileAndIsDiscarded(finishing: Bool) async throws {
         let pipeline = DelayedPipeline()
         let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         model.install(try await fixture(), mode: .add)
         #expect(model.unlockAll())
         model.prepareExport()
         await pipeline.waitForExport()
-        model.cancel()
+        if finishing { model.finishExport() } else { model.cancel() }
         let result = PhotoExport(id: UUID(), jpegs: [URL(fileURLWithPath: "/unused.jpg")], pdf: URL(fileURLWithPath: "/unused.pdf"),
                                  pages: [], layout: PrintLayout(pages: [], unplaced: [:]))
         await pipeline.completeExport(with: result)
@@ -38,7 +38,7 @@ struct PhotoWorkflowTests {
         #expect(model.activity == nil)
     }
 
-    @Test func digitalExportUsesOnlyTheSelectedPhotoAndDiscardsLateResult() async throws {
+    @Test(arguments: [false, true]) func digitalExportUsesOnlyTheSelectedPhotoAndDiscardsLateResult(finishing: Bool) async throws {
         let pipeline = DelayedPipeline()
         let model = PhotoWorkflow(pipeline: pipeline, credits: CreditStore(startingBalance: 6))
         let first = try await fixture(), second = try await fixture()
@@ -48,7 +48,7 @@ struct PhotoWorkflowTests {
         model.prepareDigitalExport(for: second.id)
         await pipeline.waitForDigitalExport()
         #expect(await pipeline.digitalExportedIDs == [second.id])
-        model.cancel()
+        if finishing { model.finishExport() } else { model.cancel() }
         let result = DigitalExport(id: UUID(), photoID: second.id, jpeg: URL(fileURLWithPath: "/unused.jpg"))
         await pipeline.completeDigitalExport(with: result)
         await pipeline.waitForExportDiscard(result.id)
@@ -65,7 +65,7 @@ struct PhotoWorkflowTests {
         #expect(model.entries.map(\.id) == [first.id, second.id])
         #expect(model.selectedID == second.id)
         #expect(model.adjustment.zoom == 1)
-        #expect(model.printItems(for: first.id).map(\.copies) == [8])
+        #expect(model.printItems(for: first.id).map(\.copies) == [12])
         #expect(model.printItems(for: second.id).map(\.copies) == [4])
         #expect(model.label(for: second.id) == "Photo 2")
         model.selectedID = first.id
@@ -128,9 +128,10 @@ struct PhotoWorkflowTests {
     }
 
     private func waitUntil(_ condition: () -> Bool) async {
-        for _ in 0..<10_000 {
+        let deadline = ContinuousClock.now + .seconds(10)
+        while ContinuousClock.now < deadline {
             if condition() { return }
-            await Task.yield()
+            try? await Task.sleep(for: .milliseconds(10))
         }
         Issue.record("Workflow did not reach expected state")
     }
@@ -173,23 +174,28 @@ private actor DelayedPipeline: PhotoProcessing {
     func completeDigitalExport(with result: DigitalExport) { pendingDigitalExport?.resume(returning: result); pendingDigitalExport = nil }
 
     func waitForImports(_ count: Int) async {
-        for _ in 0..<10_000 { if imports.count >= count { return }; await Task.yield() }
+        let deadline = ContinuousClock.now + .seconds(10)
+        while ContinuousClock.now < deadline { if imports.count >= count { return }; try? await Task.sleep(for: .milliseconds(10)) }
         Issue.record("Import did not start")
     }
     func waitForExport() async {
-        for _ in 0..<10_000 { if pendingExport != nil { return }; await Task.yield() }
+        let deadline = ContinuousClock.now + .seconds(10)
+        while ContinuousClock.now < deadline { if pendingExport != nil { return }; try? await Task.sleep(for: .milliseconds(10)) }
         Issue.record("Export did not start")
     }
     func waitForDigitalExport() async {
-        for _ in 0..<10_000 { if pendingDigitalExport != nil { return }; await Task.yield() }
+        let deadline = ContinuousClock.now + .seconds(10)
+        while ContinuousClock.now < deadline { if pendingDigitalExport != nil { return }; try? await Task.sleep(for: .milliseconds(10)) }
         Issue.record("Digital export did not start")
     }
     func waitForPhotoDiscard(_ id: UUID) async {
-        for _ in 0..<10_000 { if discardedPhotos.contains(id) { return }; await Task.yield() }
+        let deadline = ContinuousClock.now + .seconds(10)
+        while ContinuousClock.now < deadline { if discardedPhotos.contains(id) { return }; try? await Task.sleep(for: .milliseconds(10)) }
         Issue.record("Stale photo was not discarded")
     }
     func waitForExportDiscard(_ id: UUID) async {
-        for _ in 0..<10_000 { if discardedExports.contains(id) { return }; await Task.yield() }
+        let deadline = ContinuousClock.now + .seconds(10)
+        while ContinuousClock.now < deadline { if discardedExports.contains(id) { return }; try? await Task.sleep(for: .milliseconds(10)) }
         Issue.record("Stale export was not discarded")
     }
 }

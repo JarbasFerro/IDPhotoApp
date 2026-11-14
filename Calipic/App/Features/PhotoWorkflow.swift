@@ -279,7 +279,7 @@ final class PhotoWorkflow {
         let entry = PhotoEntry(photo: photo)
         if mode == .add, canAddPhoto || selectedIndex == nil {
             entries.append(entry)
-            appendDefaultPrintItem(for: photo, copies: entries.count == 1 ? 8 : 4)
+            appendDefaultPrintItem(for: photo, copies: entries.count == 1 ? nil : 4)
         } else if let index = selectedIndex {
             let previous = entries[index]
             stopWork(for: previous.id)
@@ -291,7 +291,7 @@ final class PhotoWorkflow {
             Task { await pipeline.discard(photoID: previous.id) }
         } else {
             entries.append(entry)
-            appendDefaultPrintItem(for: photo, copies: 8)
+            appendDefaultPrintItem(for: photo, copies: nil)
         }
         selectedID = photo.id
         showsOriginal = false
@@ -574,6 +574,8 @@ final class PhotoWorkflow {
     }
 
     func finishExport() {
+        // A layout edit or leaving the output also invalidates a file still being rendered.
+        if activity == .exporting { cancelWork() }
         guard let id = exportLease else { return }
         exportLease = nil
         exported = nil
@@ -622,10 +624,16 @@ final class PhotoWorkflow {
 
     // MARK: - Print job editing
 
-    private func appendDefaultPrintItem(for photo: PreparedPhoto, copies: Int) {
+    private func appendDefaultPrintItem(for photo: PreparedPhoto, copies: Int?) {
         let format = renderTarget.format
         printJob.items.append(PrintItem(photoID: photo.id, trimWidthMM: format.widthMM,
-                                        trimHeightMM: format.heightMM, copies: copies))
+                                        trimHeightMM: format.heightMM, copies: copies ?? 1))
+        if copies == nil, let itemID = printJob.items.last?.id,
+           let count = PrintLayoutSolver.copiesFillingOnePage(job: printJob, itemID: itemID) {
+            printJob.items[printJob.items.count - 1].copies = count
+        } else if copies == nil {
+            printJob.items[printJob.items.count - 1].copies = 8
+        }
     }
 
     func addPrintItem(format: PhotoFormat, photoID: UUID? = nil) {

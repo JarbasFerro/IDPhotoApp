@@ -14,13 +14,17 @@ class CalipicUITestCase: XCTestCase {
     /// `bottomClearance` also scrolls a hittable element up out of the bottom band, where a drag would be read as
     /// the system's go-home swipe.
     func reveal(_ element: XCUIElement, in app: XCUIApplication, attempts: Int = 8, bottomClearance: CGFloat = 0) {
-        for _ in 0..<attempts where !(element.exists && element.isHittable)
-            || (bottomClearance > 0 && element.frame.maxY > app.frame.height - bottomClearance) {
-            let scroll = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch
-                : app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : nil
+        for _ in 0..<attempts {
+            let scroll = app.scrollViews.allElementsBoundByIndex.first {
+                $0.identifier != "sheetPreview" && $0.frame.height > 100 && $0.isHittable
+            } ?? (app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : nil)
+            let inside = scroll.map { !element.identifier.isEmpty && $0.descendants(matching: .any)[element.identifier].exists } ?? false
+            let clipped = inside && element.frame.maxY > (scroll?.frame.maxY ?? .greatestFiniteMagnitude) + 1
+            let needsClearance = bottomClearance > 0 && element.frame.maxY > app.frame.height - bottomClearance
+            if element.exists && element.isHittable && !clipped && !needsClearance { return }
             guard let scroll else { return }
-            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.85))
-                .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.97, dy: 0.3)))
+            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.75))
+                .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.6, dy: 0.25)))
         }
     }
 
@@ -76,6 +80,13 @@ class CalipicUITestCase: XCTestCase {
         return app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'appIcon-'"))
     }
 
+    @MainActor
+    func waitForPrintFiles(_ app: XCUIApplication) {
+        app.buttons["printMenu"].tap()
+        waitUntilEnabled(app.buttons["moreFormats"])
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.4)).tap()
+    }
+
     /// Reaches Print with the photos unlocked and the files ready.
     @MainActor
     func launchToUnlockedPrint() -> XCUIApplication {
@@ -90,7 +101,8 @@ class CalipicUITestCase: XCTestCase {
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
         app.buttons["unlockAndPrint"].tap()
-        waitUntilEnabled(app.buttons["moreFormats"])
+        waitForPrintFiles(app)
+        if app.buttons["changeRoute"].exists { app.buttons["changeRoute"].tap() }
         app.buttons["routeHome"].tap()
         return app
     }

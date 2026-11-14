@@ -16,7 +16,7 @@ enum TutorialCopy {
         case .output: output == .print ? "Looks good? Tap Print. Retakes and fixes are free."
                                        : "Looks good? Tap here to continue. Retakes and fixes are free."
         case .paper: "Choose the paper you'll print on."
-        case .copies: "Choose how many copies, or fill the free space on the page."
+        case .copies: "Choose how many copies you need. Fill Pages adds whole pages."
         case .continueSheet: "All set? Tap Continue."
         case .unlock: "This is your one free photo. Unlocking it uses your free credit."
         case .route: "Choose where you'll print."

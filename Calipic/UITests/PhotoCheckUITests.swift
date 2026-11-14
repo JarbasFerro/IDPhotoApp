@@ -112,7 +112,7 @@ final class PhotoCheckUITests: CalipicUITestCase {
         app.buttons["continueToShare"].tap()
         // Print: nothing can leave the app until the photo is unlocked with a credit (ADR-048, ADR-049).
         XCTAssertTrue(any(app, "unlockCard").waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["creditBalanceLine"].label.contains("1"))
+        XCTAssertFalse(any(app, "creditBalanceLine").exists)
         XCTAssertFalse(app.buttons["printAtHome"].exists)
         XCTAssertFalse(app.buttons["moreFormats"].exists)
         XCTAssertFalse(app.buttons["shareDone"].exists)
@@ -122,10 +122,12 @@ final class PhotoCheckUITests: CalipicUITestCase {
         // Unlocked: where to print is an explicit choice before the main button works.
         XCTAssertTrue(app.buttons["chooseRouteFirst"].waitForExistence(timeout: 10))
         attachBothAppearances(app, "Print, choose where")
+        if app.buttons["changeRoute"].exists { app.buttons["changeRoute"].tap() }
         app.buttons["routeHome"].tap()
         XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
-        waitUntilEnabled(app.buttons["moreFormats"])
+        waitForPrintFiles(app)
         attachBothAppearances(app, "Print")
+        app.buttons["printMenu"].tap()
         app.buttons["moreFormats"].tap()
         XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))
         XCTAssertTrue(app.buttons["sharePDF"].exists)
@@ -133,6 +135,7 @@ final class PhotoCheckUITests: CalipicUITestCase {
         app.buttons["formatsDone"].tap()
         XCTAssertTrue(app.buttons["formatsDone"].waitForNonExistence(timeout: 5))
         // At a shop: the steps change and the main button shares the print image directly, with no extra sheet.
+        if app.buttons["changeRoute"].exists { app.buttons["changeRoute"].tap() }
         app.buttons["routeShop"].tap()
         XCTAssertTrue(any(app, "sharePages").waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["printAtHome"].exists)
@@ -158,11 +161,11 @@ final class PhotoCheckUITests: CalipicUITestCase {
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 10))
         app.buttons["unlockAndPrint"].tap()
-        waitUntilEnabled(app.buttons["moreFormats"])
-        // Back to the sheet, then to the photo.
+        waitForPrintFiles(app)
+        // Back through the tray states, then leave the layout to return to Photo Check.
+        app.buttons["printBack"].tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(app.buttons["person-1"].waitForExistence(timeout: 5))
-        app.buttons["person-1"].tap()
         XCTAssertTrue(any(app, "unlockedNote").waitForExistence(timeout: 10))
         attach(app, "Photo Check, unlocked")
         reveal(app.buttons["adjust"], in: app)
@@ -203,6 +206,7 @@ final class PhotoCheckUITests: CalipicUITestCase {
         attach(app, "Print at accessibility text size")
         app.buttons["unlockAndPrint"].tap()
         reveal(app.buttons["routeHome"], in: app, attempts: 10)
+        if app.buttons["changeRoute"].exists { app.buttons["changeRoute"].tap() }
         app.buttons["routeHome"].tap()
         XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
         reveal(app.buttons["printAtHome"], in: app, attempts: 10)

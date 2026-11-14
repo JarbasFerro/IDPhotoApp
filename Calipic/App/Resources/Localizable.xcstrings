@@ -228,22 +228,6 @@
         }
       }
     },
-    "Choose how many copies, or fill the free space on the page." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige cuántas copias, o llena el espacio libre de la página."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha quantas cópias, ou preencha o espaço livre da página."
-          }
-        }
-      }
-    },
     "Choose the paper you'll print on." : {
       "localizations" : {
         "es" : {
@@ -1268,22 +1252,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajustar"
-          }
-        }
-      }
-    },
-    "After this, framing and edits are final." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Después, el encuadre y los ajustes son definitivos."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Depois disso, o enquadramento e os ajustes são definitivos."
           }
         }
       }
@@ -2984,22 +2952,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escolha onde imprimir"
-          }
-        }
-      }
-    },
-    "Choose where you print to see the steps." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige dónde imprimes para ver los pasos."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha onde você imprime para ver os passos."
           }
         }
       }
@@ -6598,22 +6550,6 @@
         }
       }
     },
-    "Unlock your photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquea tu foto"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloqueie sua foto"
-          }
-        }
-      }
-    },
     "Use Photo" : {
       "localizations" : {
         "es" : {
@@ -8204,22 +8140,6 @@
         }
       }
     },
-    "You have %@. After this: %@." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tienes %1$@. Después: %2$@."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Você tem %1$@. Depois: %2$@."
-          }
-        }
-      }
-    },
     "You have %@. You need %@." : {
       "localizations" : {
         "es" : {
@@ -8232,22 +8152,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Você tem %1$@. Precisa de %2$@."
-          }
-        }
-      }
-    },
-    "Your digital photo is ready." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu foto digital está lista."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sua foto digital está pronta."
           }
         }
       }
@@ -10672,22 +10576,6 @@
         }
       }
     },
-    "Before you print" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antes de imprimir"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Antes de imprimir"
-          }
-        }
-      }
-    },
     "Choose Actual Size, or 100 %" : {
       "localizations" : {
         "es" : {
@@ -10944,22 +10832,6 @@
         }
       }
     },
-    "Never Fit to Page or borderless" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No uses Ajustar a la página ni Sin bordes"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nunca Ajustar à página nem Sem bordas"
-          }
-        }
-      }
-    },
     "Order a standard print on %@ paper" : {
       "localizations" : {
         "es" : {
@@ -11152,22 +11024,6 @@
         }
       }
     },
-    "Unlock and Save" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquear y guardar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquear e salvar"
-          }
-        }
-      }
-    },
     "Unlocked. Printing and sharing this photo is free." : {
       "localizations" : {
         "es" : {
@@ -11196,22 +11052,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sua impressora usa o papel mais próximo que ela oferece. Para outros tamanhos, imprima em uma loja."
-          }
-        }
-      }
-    },
-    "Your sheet is ready" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu hoja está lista"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sua folha está pronta"
           }
         }
       }
@@ -12252,6 +12092,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Seus olhos parecem fechados ou voltados para baixo."
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrás"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voltar"
+          }
+        }
+      }
+    },
+    "Unlock this photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquea esta foto"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloqueie esta foto"
+          }
+        }
+      }
+    },
+    "Print at home" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir en casa"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir em casa"
+          }
+        }
+      }
+    },
+    "Print at a shop" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir en una tienda"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir em uma loja"
+          }
+        }
+      }
+    },
+    "Unlock · %@" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear · %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desbloquear · %@"
+          }
+        }
+      }
+    },
+    "Change where" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar lugar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mudar o local"
+          }
+        }
+      }
+    },
+    "Choose Actual Size, or 100 %. Never Fit to Page." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige Tamaño real o 100 %. Nunca Ajustar a la página."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha Tamanho real ou 100 %. Nunca Ajustar à página."
+          }
+        }
+      }
+    },
+    "More sizes and paper" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más tamaños y papel"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mais tamanhos e papéis"
+          }
+        }
+      }
+    },
+    "Fill pages" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Llenar páginas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preencher páginas"
+          }
+        }
+      }
+    },
+    "^[%lld page](inflect: true)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld página](inflect: true)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld página](inflect: true)"
+          }
+        }
+      }
+    },
+    "^[%lld page](inflect: true) · ^[%lld copy](inflect: true)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%1$lld página](inflect: true) · ^[%2$lld copia](inflect: true)"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%1$lld página](inflect: true) · ^[%2$lld cópia](inflect: true)"
+          }
+        }
+      }
+    },
+    "Your digital photo is ready" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu foto digital está lista"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua foto digital está pronta"
+          }
+        }
+      }
+    },
+    "Unlocking gives you every print and the digital photo, as often as you like. Edits are final after that." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al desbloquearla, puedes imprimirla y usar la foto digital tantas veces como quieras. Después ya no podrás editarla."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ao desbloquear, você pode imprimir e usar a foto digital quantas vezes quiser. Depois disso, as edições são definitivas."
+          }
+        }
+      }
+    },
+    "You have no credits." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tienes créditos."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você não tem créditos."
+          }
+        }
+      }
+    },
+    "Choose how many copies you need. Fill Pages adds whole pages." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige cuántas copias necesitas. Llenar páginas añade páginas completas."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha quantas cópias você precisa. Preencher páginas adiciona páginas inteiras."
           }
         }
       }

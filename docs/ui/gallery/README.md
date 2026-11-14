@@ -1,6 +1,14 @@
 # Screenshot gallery
 
-Most screens were exported on 2026-11-12. Photo Check is updated for 0.21.0 pass 1 (2026-11-14), with the public generated sample, in Light and Dark, English, Spanish and Portuguese. Long supporting sentences make the tray scroll while its actions stay pinned; the gallery shows its initial position. Older Photo Check measuring / unlocked / large-text captures below still show 0.20.
+Print and Digital Photo are updated for 0.21.1 pass 2 (2026-11-14). The contact sheets below show layout, two pages, unlock, route, home, shop, digital unlock and digital ready, using only the public generated sample. Print keeps its page in the same position; long tray content scrolls above pinned actions.
+
+- English: [Light](pass2-en-light.png) · [Dark](pass2-en-dark.png)
+- Spanish: [Light](pass2-es-light.png) · [Dark](pass2-es-dark.png)
+- Portuguese: [Light](pass2-pt-br-light.png) · [Dark](pass2-pt-br-dark.png)
+- Digital Photo: [Unlock](digital-locked.png) · [Ready](digital-ready.png) · [Unlock, Dark](digital-locked-dark.png) · [Ready, Dark](digital-ready-dark.png)
+- Print route: [Light](print-routes.png) · [Dark](print-routes-dark.png)
+
+Other screens were exported on 2026-11-12. Photo Check is updated for 0.21.0 pass 1 (2026-11-14), with the public generated sample, in Light and Dark, English, Spanish and Portuguese. Long supporting sentences make the tray scroll while its actions stay pinned; the gallery shows its initial position. Older Photo Check measuring / unlocked / large-text captures below still show 0.20.
 
 - [Adjust, top](adjust-top.png)
 - [Adjust](adjust.png)

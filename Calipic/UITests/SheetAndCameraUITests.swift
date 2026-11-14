@@ -202,12 +202,14 @@ final class SheetAndCameraUITests: CalipicUITestCase {
         app.buttons["paper-a4"].tap()
         XCTAssertTrue(app.buttons["paper-a4"].isSelected)
         // Cutting options open from the scissors in the bar.
+        app.buttons["printMenu"].tap()
         app.buttons["cuttingOptions"].tap()
         XCTAssertTrue(app.buttons["cuttingDone"].waitForExistence(timeout: 5))
         attach(app, "Cutting options")
         app.buttons["cuttingDone"].tap()
         XCTAssertTrue(app.buttons["cuttingDone"].waitForNonExistence(timeout: 5))
         // Extra sizes live in the options sheet.
+        app.buttons["printMenu"].tap()
         app.buttons["moreOptions"].tap()
         let addSize = app.buttons["addSize-1"]
         XCTAssertTrue(addSize.waitForExistence(timeout: 5))
@@ -238,7 +240,7 @@ final class SheetAndCameraUITests: CalipicUITestCase {
         XCTAssertTrue(app.buttons["personCircle-2"].exists)
         // Selecting a person moves the tray to them.
         app.buttons["personCircle-2"].tap()
-        XCTAssertTrue(app.buttons["person-2"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["personCircle-2"].isSelected)
         attachBothAppearances(app, "Your sheet, two people")
         app.buttons["continueToShare"].tap()
         // Two people need two credits; a new person starts with one.
@@ -253,7 +255,8 @@ final class SheetAndCameraUITests: CalipicUITestCase {
         app.buttons["creditsDone"].tap()
         XCTAssertTrue(app.buttons["unlockAndPrint"].waitForExistence(timeout: 5))
         app.buttons["unlockAndPrint"].tap()
-        waitUntilEnabled(app.buttons["moreFormats"])
+        waitForPrintFiles(app)
+        app.buttons["printMenu"].tap()
         app.buttons["moreFormats"].tap()
         XCTAssertTrue(app.buttons["shareJPEG"].waitForExistence(timeout: 20))
         XCTAssertTrue(app.buttons["shareJPEG-2"].exists)

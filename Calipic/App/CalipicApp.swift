@@ -56,6 +56,9 @@ struct CalipicApp: App {
                         // "--uitesting-custom-size" starts with a 30 × 40 mm custom size (ADR-018 controls).
                         let arguments = ProcessInfo.processInfo.arguments
                         if arguments.contains("--uitesting-custom-size") { model.setDocument(.custom(widthMM: 30, heightMM: 40)) }
+                        if arguments.contains("--uitesting-shop-only"), let profile = ProfileCatalog.bundled.profile("gb.passport.standard") {
+                            model.setDocument(.official(profile))
+                        }
                         model.debugSyntheticFace = arguments.contains("--uitesting-measured")
                         let fixtures = arguments.contains("--uitesting-fixture-2") ? 2 : arguments.contains("--uitesting-fixture") ? 1 : 0
                         for index in 0..<fixtures {

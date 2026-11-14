@@ -10,7 +10,6 @@ enum ZoomSource {
         case .check: "check-\(index)"
         case .digital: "digital-\(index)"
         case .sheet: "sheet-\(index)"
-        case .share: "share-\(index)"
         }
     }
 

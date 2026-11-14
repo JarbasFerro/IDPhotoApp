@@ -35,7 +35,7 @@ scripts/                          version bump, test runner, rules validator and
 
 Views describe UI. They call `PhotoWorkflow`; the workflow calls the pipeline through the `PhotoProcessing` protocol, so tests can substitute it.
 
-Since 0.21 pass 1, `Features/Journey` owns `JourneyScreen`, `TrayRow` / `TrayRows`, `TrayActions` and `StatusMark`. Photo Check uses them; other journey screens migrate in later passes. Presentation-only `presentedChecks` is an in-memory set of photo IDs on the workflow, cleared per removed photo, so returning does not replay measuring or feedback. Landing, verdict bounce, timed compare and hold-release work are view-bound cancellable tasks; domain verdicts and image/export processing are unchanged.
+Since 0.21 pass 1, `Features/Journey` owns `JourneyScreen`, `TrayRow` / `TrayRows`, `TrayActions` and `StatusMark`. Photo Check, Print and Digital Photo use them; other journey screens migrate in later passes. Presentation-only `presentedChecks` is an in-memory set of photo IDs on the workflow, cleared per removed photo, so returning does not replay measuring or feedback. Landing, verdict bounce, timed compare and hold-release work are view-bound cancellable tasks; domain verdicts and image/export processing are unchanged.
 
 ## 3. The life of a photo
 
@@ -52,7 +52,7 @@ Changing the document re-solves the crop from the stored geometry with no new Vi
 
 - `PhotoWorkflow` is `@MainActor`. `PhotoPipeline` is an actor. Camera delegates run on their own queues.
 - Every long task is tied to an identity: a session `revision`, a photo ID, and an export lease. A result is applied only if its photo still exists and its task was not cancelled. Follow this pattern for all new async work.
-- Cancellation propagates: importing, analysis, previews, thumbnails, and exports each have a task that is cancelled when replaced. Going to the background cancels running work.
+- Cancellation propagates: importing, analysis, previews, thumbnails, and exports each have a task that is cancelled when replaced. Going to the background cancels running work. Since 0.21 pass 2, `finishExport()` also cancels an export still rendering, invalidates its revision and discards any late result; completed leases are deleted as before. Print calls it before returning to layout, so files from an old layout cannot be reused.
 - Exceptions to strict isolation, each needing its written reason kept next to the code: `nonisolated(unsafe)` capture-session objects in `CameraController`; `@unchecked Sendable` on `FrameAnalyzer` and `PhotoCaptureProcessor`. Do not add more without the proof AGENTS.md §3 asks for.
 
 ## 5. Coordinate spaces
@@ -66,6 +66,8 @@ Named types, never bare `CGRect`s across layers: source pixels, normalized image
 - `scripts/rules/build_app_catalog.py` writes the one bundled file `App/Resources/CalipicCatalog.json`; `--check` fails when it is stale.
 - In the app: `DocumentProfile` decodes it; `DocumentChoice` (official profile or custom size) produces a `RenderTarget`: trim format, composition spec, digital output spec, file name, page resolution. `DocumentStore` picks the first document: saved choice, then the region default, then ask once.
 - Profile names and check labels are String Catalog keys (`profile.<id>.name`, `check.<id>`). Build such a key as a plain `String` before `String(localized:)`; an interpolated literal looks up the wrong key.
+
+Print is one `Route.sheet` destination, owned by `PrintView`; `Route.share` is gone. Its step is derived from layout confirmation, locked count and route choice. The stage remains mounted while the tray changes. `PrintView+Layout` owns copy/paper controls; `SheetView` now contains reusable sheets, previews and `SheetChoices`. `copiesFillingOnePage` in the pure solver chooses the first person's default; later people still start at four. Fill calculations use one job/item identity so switching people cannot publish an older result.
 
 ## 7. Credits and the export gate
 
@@ -95,7 +97,7 @@ Named types, never bare `CGRect`s across layers: source pixels, normalized image
 | Bundled catalog is current | `python3 scripts/rules/build_app_catalog.py --check` |
 | Plain wording | `python3 scripts/strings/check_copy.py` |
 
-State at 0.21.0 pass 1: 209 test cases, 206 pass, 3 intentionally skipped (evidence capture and the private portrait harness, which run only on request). Parameterized cases add executions. The full run is `build/pass1-green.xcresult`; simulator motion recordings and the six-language/appearance Photo Check captures are in `build/pass1-*`, with the public gallery captures committed under `docs/ui/gallery/`.
+State at 0.21.1 pass 2: 214 test cases, 211 pass, zero failures and 3 intentionally skipped. The full run is `build/pass2-green.xcresult`; parameterized cases add executions. Three opt-in evidence/device cases intentionally skip unless requested. The layout, route, unlock, home, shop and Digital Photo states were reviewed in Light and Dark in English, Spanish and Portuguese; public captures are committed under `docs/ui/gallery/`. The smaller-screen Print Check flows also pass. `PhotoWorkflowTests` waits use elapsed-time deadlines rather than a scheduler-yield count, so cancellation checks remain meaningful under parallel simulator load. The simulator recording confirms copy reveal and unlock lift; the Reduce Motion comparison was interrupted by the device-runner watchdog and remains pending with physical motion/haptic review.
 
 UI tests launch with flags: `--uitesting-fresh` (Spain DNI, nothing saved, one in-memory credit, print panel suppressed), `--uitesting-fixture`, `--uitesting-fixture-2`, `--uitesting-custom-size`.
 

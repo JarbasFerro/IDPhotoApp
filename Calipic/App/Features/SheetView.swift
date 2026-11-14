@@ -1,306 +1,6 @@
 import SwiftUI
 
-/// Step 3 (design 3b): the paper is the hero; people, copies and paper sit in one tray at thumb height.
-/// Extra sizes and custom paper live in the options sheet; cutting options open from the scissors in the bar.
-struct SheetView: View {
-    @Bindable var model: PhotoWorkflow
-    @Binding var path: [Route]
-    let acquire: Acquire
-    @State private var selectedPerson: UUID?
-    @State private var showOptions = false
-    @State private var showCutting = false
-    /// Counts the person's own taps on the copies stepper, so switching person does not tick it.
-    @State private var copiesTick = 0
-    /// Rows of the first page shown so far while the copies appear after Photo Check; nil shows every row.
-    @State private var revealedRows: Int?
-    @State private var hasRevealed = false
-    /// "Fill" menu choices for the selected person, worked out off the main actor whenever the sheet changes.
-    @State private var fill: [FillChoice] = []
-    @Environment(\.zoomNamespace) private var zoomNamespace
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var person: PhotoEntry? { model.entries.first { $0.id == selectedPerson } ?? model.entries.first }
-
-    var body: some View {
-        let layout = model.layout
-        Group {
-            if dynamicTypeSize.isAccessibilitySize {
-                ScrollView {
-                    VStack(spacing: Design.Spacing.group) {
-                        matPreview(layout, box: CGSize(width: 260, height: 260))
-                            .padding(.vertical, Design.Spacing.group)
-                            .onMat()
-                        summaryLine(layout)
-                        trayContent(layout).padding(.horizontal)
-                    }
-                    .padding(.bottom)
-                }
-            } else {
-                VStack(spacing: 0) {
-                    GeometryReader { geometry in
-                        matPreview(layout, box: CGSize(width: max(160, geometry.size.width - 48),
-                                                       height: max(160, geometry.size.height - 32)))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    }
-                    // The page lies on the mat; the text sits below it.
-                    .onMat()
-                    summaryLine(layout)
-                        .padding(.vertical, Design.Spacing.text)
-                    trayContent(layout)
-                        .padding(.horizontal, 20).padding(.top, 18).padding(.bottom, Design.Spacing.text)
-                        .background {
-                            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
-                                .fill(Design.Surface.tray)
-                                .ignoresSafeArea(edges: .bottom)
-                        }
-                }
-            }
-        }
-        .background(Design.Surface.screen)
-        .guideOverlay(model.tutorial, current: guideTip, output: .print)
-        // Using the control counts as reading its tip.
-        .onChange(of: model.printJob.paper.id) { model.tutorial.pass(.paper) }
-        .onChange(of: copiesTick) { model.tutorial.pass(.copies) }
-        .navigationTitle("Your sheet")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) { StepMarker(current: .output, output: .print) }
-            // Cutting options sat inside the paper list, where nobody looked for them (founder, 0.20 review).
-            ToolbarItem(placement: .primaryAction) {
-                Button { showCutting = true } label: { Label("Cutting options", systemImage: "scissors") }
-                    .accessibilityIdentifier("cuttingOptions")
-            }
-        }
-        .sheet(isPresented: $showOptions) { SheetOptionsView(model: model) }
-        .sheet(isPresented: $showCutting) { CuttingOptionsView(model: model) }
-        .task { model.refreshSheetThumbnails() }
-        .task { await revealCopies() }
-        .task(id: "\(model.printJob.hashValue)-\(person?.id.uuidString ?? "")") {
-            guard let person, let itemID = model.printItems(for: person.id).first?.id else { fill = []; return }
-            let choices = await Self.fillChoices(job: model.printJob, itemID: itemID)
-            if !Task.isCancelled { fill = choices }
-        }
-        .sensoryFeedback(.impact(weight: .light), trigger: revealedRows) { _, new in (new ?? 0) > 0 }
-        .onChange(of: model.printJob.items.map { "\($0.id)-\($0.photoID)" }) { _, _ in model.refreshSheetThumbnails() }
-    }
-
-    private func matPreview(_ layout: PrintLayout, box: CGSize) -> some View {
-        // Page captions are left to the accessibility label here: bare text may not sit on the mat's grid.
-        SheetPreview(layout: layout, thumbnails: model.sheetThumbnails, captions: false, pageBox: box,
-                     revealedRows: revealedRows)
-            // Print zooms out of the page (U4).
-            .zoomSource(.share, at: (path.firstIndex(of: .sheet) ?? 0) + 1, in: zoomNamespace)
-    }
-
-    /// Arriving from Photo Check, the photo has just zoomed into the page; its copies then appear one row after
-    /// another with a light tap each (U4). Once per visit, never under Reduce Motion.
-    private func revealCopies() async {
-        guard !hasRevealed else { return }
-        hasRevealed = true
-        guard !reduceMotion, let index = path.firstIndex(of: .sheet), index > 0, case .check = path[index - 1],
-              let rows = model.layout.pages.first?.displayRows.count, rows > 1 else { return }
-        revealedRows = 0
-        try? await Task.sleep(for: .milliseconds(300))
-        for row in 1...rows {
-            guard !Task.isCancelled else { break }
-            withAnimation(.spring(duration: 0.35, bounce: 0.2)) { revealedRows = row }
-            try? await Task.sleep(for: .milliseconds(110))
-        }
-        withAnimation(.easeOut(duration: 0.25)) { revealedRows = nil }
-    }
-
-    private func summaryLine(_ layout: PrintLayout) -> some View {
-        Text(summary(layout))
-            .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
-            .monospacedDigit()
-            .contentTransition(.numericText(value: Double(layout.placedCount * 100 + layout.pages.count)))
-            .animation(reduceMotion ? nil : .snappy, value: summary(layout))
-            .accessibilityIdentifier("layoutSummary")
-    }
-
-    // MARK: - Tray
-
-    private func trayContent(_ layout: PrintLayout) -> some View {
-        VStack(alignment: .leading, spacing: Design.Spacing.group) {
-            if let person { personLine(person) }
-            HStack(spacing: Design.Spacing.control) {
-                ScrollView(.horizontal) {
-                    HStack(spacing: Design.Spacing.cardContent) {
-                        ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
-                            personCircle(entry, index: index)
-                        }
-                        addPersonMenu
-                    }
-                    .padding(.vertical, 8).padding(.horizontal, 4)
-                }
-                .scrollIndicators(.hidden)
-                if let person, let copies = copiesBinding(for: person) {
-                    if !fill.isEmpty { fillMenu(for: person) }
-                    Stepper("Copies",
-                            onIncrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: true) },
-                            onDecrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: false) })
-                        .labelsHidden()
-                        .accessibilityValue(Text("^[\(copies.wrappedValue) copy](inflect: true)"))
-                        .sensoryFeedback(.selection, trigger: copiesTick)
-                        .guideTarget(.copies, current: guideTip)
-                        .accessibilityIdentifier("copiesStepper")
-                }
-            }
-            paperChips
-                .sensoryFeedback(.selection, trigger: model.printJob.paper.id)
-                .guideTarget(.paper, current: guideTip, cornerRadius: 24)
-            if !layout.isComplete {
-                StatusLabel(text: "\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.", state: .warn)
-                    .font(.subheadline)
-            }
-            Button { path.append(.share) } label: {
-                Text("Continue").frame(maxWidth: .infinity)
-            }
-            .brandProminentButtonStyle()
-            .controlSize(.large)
-            .disabled(layout.pages.isEmpty || model.activity != nil)
-            .guideTarget(.continueSheet, current: guideTip)
-            .accessibilityIdentifier("continueToShare")
-        }
-    }
-
-    private func personLine(_ person: PhotoEntry) -> some View {
-        let index = model.entries.firstIndex { $0.id == person.id } ?? 0
-        let items = model.printItems(for: person.id)
-        let copies = items.reduce(0) { $0 + $1.copies }
-        let sizes = items.map { DocumentPresentation.size(widthMM: $0.trimWidthMM, heightMM: $0.trimHeightMM) }.joined(separator: ", ")
-        return HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                Text(model.entries.count > 1 ? LocalizedStringKey("Photo \(index + 1)") : LocalizedStringKey("Your photo"))
-                    .font(Design.Typography.rowTitle)
-                Text("\(sizes) · ^[\(copies) copy](inflect: true)")
-                    .font(Design.Typography.note).foregroundStyle(.secondary)
-            }
-            .contentTransition(.numericText(value: Double(copies)))
-            .animation(reduceMotion ? nil : .snappy, value: copies)
-            .accessibilityElement(children: .combine)
-            Spacer()
-            Button { path.append(.check(person.id)) } label: {
-                Text("Check")
-                    .font(.subheadline)
-                    .frame(minWidth: Design.Size.minimumTarget, minHeight: Design.Size.minimumTarget, alignment: .trailing)
-                    .contentShape(Rectangle())
-            }
-            .accessibilityIdentifier("person-\(index + 1)")
-        }
-    }
-
-    private func personCircle(_ entry: PhotoEntry, index: Int) -> some View {
-        let selected = entry.id == person?.id
-        let copies = model.printItems(for: entry.id).reduce(0) { $0 + $1.copies }
-        // The miniature covers the whole circle whatever the photo's shape; a fitted one left bars at the sides.
-        let aspect = model.renderTarget.format.aspectRatio
-        let width = max(52, 52 * aspect)
-        return Button { selectedPerson = entry.id } label: {
-            PortraitView(entry: entry, format: model.renderTarget.format)
-                .frame(width: width, height: width / aspect)
-                .frame(width: 52, height: 52, alignment: .top)
-                .clipShape(Circle())
-                .overlay(Circle().strokeBorder(selected ? Color.brandAccent : Color(.separator), lineWidth: selected ? 3 : 1))
-                .overlay(alignment: .topTrailing) {
-                    Text(verbatim: "\(copies)")
-                        .font(.caption2.weight(.bold)).monospacedDigit()
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 5)
-                        .frame(minWidth: 22, minHeight: 22)
-                        .background(Color.brandAccentFill, in: Capsule())
-                        .offset(x: 6, y: -6)
-                        .contentTransition(.numericText(value: Double(copies)))
-                        .animation(reduceMotion ? nil : .snappy, value: copies)
-                }
-        }
-        .buttonStyle(.plain)
-        .contextMenu {
-            Button { path.append(.check(entry.id)) } label: { Label("Check Photo", systemImage: "checkmark.circle") }
-            Button(role: .destructive) {
-                model.selectedID = entry.id
-                model.removePhoto()
-                if model.entries.isEmpty { path.removeAll() }
-            } label: { Label("Remove Photo", systemImage: "trash") }
-            .disabled(model.activity != nil)
-        }
-        .sensoryFeedback(.selection, trigger: selectedPerson) { old, new in new == entry.id && old != new }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Photo \(index + 1): ^[\(copies) copy](inflect: true)"))
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-        .accessibilityIdentifier("personCircle-\(index + 1)")
-    }
-
-    private var addPersonMenu: some View {
-        Menu {
-            Button { acquire(.camera, .add) } label: { Label("Take Photo", systemImage: "camera") }
-                .accessibilityIdentifier("addPersonCamera")
-            Button { acquire(.library, .add) } label: { Label("Choose Photo", systemImage: "photo.on.rectangle") }
-                .accessibilityIdentifier("addPersonLibrary")
-        } label: {
-            Image(systemName: "plus")
-                .font(.title3)
-                .frame(width: 52, height: 52)
-                .overlay(Circle().strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [4, 3])).foregroundStyle(.tertiary))
-                .contentShape(Circle())
-        }
-        .disabled(!model.canAddPhoto || model.activity != nil)
-        .accessibilityLabel(model.canAddPhoto ? Text("Add another person") : Text("Sheet is full (\(PhotoWorkflow.maxPhotos) people)"))
-        .accessibilityIdentifier("addPerson")
-    }
-
-    /// Three everyday papers plus the current one when it is something else; the rest is in the options sheet.
-    private var paperChips: some View {
-        let current = model.printJob.paper
-        let quick = PaperNames.quickPapers
-        return ScrollView(.horizontal) {
-            HStack(spacing: Design.Spacing.text) {
-                if !quick.contains(where: { $0.id == current.id }) { paperChip(current) }
-                ForEach(quick) { paperChip($0) }
-                Button { showOptions = true } label: { Text("More").foregroundStyle(Color.primary) }
-                    .buttonStyle(.bordered).buttonBorderShape(.capsule).tint(.gray)
-                    .accessibilityIdentifier("moreOptions")
-            }
-        }
-        .scrollIndicators(.hidden)
-    }
-
-    private func paperChip(_ paper: PaperSize) -> some View {
-        let selected = paper.id == model.printJob.paper.id
-        // A quiet neutral chip; the chosen paper carries the accent.
-        return Button { model.printJob.paper = paper } label: {
-            Text(PaperNames.short(for: paper))
-                .font(Design.Typography.sizeChoice(.callout, weight: selected ? .semibold : .regular))
-                .foregroundStyle(selected ? Color.brandAccent : Color.primary)
-        }
-            .buttonStyle(.bordered).buttonBorderShape(.capsule)
-            .tint(selected ? Color.brandAccent : Color.gray)
-            .accessibilityAddTraits(selected ? .isSelected : [])
-            .accessibilityIdentifier("paper-\(paper.id)")
-    }
-
-    /// Whole pages in one choice: "2 pages · 24 copies" instead of many taps on +. The counts come from the layout
-    /// solver for the current paper, options and other people (founder's recording: 22 taps to reach 30 copies).
-    private func fillMenu(for person: PhotoEntry) -> some View {
-        Menu {
-            ForEach(fill, id: \.pages) { choice in
-                Button {
-                    if let copies = copiesBinding(for: person) { copies.wrappedValue = choice.copies }
-                } label: {
-                    Text("^[\(choice.pages) page](inflect: true) · ^[\(choice.copies) copy](inflect: true)")
-                }
-            }
-        } label: {
-            Label("Fill", systemImage: "square.grid.3x3")
-                .font(.subheadline.weight(.medium))
-        }
-        .buttonStyle(.bordered).buttonBorderShape(.capsule).tint(.gray)
-        .foregroundStyle(Color.primary)
-        .accessibilityLabel(Text("Fill pages"))
-        .accessibilityIdentifier("fillPages")
-    }
-
+enum SheetChoices {
     struct FillChoice: Sendable { let pages: Int; let copies: Int }
 
     /// For 1–3 pages, the most copies of item `itemID` that fit with everything else on the sheet unchanged.
@@ -330,33 +30,6 @@ struct SheetView: View {
         return choices
     }
 
-    /// Up to one full page the stepper moves one copy at a time; beyond it, a page at a time (to the next or previous
-    /// whole-page count), so 36 copies is three taps rather than twenty-four (founder's recording, 0.20.9).
-    /// One copy per tap, always (founder, 0.20.12: a jump of a whole page at the 13th copy was unexpected). Whole
-    /// pages are the Fill menu's job.
-    private func steppedCopies(from copies: Int, up: Bool) -> Int {
-        min(max(copies + (up ? 1 : -1), 0), 50)
-    }
-
-    private func copiesBinding(for person: PhotoEntry) -> Binding<Int>? {
-        guard let id = model.printItems(for: person.id).first?.id else { return nil }
-        return Binding(get: { model.printJob.items.first { $0.id == id }?.copies ?? 0 },
-                       set: { value in
-                           if let index = model.printJob.items.firstIndex(where: { $0.id == id }), model.printJob.items[index].copies != value {
-                               model.printJob.items[index].copies = value
-                               copiesTick += 1
-                           }
-                       })
-    }
-
-    private func summary(_ layout: PrintLayout) -> String {
-        // AttributedString applies the ^[…](inflect: true) grammar; String(localized:) would show the markup.
-        let base = String(AttributedString(localized: "^[\(layout.placedCount) copy](inflect: true) · ^[\(layout.pages.count) page](inflect: true)").characters)
-        // The last page's empty slots, outlined on the paper: copies that cost no extra paper (capped by the stepper).
-        var room = layout.pages.last?.freeSlots.count ?? 0
-        if model.printJob.items.count == 1, let copies = model.printJob.items.first?.copies { room = min(room, 50 - copies) }
-        return room > 0 ? base + " · " + String(localized: "Room for \(room) more") : base
-    }
 }
 
 /// What is not needed every time: extra sizes per person and any paper.
@@ -579,15 +252,13 @@ struct SheetPreview: View {
     let layout: PrintLayout
     /// Crops per print item; placements without one are drawn as grey boxes.
     var thumbnails: [UUID: CGImage] = [:]
-    /// First page only, no captions, for cards.
-    var compact = false
-    var compactHeight: CGFloat = 130
     /// "Page 1 of 2" under each page. Off when the pages lie on the mat, where bare text is not allowed.
     var captions = true
     /// The space each full page is fitted into, keeping the paper's proportions.
     var pageBox = CGSize(width: 260, height: 260)
     /// Rows of the first page to show; nil shows them all.
     var revealedRows: Int?
+    var unlockTrigger = 0
     /// The page in the middle of the strip. It follows new pages as copies are added (founder, 0.20.9: pages 3–5 were
     /// never brought into view).
     @State private var focusedPage: Int?
@@ -605,16 +276,7 @@ struct SheetPreview: View {
     }
 
     var body: some View {
-        let pages = compact ? Array(layout.pages.prefix(1)) : layout.pages
-        if compact, let page = pages.first {
-            UprightPageView(page: page, thumbnails: thumbnails, animated: false)
-                .aspectRatio(page.displayAspect, contentMode: .fit)
-                .frame(height: compactHeight)
-                .paperDimmedInDark()
-                .paperShadow()
-                .accessibilityLabel(Text("Page 1 of \(layout.pages.count): \(page.placements.count) photos"))
-                .accessibilityIdentifier("sheetThumbnail")
-        } else {
+        let pages = layout.pages
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: Design.Spacing.group) {
                     ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
@@ -626,12 +288,14 @@ struct SheetPreview: View {
                                 .frame(width: width, height: width / aspect)
                                 .paperDimmedInDark()
                                 .paperShadow()
+                                .unlockCelebration(trigger: unlockTrigger)
                             if captions, layout.pages.count > 1 {
                                 Text("Page \(index + 1) of \(layout.pages.count)").font(Design.Typography.caption)
                             }
                         }
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel(Text("Page \(index + 1) of \(layout.pages.count): \(page.placements.count) photos"))
+                        .accessibilityIdentifier("sheetPage-\(index)")
                         .id(index)
                     }
                     if layout.pages.isEmpty {
@@ -641,11 +305,11 @@ struct SheetPreview: View {
                     }
                 }
                 .scrollTargetLayout()
-                .padding(.vertical, 6)
+                .padding(.vertical, 0)
             }
             // Pages snap one at a time and sit in the middle of the mat; the margin centres a page of the first one's
             // width, so a single page sits centred too.
-            .contentMargins(.horizontal, max(4, (pageBox.width + 48 - firstPageWidth) / 2), for: .scrollContent)
+            .contentMargins(.horizontal, max(4, (pageBox.width - firstPageWidth) / 2), for: .scrollContent)
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $focusedPage, anchor: .center)
             .onChange(of: layout.pages.count) { old, new in
@@ -659,8 +323,13 @@ struct SheetPreview: View {
                     if let arrivingFrom, arrivingFrom >= new { arrival?.cancel(); self.arrivingFrom = nil }
                 }
             }
+            .frame(height: pageBox.height)
+            .padding(.bottom, 44)
+            .onDisappear { arrival?.cancel(); arrival = nil }
+            .overlay(alignment: .bottom) {
+                if layout.pages.count > 1 { PageDots(count: layout.pages.count, selection: $focusedPage).frame(height: 44).fixedSize(horizontal: true, vertical: false) }
+            }
             .accessibilityIdentifier("sheetPreview")
-        }
     }
 }
 
@@ -670,7 +339,7 @@ extension SheetPreview {
     /// Reduce Motion.
     fileprivate func fill(newPagesFrom first: Int) {
         arrival?.cancel()
-        guard !reduceMotion, !compact else { return }
+        guard !reduceMotion else { return }
         let rowCount = layout.pages.dropFirst(first).map(\.displayRows.count).max() ?? 0
         guard rowCount > 0 else { return }
         arrivingRows = 0
@@ -836,7 +505,27 @@ struct SheetPageView: View {
     }
 }
 
-extension SheetView {
-    /// The guide on Your sheet (ADR-052): the paper, the copies, then Continue.
-    fileprivate var guideTip: GuideTip? { model.tutorial.current([.paper, .copies, .continueSheet]) }
+/// Native page indicators keep the existing scrolling strip and its copy animations.
+private struct PageDots: UIViewRepresentable {
+    let count: Int
+    @Binding var selection: Int?
+    func makeCoordinator() -> Coordinator { Coordinator(selection: $selection) }
+    func makeUIView(context: Context) -> UIPageControl {
+        let view = UIPageControl()
+        view.backgroundStyle = .prominent
+        view.addTarget(context.coordinator, action: #selector(Coordinator.changed(_:)), for: .valueChanged)
+        return view
+    }
+    func updateUIView(_ view: UIPageControl, context: Context) {
+        context.coordinator.selection = $selection
+        view.numberOfPages = count
+        view.currentPage = min(max(0, selection ?? 0), max(0, count - 1))
+    }
+    @MainActor final class Coordinator: NSObject {
+        var selection: Binding<Int?>
+        init(selection: Binding<Int?>) { self.selection = selection }
+        @objc func changed(_ view: UIPageControl) {
+            withAnimation(Design.Motion.rearrange.resolved(reduceMotion: UIAccessibility.isReduceMotionEnabled)) { selection.wrappedValue = view.currentPage }
+        }
+    }
 }

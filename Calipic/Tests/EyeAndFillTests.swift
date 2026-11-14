@@ -15,10 +15,29 @@ struct EyeAndFillTests {
         #expect(EyeOpenness.ratio([(0, 0)]) == nil)
     }
 
+    @Test(arguments: [(26.0, 32.0, 12), (35.0, 45.0, 6), (50.8, 50.8, 2)])
+    func firstPageIsFilled(width: Double, height: Double, expected: Int) {
+        let item = PrintItem(photoID: UUID(), trimWidthMM: width, trimHeightMM: height, copies: 1)
+        var job = PrintJob(paper: .photo4x6, items: [item])
+        #expect(PrintLayoutSolver.copiesFillingOnePage(job: job, itemID: item.id) == expected)
+        job.items[0].copies = expected
+        let full = PrintLayoutSolver.solve(job)
+        #expect(full.isComplete && full.pages.count == 1 && full.pages[0].freeSlots.isEmpty)
+        job.items[0].copies += 1
+        #expect(PrintLayoutSolver.solve(job).pages.count == 2)
+    }
+
+    @Test func fullPageSearchRejectsMissingOrImpossibleItems() {
+        let item = PrintItem(photoID: UUID(), trimWidthMM: 500, trimHeightMM: 500, copies: 1)
+        let job = PrintJob(paper: .photo4x6, items: [item])
+        #expect(PrintLayoutSolver.copiesFillingOnePage(job: job, itemID: item.id) == nil)
+        #expect(PrintLayoutSolver.copiesFillingOnePage(job: job, itemID: UUID()) == nil)
+    }
+
     @Test func fillChoicesAreWholePages() async {
         let item = PrintItem(photoID: UUID(), trimWidthMM: 26, trimHeightMM: 32, copies: 8)
         let job = PrintJob(paper: .photo4x6, items: [item])
-        let choices = await SheetView.fillChoices(job: job, itemID: item.id)
+        let choices = await SheetChoices.fillChoices(job: job, itemID: item.id)
         #expect(choices.map(\.pages) == [1, 2, 3])
         #expect(choices.map(\.copies) == [12, 24, 36])
         for choice in choices {
