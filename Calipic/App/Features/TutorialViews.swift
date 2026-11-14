@@ -1,6 +1,6 @@
 import SwiftUI
 
-// First-run tutorial (ADR-052): the welcome page, the guide line that sits just above the one control to use on
+// First-run tutorial (ADR-052): the welcome page, the guide bubble that sits just above the one control to use on
 // each real screen, the outline around that control, and the closing "You're all set".
 
 // MARK: - Copy
@@ -14,7 +14,7 @@ enum TutorialCopy {
         case .check: output == .print ? "Looks good? Tap Print. Retakes and fixes are free."
                                       : "Looks good? Continue. Retakes and fixes are free."
         case .sheet: "Pick the paper and copies, then tap Continue."
-        case .unlock: "This first photo uses one of your free credits."
+        case .unlock: "Your free credit unlocks this first photo."
         case .finish:
             switch (output, route) {
             case (.digital, _): "Share it, or save it to Files for your online form."
@@ -31,50 +31,98 @@ enum TutorialCopy {
     }
 }
 
-// MARK: - Guide line
+// MARK: - Guide bubble
 
-/// One line placed directly above the control to use (founder, 0.20.14: a banner at the top pushed the screen down
-/// and sat far from the button). Thin progress, then one instruction; an arrow when the target is above it.
+/// The guide: a filled speech bubble right above the control to use, its tail pointing at it (founder, 0.20.15: a
+/// plain line was easy to pass without noticing, and it should read as a temporary layer, not part of the app). The
+/// filled teal sets it apart from the app's own cards and buttons; it pops in at each new step.
 struct CoachLine: View {
     let step: TutorialStep
     let output: Output
     var hasPhoto = true
     var route: PrintCheckView.PrintRoute?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var shown = false
 
     var body: some View {
         let progress = TutorialFlow.progress(of: step, output: output)
         let hint = TutorialCopy.hint(step, output: output, hasPhoto: hasPhoto, route: route)
-        VStack(spacing: Design.Spacing.tight) {
-            HStack(spacing: Design.Spacing.text) {
-                HStack(spacing: 3) {
-                    ForEach(1...progress.count, id: \.self) { index in
-                        Capsule()
-                            .fill(index <= progress.position ? Color.brandAccent : Color.secondary.opacity(0.25))
-                            .frame(width: 18, height: 3)
-                    }
-                }
-                Text("First photo · \(progress.position) of \(progress.count)")
-                    .font(Design.Typography.caption.weight(.semibold))
-                    .foregroundStyle(Color.brandAccent)
-                    .contentTransition(.numericText())
-            }
-            HStack(alignment: .firstTextBaseline, spacing: Design.Spacing.tight) {
-                if TutorialCopy.pointsUp(step, output: output, route: route) {
-                    Image(systemName: "arrow.up").foregroundStyle(Color.brandAccent)
-                }
-                Text(hint)
-            }
-            .font(.subheadline.weight(.semibold))
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity)
+        let up = TutorialCopy.pointsUp(step, output: output, route: route)
+        let key = "\(step)\(route.map { "\($0)" } ?? "")\(hasPhoto)"
+        GuideBubble(position: progress.position, count: progress.count, hint: Text(hint), up: up,
+                    bounce: reduceMotion ? "" : key)
+        .scaleEffect(shown || reduceMotion ? 1 : 0.9, anchor: up ? .top : .bottom)
+        .opacity(shown ? 1 : 0)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("coachLine")
-        // Each new instruction is read out without moving VoiceOver's focus.
-        .onChange(of: "\(step)\(route.map { "\($0)" } ?? "")", initial: true) {
+        .onChange(of: key, initial: true) {
+            shown = false
+            withAnimation(reduceMotion ? .easeOut(duration: 0.2) : .spring(duration: 0.45, bounce: 0.35).delay(0.15)) { shown = true }
+            // Each new instruction is read out without moving VoiceOver's focus.
             AccessibilityNotification.Announcement(String(localized: hint)).post()
         }
+    }
+}
+
+/// The bubble itself, also shown on the welcome page so the guide is recognised when it appears.
+struct GuideBubble: View {
+    let position: Int
+    let count: Int
+    let hint: Text
+    let up: Bool
+    var bounce = ""
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if up { GuideTail(up: true) }
+            VStack(alignment: .leading, spacing: Design.Spacing.tight) {
+                HStack(spacing: Design.Spacing.text) {
+                    Image(systemName: up ? "hand.point.up.left.fill" : "hand.point.down.fill")
+                        .symbolEffect(.bounce, options: .repeat(2), value: bounce)
+                    Text("Guide · \(position) of \(count)")
+                        .contentTransition(.numericText())
+                    Spacer(minLength: Design.Spacing.text)
+                    HStack(spacing: 3) {
+                        ForEach(1...count, id: \.self) { index in
+                            Capsule()
+                                .fill(.white.opacity(index <= position ? 1 : 0.35))
+                                .frame(width: 14, height: 3)
+                        }
+                    }
+                    .accessibilityHidden(true)
+                }
+                .font(Design.Typography.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.9))
+                hint
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, Design.Spacing.control)
+            .padding(.vertical, Design.Spacing.text)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.brandAccentFill, in: RoundedRectangle(cornerRadius: 16))
+            if !up { GuideTail(up: false) }
+        }
+        .shadow(color: Color.brandAccentFill.opacity(0.35), radius: 10, y: 4)
+    }
+}
+
+/// The bubble's pointer, centred: every control the guide points at spans the width of the screen.
+private struct GuideTail: View {
+    let up: Bool
+
+    var body: some View {
+        Path { path in
+            path.move(to: CGPoint(x: 0, y: up ? 9 : 0))
+            path.addLine(to: CGPoint(x: 9, y: up ? 0 : 9))
+            path.addLine(to: CGPoint(x: 18, y: up ? 9 : 0))
+            path.closeSubpath()
+        }
+        .fill(Color.brandAccentFill)
+        .frame(width: 18, height: 9)
+        .padding(up ? .bottom : .top, -1)
+        .accessibilityHidden(true)
     }
 }
 
@@ -123,11 +171,17 @@ struct TutorialWelcomeView: View {
             VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
                 hero
                 VStack(alignment: .leading, spacing: Design.Spacing.text) {
-                    Text("Let's make your first ID photo")
+                    Label("Guided first photo", systemImage: "hand.point.down.fill")
+                        .font(Design.Typography.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, Design.Spacing.text)
+                        .padding(.vertical, Design.Spacing.tight)
+                        .background(Color.brandAccentFill, in: Capsule())
+                    Text("Let's make your first ID photo together")
                         .font(Design.Typography.hero)
                         .accessibilityAddTraits(.isHeader)
                         .accessibilityIdentifier("tutorialWelcome")
-                    Text("We'll guide you through it, from the photo to the print. It takes a few minutes.")
+                    Text("This one time, a guide walks you through each step, from the photo to the print. It takes a few minutes.")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
                 }
@@ -136,6 +190,7 @@ struct TutorialWelcomeView: View {
                     row("checkmark.seal", "We frame and check it", "Sized for your document, with anything to fix pointed out.")
                     row("printer", "Print it", "At home on photo paper, or at any print shop.")
                 }
+                guidePreview
                 creditNote
             }
             .padding(.horizontal)
@@ -203,6 +258,20 @@ struct TutorialWelcomeView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// What the guide will look like, so it is recognised on the real screens and known to be temporary.
+    private var guidePreview: some View {
+        VStack(alignment: .leading, spacing: Design.Spacing.text) {
+            Text("Follow the guide").font(Design.Typography.cardTitle)
+            GuideBubble(position: 1, count: 4, hint: Text("It sits above the next button to tap, and goes away after your first photo."), up: false)
+                .accessibilityElement(children: .combine)
+            // Stands for "the next button": an outline, so it is not mistaken for a real, disabled one.
+            RoundedRectangle(cornerRadius: 100)
+                .strokeBorder(Color.secondary.opacity(0.4), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                .frame(height: 44)
+                .accessibilityHidden(true)
+        }
+    }
+
     private var creditNote: some View {
         HStack(alignment: .top, spacing: Design.Spacing.control) {
             Image(systemName: "gift")
@@ -210,7 +279,7 @@ struct TutorialWelcomeView: View {
                 .foregroundStyle(Color.brandAccent)
                 .frame(width: 36, height: 36)
                 .accessibilityHidden(true)
-            Text("You have \(credits) free credits. This first photo uses one, and it's yours to print again at no cost.")
+            Text("Your first photo is free, and you can print it again at no cost.")
                 .font(Design.Typography.cardDetail)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
@@ -256,7 +325,11 @@ struct TutorialDoneView: View {
                 if output == .print {
                     tip("ruler", "Check the size", "Measure the 50 mm line on the print. If it's right, every photo is the right size.")
                 }
-                tip("creditcard", "^[\(creditsLeft) credit](inflect: true) left", "Each credit unlocks one person's photo, for every print and digital copy.")
+                if creditsLeft > 0 {
+                    tip("creditcard", "^[\(creditsLeft) credit](inflect: true) left", "Each credit unlocks one person's photo, for every print and digital copy.")
+                } else {
+                    tip("creditcard", "Prints of this photo stay free", "A new person's photo uses one credit, for every print and digital copy.")
+                }
                 tip("photo", "Need it for an online form?", "The digital photo is included: tap Digital Photo on Photo Check.")
             }
             .padding(Design.Spacing.cardContent)

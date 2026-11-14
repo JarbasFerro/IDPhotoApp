@@ -84,6 +84,22 @@
         }
       }
     },
+    "A new person's photo uses one credit, for every print and digital copy." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La foto de otra persona usa un crédito, para todas sus impresiones y copias digitales."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A foto de outra pessoa usa um crédito, para todas as impressões e cópias digitais."
+          }
+        }
+      }
+    },
     "A selfie becomes an ID photo" : {
       "localizations" : {
         "es" : {
@@ -212,34 +228,82 @@
         }
       }
     },
-    "First photo · %lld of %lld" : {
+    "Follow the guide" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primera foto · %1$lld de %2$lld"
+            "value" : "Sigue la guía"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primeira foto · %1$lld de %2$lld"
+            "value" : "Siga o guia"
           }
         }
       }
     },
-    "Let's make your first ID photo" : {
+    "Guide · %lld of %lld" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hagamos tu primera foto de carné"
+            "value" : "Guía · %1$lld de %2$lld"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vamos fazer sua primeira foto 3x4"
+            "value" : "Guia · %1$lld de %2$lld"
+          }
+        }
+      }
+    },
+    "Guided first photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primera foto guiada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primeira foto guiada"
+          }
+        }
+      }
+    },
+    "It sits above the next button to tap, and goes away after your first photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aparece sobre el siguiente botón que debes tocar y desaparece después de tu primera foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aparece acima do próximo botão a tocar e some depois da sua primeira foto."
+          }
+        }
+      }
+    },
+    "Let's make your first ID photo together" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hagamos juntos tu primera foto de carné"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vamos fazer juntos sua primeira foto 3x4"
           }
         }
       }
@@ -356,6 +420,22 @@
         }
       }
     },
+    "Prints of this photo stay free" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir esta foto sigue siendo gratis"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir esta foto continua grátis"
+          }
+        }
+      }
+    },
     "Restart the First-Photo Guide" : {
       "localizations" : {
         "es" : {
@@ -468,18 +548,18 @@
         }
       }
     },
-    "This first photo uses one of your free credits." : {
+    "This one time, a guide walks you through each step, from the photo to the print. It takes a few minutes." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta primera foto usa uno de tus créditos gratis."
+            "value" : "Solo esta vez, una guía te acompaña en cada paso, de la foto a la impresión. Son unos minutos."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta primeira foto usa um dos seus créditos grátis."
+            "value" : "Só desta vez, um guia acompanha você em cada etapa, da foto à impressão. Leva poucos minutos."
           }
         }
       }
@@ -496,38 +576,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nós enquadramos e verificamos"
-          }
-        }
-      }
-    },
-    "We'll guide you through it, from the photo to the print. It takes a few minutes." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Te guiamos de la foto a la impresión. Son unos minutos."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vamos guiar você da foto à impressão. Leva poucos minutos."
-          }
-        }
-      }
-    },
-    "You have %lld free credits. This first photo uses one, and it's yours to print again at no cost." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tienes %lld créditos gratis. Esta primera foto usa uno, y podrás volver a imprimirla sin coste."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Você tem %lld créditos grátis. Esta primeira foto usa um, e você pode imprimi-la de novo sem custo."
           }
         }
       }
@@ -580,6 +628,22 @@
         }
       }
     },
+    "Your first photo is free, and you can print it again at no cost." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu primera foto es gratis, y puedes volver a imprimirla sin coste."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sua primeira foto é grátis, e você pode imprimi-la de novo sem custo."
+          }
+        }
+      }
+    },
     "Your first photo is waiting where you left it." : {
       "localizations" : {
         "es" : {
@@ -592,6 +656,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sua primeira foto está esperando onde você parou."
+          }
+        }
+      }
+    },
+    "Your free credit unlocks this first photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu crédito gratis desbloquea esta primera foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seu crédito grátis desbloqueia esta primeira foto."
           }
         }
       }

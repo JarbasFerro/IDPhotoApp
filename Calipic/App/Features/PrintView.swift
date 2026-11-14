@@ -348,14 +348,16 @@ struct PrintView: View {
 
     @ViewBuilder private var actions: some View {
         VStack(spacing: Design.Spacing.text) {
-            if coaching {
-                CoachLine(step: locked > 0 ? .unlock : .finish, output: .print, route: route)
+            if coaching, locked == 0 {
+                CoachLine(step: .finish, output: .print, route: route)
                     .padding(.bottom, Design.Spacing.tight)
             }
             if locked > 0 {
                 UnlockCard(photos: locked, balance: model.credits.balance, inTray: !dynamicTypeSize.isAccessibilitySize)
                     .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.9, anchor: .bottom))))
                 if model.credits.canAfford(locked) {
+                    // Right above the button it is about, below the card that explains the unlock.
+                    if coaching { CoachLine(step: .unlock, output: .print).padding(.top, Design.Spacing.tight) }
                     Button { unlock() } label: {
                         Label("Unlock", systemImage: "lock.open").frame(maxWidth: .infinity)
                     }

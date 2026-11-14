@@ -16,10 +16,10 @@ struct CreditPack: Identifiable, Hashable, Sendable {
     ]
 }
 
-/// Pure credit arithmetic. One credit unlocks one photo; a new install starts with two, one of them for the
-/// first-run tutorial (ADR-048 amended, ADR-052).
+/// Pure credit arithmetic. One credit unlocks one photo; a new install starts with one, which the first-run
+/// tutorial uses (ADR-048 amended, ADR-052).
 struct CreditLedger: Equatable, Sendable {
-    static let startingBalance = 2
+    static let startingBalance = 1
     private(set) var balance: Int
 
     init(balance: Int = CreditLedger.startingBalance) { self.balance = max(0, balance) }

@@ -28,7 +28,7 @@ struct TutorialTests {
         var midway = TutorialState.fresh
         midway.welcomed = true
         #expect(TutorialFlow.initial(stored: midway, hasCreditHistory: true) == midway)
-        #expect(CreditLedger.startingBalance == 2)
+        #expect(CreditLedger.startingBalance == 1)
     }
 
     /// The photo is not kept between launches, so a credit spent on it before it left the app comes back once.
@@ -46,7 +46,7 @@ struct TutorialTests {
     @MainActor @Test func unlockingInTheTutorialMarksTheCreditAndCompletingEndsIt() throws {
         let defaults = try #require(UserDefaults(suiteName: "TutorialTests-" + UUID().uuidString))
         let credits = CreditStore(defaults: defaults)
-        #expect(credits.balance == 2)
+        #expect(credits.balance == 1)
         let coach = TutorialCoach.load(defaults: defaults, credits: credits)
         #expect(coach.isActive && coach.needsWelcome)
         coach.welcomed()
@@ -54,11 +54,11 @@ struct TutorialTests {
         #expect(credits.spend(1))
         // Relaunch before the photo left the app: the credit comes back and the tutorial continues.
         let relaunched = TutorialCoach.load(defaults: defaults, credits: credits)
-        #expect(credits.balance == 2 && relaunched.isActive && !relaunched.needsWelcome)
+        #expect(credits.balance == 1 && relaunched.isActive && !relaunched.needsWelcome)
         relaunched.creditSpent()
         relaunched.complete()
         #expect(!relaunched.isActive)
         #expect(!TutorialCoach.load(defaults: defaults, credits: credits).isActive)
-        #expect(credits.balance == 2)
+        #expect(credits.balance == 1)
     }
 }

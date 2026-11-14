@@ -94,7 +94,7 @@ final class CalipicUITests: XCTestCase {
         sleep(2)
         attachBothAppearances(app, "Tutorial, sheet")
         app.buttons["continueToShare"].tap()
-        XCTAssertTrue(coach(app, "free credits").waitForExistence(timeout: 10))
+        XCTAssertTrue(coach(app, "free credit unlocks").waitForExistence(timeout: 10))
         attachBothAppearances(app, "Tutorial, unlock")
         app.buttons["unlockAndPrint"].tap()
         XCTAssertTrue(coach(app, "Choose where").waitForExistence(timeout: 10))
