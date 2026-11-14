@@ -49,7 +49,7 @@ The specification is [03-design.md §9](03-design.md): the eleven problems and t
 
 Also in this batch, because the screens are being rebuilt anyway: the two Print UI tests that fail on a 6.3-inch iPhone, and screenshots made optional in the UI tests.
 
-Done when: every journey screen passes the check in §9.9 in Light and Dark and in three languages; all twelve moments of §9.10 work on the iPhone, the seven marked stronger included; and the founder, using it, no longer says it needs refinement.
+Done when: every journey screen passes the check in §9.9 in Light and Dark and in three languages; all twelve moments of §9.10 work on the iPhone, the six marked stronger included; and the founder, using it, no longer says it needs refinement.
 
 ### 0.24 — First testers
 
