@@ -8,7 +8,8 @@ The roadmap is ambitious on purpose, and **nothing in it is final**. If a better
 
 - The full journey works on an iPhone for 22 documents and custom sizes: guided camera, automatic framing, background and light, Photo Check, Adjust, multi-person print sheets, home and shop printing with a print check and a cutting guide, digital photo, credits with unlock in place, a guided first photo (ADR-052), three languages with a language menu.
 - **Good:** the camera screen, the deterministic core (crop solver, layout solver, rules as data), the test suite (203 passing; unit tests in under a minute, `scripts/test.sh`).
-- **Not good enough yet: the look.** The founder's verdict on 0.20.19: "it doesn't feel like a well designed app, it needs refinement". The audit (2026-11-14) found no system: too many text sizes and footnotes, mixed alignment, boxes inside boxes, four button styles, a small photo, a different layout per step. The fix is decided: **One table, one tray** (ADR-054, [03-design.md §9](03-design.md)). It comes next, before drafts.
+- **Not good enough yet: the look.** The founder's verdict on 0.20.19: "it doesn't feel like a well designed app, it needs refinement". The audit (2026-11-14) found no system: too many text sizes and footnotes, mixed alignment, boxes inside boxes, four button styles, a small photo, a different layout per step. The fix is decided: **One table, one tray** (ADR-054, [03-design.md §9](03-design.md)), and with the founder's free hand it also makes Print one screen and removes the second review (ADR-055). It comes next, before drafts.
+- **Judged by one person so far.** Nobody outside has used the app. A small group of testers now comes right after real purchases (0.24), not at 0.95.
 - **Not real yet:** purchases (credits are added without payment), drafts (everything is lost when the app closes; the guide gives its credit back after a relaunch as a workaround), and all evidence that needs devices and people (print measurements, speed, real faces).
 
 ## 2. The path at a glance
@@ -20,10 +21,11 @@ The roadmap is ambitious on purpose, and **nothing in it is final**. If a better
 | **0.19** | Calipic becomes the app | Nothing visible: the spike becomes the production project, with Swift tests in CI | E1 |
 | **0.20** | The look (stage, paper, readouts **done in 0.20.0**; transitions and real faces **done in 0.20.5**) | A recognisable Calipic: the cutting mat, real paper, one continuous photo from shutter to sheet, real faces on Home | U5, U4, U10 |
 | **0.20.6–0.20.19** | First photo, guided (done) | A welcome, a guide that points at each control, one free photo, a language menu, a sheet that fills slot by slot | U17, U18 |
-| **0.21** | **Refinement: one table, one tray** | An app that looks designed: the photo large on the mat, one tray, one button, the same shape from Home to Finished | **U19** |
+| **0.21** | **Refinement: one table, one tray** | An app that looks designed: the photo large on the mat, one tray, one button, the same shape from Home to Finished; four screens instead of six (Print is one screen, one review) | **U19** |
 | **0.22** | Keep my work | Close the app and continue later; reprint for free; delete everything in one tap | E2, U9 |
 | **0.23** | Real credits | Buying a pack works; the balance survives a reinstall | E3, U12 |
-| **0.24** | Tools | An editor and a sheet that feel like instruments; every unhappy path designed | U7, U8, U13, U14, P4, P5 |
+| **0.24** | **First testers** | Nothing new: five to ten people who have never seen the app use it on TestFlight, with real purchases in the sandbox; their sessions and prints decide what 0.25 fixes | V5, V1, V2, L2 (early) |
+| **0.25** | Tools and what the testers found | An editor that feels like an instrument; every unhappy path designed; the testers' top problems fixed | U7, U13, U14, P4, P5 |
 | **0.30** | Photo quality | Clean hair edges, glare and shadow advice, helper mode, a good-spot coach | Q1–Q4, U11 |
 | **0.40** | Ready for the world | Every Wave A profile re-checked; upload presets tested against the real forms; help; Siri | Q4, Q6, E4, E5, E6 |
 | **0.90** | Harden | Nothing new: speed, memory, privacy, and edge cases closed | P6–P10, L1 |
@@ -36,19 +38,22 @@ Work that needs devices and people (track V) runs in parallel from now and feeds
 
 ### 0.21 — Refinement: one table, one tray · Next
 
-The specification is [03-design.md §9](03-design.md): the nine problems and their fixes, the layout, type, buttons, status, each screen, and the acceptance check. One screen per pass, each installed on the founder's iPhone before the next.
+The specification is [03-design.md §9](03-design.md): the eleven problems and their fixes, the layout, type, buttons, status, each screen, the decisions made with the founder's free hand (§9.10), and the acceptance check. One pass at a time, each installed on the founder's iPhone before the next.
 
 1. **Components and Photo Check.** `JourneyScreen`, `TrayRow`, `TrayActions`, `StatusMark`, the new tokens; Photo Check rebuilt on them (photo at least 45 % of the screen, verdict as the tray title, two rows, Adjust beside Print).
-2. **Print and Digital Photo.** The unlock as one sentence and **Unlock · 1 credit**; where to print as two rows; the steps as rows.
-3. **Home, the welcome page, "You're all set".** The mat on Home; the document as one row; one caption line.
-4. **Your sheet.** Labelled rows for copies and paper; rare actions in the toolbar menu.
+2. **Print as one screen** (ADR-055) and Digital Photo. `SheetView` and `PrintView` merge: the page stays on the mat; the tray moves through layout, unlock, where, print. The first page is full by default. The unlock is one sentence and **Unlock · 1 credit**. The guide's tips and the UI tests follow. The largest pass.
+3. **Home, the welcome page, "You're all set".** The mat on Home; the document as one row; credits off Home.
+4. **One review.** The camera's still lands on Photo Check; the camera review is removed (ADR-045 amended).
 5. **Finished and the sheets.** Check your print with a large line; the type and button rules in every sheet.
-6. **Review** of the built screens against §9, then fixes. Update 03-design §1 to §3 to match.
+6. **Review** of the built screens against §9 (Fable 5.2), then fixes. Rewrite 03-design §1 to §3 to match what was built.
 
 Also in this batch, because the screens are being rebuilt anyway: the two Print UI tests that fail on a 6.3-inch iPhone, and screenshots made optional in the UI tests.
 
 Done when: every journey screen passes the check in §9.9 in Light and Dark and in three languages, and the founder, using it on the iPhone, no longer says it needs refinement.
 
+### 0.24 — First testers
+
+Five to ten people who have never seen the app, on TestFlight, in at least two countries of Wave A. Each one makes a photo for a real document and prints it. Watch or record the first session (V5), ask for a picture of the print next to a ruler (V1), and include one older iPhone (V2). No new features in this version: only what is needed to distribute (TestFlight setup, a feedback link in Settings). The top problems they hit go to the front of 0.25. Needs 0.22 and 0.23 first, so nobody loses a photo or meets fake purchases.
 
 ### 0.17 — The ending · Done (2026-11-12), except the device measurements
 
@@ -94,19 +99,19 @@ Specified in [03-design.md §7](03-design.md).
 | U4 | One continuous object: zoom transitions, the photo becomes its copies (**done in 0.20.5**) | M | 0.20 |
 | U5 | The look: stage, paper in Dark, type and number roles, one shadow | M | 0.20 |
 | U6 | Feedback map: haptics, symbol effects, numeric transitions | S–M | 0.17 |
-| U7 | Adjust as a tool: full-height photo, dial, band on the zoom scale, swatches | L | 0.24 |
-| U8 | Your sheet as a cutting mat: tap to select, pinch, copies fly in, informed paper chips (the tray's layout is done in U19) | M | 0.24 |
+| U7 | Adjust as a tool: full-height photo, dial, band on the zoom scale, swatches | L | 0.25 |
+| U8 | The sheet as a cutting mat: tap to select, pinch, copies fly in, informed paper chips (the layout, now part of the one Print screen, is done in U19; the rest only if testers ask) | M | after 0.25 |
 | U9 | Home as the studio table with a Continue shelf (the table is done in U19; the shelf needs E2) | M | 0.22 |
 | U10 | Real faces: private review set, public portraits (**Home sample and test photo done in 0.20.5**, a generated person, D-9; the varied review set is still open) | M (people) | 0.20 |
 | U11 | Camera: helper mode, find a good spot, later best frame | M–L | 0.30 |
 | U12 | Credits with StoreKit views | S | 0.23 |
-| U13 | Choose document: your country first, recents, size glyphs, honest "not offered" | S | 0.24 |
-| U14 | Designed unhappy paths | S–M | 0.24 |
+| U13 | Choose document: your country first, recents, size glyphs, honest "not offered" | S | 0.25 |
+| U14 | Designed unhappy paths | S–M | 0.25 |
 | U15 | Screenshot gallery per release | S | 0.18 |
 | U16 | Final icon with dark, tinted, and layered variants; App Store screenshots | M | 0.40 |
 | U17 | First-photo guide: welcome, coached real flow to the print, two free credits (ADR-052) | M | **done in 0.20.14**; guide line at the action, four phases, in 0.20.15; guide bubble, clearer welcome, one starting credit in 0.20.16; guide in highlighter yellow in 0.20.17; anchored bubbles, several per screen, in 0.20.18; one free photo said up front, bubbles kept off the bottom controls, in 0.20.19 |
 | U18 | Language menu in Settings (ADR-053); Spanish and Portuguese checked on screen for fit | S | **done in 0.20.19** |
-| U19 | **Refinement: one table, one tray** (ADR-054, 03-design §9): one layout for every journey screen, three text roles, one button, one status mark, no cards or footnotes | L | 0.21 |
+| U19 | **Refinement: one table, one tray** (ADR-054, ADR-055, 03-design §9): one layout for every journey screen, three text roles, one button, one status mark, no cards or footnotes; Print as one screen; one review; first page full by default | L | 0.21 |
 
 ### P — Performance and feel
 
@@ -174,11 +179,11 @@ These cannot be done by a model alone. The founder runs them; the results go int
 ## 5. Order and dependencies
 
 ```text
-0.20 look + guide (done) ─▶ 0.21 refinement ─▶ 0.22 drafts ─▶ 0.23 StoreKit ─▶ 0.24 tools
-                                                     │              │
-V1 printers ─────────────▶ confirms U1               └──────┬───────┘
-V4 real portraits ───────▶ needed by U19's review and Q1    ▼
-V2 older iPhone ─────────▶ confirms ADR-024 and track P   0.30 quality ─▶ 0.40 world ─▶ 0.90 ─▶ 0.95 ─▶ 1.0
+0.20 look + guide (done) ─▶ 0.21 refinement ─▶ 0.22 drafts ─▶ 0.23 StoreKit ─▶ 0.24 first testers ─▶ 0.25 tools + findings
+                                                                                      │
+V1 printers, V2 older iPhone, V5 first-use sessions ──▶ run inside 0.24 ◀──────────────┘
+V4 real portraits ───────▶ needed by U19's review and Q1
+                                                    0.25 ─▶ 0.30 quality ─▶ 0.40 world ─▶ 0.90 ─▶ 0.95 ─▶ 1.0
 ```
 
 - U3 and U1 share the true-size table: build it once in 0.17.
@@ -196,7 +201,7 @@ V2 older iPhone ─────────▶ confirms ADR-024 and track P   0.
 5. Every shipped profile has its research document and review date.
 6. Speed and memory are recorded on two iPhones and no P0 or P1 defect is open.
 
-A date never ends a phase early. Scope is cut instead, in this order: Wave A size → U7 and U8 → extra paper presets → App Intents. The four pillars, the unlock warning, and the export gate are never cut.
+A date never ends a phase early. Scope is cut instead, in this order: Wave A size → U8 → U7 → extra paper presets → App Intents. The four pillars, the unlock warning, and the export gate are never cut.
 
 ## 7. After 1.0
 
@@ -247,7 +252,9 @@ Written 2026-11-12 for a founder with limited usage across subscriptions. The ti
 | **0.21 — refinement** | | | |
 | 23a | Audit of every screen, two directions, the specification in 03-design §9 (**done 2026-11-14**) | Fable 5.2 | Taste and system; the most visible choice before launch |
 | 23b | Components (`JourneyScreen`, `TrayRow`, `TrayActions`, `StatusMark`) and Photo Check | Opus 5.5 | Sets the pattern every other screen copies |
-| 23c | Print, Digital Photo, Home, welcome, Your sheet, Finished, the sheets: one pass each | Opus 5.5 for Print and Your sheet (state and geometry); Sonnet 5.5 for the rest, from the pattern | Implementation from a written specification |
+| 23c | Print as one screen: merge `SheetView` and `PrintView`, tray states, navigation, guide tips, tests | Opus 5.5 | State across files, the guide, and the export gate; the riskiest pass |
+| 23c2 | One review: remove the camera review, land the still on Photo Check | Opus 5.5 | Camera, concurrency, stale results |
+| 23c3 | Digital Photo, Home, welcome, Finished, the sheets: one pass each | Sonnet 5.5, from the pattern | Implementation from a written specification |
 | 23d | Strings for the changed sentences (es, pt-BR); UI tests kept green | Haiku 5.5, then Sonnet 5.5 | Mechanical, verified by the tests and the copy check |
 | 23e | Review of the built screens against §9, in Light and Dark | Fable 5.2, one short session | Catches the gap between the specification and the build |
 | **0.22** | | | |
@@ -259,9 +266,12 @@ Written 2026-11-12 for a founder with limited usage across subscriptions. The ti
 | 28 | Design purchases: reserve, commit, release; restore; iCloud mirror | Fable 5.2 | No double charge, no lost paid photo |
 | 29 | Build StoreKit and the Credits screen | Opus 5.5 | Follows the design; many edge cases |
 | — | Sandbox and TestFlight purchase tests | Founder, with Sonnet 5.5 writing the test checklist | Needs App Store Connect |
-| **0.24** | | | |
-| 30 | Prototype the pull-up sheets against today's layout (D-4) | Sonnet 5.5 | Two variants behind a switch |
-| 31 | Adjust as a tool, Your sheet as a cutting mat | Opus 5.5 | Gestures, precise geometry, feel |
+| **0.24 — first testers** | | | |
+| 29a | TestFlight setup, feedback link, tester instructions and the session checklist | Sonnet 5.5 drafts, founder runs | Needs App Store Connect and people |
+| 29b | Read the sessions and prints; rank the problems | Opus 5.5 | Synthesis that decides the next batch |
+| **0.25** | | | |
+| 30 | The testers' top problems | Opus 5.5 plans, Sonnet 5.5 builds | Evidence first |
+| 31 | Adjust as a tool | Opus 5.5 | Gestures, precise geometry, feel |
 | 32 | Unhappy-path screens, document picker improvements | Sonnet 5.5 | Follows existing patterns |
 | **Later** | | | |
 | 33 | Calibrate checks on real portraits | Opus 5.5 | Thresholds become hard checks only with evidence |

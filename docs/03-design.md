@@ -250,7 +250,7 @@ Lock the icon finish with dark and tinted variants and a layered version for Liq
 
 ## 9. Refinement: one table, one tray (U19, ADR-054)
 
-Chosen by the founder on 2026-11-14 (refinement round 1 in `docs/ui/explorations/`), after "it doesn't feel like a well designed app". An audit of all 61 scenes found no ugly screen and no system. This section is the system. **Where it disagrees with §1 to §3, this section wins**; update those rows as each screen is rebuilt.
+Chosen by the founder on 2026-11-14 (refinement round 1 in `docs/ui/explorations/`), after "it doesn't feel like a well designed app". An audit of all 61 scenes found no ugly screen and no system. This section is the system. The founder then gave a free hand ("complete freedom to change anything"); the choices made with it are listed in §9.10 and marked **(free hand)** where they appear. **Where it disagrees with §1 to §3, this section wins**; update those rows as each screen is rebuilt.
 
 ### 9.1 What was wrong, and the fix for each
 
@@ -265,18 +265,20 @@ Chosen by the founder on 2026-11-14 (refinement round 1 in `docs/ui/explorations
 | 7 | A different page layout for each step | One layout for Home, Photo Check, Your sheet, Print, Digital Photo, Finished (§9.2) |
 | 8 | Status marks of three sizes; an orange alarm as the default; one eye icon for a problem and for a routine check | One status mark, inline with words (§9.6) |
 | 9 | Your sheet's tray: six control shapes in 150 pt | Labelled rows; rare actions move to the toolbar menu (§9.7) |
+| 10 | The same page is shown on two screens in a row (Your sheet, then Print), and the same photo is reviewed twice (camera review, then Photo Check) | **Print is one screen** whose tray changes; **one review**: the still lands on Photo Check (§9.7) **(free hand)** |
+| 11 | The default sheet leaves empty slots on paper that is used up anyway | The first page is filled by default **(free hand)** |
 
 ### 9.2 Layout: stage and tray
 
-Every journey screen (Home, Photo Check, Your sheet, Print, Digital Photo, Finished, and the guide's welcome and "You're all set") is built from one component, `JourneyScreen(stage:tray:)`.
+Every journey screen (Home, Photo Check, Print, Digital Photo, Finished, and the guide's welcome and "You're all set") is built from one component, `JourneyScreen(stage:tray:)`.
 
 - **Stage.** The mat (`Surface.mat`, with its grid) fills the screen from the top edge, under the status bar and a transparent navigation bar, down to behind the tray's top corners. It is no longer a rounded panel inset by 8 pt. The grouped grey background is never visible on a journey screen.
 - **The object.** One thing lies on the mat: the photo, the page, or Home's sample prints. It is centred in the free area between the navigation bar and the tray, with at least 20 pt to every edge, and scaled to fill that area. On Photo Check and Digital Photo it is at least 45 % of the screen height on a 6.1-inch iPhone at the default text size. Nothing else sits on the mat except the measuring layer (lines, the millimetre chip), page dots, and the compare control (§9.4).
 - **Tray.** One white panel (`Surface.tray`) at the bottom: top corners 30 pt (`Radius.tray`), a soft upward shadow, 20 pt side padding, 22 pt above the title, and the bottom safe area plus 8 pt below the actions. Its height is its content. It never takes more than 55 % of the screen: beyond that, the rows scroll inside the tray and the actions stay pinned at its bottom.
 - **The tray is the only container.** No white cards, no tinted panels, no nested rounded rectangles. Groups are separated by a hairline (rows) or by 20 pt of space (blocks).
 - **Tray order, always:** title, at most one supporting line, rows or controls, actions.
-- **Navigation bar.** Transparent over the mat. Back and menu buttons are the system glass circles. The centre holds the step marker as three words, the current one in the label colour and the others secondary: `Photo  Check  Print`. No dashes under it.
-- **Sheets are not journey screens.** Choose document, Photo requirements, Before your photo, Check details, Adjust, Cutting options, Sheet options, More formats, Check your print, Credits, Settings, and the app icon picker stay system sheets on the grouped background with standard inset lists. They follow §9.3 to §9.6 but keep their structure. The camera does not change.
+- **Navigation bar.** Transparent over the mat. Back and menu buttons are the system glass circles. The centre holds the step marker as three words, the current one in the label colour and the others secondary: `Photo  Check  Print`. No dashes under it. With Print as one screen, each word is exactly one screen.
+- **Sheets are not journey screens.** Choose document, Photo requirements, Before your photo, Check details, Adjust, Cutting options, More formats, Check your print, Credits, Settings, and the app icon picker stay system sheets on the grouped background with standard inset lists. They follow §9.3 to §9.6 but keep their structure. The camera does not change.
 
 ### 9.3 Type and alignment
 
@@ -289,7 +291,7 @@ Three roles and the readout, mapped to the existing tokens:
 | Secondary | `Typography.cardDetail` (subheadline, secondary colour) | At most one supporting line under the title; the value at the end of a row |
 | Readout | `Typography.readout` (monospaced) | Pure measurements: "26 × 32 mm", "23.7 mm" |
 
-- `Typography.note` and `Typography.caption` are not used on journey screens, with one exception: Home's last line with the credit balance and the version (AGENTS.md §17 keeps the version on the main screen). They remain for legal and privacy text in sheets.
+- `Typography.note` and `Typography.caption` are not used on journey screens, with one exception: the version on Home in builds before 1.0 (§9.4). They remain for legal and privacy text in sheets.
 - `rowTitle` (semibold subheadline) is retired: a row name is body, regular weight.
 - Everything in the tray is left-aligned: titles, lines, rows. Centred: the object on the stage, a button's label, and a sheet's navigation title. Nothing else.
 
@@ -299,10 +301,10 @@ Three roles and the readout, mapped to the existing tokens:
 |---|---|
 | "Hold to compare with the original" | Deleted. A glass capsule **Original** sits at the stage's bottom-left corner; press and hold it (or the photo) to compare. The accessibility action stays |
 | "Your photos stay on your iPhone." (Home) | Deleted from Home. It stays in Settings › Privacy and on the welcome page |
-| "1 credit" and the version (Home) | One caption line at the bottom of Home's tray: the balance as a text button on the left, the version on the right |
+| "1 credit" and the version (Home) | **(free hand)** The balance leaves Home: it is shown where it is spent (the unlock button, and "You have no credits" when short) and in Settings › Credits. The version stays as one quiet line at the bottom of Home's tray **until 1.0 only**, because the founder identifies builds from screenshots; from 1.0 it is in Settings alone. The long press on it still turns on developer details |
 | "Fix these issues or continue after checking by eye." | Deleted. The rows say what there is to look at |
 | "Unlocked. Printing and sharing this photo is free." | The supporting line under the title, when unlocked |
-| "8 copies · 1 page · Room for 4 more" under the mat | The supporting line under the tray title on Your sheet |
+| "8 copies · 1 page · Room for 4 more" under the mat | The supporting line under the tray title on Print: "12 copies on 10 × 15 cm paper" |
 | The unlock card's three benefits, "After this, framing and edits are final.", "You have 1 credit. After this: 0 credits." | One body sentence: "Unlocking gives you every print and the digital photo, as often as you like. Edits are final after that." The cost is in the button: **Unlock · 1 credit**. The balance is said only when it is not enough: "You have no credits." with **Get Credits** as the button |
 | "Before you print" label, "Choose where you print to see the steps." | Deleted. The steps appear as rows once a place is chosen |
 | "Sized for online forms" | The supporting line under "Your digital photo is ready" |
@@ -315,7 +317,7 @@ Three roles and the readout, mapped to the existing tokens:
 3. **Chips:** only for one choice among several (paper sizes). Never for an action.
 4. **Toolbar:** system glass circles; everything a screen needs rarely (Retake, requirements, cutting options, add a person, more formats, remove) goes in its ••• menu.
 
-Removed: the pale-teal full-width buttons (`.bordered` Digital Photo, Adjust, No, Close, Done), the "Check" link on Your sheet (Back does that), and the Fill pill (§9.7). A primary button that cannot act yet stays in place, disabled, and says what is missing ("Choose where to print").
+Removed: the pale-teal full-width buttons (`.bordered` Digital Photo, Adjust, No, Close, Done), the "Check" link on the sheet (Back does that), and the Fill pill (§9.7). A primary button that cannot act yet stays in place, disabled, and says what is missing ("Choose where to print").
 
 ### 9.6 Status
 
@@ -325,17 +327,22 @@ Photo Check's verdict logic does not change (ADR-007). Its presentation does: th
 
 ### 9.7 Each screen
 
+The journey is four screens and the camera: **Home → Camera → Photo Check → Print → Finished** (Digital Photo takes Print's place for a digital main output).
+
 | Screen | Stage | Tray |
 |---|---|---|
-| **Home** | The sample selfie, photo and sheet lying on the mat (the person's own once they have one). The wordmark "Calipic" and the ••• button over the mat | Title "Take it at home. Print it yourself." · row: flag, document name, size as a readout, chevron (opens Choose document; Photo requirements moves into that sheet and the ••• menu) · **Take Photo** · "Choose from Library" · the caption line (credits, version). With photos in progress, a row per person above the document row |
-| **Photo Check** | The framed photo, at least 45 % of the screen, with the measuring lines on request and the **Original** capsule | Verdict title with its mark · "Framed for …" · rows Measured and To check by eye · "Adjust" beside **Print** (or **Digital Photo** when that is the main output; the other output is in the ••• menu) |
-| **Your sheet** | The page, as today, with page dots and free slots | Title "Your sheet" · supporting line "8 copies · 1 page · room for 4 more" · row **Copies** with the count and the stepper; under it the text button "Fill the page" when there is room · row **Paper** with the chips · with two or more people, a row of their circles above Copies · **Continue**. Add a person, add a size, and cutting options live in the toolbar menu (the scissors become •••) |
-| **Print, locked** | The page (or the stack), large | Title "Your sheet is ready" · "8 copies on 10 × 15 cm paper" · the unlock sentence · **Unlock · 1 credit** · "Keep Editing" |
-| **Print, unlocked** | The same page | Title "Where will you print?" · two rows, **At Home** and **At a Shop**, each with its symbol, one secondary line, and a check on the chosen one · once chosen, the numbered steps as rows and "Check Your Print" as the last row · **Print** or **Share Print Image** · "More Formats" in the ••• menu |
-| **Digital Photo** | The photo, at least 45 % | Locked: as Print, locked. Ready: title "Your digital photo is ready" with the pass mark · "Sized for online forms" · **Share Photo** · "Done" |
-| **Finished** | The page with the cut order drawn on it | The seal and title "Your photos are the right size" (left-aligned, the seal before the title) · the cut steps as rows · **Done** |
+| **Home** | The sample selfie, photo and sheet lying on the mat (the person's own once they have one). The wordmark "Calipic" and the ••• button over the mat | Title "Take it at home. Print it yourself." · row: flag, document name, size as a readout, chevron (opens Choose document; Photo requirements moves into that sheet and the ••• menu) · **Take Photo** · "Choose from Library" · before 1.0, the version line. With photos in progress, a row per person above the document row |
+| **Camera** | Unchanged, except the end **(free hand)**: there is no separate review. The shutter's bloom carries the still straight onto Photo Check's mat, where it settles into its frame (the landing animation). Analysis starts at the shutter, as it does today during the review | — |
+| **Photo Check** | The framed photo, at least 45 % of the screen, with the measuring lines on request and the **Original** capsule | Verdict title with its mark · "Framed for …" · rows Measured and To check by eye · "Adjust" beside **Print** (or **Digital Photo** when that is the main output; the other output is in the ••• menu). **Retake** is the toolbar's text button and becomes the primary button when the verdict is *Better to retake* or the eyes measured closed |
+| **Print** **(free hand: Your sheet and Print are one screen)** | The page, always: large, with page dots, free slots, and the stack for several pages. It does not move or shrink while the tray changes | Four states, cross-fading in place; Back steps to the previous state before leaving the screen. **1 · Layout:** title "Your sheet" · "12 copies on 10 × 15 cm paper" · row **Copies** with the count and the stepper · row **Paper** with the chips · with two or more people, a row of their circles above Copies · **Continue**. **2 · Unlock** (skipped when already unlocked): title "Unlock this photo" · the unlock sentence · **Unlock · 1 credit** · "Keep Editing" (back to state 1). **3 · Where:** title "Where will you print?" · two rows, **At Home** and **At a Shop**, each with its symbol and one secondary line; tapping one goes on. **4 · Print:** title "Print at home" or "Print at a shop" · the numbered steps as rows · **Print** or **Share Print Image** · "Change where" as the text button. Add a person, add a size, cutting options and More Formats live in the toolbar ••• menu |
+| **Digital Photo** | The photo, at least 45 % | Locked: Print's Unlock state. Ready: title "Your digital photo is ready" with the pass mark · "Sized for online forms" · **Share Photo** · "Done" |
+| **Finished** | The page with the cut order drawn on it | The seal and title "Your photos are the right size" (left-aligned, the seal before the title) · the cut steps as rows · **Done**. "Check Your Print" opens from the print panel closing, as today, and from the ••• menu |
 | **Welcome, You're all set** | Welcome: the selfie becoming the photo. All set: the printed page | The same content as today, in the tray, under the rules above |
 | **Check your print** (sheet) | — | The 50 mm line drawn large in the upper half, with its readout; the question as a left-aligned title; **Yes, Same Size** and the text button "No" |
+
+**Copies (free hand).** A new sheet starts with the first page full (today: 8 copies, which leaves 4 slots empty on 10 × 15 cm). The stepper still moves one copy at a time; "Fill the page" is a text button under the Copies row, shown only when there are free slots.
+
+**The guide** follows the same shape: Home (document, Take Photo), Photo Check (the rows, Print), Print (copies and paper, Continue, Unlock, where, Print). Four phases stay four.
 
 ### 9.8 Dark, large text, motion, the guide
 
@@ -346,15 +353,28 @@ Photo Check's verdict logic does not change (ADR-007). Its presentation does: th
 
 ### 9.9 How it is built
 
-New pieces, all in `App/Brand` or `App/Features/Journey`: `JourneyScreen`, `TrayRow` (name, optional secondary line, trailing value, chevron or control), `TrayActions` (primary, optional text button, optional leading peer), `StatusMark`, `Radius.tray`, `Typography.trayTitle`. `Surface.card` and `Surface.stage` leave the journey screens.
+New pieces, all in `App/Brand` or `App/Features/Journey`: `JourneyScreen`, `TrayRow` (name, optional secondary line, trailing value, chevron or control), `TrayActions` (primary, optional text button, optional leading peer), `StatusMark`, `Radius.tray`, `Typography.trayTitle`. `Surface.card` and `Surface.stage` leave the journey screens. Print's tray state is derived from the model (locked count, chosen route), with one stored value for "layout confirmed", so a relaunch or Back cannot leave it in an impossible state.
 
-Build order, one screen per pass, each on the founder's iPhone before the next:
+Build order, one pass each, each on the founder's iPhone before the next:
 
 1. The components, then **Photo Check**.
-2. **Print** (locked and unlocked) and **Digital Photo**.
+2. **Print as one screen** (the largest pass: `SheetView` and `PrintView` merge; navigation, the guide's tips and the UI tests follow), and **Digital Photo**. The first page filled by default.
 3. **Home**, the welcome page, "You're all set".
-4. **Your sheet**.
+4. **One review:** the camera's still lands on Photo Check; the camera review screen is removed.
 5. **Finished** and the sheets (Check your print, then type and button rules in the rest).
 6. Review of the built screens against this section (Fable 5.2), then fixes.
 
-A pass is done when, in screenshots in Light and Dark, English, Spanish and Portuguese: the screen has one filled button; no text below the Secondary role except Home's caption line; nothing is centred that §9.3 does not centre; no rounded box sits inside the tray; the object fills the stage; and the UI tests pass with their identifiers unchanged.
+A pass is done when, in screenshots in Light and Dark, English, Spanish and Portuguese: the screen has one filled button; no text below the Secondary role except Home's version line; nothing is centred that §9.3 does not centre; no rounded box sits inside the tray; the object fills the stage; and the UI tests pass.
+
+### 9.10 Decisions made with the founder's free hand (2026-11-14)
+
+The founder said "you have complete freedom to change anything". These go beyond the chosen direction B; each is recorded in [05-decisions.md](05-decisions.md) and can be reversed by saying so.
+
+| Decision | Instead of | Why |
+|---|---|---|
+| **Print is one screen** with a tray that changes (ADR-055) | Your sheet, then Print, both showing the same page | One object, one journey (§6): the page never leaves the mat; one screen fewer; each word of the step marker is one screen |
+| **One review** (ADR-045 amended) | Camera review, then Photo Check | The same photo was approved twice. Photo Check shows the same still, measured, with Retake one tap away |
+| **The first page is full by default** | 8 copies, leaving free slots | The paper is used either way; spare photos are what people want from a sheet |
+| **Credits leave Home**; the version leaves Home at 1.0 | A caption line with both | Home says one thing. The balance matters at the unlock; the version matters to the founder until launch |
+| **Status inline, verdict as the title** | A large icon over a centred headline | Calm by default; orange only for a measured problem |
+| **A small group of testers after real purchases (0.24)**, before the tools work | A beta only at 0.95 | The look and the flow have been judged by one person. Five people who have never seen the app are worth more than another round of polish |

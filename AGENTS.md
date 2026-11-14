@@ -63,6 +63,9 @@ Third-party packages require an ADR or dependency review explaining why Apple AP
 - Use system typography, Dynamic Type, semantic colors/materials, and SF Symbols by default.
 - Motion and haptics must communicate state or cause/effect; avoid decorative motion/haptic noise.
 - Respect light/dark appearance and Reduce Motion. Other accessibility settings follow the 1.0 baseline in section 6.
+- **Journey screens follow one layout (ADR-054, `docs/03-design.md` §9):** the cutting mat edge to edge with the photo or page large on it, and one white tray below for everything that is read or tapped. Build them with `JourneyScreen`, `TrayRow`, `TrayActions` and `StatusMark`; do not add cards, tinted panels, or a second filled button.
+- Three text roles (title, body, secondary) plus the monospaced readout, left-aligned. No footnote-sized grey text on a journey screen: delete the line, make it a sentence, or move it behind a row.
+- One filled button per screen and at most one text button; rare actions go in the toolbar menu. Status is one inline `StatusMark` with words.
 
 ## 6. Accessibility baseline (1.0 scope, ADR-050)
 
@@ -212,7 +215,7 @@ Any new non-Apple dependency must document:
 
 ## 17. Versioning
 
-- The app shows `marketing version (build)` on its main screen.
+- Until 1.0 the app shows `marketing version (build)` on its main screen, as one quiet line, so a screenshot identifies the build; it is always in Settings. From 1.0 it is in Settings only.
 - Marketing version follows `0.<milestone>.<fix>` until release; build number is the git commit count.
 - Run `scripts/bump-version.sh <version>` before committing app changes, and tag commits handed to a device with `v<version>`.
 - Never ship two different binaries with the same version and build.
@@ -231,6 +234,7 @@ Before considering work complete, ask:
 8. Is the behavior tested at rule/geometry boundaries?
 9. Does it behave well on the oldest iPhone that runs iOS 27?
 10. Does this feature make the ID-photo task better, or is it merely showcasing an API?
+11. Does every changed screen pass the check in `docs/03-design.md` §9.9 (one filled button, three text roles, nothing boxed inside the tray, the object fills the stage), in Light and Dark and in all three languages?
 
 When the answer changes a foundational decision, update `docs/05-decisions.md` before quietly implementing a workaround.
 ## 19. Model tiering for AI agents
