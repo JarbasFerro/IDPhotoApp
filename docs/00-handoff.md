@@ -32,13 +32,21 @@ Always use the full Xcode: `export DEVELOPER_DIR=/Applications/Xcode.app/Content
 # Simulators available on this Mac
 xcrun simctl list devices available
 
-# All tests (unit and UI) on the first iOS 27 iPhone simulator. Takes about five minutes.
-scripts/test.sh auto
-# Unit tests only, as CI will run them (seconds once built). A specific simulator also works:
+# Two levels. After each change: the unit tests (under a minute with the build), then only the UI tests of the
+# screens you touched. Once before a commit: everything, with the UI tests spread over 3 simulator clones (about
+# 7.5 minutes with the build, against about 9 plus the build on one simulator). "auto" prefers a running iPhone
+# simulator. testPrintCheckLeadsToTheFixOrToFinished and testShopPrintOffersTheCheck fail on a 6.3-inch iPhone
+# (the Check button stays under the tray); run on a 6.7-inch one until they are fixed.
 scripts/test.sh --unit auto
+scripts/test.sh --ui testTutorialWelcomeAndHome,testSettingsLanguageMenu --result guide auto
+scripts/test.sh --result full auto
+# Options: --workers N (clones, default 3), --language es | pt-BR (screenshots for a translation check),
+# --no-build (reuse the last build). A specific simulator also works:
 scripts/test.sh "platform=iOS Simulator,id=<simulator UUID>"
+# The UI tests are four classes of about the same length (Calipic/UITests, shared helpers in CalipicUITestCase),
+# because xcodebuild hands whole classes to the clones. Keep them balanced when adding tests.
 
-# Result summary and screenshots from a run made with -resultBundlePath
+# Result summary and screenshots from a run made with --result <name> (or -resultBundlePath)
 xcrun xcresulttool get test-results summary --path build/<name>.xcresult
 xcrun xcresulttool export attachments --path build/<name>.xcresult --output-path <folder>
 
