@@ -59,7 +59,6 @@ struct PhotoCheckView: View {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
             }
         }
-        .tutorialCoach(coachCard)
         .navigationTitle(position.map { $0.1 > 1 ? String(localized: "Photo \($0.0) of \($0.1)") : String(localized: "Photo Check") } ?? String(localized: "Photo Check"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -344,6 +343,7 @@ struct PhotoCheckView: View {
         let secondary = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
         return VStack(spacing: Design.Spacing.control) {
+            if model.tutorial.isActive { CoachLine(step: .check, output: model.document.primaryOutput) }
             if let first = outputs.first { outputButton(first).brandProminentButtonStyle().coachTarget(model.tutorial.isActive) }
             secondary {
                 ForEach(Array(outputs.dropFirst()), id: \.self) { output in
@@ -426,12 +426,3 @@ struct PortraitView: View {
     }
 }
 
-extension PhotoCheckView {
-    fileprivate var coachCard: CoachCard? {
-        guard model.tutorial.isActive else { return nil }
-        let output = model.document.primaryOutput
-        return CoachCard(step: .check, steps: TutorialFlow.steps(for: output),
-                         title: TutorialCopy.title(.check, output: output, hasPhoto: true),
-                         message: TutorialCopy.message(.check, output: output, hasPhoto: true, route: nil))
-    }
-}

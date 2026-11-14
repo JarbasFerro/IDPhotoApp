@@ -4,21 +4,22 @@ import Testing
 
 /// First-run tutorial (ADR-052).
 struct TutorialTests {
-    @Test func stepsFollowTheMainOutput() {
-        #expect(TutorialFlow.steps(for: .print) == [.document, .photo, .check, .sheet, .unlock, .finish])
-        #expect(TutorialFlow.steps(for: .digital) == [.document, .photo, .check, .unlock, .finish])
-        #expect(TutorialFlow.position(of: .unlock, in: TutorialFlow.steps(for: .print)) == 5)
-        #expect(TutorialFlow.position(of: .unlock, in: TutorialFlow.steps(for: .digital)) == 4)
+    @Test func phasesFollowTheMainOutput() {
+        #expect(TutorialFlow.phases(for: .print) == [.photo, .check, .sheet, .finish])
+        #expect(TutorialFlow.phases(for: .digital) == [.photo, .check, .finish])
+        #expect(TutorialFlow.progress(of: .unlock, output: .print) == (4, 4))
+        #expect(TutorialFlow.progress(of: .finish, output: .print) == (4, 4))
+        #expect(TutorialFlow.progress(of: .unlock, output: .digital) == (3, 3))
+        #expect(TutorialFlow.progress(of: .check, output: .digital) == (2, 3))
     }
 
-    @Test func stepComesFromTheScreenAndProgress() {
-        #expect(TutorialFlow.step(on: .home, documentConfirmed: false, hasPhoto: false, unlocked: false) == .document)
-        #expect(TutorialFlow.step(on: .home, documentConfirmed: true, hasPhoto: false, unlocked: false) == .photo)
-        #expect(TutorialFlow.step(on: .check, documentConfirmed: true, hasPhoto: true, unlocked: false) == .check)
-        #expect(TutorialFlow.step(on: .sheet, documentConfirmed: true, hasPhoto: true, unlocked: false) == .sheet)
-        #expect(TutorialFlow.step(on: .print, documentConfirmed: true, hasPhoto: true, unlocked: false) == .unlock)
-        #expect(TutorialFlow.step(on: .print, documentConfirmed: true, hasPhoto: true, unlocked: true) == .finish)
-        #expect(TutorialFlow.step(on: .digital, documentConfirmed: true, hasPhoto: true, unlocked: true) == .finish)
+    @Test func stepComesFromTheScreen() {
+        #expect(TutorialFlow.step(on: .home, unlocked: false) == .photo)
+        #expect(TutorialFlow.step(on: .check, unlocked: false) == .check)
+        #expect(TutorialFlow.step(on: .sheet, unlocked: false) == .sheet)
+        #expect(TutorialFlow.step(on: .print, unlocked: false) == .unlock)
+        #expect(TutorialFlow.step(on: .print, unlocked: true) == .finish)
+        #expect(TutorialFlow.step(on: .digital, unlocked: true) == .finish)
     }
 
     @Test func newInstallsStartAndExistingPeopleDoNot() {

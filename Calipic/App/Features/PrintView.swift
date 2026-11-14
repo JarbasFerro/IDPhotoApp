@@ -50,7 +50,6 @@ struct PrintView: View {
             }
         }
         .background(Design.Surface.screen)
-        .tutorialCoach(coachCard)
         .animation(reduceMotion ? nil : .smooth, value: locked)
         .safeAreaInset(edge: .bottom) {
             if !dynamicTypeSize.isAccessibilitySize {
@@ -110,13 +109,6 @@ struct PrintView: View {
 
     private var coaching: Bool { model.tutorial.isActive }
 
-    private var coachCard: CoachCard? {
-        guard coaching else { return nil }
-        let step = TutorialFlow.step(on: .print, documentConfirmed: true, hasPhoto: true, unlocked: locked == 0)
-        return CoachCard(step: step, steps: TutorialFlow.steps(for: .print),
-                         title: TutorialCopy.title(step, output: .print, hasPhoto: true),
-                         message: TutorialCopy.message(step, output: .print, hasPhoto: true, route: route))
-    }
 
     /// The photo left the app inside the tutorial: it is over.
     private func finishTutorial() {
@@ -356,6 +348,10 @@ struct PrintView: View {
 
     @ViewBuilder private var actions: some View {
         VStack(spacing: Design.Spacing.text) {
+            if coaching {
+                CoachLine(step: locked > 0 ? .unlock : .finish, output: .print, route: route)
+                    .padding(.bottom, Design.Spacing.tight)
+            }
             if locked > 0 {
                 UnlockCard(photos: locked, balance: model.credits.balance, inTray: !dynamicTypeSize.isAccessibilitySize)
                     .transition(.asymmetric(insertion: .opacity, removal: .opacity.combined(with: .scale(scale: 0.9, anchor: .bottom))))

@@ -68,3 +68,7 @@ Made as a local page ([source](2026-11-12-look-round3.html), rendered with Chrom
 The four parts can be mixed (for example B's stage with A's numbers).
 
 **Decision (founder, 2026-11-12):** **B, Cutting mat**, with one condition: the text over the mat in the mock-up was not legible. Built in 0.20.0 with two rules: no bare text on the grid (captions and counts sit below the mat, the measurement chip has a solid background, the grid stays out from under the navigation bar), and the grid is never shown where something is true size (Check your print).
+
+## First-photo guide, round 1 (2026-11-14)
+
+The 0.20.14 coach card pushed every screen down and sat far from the button. Research and three options (line on the action, bubble pointing at the control, spotlight) are in [2026-11-14-first-photo-guide-round1.md](2026-11-14-first-photo-guide-round1.md). **Decision (founder):** A, the line on the action; built in 0.20.15.

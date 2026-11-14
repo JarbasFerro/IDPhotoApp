@@ -39,6 +39,7 @@ struct DigitalShareView: View {
                     Text("Sized for online forms")
                         .font(Design.Typography.cardDetail)
                         .foregroundStyle(.secondary)
+                    if coaching { CoachLine(step: .finish, output: .digital).padding(.top, Design.Spacing.text) }
                     // The system sheet directly, so a completed share can end the tutorial.
                     Button {
                         ShareController.present([result.jpeg]) { shared in
@@ -62,6 +63,7 @@ struct DigitalShareView: View {
                     PortraitView(entry: entry, format: model.renderTarget.format, label: "Prepared photo")
                         .frame(maxWidth: 200)
                     UnlockCard(photos: 1, balance: model.credits.balance)
+                    if coaching { CoachLine(step: .unlock, output: .digital) }
                     if model.credits.canAfford(1) {
                         Button {
                             if model.unlock([photoID]) { model.prepareDigitalExport(for: photoID) }
@@ -96,7 +98,6 @@ struct DigitalShareView: View {
             .padding()
         }
         .background(Design.Surface.screen)
-        .tutorialCoach(coachCard)
         .sheet(isPresented: $showAllSet, onDismiss: { path.removeAll() }) {
             TutorialDoneView(output: .digital, route: nil, creditsLeft: model.credits.balance, done: { showAllSet = false })
         }
@@ -110,14 +111,3 @@ struct DigitalShareView: View {
     }
 }
 
-extension DigitalShareView {
-    fileprivate var coachCard: CoachCard? {
-        guard coaching else { return nil }
-        let unlocked = entry?.isUnlocked ?? false
-        let step = TutorialFlow.step(on: .digital, documentConfirmed: true, hasPhoto: true, unlocked: unlocked)
-        let output = model.document.primaryOutput
-        return CoachCard(step: step, steps: TutorialFlow.steps(for: output),
-                         title: TutorialCopy.title(step, output: .digital, hasPhoto: true),
-                         message: TutorialCopy.message(step, output: .digital, hasPhoto: true, route: nil))
-    }
-}

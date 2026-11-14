@@ -57,7 +57,6 @@ struct HomeView: View {
             .padding(.bottom)
         }
         .background(Design.Surface.screen)
-        .tutorialCoach(coachCard)
         .animation(reduceMotion ? nil : .smooth, value: model.tutorial.state)
         .safeAreaInset(edge: .bottom) {
             if !dynamicTypeSize.isAccessibilitySize {
@@ -111,29 +110,8 @@ struct HomeView: View {
 
     // MARK: - Tutorial (ADR-052)
 
-    private var coachStep: TutorialStep? {
-        guard model.tutorial.isActive else { return nil }
-        return TutorialFlow.step(on: .home, documentConfirmed: model.tutorial.state.documentConfirmed,
-                                 hasPhoto: !model.entries.isEmpty, unlocked: false)
-    }
-
-    private var coachCard: CoachCard? {
-        guard let step = coachStep else { return nil }
-        let output = model.document.primaryOutput
-        let hasPhoto = !model.entries.isEmpty && step == .photo
-        var card = CoachCard(step: hasPhoto ? .check : step, steps: TutorialFlow.steps(for: output),
-                             title: TutorialCopy.title(step, output: output, hasPhoto: hasPhoto),
-                             message: TutorialCopy.message(step, output: output, hasPhoto: hasPhoto, route: nil))
-        if step == .document {
-            card.actionTitle = "Continue"
-            card.action = { model.tutorial.confirmDocument() }
-        } else if hasPhoto, let first = model.entries.first {
-            // Back on Home with a photo in progress: pick up at its Photo Check.
-            card.actionTitle = "Continue"
-            card.action = { path = [.check(first.id)] }
-        }
-        return card
-    }
+    /// The guided first photo: Home always coaches taking the photo, or picking up the one in progress.
+    private var coaching: Bool { model.tutorial.isActive }
 
     // MARK: - Hero
 
@@ -312,7 +290,6 @@ struct HomeView: View {
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Chooses the country and document, or a custom size.")
-            .coachTarget(coachStep == .document, cornerRadius: Design.Radius.group)
             .accessibilityIdentifier("documentCard")
             Divider().padding(.leading)
             Button { showRequirements = true } label: {
@@ -337,6 +314,27 @@ struct HomeView: View {
 
     private var actions: some View {
         VStack(spacing: Design.Spacing.tight) {
+            if coaching {
+                CoachLine(step: .photo, output: model.document.primaryOutput, hasPhoto: !model.entries.isEmpty)
+                    .padding(.bottom, Design.Spacing.tight)
+            }
+            if coaching, let first = model.entries.first {
+                // Back on Home with the first photo in progress: one way on, to its Photo Check.
+                Button { path = [.check(first.id)] } label: {
+                    Text("Continue").frame(maxWidth: .infinity)
+                }
+                .brandProminentButtonStyle()
+                .controlSize(.large)
+                .coachTarget(true)
+                .accessibilityIdentifier("coachAction")
+            } else {
+                photoButtons
+            }
+            footer
+        }
+    }
+
+    @ViewBuilder private var photoButtons: some View {
             Button {
                 if model.tutorial.isActive { model.tutorial.confirmDocument() }
                 acquire(.camera, model.entries.isEmpty ? .replace : .add)
@@ -346,7 +344,7 @@ struct HomeView: View {
             .brandProminentButtonStyle()
             .controlSize(.large)
             .disabled(isBusy)
-            .coachTarget(coachStep == .photo && model.entries.isEmpty)
+            .coachTarget(coaching)
             .accessibilityIdentifier("takePhoto")
             Button("Choose from Library") {
                 if model.tutorial.isActive { model.tutorial.confirmDocument() }
@@ -355,8 +353,6 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
                 .disabled(isBusy)
                 .accessibilityIdentifier("choosePhoto")
-            footer
-        }
     }
 
     /// Credits and privacy in plain sight (ADR-048 §8), and the version (AGENTS.md §17).

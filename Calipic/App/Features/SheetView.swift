@@ -58,11 +58,6 @@ struct SheetView: View {
             }
         }
         .background(Design.Surface.screen)
-        .tutorialCoach(model.tutorial.isActive
-            ? CoachCard(step: .sheet, steps: TutorialFlow.steps(for: .print),
-                        title: TutorialCopy.title(.sheet, output: .print, hasPhoto: true),
-                        message: TutorialCopy.message(.sheet, output: .print, hasPhoto: true, route: nil))
-            : nil)
         .navigationTitle("Your sheet")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -153,6 +148,7 @@ struct SheetView: View {
                 StatusLabel(text: "\(layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages.", state: .warn)
                     .font(.subheadline)
             }
+            if model.tutorial.isActive { CoachLine(step: .sheet, output: .print).padding(.top, Design.Spacing.tight) }
             Button { path.append(.share) } label: {
                 Text("Continue").frame(maxWidth: .infinity)
             }

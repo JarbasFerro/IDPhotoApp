@@ -132,6 +132,22 @@
         }
       }
     },
+    "Check the document above, then take your photo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revisa el documento de arriba y haz tu foto."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confira o documento acima e tire sua foto."
+          }
+        }
+      }
+    },
     "Check the size" : {
       "localizations" : {
         "es" : {
@@ -148,50 +164,18 @@
         }
       }
     },
-    "Choose the paper and how many copies, then tap Continue." : {
+    "Choose where you'll print." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elige el papel y cuántas copias, y toca Continuar."
+            "value" : "Elige dónde imprimirás."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Escolha o papel e quantas cópias, depois toque em Continuar."
-          }
-        }
-      }
-    },
-    "Choose where you'll print: at home or at a shop." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elige dónde imprimirás: en casa o en una tienda."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escolha onde vai imprimir: em casa ou em uma loja."
-          }
-        }
-      }
-    },
-    "Continue your first photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continúa tu primera foto"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue sua primeira foto"
+            "value" : "Escolha onde vai imprimir."
           }
         }
       }
@@ -244,54 +228,6 @@
         }
       }
     },
-    "Framed and checked" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encuadrada y revisada"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enquadrada e verificada"
-          }
-        }
-      }
-    },
-    "Is this your document?" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Es este tu documento?"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Este é o seu documento?"
-          }
-        }
-      }
-    },
-    "Lay out your sheet" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prepara tu hoja"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Monte sua folha"
-          }
-        }
-      }
-    },
     "Let's make your first ID photo" : {
       "localizations" : {
         "es" : {
@@ -324,34 +260,34 @@
         }
       }
     },
-    "Look at anything marked. Retakes and adjustments are free. Then continue." : {
+    "Looks good? Continue. Retakes and fixes are free." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisa lo que esté marcado. Repetir y ajustar es gratis. Después continúa."
+            "value" : "¿Se ve bien? Continúa. Repetir y ajustar es gratis."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veja o que estiver marcado. Refazer e ajustar é grátis. Depois continue."
+            "value" : "Ficou bom? Continue. Refazer e ajustar é grátis."
           }
         }
       }
     },
-    "Look at anything marked. Retakes and adjustments are free. Then tap Print." : {
+    "Looks good? Tap Print. Retakes and fixes are free." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Revisa lo que esté marcado. Repetir y ajustar es gratis. Después toca Imprimir."
+            "value" : "¿Se ve bien? Toca Imprimir. Repetir y ajustar es gratis."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veja o que estiver marcado. Refazer e ajustar é grátis. Depois toque em Imprimir."
+            "value" : "Ficou bom? Toque em Imprimir. Refazer e ajustar é grátis."
           }
         }
       }
@@ -388,6 +324,22 @@
         }
       }
     },
+    "Pick the paper and copies, then tap Continue." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elige el papel y las copias, y toca Continuar."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escolha o papel e as cópias, depois toque em Continuar."
+          }
+        }
+      }
+    },
     "Print it" : {
       "localizations" : {
         "es" : {
@@ -400,22 +352,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Imprima"
-          }
-        }
-      }
-    },
-    "Print your photos" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imprime tus fotos"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imprima suas fotos"
           }
         }
       }
@@ -436,50 +372,34 @@
         }
       }
     },
-    "Save your photo" : {
+    "Send the image to your print shop." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guarda tu foto"
+            "value" : "Envía la imagen a tu tienda de fotos."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Salve sua foto"
+            "value" : "Envie a imagem para a loja de impressão."
           }
         }
       }
     },
-    "Send the image to your print shop, or save it to Files to take with you." : {
+    "Share it, or save it to Files for your online form." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envía la imagen a tu tienda de fotos, o guárdala en Archivos para llevarla."
+            "value" : "Compártela o guárdala en Archivos para tu formulario en línea."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envie a imagem para a loja de impressão, ou salve no Arquivos para levar."
-          }
-        }
-      }
-    },
-    "Share it, or save it to Files, to use it in your online form." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compártela o guárdala en Archivos para usarla en tu formulario en línea."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartilhe ou salve no Arquivos para usar no seu formulário online."
+            "value" : "Compartilhe ou salve no Arquivos para seu formulário online."
           }
         }
       }
@@ -496,22 +416,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No tamanho do seu documento, apontando o que precisar corrigir."
-          }
-        }
-      }
-    },
-    "Stand facing a window, in front of a plain light wall. Or choose a photo from your library." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ponte frente a una ventana, delante de una pared lisa y clara. O elige una foto de tu fototeca."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fique de frente para uma janela, diante de uma parede lisa e clara. Ou escolha uma foto da sua Fototeca."
           }
         }
       }
@@ -564,50 +468,18 @@
         }
       }
     },
-    "The photo is sized for it. Tap it to choose another, or continue." : {
+    "This first photo uses one of your free credits." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La foto se ajusta a su tamaño. Tócalo para elegir otro, o continúa."
+            "value" : "Esta primera foto usa uno de tus créditos gratis."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A foto é dimensionada para ele. Toque para escolher outro, ou continue."
-          }
-        }
-      }
-    },
-    "This first photo uses one of your two free credits. After that, it's yours to print and share again." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta primera foto usa uno de tus dos créditos gratis. Después es tuya para imprimirla y compartirla de nuevo."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta primeira foto usa um dos seus dois créditos grátis. Depois, ela é sua para imprimir e compartilhar de novo."
-          }
-        }
-      }
-    },
-    "Unlock with a free credit" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloquea con un crédito gratis"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desbloqueie com um crédito grátis"
+            "value" : "Esta primeira foto usa um dos seus créditos grátis."
           }
         }
       }
@@ -708,18 +580,18 @@
         }
       }
     },
-    "Your photo is waiting where you left it." : {
+    "Your first photo is waiting where you left it." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu foto te espera donde la dejaste."
+            "value" : "Tu primera foto te espera donde la dejaste."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sua foto está esperando onde você parou."
+            "value" : "Sua primeira foto está esperando onde você parou."
           }
         }
       }
