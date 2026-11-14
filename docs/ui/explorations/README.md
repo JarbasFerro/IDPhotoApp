@@ -72,3 +72,7 @@ The four parts can be mixed (for example B's stage with A's numbers).
 ## First-photo guide, round 1 (2026-11-14)
 
 The 0.20.14 coach card pushed every screen down and sat far from the button. Research and three options (line on the action, bubble pointing at the control, spotlight) are in [2026-11-14-first-photo-guide-round1.md](2026-11-14-first-photo-guide-round1.md). **Decision (founder):** A, the line on the action; built in 0.20.15.
+
+## Guide colour, round 1 (2026-11-14)
+
+The guide in teal blends with the teal buttons it points at. Green, orange and red mean pass, warn and fail, and purple is excluded by the brand, so the candidates are **A. Highlighter yellow** (system yellow `#FFCC00` light / `#FFD60A` dark, near-black text, ring `#F2B700` / `#FFD60A`; recommended) and **B. Ink** (near-black bubble in light, near-white in dark). Mock-up: [2026-11-14-guide-color-round1.html](2026-11-14-guide-color-round1.html), [png](2026-11-14-guide-color-round1.png). **Decision (founder, 2026-11-14):** A, highlighter yellow, for the bubble, the ring and the welcome chip; built in 0.20.17.

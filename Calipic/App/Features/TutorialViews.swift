@@ -31,11 +31,29 @@ enum TutorialCopy {
     }
 }
 
+// MARK: - Guide colour
+
+/// The guide's own colour (founder, 2026-11-14, round 1 in docs/ui/explorations): highlighter yellow, so it stands
+/// apart from the teal app and reads as a layer on top. A lemon yellow, never amber, to stay clear of the orange warn
+/// status. Not a brand colour and never used outside the guide.
+enum GuideStyle {
+    /// Bubble and chip fill: system yellow.
+    static let fill = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
+        ? UIColor(red: 1, green: 0.839, blue: 0.039, alpha: 1)    // #FFD60A
+        : UIColor(red: 1, green: 0.8, blue: 0, alpha: 1) })       // #FFCC00
+    /// The ring around the control to use: a touch deeper in Light so it holds against the light screen.
+    static let ring = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
+        ? UIColor(red: 1, green: 0.839, blue: 0.039, alpha: 1)    // #FFD60A
+        : UIColor(red: 0.949, green: 0.718, blue: 0, alpha: 1) }) // #F2B700
+    /// Text and glyphs on the yellow, in both appearances.
+    static let ink = Color(red: 0.11, green: 0.11, blue: 0.118)   // #1C1C1E
+}
+
 // MARK: - Guide bubble
 
 /// The guide: a filled speech bubble right above the control to use, its tail pointing at it (founder, 0.20.15: a
 /// plain line was easy to pass without noticing, and it should read as a temporary layer, not part of the app). The
-/// filled teal sets it apart from the app's own cards and buttons; it pops in at each new step.
+/// highlighter yellow sets it apart from the teal buttons it points at; it pops in at each new step.
 struct CoachLine: View {
     let step: TutorialStep
     let output: Output
@@ -85,26 +103,26 @@ struct GuideBubble: View {
                     HStack(spacing: 3) {
                         ForEach(1...count, id: \.self) { index in
                             Capsule()
-                                .fill(.white.opacity(index <= position ? 1 : 0.35))
+                                .fill(GuideStyle.ink.opacity(index <= position ? 1 : 0.3))
                                 .frame(width: 14, height: 3)
                         }
                     }
                     .accessibilityHidden(true)
                 }
                 .font(Design.Typography.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.9))
+                .foregroundStyle(GuideStyle.ink.opacity(0.8))
                 hint
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(GuideStyle.ink)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, Design.Spacing.control)
             .padding(.vertical, Design.Spacing.text)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.brandAccentFill, in: RoundedRectangle(cornerRadius: 16))
+            .background(GuideStyle.fill, in: RoundedRectangle(cornerRadius: 16))
             if !up { GuideTail(up: false) }
         }
-        .shadow(color: Color.brandAccentFill.opacity(0.35), radius: 10, y: 4)
+        .shadow(color: Color.black.opacity(0.18), radius: 10, y: 4)
     }
 }
 
@@ -119,7 +137,7 @@ private struct GuideTail: View {
             path.addLine(to: CGPoint(x: 18, y: up ? 9 : 0))
             path.closeSubpath()
         }
-        .fill(Color.brandAccentFill)
+        .fill(GuideStyle.fill)
         .frame(width: 18, height: 9)
         .padding(up ? .bottom : .top, -1)
         .accessibilityHidden(true)
@@ -144,7 +162,7 @@ private struct CoachTarget: ViewModifier {
             .overlay {
                 if active {
                     RoundedRectangle(cornerRadius: cornerRadius)
-                        .strokeBorder(Color.brandAccent, lineWidth: 2)
+                        .strokeBorder(GuideStyle.ring, lineWidth: 3)
                         .padding(-4)
                         .opacity(reduceMotion ? 1 : (breathing ? 1 : 0.35))
                         .allowsHitTesting(false)
@@ -173,10 +191,10 @@ struct TutorialWelcomeView: View {
                 VStack(alignment: .leading, spacing: Design.Spacing.text) {
                     Label("Guided first photo", systemImage: "hand.point.down.fill")
                         .font(Design.Typography.caption.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(GuideStyle.ink)
                         .padding(.horizontal, Design.Spacing.text)
                         .padding(.vertical, Design.Spacing.tight)
-                        .background(Color.brandAccentFill, in: Capsule())
+                        .background(GuideStyle.fill, in: Capsule())
                     Text("Let's make your first ID photo together")
                         .font(Design.Typography.hero)
                         .accessibilityAddTraits(.isHeader)

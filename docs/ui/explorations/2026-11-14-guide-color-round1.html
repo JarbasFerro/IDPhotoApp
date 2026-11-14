@@ -1,0 +1,66 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Guide colour, round 1</title>
+<style>
+  body { margin: 0; padding: 24px; background: #8a8a8e; font: 14px -apple-system, system-ui, sans-serif; }
+  h1 { font-size: 18px; margin: 0 0 4px; color: #fff; }
+  p.note { color: #f2f2f7; margin: 0 0 20px; max-width: 900px; }
+  .row { display: flex; gap: 22px; }
+  .opt { display: flex; flex-direction: column; gap: 8px; }
+  .opt h2 { color: #fff; font-size: 15px; margin: 0; }
+  .pair { display: flex; gap: 10px; }
+  .phone { width: 200px; border-radius: 28px; padding: 18px 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .light { background: #f2f2f7; color: #000; }
+  .dark { background: #000; color: #fff; }
+  .card { border-radius: 14px; padding: 10px 12px; font-size: 13px; }
+  .light .card { background: #fff; }
+  .dark .card { background: #1c1c1e; }
+  .warn { color: #ff9500; font-weight: 700; }
+  .dark .warn { color: #ff9f0a; }
+  .sub { opacity: .55; font-size: 11px; }
+  .bubble { border-radius: 16px; padding: 8px 12px; position: relative; margin-bottom: 8px; }
+  .bubble .head { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; opacity: .9; }
+  .bubble .head .bars { margin-left: auto; display: flex; gap: 3px; }
+  .bubble .head .bars i { width: 14px; height: 3px; border-radius: 2px; background: currentColor; display: block; }
+  .bubble .head .bars i.off { opacity: .35; }
+  .bubble .text { font-size: 13px; font-weight: 600; margin-top: 3px; }
+  .bubble:after { content: ""; position: absolute; left: 50%; bottom: -8px; margin-left: -9px;
+    border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 9px solid var(--b); }
+  .btn { border-radius: 100px; text-align: center; padding: 11px; font-weight: 600; color: #fff; position: relative; }
+  .light .btn { background: #0E6F7C; }
+  .dark .btn { background: #25828E; }
+  .btn.ring { outline: 3px solid var(--r); outline-offset: 3px; }
+  .sec { border-radius: 100px; text-align: center; padding: 10px; font-weight: 600; }
+  .light .sec { background: #e5e5ea; color: #0E6F7C; }
+  .dark .sec { background: #1c1c1e; color: #4FC3D1; }
+  .teal-l { --b: #0E6F7C; --r: #0E6F7C; } .teal-d { --b: #25828E; --r: #4FC3D1; }
+  .yel-l { --b: #FFCC00; --r: #F2B700; } .yel-d { --b: #FFD60A; --r: #FFD60A; }
+  .ink-l { --b: #1C1C1E; --r: #1C1C1E; } .ink-d { --b: #F2F2F7; --r: #F2F2F7; }
+  .teal-l .bubble, .teal-d .bubble { background: var(--b); color: #fff; }
+  .yel-l .bubble, .yel-d .bubble { background: var(--b); color: #1c1c1e; }
+  .ink-l .bubble { background: var(--b); color: #fff; } .ink-d .bubble { background: var(--b); color: #000; }
+</style></head><body>
+<h1>Guide colour, round 1 (2026-11-14)</h1>
+<p class="note">The guide bubble and the ring around the button to tap, on Photo Check. Green, orange and red are taken by pass, warn and fail; purple is excluded by the brand. Today (left) the guide is the same teal as the button, so the two blend.</p>
+<div class="row">
+<script>
+const opts = [
+  ["Today: teal", "teal"],
+  ["A. Highlighter yellow (recommended)", "yel"],
+  ["B. Ink (inverted)", "ink"],
+];
+for (const [title, k] of opts) {
+  const phone = (mode) => `
+  <div class="phone ${mode} ${k}-${mode[0]}">
+    <div class="card"><span class="warn">!</span> 2 things to look at<div class="sub">Face · Background</div></div>
+    <div class="card">4 things to check by eye<div class="sub">Eyes open · Whole face visible</div></div>
+    <div style="height:30px"></div>
+    <div class="bubble"><div class="head">☝︎ Guide · 2 of 4<span class="bars"><i></i><i></i><i class="off"></i><i class="off"></i></span></div>
+      <div class="text">Looks good? Tap Print. Retakes and fixes are free.</div></div>
+    <div class="btn ring">Print</div>
+    <div class="sec">Adjust</div>
+  </div>`;
+  document.write(`<div class="opt"><h2>${title}</h2><div class="pair">${phone("light")}${phone("dark")}</div></div>`);
+}
+</script>
+</div>
+</body></html>
