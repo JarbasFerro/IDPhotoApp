@@ -3838,22 +3838,6 @@
         }
       }
     },
-    "Finding your face…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscando tu cara…"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Procurando seu rosto…"
-          }
-        }
-      }
-    },
     "Fine" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3867,22 +3851,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Certo"
-          }
-        }
-      }
-    },
-    "Fix these issues or continue after checking by eye." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corrige estos problemas o continúa después de revisar la foto visualmente."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corrija estes problemas ou continue após conferir a foto visualmente."
           }
         }
       }
@@ -3999,22 +3967,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enquadramento"
-          }
-        }
-      }
-    },
-    "Framing…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Encuadrando…"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enquadrando…"
           }
         }
       }
@@ -4326,22 +4278,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mantenha o telefone na vertical"
-          }
-        }
-      }
-    },
-    "Hold to compare with the original" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantén pulsado para comparar con la original"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mantenha pressionado para comparar com a original"
           }
         }
       }
@@ -6530,22 +6466,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Antes de usar a foto, confira visualmente a expressão, os olhos e os óculos. O órgão responsável decide se a aceita."
-          }
-        }
-      }
-    },
-    "Review the details below before using this photo." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revisa los detalles siguientes antes de usar esta foto."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Revise os detalhes abaixo antes de usar esta foto."
           }
         }
       }
@@ -10544,22 +10464,6 @@
         }
       }
     },
-    "Use Original Photo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usar la foto original"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usar a foto original"
-          }
-        }
-      }
-    },
     "Photo Check" : {
       "localizations" : {
         "es" : {
@@ -12252,6 +12156,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "permitido: %1$@–%2$@ mm"
+          }
+        }
+      }
+    },
+    "Edited photo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto editada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto editada"
+          }
+        }
+      }
+    },
+    "Print anyway" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir de todos modos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imprimir mesmo assim"
+          }
+        }
+      }
+    },
+    "To check by eye" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para comprobar a simple vista"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para conferir visualmente"
+          }
+        }
+      }
+    },
+    "Use Original" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar original"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar original"
+          }
+        }
+      }
+    },
+    "Use anyway" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar de todos modos"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar mesmo assim"
+          }
+        }
+      }
+    },
+    "Your eyes look closed or turned down." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus ojos parecen cerrados o mirando hacia abajo."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seus olhos parecem fechados ou voltados para baixo."
           }
         }
       }

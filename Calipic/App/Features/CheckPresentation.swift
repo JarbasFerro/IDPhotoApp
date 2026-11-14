@@ -169,15 +169,6 @@ enum CheckPresentation {
         }
     }
 
-    static func subtitle(for headline: PhotoCheckSummary.Headline) -> LocalizedStringResource {
-        switch headline {
-        case .checking: "Finding your face and preparing the background."
-        case .good: "Review the details below before using this photo."
-        case .review: "Fix these issues or continue after checking by eye."
-        case .retake: "This photo has problems we can't fix. A new one takes a minute."
-        }
-    }
-
     static func symbol(for headline: PhotoCheckSummary.Headline) -> String {
         switch headline {
         case .checking: "sparkle.magnifyingglass"

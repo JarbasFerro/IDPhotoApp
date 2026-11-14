@@ -46,7 +46,7 @@ final class PhotoCheckUITests: CalipicUITestCase {
         XCTAssertTrue(any(app, "checkHeadline").waitForExistence(timeout: 15))
         // The document's own by-eye checks fold into one row and open on tap.
         let byEye = any(app, "byEyeRow")
-        XCTAssertTrue(byEye.exists)
+        XCTAssertTrue(byEye.waitForExistence(timeout: 10))
         let checkScreenshot = XCTAttachment(screenshot: app.screenshot())
         checkScreenshot.name = "Photo Check"
         checkScreenshot.lifetime = .keepAlways
@@ -58,12 +58,8 @@ final class PhotoCheckUITests: CalipicUITestCase {
         checkDark.lifetime = .keepAlways
         add(checkDark)
         XCUIDevice.shared.appearance = .light
-        // Scroll the row clear of the bottom action bar before tapping it.
         XCTAssertTrue(any(app, "stepMarker").exists)
-        let continueButton = app.buttons["outputPrint"]
-        for _ in 0..<6 where byEye.frame.maxY > continueButton.frame.minY - 8 {
-            app.scrollViews.firstMatch.swipeUp()
-        }
+        reveal(byEye, in: app)
         byEye.tap()
         let eyesOpen = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Eyes open")).firstMatch
         XCTAssertTrue(eyesOpen.waitForExistence(timeout: 5), app.debugDescription)
@@ -211,5 +207,73 @@ final class PhotoCheckUITests: CalipicUITestCase {
         XCTAssertTrue(app.buttons["printAtHome"].waitForExistence(timeout: 10))
         reveal(app.buttons["printAtHome"], in: app, attempts: 10)
         XCTAssertTrue(app.buttons["printAtHome"].isHittable)
+    }
+}
+
+
+extension PhotoCheckUITests {
+    @MainActor
+    func testJourneyTrayScrollKeepsActionsPinned() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fresh", "--uitesting-journey-tray"]
+        app.launch()
+        let action = app.buttons["fixtureAction"]
+        XCTAssertTrue(action.waitForExistence(timeout: 10))
+        let initial = action.frame
+        let lastRow = any(app, "fixtureRow-29")
+        let scroll = app.scrollViews.firstMatch
+        // This fixture has no photo gestures. Drag through its rows, clear of the system scroll indicator.
+        for _ in 0..<15 where !lastRow.isHittable {
+            scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+                .press(forDuration: 0.05, thenDragTo: scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25)))
+        }
+        XCTAssertTrue(lastRow.isHittable)
+        XCTAssertEqual(action.frame.minY, initial.minY, accuracy: 1)
+        XCTAssertTrue(action.isHittable)
+        XCTAssertGreaterThan(any(app, "journeyStageFixture").frame.height, app.frame.height * 0.25)
+        attach(app, "Shared tray, thirty rows")
+    }
+
+    @MainActor
+    func testPhotoCheckStageAndOriginal() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fresh", "--uitesting-fixture", "--uitesting-measured", "--uitesting-synthetic-only"]
+        app.launch()
+        let chip = app.buttons["measureChip"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 15))
+        let portrait = any(app, "portrait")
+        XCTAssertGreaterThanOrEqual(portrait.frame.height, app.frame.height * 0.45)
+        XCTAssertTrue(app.buttons["adjust"].isHittable)
+        XCTAssertTrue(app.buttons["outputPrint"].isHittable)
+        let original = app.buttons["photoCheck"]
+        original.tap()
+        XCTAssertEqual(portrait.label, "Original photo")
+        let framed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Framed photo"), object: portrait)
+        XCTAssertEqual(XCTWaiter.wait(for: [framed], timeout: 3), .completed)
+        original.press(forDuration: 0.6)
+        XCTAssertEqual(portrait.label, "Framed photo")
+        app.buttons["outputPrint"].tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(any(app, "measuredRow").waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["measureChipLinesShown"].exists)
+        attach(app, "Photo Check, returning without replay")
+    }
+
+    @MainActor
+    func testPhotoCheckRetakeOffersOutputAnyway() {
+        for flag in ["--uitesting-no-face", "--uitesting-closed-eyes"] {
+            let app = XCUIApplication()
+            app.launchArguments = ["--uitesting-fresh", "--uitesting-fixture", "--uitesting-measured", "--uitesting-synthetic-only", flag]
+            app.launch()
+            XCTAssertTrue(app.buttons["retakePrimary"].waitForExistence(timeout: 15))
+            XCTAssertTrue(app.buttons["outputPrint"].isHittable)
+            XCTAssertFalse(app.buttons["adjust"].exists)
+            if flag == "--uitesting-closed-eyes" { XCTAssertTrue(any(app, "eyesClosedNote").exists) }
+            attach(app, "Photo Check, " + flag)
+            app.buttons["photoMenu"].tap()
+            XCTAssertTrue(app.buttons["adjust"].waitForExistence(timeout: 5))
+            app.terminate()
+        }
     }
 }

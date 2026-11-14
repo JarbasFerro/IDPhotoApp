@@ -8,7 +8,8 @@ import SwiftUI
 /// - **The grid is decoration, not a scale.** It is never shown where something on screen is true size
 ///   (Check your print), so nobody measures against it.
 /// - **No bare text on the grid.** Captions and counts sit below the mat; anything that must sit on it (the
-///   measurement chip) carries its own solid background. The mat never runs behind the navigation bar.
+///   measurement chip) carries its own background. JourneyScreen extends the mat behind the navigation bar;
+///   unconverted screens retain the inset panel until their 0.21 pass.
 extension Design.Surface {
     /// The mat's colour: `#DCE8E6` in Light, `#0E2C2E` in Dark.
     static let mat = Color("StageMat")

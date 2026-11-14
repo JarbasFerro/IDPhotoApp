@@ -1,6 +1,6 @@
 # Screenshot gallery
 
-Exported from dark.xcresult on 2026-11-12 by scripts/ui/export-gallery.sh. Light and Dark where the tests capture both.
+Most screens were exported on 2026-11-12. Photo Check is updated for 0.21.0 pass 1 (2026-11-14), with the public generated sample, in Light and Dark, English, Spanish and Portuguese. Long supporting sentences make the tray scroll while its actions stay pinned; the gallery shows its initial position. Older Photo Check measuring / unlocked / large-text captures below still show 0.20.
 
 - [Adjust, top](adjust-top.png)
 - [Adjust](adjust.png)
@@ -14,6 +14,8 @@ Exported from dark.xcresult on 2026-11-12 by scripts/ui/export-gallery.sh. Light
 - [Photo Check, measured](photo-check-measured.png)
 - [Photo Check, measuring](photo-check-measuring.png)
 - [Photo Check](photo-check.png)
+- [Photo Check, Spanish](photo-check-es.png) · [Dark](photo-check-es-dark.png)
+- [Photo Check, Portuguese](photo-check-pt-br.png) · [Dark](photo-check-pt-br-dark.png)
 - [Print at a shop](print-at-a-shop.png)
 - [Print check, smaller](print-check-smaller.png)
 - [Print, dark](print-dark.png)

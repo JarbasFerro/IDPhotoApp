@@ -33,7 +33,9 @@ struct CalipicApp: App {
         WindowGroup {
             Group {
                 #if DEBUG
-                if ProcessInfo.processInfo.arguments.contains("--camera-review-fixture") {
+                if ProcessInfo.processInfo.arguments.contains("--uitesting-journey-tray") {
+                    JourneyTrayFixture()
+                } else if ProcessInfo.processInfo.arguments.contains("--camera-review-fixture") {
                     CameraView(onCapture: { _, _ in }, onChoosePhoto: {})
                 } else {
                     RootView(model: model, promptForDocument: needsDocumentPrompt)

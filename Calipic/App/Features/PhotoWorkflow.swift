@@ -29,6 +29,9 @@ struct PhotoEntry: Identifiable {
 @MainActor
 @Observable
 final class PhotoWorkflow {
+    /// Presentation history for this in-memory session; returning to a checked photo does not replay feedback.
+    var presentedChecks: Set<UUID> = []
+
     /// Photos in the session, in the order they were added. Every one can appear on the print sheet.
     private(set) var entries: [PhotoEntry] = []
     /// The photo the editor controls.
@@ -313,6 +316,12 @@ final class PhotoWorkflow {
                 } else {
                     measured = Self.syntheticAnalysis(for: photo.pixels)
                 }
+            }
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-no-face") {
+                measured = FaceAnalysis(faceCount: 0, geometry: nil, solution: nil, visionRollDegrees: nil)
+            }
+            if ProcessInfo.processInfo.arguments.contains("--uitesting-closed-eyes") {
+                measured?.eyeOpenness = (left: 0.05, right: 0.05)
             }
             #endif
             guard !Task.isCancelled, index(of: photo.id) != nil else { signposter.endInterval("Verdict", verdictInterval); return }
@@ -602,6 +611,7 @@ final class PhotoWorkflow {
         guard let index = selectedIndex else { return }
         cancelWork()
         let removed = entries.remove(at: index)
+        presentedChecks.remove(removed.id)
         stopWork(for: removed.id)
         printJob.items.removeAll { $0.photoID == removed.id }
         sheetThumbnails = sheetThumbnails.filter { key, _ in printJob.items.contains { $0.id == key } }

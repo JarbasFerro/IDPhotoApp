@@ -8,6 +8,8 @@ import SwiftUI
 enum Design {
     /// Distances between things, in points. They do not scale with Dynamic Type; text does.
     enum Spacing {
+        static let tray: CGFloat = 20
+        static let stageMargin: CGFloat = 20
         /// A title and the detail line directly under it.
         static let titlePair: CGFloat = 2
         /// A control and its own label (slider title, page caption).
@@ -34,6 +36,7 @@ enum Design {
 
     /// Corner radii, in points.
     enum Radius {
+        static let tray: CGFloat = 30
         /// A photo shown as an object: just enough to read as paper, never a rounded avatar.
         static let photo: CGFloat = 6
         /// A symbol tile inside a card.
@@ -44,8 +47,7 @@ enum Design {
         static let group: CGFloat = 22
     }
 
-    /// Surfaces. Every screen sits on the grouped background and puts grouped content on cards, so screens match
-    /// in Light and Dark.
+    /// Journey screens use mat and tray; system sheets and screens awaiting conversion use grouped surfaces.
     enum Surface {
         static let screen = Color(.systemGroupedBackground)
         static let card = Color(.secondarySystemGroupedBackground)
@@ -74,6 +76,7 @@ enum Design {
 
     /// Sizes of glyphs, thumbnails and targets, in points.
     enum Size {
+        static let statusMark: CGFloat = 22
         /// Smallest interactive target (HIG). Only ever a minimum width or height, never a visual size.
         static let minimumTarget: CGFloat = 44
         /// A small square picture in a card or row: session faces, symbol tiles.
@@ -88,6 +91,7 @@ enum Design {
 
     /// Type roles. System text styles only, so Dynamic Type, Bold Text and localisation keep working.
     enum Typography {
+        static let trayTitle = Font.title2.weight(.bold)
         /// The one sentence that names a screen's promise or result.
         static let screenTitle = Font.title2.weight(.semibold)
         /// The check headline.

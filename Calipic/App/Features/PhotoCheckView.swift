@@ -19,10 +19,14 @@ struct PhotoCheckView: View {
     @State private var showsMeasureLines = false
     /// Bumped once when a verdict appears or changes; drives the symbol bounce.
     @State private var verdictBounce = 0
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var verdictRevealed = false
+    @State private var celebratesVerdict = false
+    @State private var comparePulse: UUID?
+    @GestureState private var compareHeld = false
+    @State private var suppressCompareTap = false
     @Environment(\.zoomNamespace) private var zoomNamespace
     /// Where this screen sits in the path; the screens it opens are pushed right after it.
-    private var nextIndex: Int { (path.firstIndex(of: .check(photoID)) ?? path.count - 1) + 1 }
+    private var nextIndex: Int { (path.lastIndex(of: .check(photoID)) ?? path.count - 1) + 1 }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Developer details (long press on the version line) also switch on the L19-017 capture-protection test.
     @AppStorage(DeveloperMode.key) private var developerMode = false
@@ -36,25 +40,12 @@ struct PhotoCheckView: View {
     var body: some View {
         Group {
             if let entry {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Design.Spacing.group) {
-                        portrait(entry)
-                        summaryBlock(entry)
-                        if dynamicTypeSize.isAccessibilitySize { actions }
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                }
-                .background(Design.Surface.screen)
-                .safeAreaInset(edge: .bottom) {
-                    if !dynamicTypeSize.isAccessibilitySize {
-                        actions
-                            .padding(.horizontal)
-                            .padding(.top, 10)
-                            .padding(.bottom, 6)
-                            .background(Design.Surface.screen)
-                            .guideAvoid()
-                    }
+                JourneyScreen(minimumObjectHeightFraction: 0.45, stageBottomReserve: 44) { size in
+                    portrait(entry, size: size)
+                } tray: {
+                    summaryBlock(entry)
+                } actions: {
+                    actions(entry)
                 }
             } else {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
@@ -76,6 +67,12 @@ struct PhotoCheckView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
+                    if !model.tutorial.isActive {
+                        ForEach(model.document.availableOutputs.filter { $0 != model.document.primaryOutput }, id: \.self) { output in
+                            outputButton(output)
+                        }
+                    }
+                    if shouldRetake(entry) { adjustButton }
                     Button { showRequirements = true } label: { Label("Photo requirements", systemImage: "list.bullet.rectangle") }
                     Button(role: .destructive) { confirmRemove = true } label: { Label("Remove Photo", systemImage: "trash") }
                         .disabled(model.activity != nil)
@@ -107,21 +104,65 @@ struct PhotoCheckView: View {
             }
         }
         .onAppear { model.selectedID = photoID; model.showsOriginal = false }
-        .task(id: photoID) {
-            // Landing: show the uncropped photo first, wait for the push to settle and the check to finish, then frame it.
-            landed = false
-            try? await Task.sleep(for: Design.Motion.landingDelay(reduceMotion: reduceMotion))
-            while (entry?.isAnalyzing ?? false), !Task.isCancelled { try? await Task.sleep(for: .milliseconds(50)) }
-            guard !Task.isCancelled else { return }
-            withAnimation(Design.Motion.landing.resolved(reduceMotion: reduceMotion)) { landed = true }
-            // Show the measuring once, then fold it into the chip.
-            guard measurement(for: entry) != nil else { return }
-            try? await Task.sleep(for: .milliseconds(reduceMotion ? 0 : 600))
-            showsMeasureLines = true
-            try? await Task.sleep(for: .seconds(2.6))
-            guard !Task.isCancelled else { return }
-            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.35)) { showsMeasureLines = false }
+        .task(id: photoID) { await presentPhoto() }
+        .task(id: displayedSummary.headline) {
+            guard celebratesVerdict, displayedSummary.headline != .checking, !reduceMotion else { return }
+            do { try await Task.sleep(for: .milliseconds(80)) } catch { return }
+            verdictBounce += 1
         }
+        .task(id: comparePulse) {
+            guard comparePulse != nil else { return }
+            do { try await Task.sleep(for: .seconds(1.2)) } catch { return }
+            setComparing(false)
+            comparePulse = nil
+        }
+        .onDisappear {
+            comparing = false; comparePulse = nil
+        }
+    }
+
+    private var displayedSummary: PhotoCheckSummary {
+        guard verdictRevealed, let entry else { return .checking }
+        return summary(for: entry)
+    }
+
+    /// A view-bound task: no landing, line reveal, or verdict can arrive after this visit is cancelled.
+    private func presentPhoto() async {
+        if model.presentedChecks.contains(photoID) {
+            celebratesVerdict = false
+            showsMeasureLines = false
+            landed = true
+            verdictRevealed = true
+            return
+        }
+        landed = false
+        verdictRevealed = false
+        showsMeasureLines = false
+        celebratesVerdict = true
+        do {
+            try await Task.sleep(for: Design.Motion.landingDelay(reduceMotion: reduceMotion))
+            while entry?.isAnalyzing == true { try await Task.sleep(for: .milliseconds(50)) }
+            try Task.checkCancellation()
+            withAnimation(Design.Motion.landing.resolved(reduceMotion: reduceMotion)) { landed = true }
+            if measurement(for: entry) != nil {
+                try await Task.sleep(for: .milliseconds(reduceMotion ? 0 : 600))
+                try Task.checkCancellation()
+                showsMeasureLines = true
+                // MeasurementOverlay draws for 0.7 seconds. Even a fast analysis must show the measuring first.
+                try await Task.sleep(for: .milliseconds(reduceMotion ? 0 : 700))
+            }
+            while entry.map({ summary(for: $0).headline == .checking }) == true {
+                try await Task.sleep(for: .milliseconds(50))
+            }
+            try Task.checkCancellation()
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) { verdictRevealed = true }
+            model.presentedChecks.insert(photoID)
+            if showsMeasureLines {
+                try await Task.sleep(for: .seconds(1.9))
+                try Task.checkCancellation()
+                withAnimation(reduceMotion ? nil : .easeOut(duration: 0.35)) { showsMeasureLines = false }
+            }
+        } catch { /* Leaving the screen cancels every delayed presentation change. */ }
     }
 
     /// The final look. While the photo is being checked it sits wide and uncropped; when the face is found the
@@ -134,63 +175,90 @@ struct PhotoCheckView: View {
         return PhotoMeasurement.measure(geometry: geometry, adjustment: entry.adjustment, format: target.format, spec: target.spec)
     }
 
-    private func portrait(_ entry: PhotoEntry) -> some View {
+    private func portrait(_ entry: PhotoEntry, size: CGSize) -> some View {
         let checking = entry.isAnalyzing || !landed
-        let width: CGFloat = dynamicTypeSize.isAccessibilitySize ? 200 : (checking ? 250 : 210)
         let format = model.renderTarget.format
+        let photoHeight = max(0, min(size.height - 44, size.width / format.aspectRatio))
         let portrait = PortraitView(entry: entry, format: format, showsOriginal: comparing || !landed,
                                     label: comparing ? "Original photo" : "Framed photo", animated: !reduceMotion)
-        return VStack(spacing: Design.Spacing.caption) {
-            // The photo and its measurement lie on the mat; the only thing on the grid besides the photo is the chip,
-            // which has its own solid background. Captions sit below, on the plain screen.
-            VStack(spacing: Design.Spacing.control) {
-                Group {
-                    if developerMode {
-                        CaptureProtected { portrait }.aspectRatio(format.aspectRatio, contentMode: .fit)
-                    } else {
-                        portrait
-                    }
+        return VStack(spacing: 0) {
+            Group {
+                if developerMode {
+                    CaptureProtected { portrait }.aspectRatio(format.aspectRatio, contentMode: .fit)
+                } else {
+                    portrait
                 }
-                .frame(maxWidth: width)
-                .paperDimmedInDark()
-                .paperShadow(lifted: checking)
-                .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
-                .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
-                    withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { comparing = pressing }
+            }
+            .frame(width: photoHeight * format.aspectRatio, height: photoHeight)
+            .contentShape(Rectangle())
+            .paperDimmedInDark()
+            .paperShadow(lifted: checking)
+            .scaleEffect(checking && !reduceMotion ? 1.06 : 1)
+            .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
+            .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
+                setComparing(pressing)
+            }
+            .accessibilityHint("Press and hold to compare with the original.")
+            .accessibilityAction(named: Text("Compare with original")) { setComparing(!comparing) }
+            .accessibilityIdentifier("portrait")
+            .zoomSource(.sheet, at: nextIndex, in: zoomNamespace)
+            .zoomSource(.digital(photoID), at: nextIndex, in: zoomNamespace)
+            .overlay {
+                if let measurement = measurement(for: entry), landed, !comparing {
+                    MeasurementOverlay(measurement: measurement, showsRange: model.document.statesHeadHeight,
+                                       visible: showsMeasureLines)
                 }
+            }
+            HStack(spacing: 8) {
+                Button {
+                    if !suppressCompareTap { compareBriefly() }
+                } label: {
+                    Label("Original", systemImage: "rectangle.on.rectangle")
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 10)
+                        .frame(minHeight: 36)
+                }
+                .buttonStyle(.glass)
+                .tint(comparing ? Color.brandAccentFill : nil)
+                .foregroundStyle(comparing ? Color.white : Color.primary)
+                .background { if comparing { Capsule().fill(Brand.accentFill) } }
+                .simultaneousGesture(LongPressGesture(minimumDuration: 0.5, maximumDistance: 40)
+                    .sequenced(before: DragGesture(minimumDistance: 0))
+                    .updating($compareHeld) { value, state, _ in
+                        if case .second(true, _) = value { state = true }
+                    })
+                .onChange(of: compareHeld) { _, held in
+                    if held { suppressCompareTap = true; comparePulse = nil }
+                    setComparing(held)
+                }
+                .task(id: compareHeld) {
+                    guard !compareHeld else { return }
+                    // A native Button also sends its action on release. Consume that action after a hold.
+                    do { try await Task.sleep(for: .milliseconds(100)) } catch { return }
+                    suppressCompareTap = false
+                }
+                .frame(minHeight: 44)
+                .disabled(displayedSummary.headline == .checking)
                 .accessibilityHint("Press and hold to compare with the original.")
-                .accessibilityAction(named: Text("Compare with original")) { comparing.toggle() }
-                .accessibilityIdentifier("portrait")
-                // The photo is what Your sheet and Digital Photo zoom out of (U4).
-                .zoomSource(.sheet, at: nextIndex, in: zoomNamespace)
-                .zoomSource(.digital(photoID), at: nextIndex, in: zoomNamespace)
-                .overlay {
-                    if let measurement = measurement(for: entry), landed, !comparing, !entry.isAnalyzing {
-                        MeasurementOverlay(measurement: measurement, showsRange: model.document.statesHeadHeight,
-                                           visible: showsMeasureLines)
-                    }
-                }
-                if let measurement = measurement(for: entry), landed, !entry.isAnalyzing {
+                .accessibilityIdentifier("photoCheck")
+                Spacer(minLength: 0)
+                if let measurement = measurement(for: entry), landed {
                     MeasurementChip(measurement: measurement, showsRange: model.document.statesHeadHeight, showsLines: $showsMeasureLines)
                 }
             }
-            .padding(.vertical, Design.Spacing.group)
-            .frame(maxWidth: .infinity)
-            .onMat(bleed: 16)
-            Text(comparing ? "Original" : entry.isAnalyzing ? "Finding your face…" : !landed ? "Framing…" : "Hold to compare with the original")
-                .font(Design.Typography.caption).foregroundStyle(.secondary)
-                .animation(nil, value: checking)
-                // Leaf element that marks the screen for UI tests; identifiers on containers hide their children.
-                .accessibilityIdentifier("photoCheck")
-            if developerMode {
-                Text(verbatim: CaptureProtection.isAvailable
-                     ? "Capture protection test: on. Take a screenshot to check."
-                     : "Capture protection test: unavailable on this iOS.")
-                    .font(Design.Typography.noteDigits).foregroundStyle(.tertiary)
-                    .accessibilityIdentifier("captureProtectionStatus")
-            }
+            .frame(height: 44)
+            .zIndex(1)
         }
-        .frame(maxWidth: .infinity)
+        .frame(width: size.width, height: size.height)
+    }
+
+    private func compareBriefly() {
+        setComparing(true)
+        comparePulse = UUID()
+    }
+
+    private func setComparing(_ value: Bool) {
+        withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { comparing = value }
     }
 
     // MARK: - Verdict and details (design 2a)
@@ -201,174 +269,137 @@ struct PhotoCheckView: View {
     }
 
     private func summaryBlock(_ entry: PhotoEntry) -> some View {
-        let summary = summary(for: entry)
-        return VStack(alignment: .leading, spacing: Design.Spacing.group) {
-            verdict(summary)
+        let summary = displayedSummary
+        return VStack(alignment: .leading, spacing: Design.Spacing.tray) {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Group {
+                        if summary.headline == .checking { StatusMark.progress }
+                        else { StatusMark(summary.worstState) }
+                    }
+                    .symbolEffect(.bounce, options: .nonRepeating, value: verdictBounce)
+                    .accessibilityHidden(true)
+                    Text(CheckPresentation.title(for: summary.headline))
+                        .font(Design.Typography.trayTitle)
+                        .contentTransition(.opacity)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("checkHeadline")
+                supportingLine(entry, summary: summary)
+                    .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
+            }
             if summary.headline != .checking {
-                // Said right under the verdict: an unlocked photo is final, and Adjust asks before changing it.
-                if entry.isUnlocked {
-                    Label("Unlocked. Printing and sharing this photo is free.", systemImage: "checkmark.seal")
-                        .font(Design.Typography.note).foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity)
-                        .accessibilityIdentifier("unlockedNote")
+                TrayRows {
+                    if !summary.rows.isEmpty {
+                        TrayRow(title: Text("Measured"),
+                                detail: Text(verbatim: (summary.attention.isEmpty ? summary.rows : summary.attention)
+                                    .map { String(localized: $0.title) }.joined(separator: " · ")),
+                                value: measurement(for: entry).map(measurementValue),
+                                chevron: true, action: { detailsFocus = .measured },
+                                leading: { StatusMark(summary.worstState) })
+                            .accessibilityHint("Shows every check.")
+                            .accessibilityIdentifier("measuredRow")
+                    }
+                    if !model.document.byEyeChecks.isEmpty {
+                        TrayRow(title: Text("To check by eye"),
+                                detail: Text(verbatim: model.document.byEyeChecks.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
+                                value: Text(model.document.byEyeChecks.count, format: .number),
+                                chevron: true, action: { detailsFocus = .byEye },
+                                leading: { StatusMark(.manualCheck) })
+                            .accessibilityHint("Shows every check.")
+                            .accessibilityIdentifier("byEyeRow")
+                    }
+                    if !entry.isUnlocked, let note = CheckPresentation.editingNote(for: entry, document: model.document) {
+                        TrayRow(title: Text("Edited photo"),
+                                detail: Text("This document's rules ask for an unedited photo. \(String(localized: note))"),
+                                leading: { StatusMark(.manualCheck) }, trailing: {
+                            Button("Use Original") { model.useOriginalLook(for: photoID) }
+                                .frame(minHeight: 44).accessibilityIdentifier("useOriginal")
+                        })
+                    }
                 }
-                detailsCard(summary)
-                    .guideTarget(.checkResult, current: guideTip, ring: false)
-                if !entry.isUnlocked, let note = CheckPresentation.editingNote(for: entry, document: model.document) {
-                    editingNote(note)
-                }
+                .guideTarget(.checkResult, current: guideTip, ring: false)
             }
         }
-        .animation(.default, value: summary)
-        // Only when the analysis finishes or the verdict changes; a photo that is already checked stays quiet.
+        .animation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion), value: summary.headline)
         .sensoryFeedback(trigger: summary.headline) { old, new in
-            guard old != new else { return nil }
+            guard celebratesVerdict, old != new else { return nil }
             switch new {
             case .checking: return nil
             case .good: return .success
             case .review, .retake: return .warning
             }
         }
-        .onChange(of: summary.headline) { _, new in
-            guard new != .checking, !reduceMotion else { return }
-            // The symbol may be inserted by this very change; bounce once it is on screen.
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(80))
-                verdictBounce += 1
-            }
+    }
+
+    @ViewBuilder private func supportingLine(_ entry: PhotoEntry, summary: PhotoCheckSummary) -> some View {
+        if summary.headline == .checking {
+            Text("Finding your face and preparing the background.")
+        } else if entry.analysis?.eyesLookClosed == true {
+            Label { Text("Your eyes look closed or turned down.") } icon: { StatusMark(.warn) }
+                .accessibilityIdentifier("eyesClosedNote")
+        } else if entry.isUnlocked {
+            Text("Unlocked. Printing and sharing this photo is free.").accessibilityIdentifier("unlockedNote")
+        } else if summary.headline == .retake {
+            Text("This photo has problems we can't fix. A new one takes a minute.")
+        } else if summary.attention.count == 1, let only = summary.attention.first {
+            Text(only.detail)
+        } else {
+            Text("Framed for \(DocumentPresentation.name(model.document))")
         }
     }
 
-    /// One large answer. Facts and advisory checks sit behind it (docs/03-design.md §4: only facts say a thing is done).
-    private func verdict(_ summary: PhotoCheckSummary) -> some View {
-        VStack(spacing: Design.Spacing.caption) {
-            if summary.headline == .checking {
-                ProgressView().controlSize(.large)
-            } else {
-                Image(systemName: CheckPresentation.verdictSymbol(for: summary.headline))
-                    .font(.largeTitle)
-                    .foregroundStyle(StatusStyle.color(for: summary.headline))
-                    .symbolEffect(.bounce, options: .nonRepeating, value: verdictBounce)
-                    .accessibilityHidden(true)
-            }
-            Text(CheckPresentation.title(for: summary.headline))
-                .font(Design.Typography.hero)
-            Group {
-                if summary.headline == .good {
-                    Text("Framed for \(DocumentPresentation.name(model.document))")
-                } else if summary.attention.count == 1, let only = summary.attention.first {
-                    // One thing to look at: say it here, so nobody has to open the list to learn what it is.
-                    Text(only.detail)
-                } else {
-                    Text(CheckPresentation.subtitle(for: summary.headline))
-                }
-            }
-            .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
-        }
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("checkHeadline")
+    private func measurementValue(_ measurement: PhotoMeasurement) -> Text {
+        let value = (measurement.crownIsEstimate ? "≈ " : "") + MeasurementPresentation.millimetres(measurement.headHeightMM)
+        return Text("\(value) mm").font(Design.Typography.readout(.subheadline))
     }
 
-    /// Two short rows that open the full list in a sheet. The list used to unfold in place and pushed the photo
-    /// and the buttons off the screen (founder, 0.20 review).
-    private func detailsCard(_ summary: PhotoCheckSummary) -> some View {
-        let byEye = model.document.byEyeChecks
-        let worst = summary.worstState
-        return VStack(spacing: 0) {
-            if !summary.rows.isEmpty {
-                disclosureRow(symbol: StatusStyle.symbol(for: worst), color: StatusStyle.color(for: worst),
-                              title: summary.attention.isEmpty
-                                  ? Text("Everything measured looks fine")
-                                  : Text("^[\(summary.attention.count) thing](inflect: true) to look at"),
-                              subtitle: Text(verbatim: (summary.attention.isEmpty ? summary.rows : summary.attention)
-                                  .map { String(localized: $0.title) }.joined(separator: " · ")),
-                              identifier: "measuredRow") { detailsFocus = .measured }
-            }
-            if !byEye.isEmpty {
-                if !summary.rows.isEmpty { Divider().padding(.leading) }
-                disclosureRow(symbol: StatusStyle.symbol(for: .manualCheck), color: StatusStyle.color(for: .manualCheck),
-                              title: Text("^[\(byEye.count) thing](inflect: true) to check by eye"),
-                              subtitle: Text(verbatim: byEye.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
-                              identifier: "byEyeRow") { detailsFocus = .byEye }
-            }
-        }
-        .background(Design.Surface.card, in: RoundedRectangle(cornerRadius: Design.Radius.group))
+    private func shouldRetake(_ entry: PhotoEntry?) -> Bool {
+        guard let entry, verdictRevealed else { return false }
+        return summary(for: entry).headline == .retake || entry.analysis?.eyesLookClosed == true
     }
 
-    private func disclosureRow(symbol: String, color: Color, title: Text, subtitle: Text?,
-                               identifier: String, open: @escaping () -> Void) -> some View {
-        Button(action: open) {
-            HStack(spacing: Design.Spacing.control) {
-                Image(systemName: symbol).foregroundStyle(color).frame(width: 24)
-                VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                    title.foregroundStyle(.primary)
-                    if let subtitle {
-                        subtitle.font(Design.Typography.note).foregroundStyle(.secondary).lineLimit(1)
+    private func actions(_ entry: PhotoEntry) -> some View {
+        Group {
+            if shouldRetake(entry) {
+                TrayActions {
+                    Button { acquire(.camera, .replace) } label: {
+                        Label("Retake", systemImage: "camera").frame(maxWidth: .infinity)
                     }
+                    .disabled(model.activity != nil)
+                    .accessibilityIdentifier("retakePrimary")
+                } secondary: {
+                    Button(model.document.primaryOutput == .print ? "Print anyway" : "Use anyway") {
+                        openOutput(model.document.primaryOutput)
+                    }
+                    .disabled(model.activity != nil)
+                    .accessibilityIdentifier(model.document.primaryOutput == .print ? "outputPrint" : "outputDigital")
+                    .guideTarget(.output, current: guideTip)
                 }
-                .multilineTextAlignment(.leading)
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+            } else {
+                TrayActions {
+                    outputButton(model.document.primaryOutput).guideTarget(.output, current: guideTip)
+                } peer: {
+                    adjustButton
+                }
             }
-            .padding(.horizontal)
-            .frame(minHeight: 54)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isButton)
-        .accessibilityHint("Shows every check.")
-        .accessibilityIdentifier(identifier)
     }
 
-    /// Honest editing (ADR-051): when the document's own rules ask for an unedited photo, say what Calipic changed
-    /// and offer the original in one tap. Editing itself stays available (ADR-051).
-    private func editingNote(_ note: LocalizedStringResource) -> some View {
-        VStack(alignment: .leading, spacing: Design.Spacing.text) {
-            Text("This document's rules ask for an unedited photo. \(String(localized: note))")
-                .font(Design.Typography.note).foregroundStyle(.secondary)
-            Button("Use Original Photo") { model.useOriginalLook(for: photoID) }
-                .font(Design.Typography.note.weight(.semibold))
-                .frame(minHeight: Design.Size.minimumTarget)
-                .accessibilityIdentifier("useOriginal")
+    private var adjustButton: some View {
+        Button {
+            if entry?.isUnlocked == true { confirmEdit = true } else { showAdjust = true }
+        } label: {
+            Text("Adjust").frame(maxWidth: .infinity, minHeight: 44)
         }
-        .padding(.horizontal, Design.Spacing.tight)
+        .accessibilityIdentifier("adjust")
     }
 
-    /// The main output on its own line; the other output and Adjust share the next one, so the buttons take two
-    /// lines instead of three. At accessibility text sizes they stack.
-    private var actions: some View {
-        // The tutorial offers only the main output, the way it continues (ADR-052).
-        let outputs = model.tutorial.isActive ? [model.document.primaryOutput] : model.document.availableOutputs
-        let secondary = dynamicTypeSize.isAccessibilitySize
-            ? AnyLayout(VStackLayout(spacing: Design.Spacing.control)) : AnyLayout(HStackLayout(spacing: Design.Spacing.control))
-        return VStack(spacing: Design.Spacing.control) {
-            if let first = outputs.first {
-                outputButton(first).brandProminentButtonStyle().guideTarget(.output, current: guideTip)
-            }
-            secondary {
-                ForEach(Array(outputs.dropFirst()), id: \.self) { output in
-                    outputButton(output).buttonStyle(.bordered)
-                }
-                Button {
-                    // An unlocked photo is final (ADR-048 §5): warn before it is locked again.
-                    if model.entries.first(where: { $0.id == photoID })?.isUnlocked == true { confirmEdit = true } else { showAdjust = true }
-                } label: {
-                    Label("Adjust", systemImage: "slider.horizontal.3").lineLimit(1).frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .accessibilityIdentifier("adjust")
-            }
-        }
-    }
+    private func openOutput(_ output: Output) { path.append(output == .print ? .sheet : .digital(photoID)) }
 
     private func outputButton(_ output: Output) -> some View {
         Button {
-            path.append(output == .print ? .sheet : .digital(photoID))
+            openOutput(output)
         } label: {
             Label(output == .print ? "Print" : "Digital Photo", systemImage: output == .print ? "printer" : "photo")
                 .lineLimit(1).minimumScaleFactor(0.85)

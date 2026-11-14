@@ -136,6 +136,7 @@ final class SheetAndCameraUITests: CalipicUITestCase {
         app.launch()
         XCTAssertTrue(any(app, "photoCheck").waitForExistence(timeout: 15))
         reveal(app.buttons["outputPrint"], in: app)
+        app.buttons["photoMenu"].tap()
         XCTAssertTrue(app.buttons["outputDigital"].waitForExistence(timeout: 5))
         app.buttons["outputDigital"].tap()
         XCTAssertFalse(app.buttons["continueToShare"].exists)

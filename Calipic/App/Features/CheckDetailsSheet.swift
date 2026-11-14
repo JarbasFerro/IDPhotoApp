@@ -25,8 +25,7 @@ struct CheckDetailsSheet: View {
                     Section {
                         ForEach(byEye, id: \.self) { id in
                             Label { Text(DocumentPresentation.check(id)) } icon: {
-                                Image(systemName: StatusStyle.symbol(for: .manualCheck))
-                                    .foregroundStyle(StatusStyle.color(for: .manualCheck))
+                                StatusMark(.manualCheck)
                             }
                         }
                     } footer: {
@@ -48,12 +47,11 @@ struct CheckDetailsSheet: View {
     private func measuredRow(_ row: PhotoCheckSummary.Row) -> some View {
         Label {
             VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
-                Text(row.title).font(Design.Typography.rowTitle)
-                Text(row.detail).font(Design.Typography.note).foregroundStyle(.secondary)
+                Text(row.title).font(.body)
+                Text(row.detail).font(Design.Typography.cardDetail).foregroundStyle(.secondary)
             }
         } icon: {
-            Image(systemName: StatusStyle.symbol(for: row.state))
-                .foregroundStyle(StatusStyle.color(for: row.state))
+            StatusMark(row.state)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: "\(String(localized: row.title)), \(String(localized: StatusStyle.name(for: row.state))). \(String(localized: row.detail))"))

@@ -64,7 +64,9 @@ enum LocalPortrait {
         // .../Calipic/App/Imaging/SyntheticFixture.swift -> the repository root.
         var root = URL(fileURLWithPath: #filePath)
         for _ in 0..<4 { root.deleteLastPathComponent() }
-        return ["test_data/local", "test_data/sample"].map { root.appendingPathComponent($0) }
+        let folders = ProcessInfo.processInfo.arguments.contains("--uitesting-public-sample")
+            ? ["test_data/sample"] : ["test_data/local", "test_data/sample"]
+        return folders.map { root.appendingPathComponent($0) }
             .first { FileManager.default.isReadableFile(atPath: $0.appendingPathComponent("portrait.jpg").path) }
         #else
         return nil

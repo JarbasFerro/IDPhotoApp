@@ -15,7 +15,7 @@ Calipic/
 │   ├── Domain/                   pure logic, no UI, no frameworks beyond Foundation and CoreGraphics types
 │   ├── Imaging/                  the photo pipeline: files, Vision, Core Image, rendering, export
 │   ├── Camera/                   AVFoundation session, live guidance, camera screen
-│   ├── Features/                 screens and the workflow model
+│   ├── Features/                 screens and the workflow model; Journey/ holds the shared mat/tray components
 │   ├── Brand/                    tokens, accent roles, camera frame shape, app icon choice
 │   └── Resources/                String Catalog, bundled rules catalog, assets, privacy manifest
 ├── Tests/                        Swift Testing: domain, pipeline, workflow, presentation
@@ -34,6 +34,8 @@ scripts/                          version bump, test runner, rules validator and
 | **Features** | `PhotoWorkflow` (the one `@Observable` model), `AppFlow` (navigation), one file per screen, `CheckPresentation` and other presentation helpers | State, navigation, words | Do geometry or image math |
 
 Views describe UI. They call `PhotoWorkflow`; the workflow calls the pipeline through the `PhotoProcessing` protocol, so tests can substitute it.
+
+Since 0.21 pass 1, `Features/Journey` owns `JourneyScreen`, `TrayRow` / `TrayRows`, `TrayActions` and `StatusMark`. Photo Check uses them; other journey screens migrate in later passes. Presentation-only `presentedChecks` is an in-memory set of photo IDs on the workflow, cleared per removed photo, so returning does not replay measuring or feedback. Landing, verdict bounce, timed compare and hold-release work are view-bound cancellable tasks; domain verdicts and image/export processing are unchanged.
 
 ## 3. The life of a photo
 
@@ -93,7 +95,7 @@ Named types, never bare `CGRect`s across layers: source pixels, normalized image
 | Bundled catalog is current | `python3 scripts/rules/build_app_catalog.py --check` |
 | Plain wording | `python3 scripts/strings/check_copy.py` |
 
-State at 0.19.0: 180 tests (161 Swift Testing, 19 UI), 177 pass, 3 skipped (evidence capture and the private portrait harness, which run only on request).
+State at 0.21.0 pass 1: 209 test cases, 206 pass, 3 intentionally skipped (evidence capture and the private portrait harness, which run only on request). Parameterized cases add executions. The full run is `build/pass1-green.xcresult`; simulator motion recordings and the six-language/appearance Photo Check captures are in `build/pass1-*`, with the public gallery captures committed under `docs/ui/gallery/`.
 
 UI tests launch with flags: `--uitesting-fresh` (Spain DNI, nothing saved, one in-memory credit, print panel suppressed), `--uitesting-fixture`, `--uitesting-fixture-2`, `--uitesting-custom-size`.
 
