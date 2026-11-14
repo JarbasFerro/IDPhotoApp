@@ -851,6 +851,6 @@ New in 0.21: no haptic for a tray state change by itself (Continue, Keep Editing
 | `creditsButton` | Home's footer | removed; tests use `settingsButton` then `settingsCredits` |
 | `eyesClosedNote` | the camera review | Photo Check's supporting line |
 
-**Removed, with their tests rewritten:** `person-N` (the "Check" link), `cameraRetake`, `cameraUsePhoto`, `cameraReviewCancel` stays.
+**Removed, with their tests rewritten:** `person-N` (the "Check" link), `cameraRetake`, `cameraUsePhoto`. `cameraReviewCancel` stays, on the Cancel button shown while the still is handed over.
 
-**New:** `printMenu`, `originalCapsule` is not used (the capsule carries `photoCheck`), `changeRoute` ("Change where"), `printBack` (the stepping back button).
+**New:** `printMenu` (the ••• menu on Print), `changeRoute` ("Change where"), `printBack` (the back button that steps through Print's states). The Original capsule needs no new identifier: it carries `photoCheck`.
