@@ -434,6 +434,8 @@ Create `F/Journey/JourneyScreen.swift`, `F/Journey/TrayRow.swift`, `F/Journey/Tr
 
 **Passes 1–2 review fixes (0.21.3).** Cancelling a page arrival clears its hidden-row state. Unlock lift/sweep consume a new trigger change, so a newly mounted page or a returning view cannot replay an old unlock. Original comparison coordinates both holds with an identified timed tap; an expired tap never overrides a hold or a newer tap. Print's import alert offers **Choose Another Photo**, retaining add-person mode; export errors retain **Try Again**. Digital Photo keys transitions by locked/preparing/ready/failed and opts into animated measured tray heights through `JourneyScreen.trayAnimation`; the same token resolves to nil under Reduce Motion. The Copies row retains its numeric transition and selection tick.
 
+**Follow-up alignment fixes (0.21.4).** The tray's plain button style expands the label itself to the full-width 44 pt hit region, retaining pressed and disabled feedback. Photo Check waits for the actual visible overlay's animation completion, with a per-visit identity and cancellation; a held comparison invalidates the interrupted draw, and release redraws before the verdict. The measurement chip is disabled during the initial check so it cannot hide that first draw. Under Reduce Motion, completion is immediate. Fill results carry the complete job/item request: stale results are hidden immediately, late publications are rejected, and an already-open native menu checks its captured request again before applying a count.
+
 **`JourneyScreen`**
 
 ```swift

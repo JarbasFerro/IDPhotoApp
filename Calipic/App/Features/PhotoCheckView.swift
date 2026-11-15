@@ -18,6 +18,7 @@ struct PhotoCheckView: View {
     @State private var landed = false
     /// The measuring lines (D-2): drawn when the photo lands, folded into the chip after a moment.
     @State private var showsMeasureLines = false
+    @State private var measurementSequence = MeasurementSequence()
     /// Bumped once when a verdict appears or changes; drives the symbol bounce.
     @State private var verdictBounce = 0
     @State private var verdictRevealed = false
@@ -146,9 +147,8 @@ struct PhotoCheckView: View {
             if measurement(for: entry) != nil {
                 try await Task.sleep(for: .milliseconds(reduceMotion ? 0 : 600))
                 try Task.checkCancellation()
-                showsMeasureLines = true
-                // MeasurementOverlay draws for 0.7 seconds. Even a fast analysis must show the measuring first.
-                try await Task.sleep(for: .milliseconds(reduceMotion ? 0 : 700))
+                // Wait for the visible overlay's animation completion, also after a held comparison interrupts it.
+                try await measurementSequence.waitForDraw { showsMeasureLines = true }
             }
             while entry.map({ summary(for: $0).headline == .checking }) == true {
                 try await Task.sleep(for: .milliseconds(50))
@@ -204,8 +204,11 @@ struct PhotoCheckView: View {
             .zoomSource(.digital(photoID), at: nextIndex, in: zoomNamespace)
             .overlay {
                 if let measurement = measurement(for: entry), landed, !comparing {
+                    let drawing = measurementSequence.id
                     MeasurementOverlay(measurement: measurement, showsRange: model.document.statesHeadHeight,
-                                       visible: showsMeasureLines)
+                                       visible: showsMeasureLines) {
+                        if let drawing { measurementSequence.drawn(id: drawing) }
+                    }
                 }
             }
             HStack(spacing: 8) {
@@ -243,6 +246,7 @@ struct PhotoCheckView: View {
                 Spacer(minLength: 0)
                 if let measurement = measurement(for: entry), landed {
                     MeasurementChip(measurement: measurement, showsRange: model.document.statesHeadHeight, showsLines: $showsMeasureLines)
+                        .disabled(displayedSummary.headline == .checking)
                 }
             }
             .frame(height: 44)

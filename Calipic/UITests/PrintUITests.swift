@@ -91,6 +91,30 @@ final class PrintUITests: CalipicUITestCase {
 
 extension PrintUITests {
     @MainActor
+    func testTraySecondaryRespondsBesideItsText() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fresh", "--uitesting-fixture", "--uitesting-synthetic-only"]
+        app.launch()
+        XCTAssertTrue(app.buttons["outputPrint"].waitForExistence(timeout: 15))
+        app.buttons["outputPrint"].tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
+        app.buttons["continueToShare"].tap()
+        let keepEditing = app.buttons["keepEditing"]
+        XCTAssertTrue(keepEditing.waitForExistence(timeout: 5))
+        // Use the tray's left inset, outside the visible text, rather than the element's centre.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.08, dy: keepEditing.frame.midY / app.frame.height)).tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
+        app.buttons["continueToShare"].tap()
+        app.buttons["unlockAndPrint"].tap()
+        XCTAssertTrue(app.buttons["routeHome"].waitForExistence(timeout: 10))
+        app.buttons["routeHome"].tap()
+        let changeRoute = app.buttons["changeRoute"]
+        XCTAssertTrue(changeRoute.waitForExistence(timeout: 5))
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.08, dy: changeRoute.frame.midY / app.frame.height)).tap()
+        XCTAssertTrue(app.buttons["chooseRouteFirst"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testPrintImportFailureCanChooseAnotherPhoto() {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fresh", "--uitesting-fixture", "--uitesting-synthetic-only", "--uitesting-print-import-error"]

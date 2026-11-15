@@ -11,7 +11,7 @@ struct PrintView: View {
     @State var copiesTick = 0
     @State var revealedRows: Int?
     @State var hasRevealed = false
-    @State var fill: [SheetChoices.FillChoice] = []
+    @State var fillResult: SheetChoices.Snapshot?
     @State var layoutConfirmed = false
     @State var chosenRoute: PrintCheckView.PrintRoute?
     @State var pending: Action?
@@ -36,8 +36,10 @@ struct PrintView: View {
     var route: PrintCheckView.PrintRoute? { canPrintAtHome ? chosenRoute : .shop }
     var person: PhotoEntry? { model.entries.first { $0.id == selectedPerson } ?? model.entries.first }
     var coaching: Bool { model.tutorial.isActive }
-    struct FillRequest: Hashable { let job: PrintJob; let itemID: UUID? }
-    var fillRequest: FillRequest { FillRequest(job: model.printJob, itemID: person.flatMap { model.printItems(for: $0.id).first?.id }) }
+    var fillRequest: SheetChoices.Request {
+        SheetChoices.Request(job: model.printJob, itemID: person.flatMap { model.printItems(for: $0.id).first?.id })
+    }
+    var fill: [SheetChoices.FillChoice] { fillResult?.choices(for: fillRequest) ?? [] }
 
     var step: PrintStep {
         if !layoutConfirmed { return .layout }
@@ -117,9 +119,10 @@ struct PrintView: View {
         .task { model.refreshSheetThumbnails(); await revealCopies() }
         .task(id: fillRequest) {
             let request = fillRequest
-            guard let itemID = request.itemID else { fill = []; return }
+            guard let itemID = request.itemID else { fillResult = nil; return }
             let choices = await SheetChoices.fillChoices(job: request.job, itemID: itemID)
-            if !Task.isCancelled { fill = choices }
+            guard !Task.isCancelled, request == fillRequest else { return }
+            fillResult = SheetChoices.Snapshot(request: request, values: choices)
         }
         .task(id: step) {
             if step == .send, model.exported == nil, model.activity == nil { model.prepareExport() }

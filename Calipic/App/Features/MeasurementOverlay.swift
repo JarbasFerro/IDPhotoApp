@@ -36,8 +36,10 @@ struct MeasurementOverlay: View {
     let measurement: PhotoMeasurement
     let showsRange: Bool
     let visible: Bool
+    var onDrawComplete: () -> Void = {}
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var progress: CGFloat = 0
+    @State private var drawingID: UUID?
 
     var body: some View {
         GeometryReader { geometry in
@@ -67,7 +69,11 @@ struct MeasurementOverlay: View {
         .allowsHitTesting(false)
         .accessibilityHidden(true)
         .onAppear { if visible { drawIn() } }
-        .onChange(of: visible) { _, now in if now { drawIn() } else { progress = 0 } }
+        .onChange(of: visible) { _, now in
+            if now { drawIn() } else { drawingID = nil; progress = 0 }
+        }
+        .onChange(of: reduceMotion) { _, _ in if visible { drawIn() } }
+        .onDisappear { drawingID = nil }
     }
 
     private func line(at y: CGFloat, width: CGFloat, dashed: Bool) -> some View {
@@ -88,8 +94,18 @@ struct MeasurementOverlay: View {
     }
 
     private func drawIn() {
+        let drawing = UUID()
+        drawingID = drawing
         progress = 0
-        if reduceMotion { progress = 1 } else { withAnimation(.easeOut(duration: 0.7)) { progress = 1 } }
+        if reduceMotion {
+            progress = 1
+            onDrawComplete()
+        } else {
+            withAnimation(.easeOut(duration: 0.7), completionCriteria: .logicallyComplete) { progress = 1 } completion: {
+                guard drawingID == drawing else { return }
+                onDrawComplete()
+            }
+        }
     }
 }
 

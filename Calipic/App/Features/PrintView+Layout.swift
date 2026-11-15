@@ -131,9 +131,12 @@ extension PrintView {
     /// Whole pages in one choice: "2 pages · 24 copies" instead of many taps on +. The counts come from the layout
     /// solver for the current paper, options and other people (founder's recording: 22 taps to reach 30 copies).
     func fillMenu(for person: PhotoEntry) -> some View {
-        Menu {
+        let request = fillRequest
+        return Menu {
             ForEach(fill, id: \.pages) { choice in
                 Button {
+                    // A native menu can outlive the SwiftUI content that opened it.
+                    guard request == fillRequest else { return }
                     if let copies = copiesBinding(for: person) { copies.wrappedValue = choice.copies }
                 } label: {
                     Text("^[\(choice.pages) page](inflect: true) · ^[\(choice.copies) copy](inflect: true)")

@@ -37,8 +37,18 @@ struct TrayActions<Primary: View, Alternative: View>: View {
     }
 
     private var textAction: some View {
-        alternative.buttonStyle(.plain).foregroundStyle(Color.brandAccent)
+        alternative.buttonStyle(TrayTextButtonStyle()).foregroundStyle(Color.brandAccent)
+    }
+}
+
+/// Keep the expanded hit region inside the native Button's label, including the blank space beside its text.
+private struct TrayTextButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
             .frame(maxWidth: .infinity, minHeight: Design.Size.minimumTarget)
+            .contentShape(Rectangle())
+            .opacity(isEnabled ? (configuration.isPressed ? 0.6 : 1) : 0.4)
     }
 }
 

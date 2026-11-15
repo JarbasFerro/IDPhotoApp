@@ -2,6 +2,13 @@ import SwiftUI
 
 enum SheetChoices {
     struct FillChoice: Sendable { let pages: Int; let copies: Int }
+    struct Request: Hashable, Sendable { let job: PrintJob; let itemID: UUID? }
+    struct Snapshot: Sendable {
+        let request: Request
+        let values: [FillChoice]
+
+        func choices(for current: Request) -> [FillChoice] { current == request ? values : [] }
+    }
 
     /// For 1–3 pages, the most copies of item `itemID` that fit with everything else on the sheet unchanged.
     /// Pure layout work, so it runs off the main actor.
