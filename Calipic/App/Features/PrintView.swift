@@ -132,9 +132,6 @@ struct PrintView: View {
             do { try await Task.sleep(for: .milliseconds(250)) } catch { holdsUnlockTray = false; return }
             withAnimation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { holdsUnlockTray = false }
         }
-        .onChange(of: locked) { old, new in
-            if old > 0, new == 0 { unlockTick += 1 }
-        }
         .sensoryFeedback(.success, trigger: unlockTick)
         .sensoryFeedback(.impact(weight: .light), trigger: revealedRows) { _, new in (new ?? 0) > 0 }
         .onChange(of: model.exported?.id) { _, _ in
@@ -304,10 +301,13 @@ struct PrintView: View {
     }
 
     func unlock() {
+        guard locked > 0 else { return }
         unlockCost = locked
         balanceBeforeUnlock = model.credits.balance
         holdsUnlockTray = true
         guard model.unlockAll() else { holdsUnlockTray = false; showCredits = true; return }
+        // Removing the last locked person also makes lockedCount zero; only a real unlock celebrates.
+        unlockTick += 1
         if model.exported == nil, model.activity == nil { model.prepareExport() }
     }
 

@@ -436,6 +436,8 @@ Create `F/Journey/JourneyScreen.swift`, `F/Journey/TrayRow.swift`, `F/Journey/Tr
 
 **Follow-up alignment fixes (0.21.4).** The tray's plain button style expands the label itself to the full-width 44 pt hit region, retaining pressed and disabled feedback. Photo Check waits for the actual visible overlay's animation completion, with a per-visit identity and cancellation; a held comparison invalidates the interrupted draw, and release redraws before the verdict. The measurement chip is disabled during the initial check so it cannot hide that first draw. Under Reduce Motion, completion is immediate. Fill results carry the complete job/item request: stale results are hidden immediately, late publications are rejected, and an already-open native menu checks its captured request again before applying a count.
 
+**Unlock trigger correction (0.21.5).** Print increments its lift/sweep and success-feedback event only after its unlock action succeeds with a nonzero locked count. Removing the last locked person, opening or returning to the screen, a short balance and a repeated action with nothing locked do not celebrate. This replaces M7’s earlier count-change example, which could also fire on removal.
+
 **`JourneyScreen`**
 
 ```swift
@@ -770,7 +772,7 @@ Each has: what the code does today, what it must do after 0.21, and how to tell 
 
 - **Today.** `unlock()` (`F/PrintView.swift` 443–449) runs `model.unlockAll()` inside `withAnimation(Motion.rearrange)`; the `UnlockCard` leaves with opacity and a 0.9 scale; `.sensoryFeedback(.success, trigger: locked == 0)` (107), which fires on any change of that value; then `promptRouteChoice` scrolls to the route cards and pulses a ring. The page itself does nothing (the design doc's "the page lifts" was never built). On Digital Photo there is no animation and the haptic fires when the file is ready, not at the tap.
 - **After.** The page is still on the stage, so the moment happens on it:
-  1. **Trigger:** `.onChange(of: locked) { old, new in if old > 0 && new == 0 { celebrate() } }`. Not on appear, not when `locked` rises.
+  1. **Trigger:** increment the celebration event in Print's `unlock()` only after `model.unlockAll()` succeeds with at least one locked photo. Do not derive it from the locked count: removing the last locked person also makes that count zero. Opening or returning to the screen, removing a person, an insufficient balance and a repeated action with nothing locked do not celebrate.
   2. **Haptic:** `.success`, from the same trigger (replace the `locked == 0` trigger).
   3. **Lift:** the page scales 1.0 → 1.03 → 1.0 (`spring(duration: 0.6, bounce: 0.25)` up, settling back), with `paperShadow(lifted: true)` during it.
   4. **Light sweep:** one band of light crosses the page once: a `LinearGradient` from clear to `white.opacity(0.55)` to clear, 40 % of the page's width, rotated 20°, moving from fully off the leading edge to fully off the trailing edge in 0.7 s (`easeInOut`), masked to the page's rectangle, `.blendMode(.plusLighter)`, `.allowsHitTesting(false)`, removed when done. Put it in a small reusable modifier `lightSweep(trigger:)` in `B/Stage.swift`.
