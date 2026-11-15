@@ -91,6 +91,22 @@ final class PrintUITests: CalipicUITestCase {
 
 extension PrintUITests {
     @MainActor
+    func testPrintImportFailureCanChooseAnotherPhoto() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--uitesting-fresh", "--uitesting-fixture", "--uitesting-synthetic-only", "--uitesting-print-import-error"]
+        app.launch()
+        XCTAssertTrue(app.buttons["outputPrint"].waitForExistence(timeout: 15))
+        app.buttons["outputPrint"].tap()
+        let choose = app.alerts.buttons["Choose Another Photo"]
+        XCTAssertTrue(choose.waitForExistence(timeout: 10))
+        choose.tap()
+        XCTAssertTrue(app.buttons["preparationContinue"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["preparationContinue"].label, "Choose Photo")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
     func testShopOnlySkipsTheRouteChooser() {
         let app = XCUIApplication()
         app.launchArguments = ["--uitesting-fresh", "--uitesting-fixture", "--uitesting-shop-only", "--uitesting-synthetic-only"]

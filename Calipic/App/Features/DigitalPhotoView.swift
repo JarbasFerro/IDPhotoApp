@@ -12,12 +12,19 @@ struct DigitalShareView: View {
     private var coaching: Bool { model.tutorial.isActive }
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
     private var locked: Bool { entry?.isUnlocked == false }
+    private enum PresentationState { case locked, preparing, ready, failed }
+    private var presentation: PresentationState {
+        if locked { return .locked }
+        if result != nil { return .ready }
+        return model.activity == .exporting ? .preparing : .failed
+    }
     private var result: DigitalExport? { model.digitalExport?.photoID == photoID ? model.digitalExport : nil }
 
     var body: some View {
         Group {
             if let entry {
-                JourneyScreen(minimumObjectHeightFraction: 0.45) { size in
+                JourneyScreen(minimumObjectHeightFraction: 0.45,
+                              trayAnimation: Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { size in
                     let format = model.renderTarget.digital.format(base: model.renderTarget.format)
                     let aspect = format.aspectRatio
                     let height = max(0, min(size.height, size.width / aspect))
@@ -43,10 +50,11 @@ struct DigitalShareView: View {
                             Text(model.errorMessage ?? String(localized: "The photo could not be prepared. Try again.")).font(.body)
                         }
                     }
-                    .animation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion), value: locked)
+                    .id(presentation).transition(.opacity)
                 } actions: {
                     actions
                 }
+                .animation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion), value: presentation)
             } else {
                 ContentUnavailableView("This photo was removed", systemImage: "photo")
             }

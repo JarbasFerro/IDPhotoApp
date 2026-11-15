@@ -21,6 +21,8 @@ extension PrintView {
                             .sensoryFeedback(.selection, trigger: copiesTick)
                             .guideTarget(.copies, current: guideTip).accessibilityIdentifier("copiesStepper")
                     })
+                    .contentTransition(.numericText(value: Double(copies.wrappedValue)))
+                    .animation(reduceMotion ? nil : .snappy, value: copies.wrappedValue)
                 }
                 TrayRow(title: Text("Paper"), trailing: { paperChips })
             }

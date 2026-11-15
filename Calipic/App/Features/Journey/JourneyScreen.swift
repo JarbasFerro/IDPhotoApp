@@ -7,6 +7,8 @@ struct JourneyScreen<Stage: View, Tray: View, Actions: View>: View {
     var stageBottomReserve: CGFloat = 0
     /// Print reserves one tray footprint so the page keeps its position through layout, unlock and sending.
     var reservedTrayFraction: CGFloat? = nil
+    /// A screen may animate measured tray-height changes as well as its content transition.
+    var trayAnimation: Animation? = nil
     @ViewBuilder let stage: (CGSize) -> Stage
     @ViewBuilder let tray: () -> Tray
     @ViewBuilder let actions: () -> Actions
@@ -39,7 +41,9 @@ struct JourneyScreen<Stage: View, Tray: View, Actions: View>: View {
                     }
                     .frame(height: reservedTrayFraction == nil ? min(contentHeight, limit) : limit, alignment: .top)
                     actions()
-                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { actionsHeight = $0 }
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                            withAnimation(actionsHeight > 0 ? trayAnimation : nil) { actionsHeight = height }
+                        }
                         .guideAvoid()
                 }
                 .frame(height: reservedTrayFraction == nil ? nil : max(0, screen.size.height * fraction - 30), alignment: .top)
@@ -63,7 +67,9 @@ struct JourneyScreen<Stage: View, Tray: View, Actions: View>: View {
         tray()
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
-            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                withAnimation(contentHeight > 0 ? trayAnimation : nil) { contentHeight = height }
+            }
     }
 }
 

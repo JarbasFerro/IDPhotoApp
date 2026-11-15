@@ -432,6 +432,8 @@ Create `F/Journey/JourneyScreen.swift`, `F/Journey/TrayRow.swift`, `F/Journey/Tr
 
 **Pass 2 implementation.** Print reserves 45 % of the available height for its tray at normal text sizes (75 % at accessibility sizes), so the full page keeps exactly the same position and scale through all four states. Long instructions scroll within that fixed footprint; actions stay pinned. Page dots use native `UIPageControl` with a 44 pt hit area in a reserved footer below the existing snapping strip. Unlock briefly retains its pre-spend words and balance while the page lifts and the light passes, then shows the next tray. Returning to layout cancels any pending export and deletes completed files. Digital Photo uses the same crop recipe as its actual digital export, including a looser online crop when the profile asks for one.
 
+**Passes 1–2 review fixes (0.21.3).** Cancelling a page arrival clears its hidden-row state. Unlock lift/sweep consume a new trigger change, so a newly mounted page or a returning view cannot replay an old unlock. Original comparison coordinates both holds with an identified timed tap; an expired tap never overrides a hold or a newer tap. Print's import alert offers **Choose Another Photo**, retaining add-person mode; export errors retain **Try Again**. Digital Photo keys transitions by locked/preparing/ready/failed and opts into animated measured tray heights through `JourneyScreen.trayAnimation`; the same token resolves to nil under Reduce Motion. The Copies row retains its numeric transition and selection tick.
+
 **`JourneyScreen`**
 
 ```swift

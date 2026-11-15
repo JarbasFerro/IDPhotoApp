@@ -129,13 +129,16 @@ private struct UnlockLift: ViewModifier {
     let trigger: Int
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var lifted = false
+    @State private var event = 0
 
     func body(content: Content) -> some View {
         content
             .scaleEffect(lifted ? 1.03 : 1)
             .shadow(color: .black.opacity(lifted ? 0.18 : 0), radius: 16, y: 8)
-            .task(id: trigger) {
-                guard trigger > 0, !reduceMotion else { return }
+            .onChange(of: trigger) { _, new in event = new }
+            .onDisappear { event = 0; lifted = false }
+            .task(id: event) {
+                guard event > 0, !reduceMotion else { return }
                 withAnimation(.spring(duration: 0.3, bounce: 0.15)) { lifted = true }
                 do { try await Task.sleep(for: .milliseconds(300)) } catch { lifted = false; return }
                 withAnimation(.spring(duration: 0.6, bounce: 0.25)) { lifted = false }
@@ -147,6 +150,7 @@ private struct UnlockLightSweep: ViewModifier {
     let trigger: Int
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var active = false
+    @State private var event = 0
     @State private var position: CGFloat = -1
 
     func body(content: Content) -> some View {
@@ -161,8 +165,10 @@ private struct UnlockLightSweep: ViewModifier {
                 .clipped().blendMode(.plusLighter).allowsHitTesting(false).accessibilityHidden(true)
             }
         }
-        .task(id: trigger) {
-            guard trigger > 0, !reduceMotion else { return }
+        .onChange(of: trigger) { _, new in event = new }
+        .onDisappear { event = 0; active = false }
+        .task(id: event) {
+            guard event > 0, !reduceMotion else { return }
             position = -1
             active = true
             do { try await Task.sleep(for: .milliseconds(16)) } catch { active = false; return }

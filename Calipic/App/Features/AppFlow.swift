@@ -50,6 +50,13 @@ struct RootView: View {
                 }
         }
         .environment(\.zoomNamespace, zoom)
+        #if DEBUG
+        .onChange(of: path) { _, routes in
+            if routes.last == .sheet, ProcessInfo.processInfo.arguments.contains("--uitesting-print-import-error") {
+                model.importPhoto(mode: .add) { throw PhotoError.unreadable }
+            }
+        }
+        #endif
         // A new install begins with the welcome page and the guided first photo (ADR-052).
         .fullScreenCover(isPresented: Binding(get: { model.tutorial.needsWelcome }, set: { _ in })) {
             TutorialWelcomeView(credits: model.credits.balance) { model.tutorial.welcomed() }

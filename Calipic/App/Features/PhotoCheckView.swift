@@ -9,7 +9,8 @@ struct PhotoCheckView: View {
     @State private var showAdjust = false
     @State private var showRequirements = false
     @State private var confirmRemove = false
-    @State private var comparing = false
+    @State private var comparison = OriginalComparison()
+    private var comparing: Bool { comparison.isComparing }
     /// The full list of checks, in a sheet: the screen itself stays one page with the photo in view.
     @State private var detailsFocus: CheckDetailsSheet.Focus?
     @State private var confirmEdit = false
@@ -21,7 +22,6 @@ struct PhotoCheckView: View {
     @State private var verdictBounce = 0
     @State private var verdictRevealed = false
     @State private var celebratesVerdict = false
-    @State private var comparePulse: UUID?
     @GestureState private var compareHeld = false
     @State private var suppressCompareTap = false
     @Environment(\.zoomNamespace) private var zoomNamespace
@@ -110,14 +110,13 @@ struct PhotoCheckView: View {
             do { try await Task.sleep(for: .milliseconds(80)) } catch { return }
             verdictBounce += 1
         }
-        .task(id: comparePulse) {
-            guard comparePulse != nil else { return }
+        .task(id: comparison.pulse) {
+            guard let pulse = comparison.pulse else { return }
             do { try await Task.sleep(for: .seconds(1.2)) } catch { return }
-            setComparing(false)
-            comparePulse = nil
+            updateComparison { $0.finishPulse(pulse) }
         }
         .onDisappear {
-            comparing = false; comparePulse = nil
+            comparison = OriginalComparison()
         }
     }
 
@@ -196,10 +195,10 @@ struct PhotoCheckView: View {
             .scaleEffect(checking && !reduceMotion ? 1.06 : 1)
             .animation(Design.Motion.landing.resolved(reduceMotion: reduceMotion), value: checking)
             .onLongPressGesture(minimumDuration: 0.15, maximumDistance: 40) {} onPressingChanged: { pressing in
-                setComparing(pressing)
+                updateComparison { $0.holdPhoto(pressing) }
             }
             .accessibilityHint("Press and hold to compare with the original.")
-            .accessibilityAction(named: Text("Compare with original")) { setComparing(!comparing) }
+            .accessibilityAction(named: Text("Compare with original")) { updateComparison { $0.toggle() } }
             .accessibilityIdentifier("portrait")
             .zoomSource(.sheet, at: nextIndex, in: zoomNamespace)
             .zoomSource(.digital(photoID), at: nextIndex, in: zoomNamespace)
@@ -228,8 +227,8 @@ struct PhotoCheckView: View {
                         if case .second(true, _) = value { state = true }
                     })
                 .onChange(of: compareHeld) { _, held in
-                    if held { suppressCompareTap = true; comparePulse = nil }
-                    setComparing(held)
+                    if held { suppressCompareTap = true }
+                    updateComparison { $0.holdControl(held) }
                 }
                 .task(id: compareHeld) {
                     guard !compareHeld else { return }
@@ -253,12 +252,11 @@ struct PhotoCheckView: View {
     }
 
     private func compareBriefly() {
-        setComparing(true)
-        comparePulse = UUID()
+        updateComparison { $0.showBriefly() }
     }
 
-    private func setComparing(_ value: Bool) {
-        withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { comparing = value }
+    private func updateComparison(_ change: (inout OriginalComparison) -> Void) {
+        withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { change(&comparison) }
     }
 
     // MARK: - Verdict and details (design 2a)

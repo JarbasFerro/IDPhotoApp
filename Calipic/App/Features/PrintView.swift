@@ -145,7 +145,15 @@ struct PrintView: View {
         .onChange(of: copiesTick) { _, _ in model.tutorial.pass(.copies) }
         .onDisappear { pending = nil; model.finishExport() }
         .alert("Unable to complete", isPresented: Binding(get: { model.errorMessage != nil }, set: { if !$0 { model.errorMessage = nil } })) {
-            Button("Try Again") { model.errorMessage = nil; if layoutConfirmed { model.prepareExport() } }
+            if model.errorActivity == .importing {
+                Button("Choose Another Photo") {
+                    model.errorMessage = nil
+                    returnToLayout()
+                    acquire(.library, .add)
+                }
+            } else {
+                Button("Try Again") { model.errorMessage = nil; if layoutConfirmed { model.prepareExport() } }
+            }
             Button("OK", role: .cancel) { model.errorMessage = nil }
         } message: { Text(model.errorMessage ?? "") }
     }
