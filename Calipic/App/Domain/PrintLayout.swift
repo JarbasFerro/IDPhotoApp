@@ -94,6 +94,10 @@ struct PrintOptions: Sendable, Hashable {
     var orientation: PageOrientation = .automatic
     var maxPages = 10
 
+    /// The opt-in "As many copies as possible" (zero gutter, ADR-036): copies come before the check bar and before
+    /// keeping every photo the same way up. Otherwise the sheet keeps what the person chose and spills to a new page.
+    var prefersCopies: Bool { gutterMM == 0 }
+
     /// Opt-in: shared cut lines, no bleed. A cut error makes one photo oversize and its neighbour undersize.
     static let maximumCopies = PrintOptions(marginMM: 3, gutterMM: 0, bleed: .none, cornerTicks: true,
                                             calibrationBar: true)
@@ -230,11 +234,13 @@ enum PrintLayoutSolver {
                                                   availableWidth: size.w - 2 * margin,
                                                   availableHeight: size.h - 2 * margin - reserve,
                                                   gutter: gutter, strategy: options.fillStrategy) else { continue }
-                        // Copies first; then keeping a safety margin at all and the check bar; then every photo the same
-                        // way up (a mixed page is harder to cut and looks wrong, founder 0.20 reviews); only then the
-                        // margin's exact size, so 0.5 mm all upright beats 1 mm with a sideways row.
-                        let score = [plan.placed, bleed > 0 ? 1 : 0, bar ? 1 : 0, -plan.orientationCount, bleed,
-                                     -plan.distinctHeights, -plan.usedLength, -index]
+                        // The check bar the person asked for and every photo the same way up come before one more copy
+                        // (founder, 0.21.9: a second person made the bar vanish and a column turn sideways to fit 13
+                        // instead of 12). Then copies; then keeping a safety margin at all; only then its exact size, so
+                        // 0.5 mm all upright beats 1 mm with a sideways row. "As many copies as possible" puts copies first.
+                        let kept = [bar ? 1 : 0, -plan.orientationCount]
+                        let rest = [bleed > 0 ? 1 : 0, bleed, -plan.distinctHeights, -plan.usedLength, -index]
+                        let score = options.prefersCopies ? [plan.placed] + kept + rest : kept + [plan.placed] + rest
                         if best == nil || best!.score.lexicographicallyPrecedes(score) {
                             best = (score, plan, size.w, size.h, bleed, bar)
                         }
@@ -396,12 +402,19 @@ enum PrintLayoutSolver {
                 }
             }
         }
-        guard let largest = grids.map(\.plan.placed).max(), copies > 0 else {
+        // The check bar and one way up are kept before more copies, as for several people (unless "As many copies
+        // as possible" is on); among those grids, the fullest.
+        let prefersCopies = job.options.prefersCopies
+        func kept(_ g: Grid) -> Bool {
+            prefersCopies || ((g.bar || !barChoices.contains(true) || !grids.contains(where: \.bar)) && g.plan.orientationCount == 1)
+        }
+        let eligible = grids.contains(where: kept) ? grids.filter(kept) : grids
+        guard let largest = eligible.map(\.plan.placed).max(), copies > 0 else {
             return PrintLayout(pages: [], unplaced: copies > 0 ? [items[itemIndex].id: copies] : [:])
         }
         // Always the fullest grid, whatever the count: a roomier grid for a few copies had to be swapped for the
         // full one at some count, and the swap read as a flash (founder, 0.20.12: at the 10th copy).
-        let chosen = grids
+        let chosen = eligible
             .filter { $0.plan.placed == largest }
             .max { a, b in
                 func key(_ g: Grid) -> [Int] {

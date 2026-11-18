@@ -45,7 +45,7 @@ The decisions that are in force, one short entry each. ADR numbers are kept beca
 | 011, 038 | No change to the person's identity: no retouching, reshaping, or generated content. Document Tone is one global, reversible correction of exposure and colour | Accepted |
 | 026 | Print accuracy is proven by measuring real prints, not by math alone | Accepted; printer round not done |
 | 027 | No private or family face photos in the repository. Fixtures are synthetic (including generated people who do not exist, D-9), licensed, or consented | Accepted |
-| 036 | Print sheet: paper catalog plus custom paper; deterministic row solver; 0–1 mm adaptive safety margin, 4 mm page margin, 2 mm gutter, corner marks, 50 mm check line; zero-gutter "as many as possible" is opt-in | Accepted in practice |
+| 036 | Print sheet: paper catalog plus custom paper; deterministic row solver; 0–1 mm adaptive safety margin, 4 mm page margin, 2 mm gutter, corner marks, 50 mm check line; zero-gutter "as many as possible" is opt-in. **Amended 2026-11-18 (0.21.9, founder's recording):** by default a page keeps the check bar (when switched on) and every photo the same way up before fitting one more copy; the extra copy goes to the next page. Only "As many copies as possible" puts copies first | Accepted in practice; amended 2026-11-18 |
 | 037 | The replacement background colour comes from the profile | Accepted in practice |
 | 039 | Crop solving: eye line and chin from landmarks; the crown is an estimate from the mask top and face proportions; level the eyes, scale to the head-height target, place by the eye-line and top-margin bands | Accepted in practice; calibration open |
 

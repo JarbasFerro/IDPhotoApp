@@ -27,7 +27,8 @@ struct PrintLayoutSolverTests {
         Case(paper: .photo9x13, trim: (35, 45), minimum: 4, exact: true),
         Case(paper: .a6, trim: (26, 32), minimum: 12, exact: false),
         Case(paper: .a6, trim: (35, 45), minimum: 6, exact: false),
-        Case(paper: .a5, trim: (26, 32), minimum: 30, exact: false),
+        // 30 only without the check bar; with it, 28 all turned (the bar is kept before copies since 0.21.9).
+        Case(paper: .a5, trim: (26, 32), minimum: 28, exact: false),
         Case(paper: .a4, trim: (26, 32), minimum: 60, exact: false),
         Case(paper: .a4, trim: (35, 45), minimum: 30, exact: false),
         Case(paper: .usLetter, trim: (26, 32), minimum: 56, exact: false),
@@ -111,8 +112,9 @@ struct PrintLayoutSolverTests {
         let fixed = PrintLayoutSolver.solve(job(.photo4x6, items: [(35, 45, 6)], options: {
             var options = PrintOptions(); options.bleed = .fixed(mm: 1); return options
         }()))
-        // Beyond one page the fullest grid is used: two upright rows of two plus one rotated copy in the 44 mm strip.
-        #expect(fixed.pages[0].placements.count == 5)
+        // Beyond one page: two upright rows of two. The fifth copy would lie sideways in the 44 mm strip, and a mixed
+        // page is no longer traded for one more copy (0.21.9), so it goes to the second page.
+        #expect(fixed.pages[0].placements.count == 4)
         #expect(fixed.pages.count == 2)
         let full = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 12)]))
         // A full 12-up sheet keeps the check bar with a smaller margin (0.20.7); it used to drop the bar for 1 mm.
@@ -240,5 +242,25 @@ struct PrintLayoutSolverTests {
             #expect(Set(page.placements.map(\.rotated)).count == 1, "\(copies) copies mix orientations")
             #expect(page.bleedMM > 0 && page.calibrationBar != nil, "\(copies) copies lost the margin or the check bar")
         }
+    }
+
+    /// Founder's recording (0.21.9): adding a second person made the check bar vanish and a column turn sideways, so
+    /// 13 copies fit on one 10 x 15 cm page where one person gets 12. The sheet keeps the bar and one way up, and the
+    /// 13th copy goes to a second page; "As many copies as possible" may still trade them for copies.
+    @Test func severalPeopleKeepTheCheckBarAndOneWayUp() {
+        let first = PrintItem(photoID: UUID(), trimWidthMM: 26, trimHeightMM: 32, copies: 9)
+        let second = PrintItem(photoID: UUID(), trimWidthMM: 26, trimHeightMM: 32, copies: 4)
+        let layout = PrintLayoutSolver.solve(PrintJob(paper: .photo4x6, items: [first, second]))
+        #expect(layout.isComplete)
+        #expect(layout.pages.count == 2)
+        for page in layout.pages {
+            #expect(page.calibrationBar != nil, "a page lost the check bar")
+            #expect(Set(page.placements.map(\.rotated)).count == 1, "a page mixes orientations")
+        }
+        #expect(layout.pages.first?.placements.count == 12)
+
+        var maximum = PrintJob(paper: .photo4x6, items: [first, second])
+        maximum.options = .maximumCopies
+        #expect(PrintLayoutSolver.solve(maximum).pages.count == 1)
     }
 }
