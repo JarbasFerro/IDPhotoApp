@@ -69,7 +69,6 @@ struct DigitalShareView: View {
         .task(id: photoID) {
             if !locked, result == nil, model.activity == nil { model.prepareDigitalExport(for: photoID) }
         }
-        .onChange(of: locked) { old, new in if old, !new { unlockTick += 1 } }
         .sensoryFeedback(.success, trigger: unlockTick)
         .onDisappear { model.finishExport() }
     }
@@ -93,7 +92,7 @@ struct DigitalShareView: View {
             if locked {
                 if model.credits.canAfford(1) {
                     Button {
-                        if model.unlock([photoID]) { model.prepareDigitalExport(for: photoID) }
+                        if model.unlock([photoID]) { unlockTick += 1; model.prepareDigitalExport(for: photoID) }
                     } label: { Text("Unlock · \(CreditsPresentation.count(1))").frame(maxWidth: .infinity) }
                         .guideTarget(.unlock, current: coaching ? .unlock : nil).accessibilityIdentifier("unlockDigital")
                 } else {

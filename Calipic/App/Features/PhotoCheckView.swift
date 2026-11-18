@@ -41,7 +41,7 @@ struct PhotoCheckView: View {
     var body: some View {
         Group {
             if let entry {
-                JourneyScreen(minimumObjectHeightFraction: 0.45, stageBottomReserve: 44) { size in
+                JourneyScreen { size in
                     portrait(entry, size: size)
                 } tray: {
                     summaryBlock(entry)
@@ -177,7 +177,7 @@ struct PhotoCheckView: View {
     private func portrait(_ entry: PhotoEntry, size: CGSize) -> some View {
         let checking = entry.isAnalyzing || !landed
         let format = model.renderTarget.format
-        let photoHeight = max(0, min(size.height - 44, size.width / format.aspectRatio))
+        let photoHeight = max(0, min(size.height - 40, size.width / format.aspectRatio))
         let portrait = PortraitView(entry: entry, format: format, showsOriginal: comparing || !landed,
                                     label: comparing ? "Original photo" : "Framed photo", animated: !reduceMotion)
         return VStack(spacing: 0) {
@@ -249,7 +249,7 @@ struct PhotoCheckView: View {
                         .disabled(displayedSummary.headline == .checking)
                 }
             }
-            .frame(height: 44)
+            .frame(height: 40)
             .zIndex(1)
         }
         .frame(width: size.width, height: size.height)

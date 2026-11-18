@@ -70,7 +70,7 @@ struct PrintView: View {
     var body: some View {
         JourneyScreen(reservedTrayFraction: 0.45) { size in
             SheetPreview(layout: model.layout, thumbnails: model.sheetThumbnails, captions: false,
-                         pageBox: CGSize(width: size.width, height: max(0, size.height - 44)), revealedRows: revealedRows, unlockTrigger: unlockTick)
+                         pageBox: CGSize(width: size.width, height: max(0, size.height - 24)), revealedRows: revealedRows, unlockTrigger: unlockTick)
                 .frame(width: size.width, height: size.height)
         } tray: {
             tray.id(step).transition(.opacity)

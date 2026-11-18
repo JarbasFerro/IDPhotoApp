@@ -12,21 +12,23 @@ extension PrintView {
             }
             TrayRows(leadingInset: 0) {
                 if let person, let copies = copiesBinding(for: person) {
-                    TrayRow(title: Text("Copies"), detail: model.entries.count > 1 ? Text(model.label(for: person.id)) : nil,
-                            value: Text(copies.wrappedValue, format: .number).monospacedDigit(), trailing: {
-                        Stepper("Copies", onIncrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: true) },
-                                onDecrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: false) })
-                            .labelsHidden().fixedSize()
-                            .accessibilityValue(Text("^[\(copies.wrappedValue) copy](inflect: true)"))
-                            .sensoryFeedback(.selection, trigger: copiesTick)
-                            .guideTarget(.copies, current: guideTip).accessibilityIdentifier("copiesStepper")
-                    })
-                    .contentTransition(.numericText(value: Double(copies.wrappedValue)))
-                    .animation(reduceMotion ? nil : .snappy, value: copies.wrappedValue)
+                    VStack(alignment: .leading, spacing: 0) {
+                        TrayRow(title: Text("Copies"), detail: model.entries.count > 1 ? Text(model.label(for: person.id)) : nil,
+                                value: Text(copies.wrappedValue, format: .number).monospacedDigit(), trailing: {
+                            Stepper("Copies", onIncrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: true) },
+                                    onDecrement: { copies.wrappedValue = steppedCopies(from: copies.wrappedValue, up: false) })
+                                .labelsHidden().fixedSize()
+                                .accessibilityValue(Text("^[\(copies.wrappedValue) copy](inflect: true)"))
+                                .sensoryFeedback(.selection, trigger: copiesTick)
+                                .guideTarget(.copies, current: guideTip).accessibilityIdentifier("copiesStepper")
+                        })
+                        .contentTransition(.numericText(value: Double(copies.wrappedValue)))
+                        .animation(reduceMotion ? nil : .snappy, value: copies.wrappedValue)
+                        if !fill.isEmpty { fillMenu(for: person).frame(minHeight: 44) }
+                    }
                 }
                 TrayRow(title: Text("Paper"), trailing: { paperChips })
             }
-            if let person, !fill.isEmpty { fillMenu(for: person).frame(minHeight: 44) }
             if !model.layout.isComplete {
                 TrayRow(title: Text("\(model.layout.unplacedCount) copies do not fit within \(model.printJob.options.maxPages) pages."),
                         leading: { StatusMark(.warn) })
@@ -45,6 +47,8 @@ extension PrintView {
             }
         }
         .scrollIndicators(.hidden)
+        .contentMargins(.trailing, Design.Spacing.tray, for: .scrollContent)
+        .padding(.trailing, -Design.Spacing.tray)
         .sensoryFeedback(.selection, trigger: model.printJob.paper.id)
         .guideTarget(.paper, current: guideTip, cornerRadius: 24)
     }

@@ -246,7 +246,9 @@ extension PhotoCheckUITests {
         let chip = app.buttons["measureChip"]
         XCTAssertTrue(chip.waitForExistence(timeout: 15))
         let portrait = any(app, "portrait")
-        XCTAssertGreaterThanOrEqual(portrait.frame.height, app.frame.height * 0.45)
+        // The tray hugs its rows and the photo takes the rest (§9.9): no row is cut, and the photo stays large.
+        XCTAssertGreaterThanOrEqual(portrait.frame.height, app.frame.height * 0.42)
+        XCTAssertLessThanOrEqual(any(app, "byEyeRow").frame.maxY, app.buttons["adjust"].frame.minY)
         XCTAssertTrue(app.buttons["adjust"].isHittable)
         XCTAssertTrue(app.buttons["outputPrint"].isHittable)
         let original = app.buttons["photoCheck"]

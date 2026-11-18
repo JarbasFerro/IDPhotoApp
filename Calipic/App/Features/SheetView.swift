@@ -331,13 +331,13 @@ struct SheetPreview: View {
                 }
             }
             .frame(height: pageBox.height)
-            .padding(.bottom, 44)
+            .padding(.bottom, 24)
             .onDisappear {
                 arrival?.cancel(); arrival = nil
                 arrivingFrom = nil; arrivingRows = 0
             }
             .overlay(alignment: .bottom) {
-                if layout.pages.count > 1 { PageDots(count: layout.pages.count, selection: $focusedPage).frame(height: 44).fixedSize(horizontal: true, vertical: false) }
+                if layout.pages.count > 1 { PageDots(count: layout.pages.count, selection: $focusedPage).frame(height: 44).fixedSize(horizontal: true, vertical: false).offset(y: 10) }
             }
             .accessibilityIdentifier("sheetPreview")
     }
