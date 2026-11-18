@@ -29,41 +29,21 @@ struct HomeView: View {
     private var isBusy: Bool { !model.isInitialized || model.activity != nil || !model.canAddPhoto }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
-                hero
-                Text("Take it at home.\nPrint it yourself.")
-                    .font(Design.Typography.hero)
-                    .accessibilityAddTraits(.isHeader)
-
-                if !model.isInitialized {
-                    ProgressView("Preparing private photo storage…")
-                }
-                if let activity = model.activity {
-                    HStack {
-                        ProgressView()
-                        Text(activity == .importing ? LocalizedStringKey("Opening photo…") : LocalizedStringKey("Preparing files…"))
-                        Spacer()
-                        Button("Cancel", role: .cancel) { model.cancel() }
-                    }
-                    .accessibilityElement(children: .contain)
-                }
-
-                if !model.entries.isEmpty { sessionCard }
-                documentCard
-                if dynamicTypeSize.isAccessibilitySize { actions }
-            }
-            .padding(.horizontal)
-            .padding(.bottom)
+        // Everything fits at rest: the hero shrinks before anything is cut off under the buttons, and the page
+        // scrolls only when even the smallest hero does not fit (founder's screenshot, 0.21.8).
+        ViewThatFits(in: .vertical) {
+            ForEach([1, 0.85, 0.7, 0.6, 0.5] as [CGFloat], id: \.self) { content(heroScale: $0) }
+            ScrollView { content(heroScale: 1) }
         }
         .background(Design.Surface.screen)
         .animation(reduceMotion ? nil : .smooth, value: model.tutorial.state)
-        .safeAreaInset(edge: .bottom) {
+        // A system bar: content scrolls under it with the soft scroll edge, instead of being sliced by an opaque strip
+        // (founder's screenshot, 0.21.8: the document card was cut through when a sheet was in progress).
+        .safeAreaBar(edge: .bottom) {
             if !dynamicTypeSize.isAccessibilitySize {
                 actions
                     .padding(.horizontal)
                     .padding(.top, Design.Spacing.text)
-                    .background(Design.Surface.screen)
             }
         }
         .guideOverlay(model.tutorial, current: guideTip, output: model.document.primaryOutput)
@@ -109,6 +89,35 @@ struct HomeView: View {
         .onAppear { Self.signposter.emitEvent("HomeAppeared") }
     }
 
+    private func content(heroScale: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: Design.Spacing.sectionTight) {
+            hero(scale: heroScale)
+            Text("Take it at home.\nPrint it yourself.")
+                .font(Design.Typography.hero)
+                .accessibilityAddTraits(.isHeader)
+
+            if !model.isInitialized {
+                ProgressView("Preparing private photo storage…")
+            }
+            if let activity = model.activity {
+                HStack {
+                    ProgressView()
+                    Text(activity == .importing ? LocalizedStringKey("Opening photo…") : LocalizedStringKey("Preparing files…"))
+                    Spacer()
+                    Button("Cancel", role: .cancel) { model.cancel() }
+                }
+                .accessibilityElement(children: .contain)
+            }
+
+            if !model.entries.isEmpty { sessionCard }
+            documentCard
+            if dynamicTypeSize.isAccessibilitySize { actions }
+        }
+        .padding(.horizontal)
+        .padding(.bottom)
+        .frame(maxHeight: .infinity, alignment: .top)
+    }
+
     // MARK: - Tutorial (ADR-052)
 
     /// The guided first photo: Home always coaches taking the photo, or picking up the one in progress.
@@ -135,11 +144,10 @@ struct HomeView: View {
 
     /// The whole job in one picture: a selfie, the ID photo made from it, and the sheet of copies (U10).
     /// A sample person until the person has a photo, then their own original, photo, and copies.
-    private var hero: some View {
+    private func hero(scale: CGFloat) -> some View {
         let entry = model.entries.last
         let pose = Self.poses[entry == nil ? sampleIndex % Self.poses.count : 0]
         return ZStack {
-            RoundedRectangle(cornerRadius: Design.Radius.group).fill(Design.Surface.stage)
             // The selfie, as taken: a phone photo at the back.
             heroSelfie(entry)
                 .frame(width: 150, height: 100)
@@ -173,7 +181,11 @@ struct HomeView: View {
                 .rotationEffect(.degrees(pose.photo))
                 .offset(x: -58 - pose.nudge, y: 44)
         }
-        .frame(height: 236)
+        // The papers scale together so a shorter mat keeps the same arrangement.
+        .scaleEffect(scale)
+        .frame(maxWidth: .infinity)
+        .frame(height: 236 * scale)
+        .background(Design.Surface.stage, in: RoundedRectangle(cornerRadius: Design.Radius.group))
         .contentShape(Rectangle())
         .onTapGesture { if entry == nil { nextSample() } }
         .sensoryFeedback(.impact(weight: .light), trigger: sampleIndex)
@@ -232,7 +244,7 @@ struct HomeView: View {
                     }
                     VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                         Text("Your sheet").font(Design.Typography.cardTitle)
-                        Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.name(for: model.printJob.paper))")
+                        Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.short(for: model.printJob.paper))")
                             .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 0)
