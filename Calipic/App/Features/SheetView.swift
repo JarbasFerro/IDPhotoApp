@@ -265,7 +265,17 @@ enum PaperNames {
 struct SheetPreview: View {
     private var firstPageWidth: CGFloat {
         guard let page = layout.pages.first else { return pageBox.width }
-        return min(pageBox.width, pageBox.height * page.displayAspect)
+        return page.displaySizeMM.width * pointsPerMM
+    }
+
+    /// One scale for every page, the tightest fit among them, so a page shown turned (its photos lie sideways) is not
+    /// drawn larger than an upright one: the same photo is the same size on every page (founder, 0.21.10).
+    private var pointsPerMM: CGFloat {
+        let fits = layout.pages.map { page -> CGFloat in
+            let size = page.displaySizeMM
+            return min(pageBox.width / size.width, pageBox.height / size.height)
+        }
+        return fits.min() ?? 1
     }
 
     let layout: PrintLayout
@@ -299,8 +309,9 @@ struct SheetPreview: View {
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: Design.Spacing.group) {
                     ForEach(Array(pages.enumerated()), id: \.offset) { index, page in
-                        let aspect = page.displayAspect
-                        let width = min(pageBox.width, pageBox.height * aspect)
+                        let size = page.displaySizeMM
+                        let width = size.width * pointsPerMM
+                        let aspect = size.width / size.height
                         VStack(spacing: Design.Spacing.tight) {
                             UprightPageView(page: page, thumbnails: thumbnails, animated: !reduceMotion,
                                             revealedRows: rows(onPage: index), showsEmptySlots: true)
@@ -390,6 +401,9 @@ extension PrintPage {
 
     /// Width over height of the page as shown on screen.
     var displayAspect: Double { displaysTurned ? heightMM / widthMM : widthMM / heightMM }
+
+    /// The page's size as shown on screen, in millimetres.
+    var displaySizeMM: CGSize { displaysTurned ? CGSize(width: heightMM, height: widthMM) : CGSize(width: widthMM, height: heightMM) }
 }
 
 /// A page as shown on screen: turned when its photos lie sideways, so faces are always upright.
