@@ -388,6 +388,38 @@
         }
       }
     },
+    "Lay it on the screen before cutting" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ponla sobre la pantalla antes de recortar"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque-a sobre a tela antes de recortar"
+          }
+        }
+      }
+    },
+    "Lay one on the screen once you have them" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pon una sobre la pantalla al recogerlas"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloque uma sobre a tela ao buscá-las"
+          }
+        }
+      }
+    },
     "Let's make your first ID photo together" : {
       "localizations" : {
         "es" : {
@@ -8020,22 +8052,6 @@
         }
       }
     },
-    "When the prints are back, lay one on the screen" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cuando tengas las copias, pon una sobre la pantalla"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quando as cópias chegarem, coloque uma sobre a tela"
-          }
-        }
-      }
-    },
     "When the ring closes, a 3-second countdown runs and the photo is taken for you. Look at the lens during the countdown." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10768,38 +10784,6 @@
         }
       }
     },
-    "Measure one photo before cutting" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mide una foto antes de cortar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meça uma foto antes de cortar"
-          }
-        }
-      }
-    },
-    "Measure the 50 mm line before cutting" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mide la línea de 50 mm antes de cortar"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meça a linha de 50 mm antes de cortar"
-          }
-        }
-      }
-    },
     "More Formats" : {
       "localizations" : {
         "es" : {
@@ -11884,22 +11868,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salvar"
-          }
-        }
-      }
-    },
-    "Lay it on the screen to see it is the right size" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ponla sobre la pantalla para comprobar su tamaño"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coloque-a sobre a tela para conferir o tamanho"
           }
         }
       }

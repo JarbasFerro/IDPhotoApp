@@ -68,7 +68,7 @@ struct PrintView: View {
     }
 
     var body: some View {
-        JourneyScreen(reservedTrayFraction: 0.45) { size in
+        JourneyScreen(reservedTrayFraction: 0.5) { size in
             SheetPreview(layout: model.layout, thumbnails: model.sheetThumbnails, captions: false,
                          pageBox: CGSize(width: size.width, height: max(0, size.height - 24)), revealedRows: revealedRows, unlockTrigger: unlockTick)
                 .frame(width: size.width, height: size.height)
@@ -251,18 +251,17 @@ struct PrintView: View {
         return TrayRows {
             TrayRow(title: route == .home
                 ? (PaperNames.isPhotoPaper(model.printJob.paper) ? Text("Load \(paper) photo paper") : Text("Load \(paper) paper"))
-                : Text("Order a standard print on \(paper) paper"), leading: { Text(1, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+                : Text("Order a standard print on \(paper) paper"), minHeight: 44, leading: { Text(1, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
             TrayRow(title: route == .home ? Text("Choose Actual Size, or 100 %. Never Fit to Page.")
-                       : Text("Ask for no cropping and no Fit to Page"), leading: { Text(2, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
-            TrayRow(title: model.printJob.options.calibrationBar ? Text("Measure the 50 mm line before cutting") : Text("Measure one photo before cutting"),
-                    leading: { Text(3, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+                       : Text("Ask for no cropping and no Fit to Page"), minHeight: 44, leading: { Text(2, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+            // Step 3 is the check itself: it replaces a separate "measure before cutting" step (founder, 2026-11-18).
+            TrayRow(title: Text("Check Your Print"), detail: Text(route == .home ? "Lay it on the screen before cutting" : "Lay one on the screen once you have them"),
+                    chevron: true, action: { showCheck = true }, leading: { Text(3, format: .number).monospacedDigit().foregroundStyle(Color.brandAccent) })
+                .accessibilityIdentifier("checkPrintButton")
             if route == .shop, let note = model.document.printNoteKey {
                 TrayRow(title: Text(String(localized: String.LocalizationValue(note))), leading: { Image(systemName: "storefront").foregroundStyle(Color.brandAccent) })
                     .accessibilityIdentifier("printRouteNote")
             }
-            TrayRow(title: Text("Check Your Print"), detail: Text(route == .home ? "Lay it on the screen to see it is the right size" : "When the prints are back, lay one on the screen"),
-                    chevron: true, action: { showCheck = true }, leading: { Image(systemName: "ruler").foregroundStyle(Color.brandAccent) })
-                .accessibilityIdentifier("checkPrintButton")
         }
     }
 

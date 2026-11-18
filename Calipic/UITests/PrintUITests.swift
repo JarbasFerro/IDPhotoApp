@@ -158,7 +158,8 @@ extension PrintUITests {
         let page = any(app, "sheetPage-0")
         XCTAssertTrue(page.waitForExistence(timeout: 10))
         let originalFrame = page.frame
-        XCTAssertGreaterThanOrEqual(originalFrame.height, 300)
+        // The send tray shows all three steps, so the page is a little under F5's 300 pt (founder, 2026-11-18).
+        XCTAssertGreaterThanOrEqual(originalFrame.height, 285)
         app.buttons["continueToShare"].tap()
         XCTAssertTrue(any(app, "unlockCard").waitForExistence(timeout: 5))
         XCTAssertEqual(page.frame.minY, originalFrame.minY, accuracy: 1)
