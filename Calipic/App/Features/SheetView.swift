@@ -2,7 +2,19 @@ import SwiftUI
 
 enum SheetChoices {
     struct FillChoice: Sendable { let pages: Int; let copies: Int }
-    struct Request: Hashable, Sendable { let job: PrintJob; let itemID: UUID? }
+    struct Request: Hashable, Sendable {
+        let job: PrintJob
+        let itemID: UUID?
+
+        /// The choices never depend on the item's own count, so it is left out: tapping + or − keeps the
+        /// cached choices instead of hiding the Fill row until they are recomputed (founder's recording, 0.21.7).
+        init(job: PrintJob, itemID: UUID?) {
+            var job = job
+            if let itemID, let index = job.items.firstIndex(where: { $0.id == itemID }) { job.items[index].copies = 1 }
+            self.job = job
+            self.itemID = itemID
+        }
+    }
     struct Snapshot: Sendable {
         let request: Request
         let values: [FillChoice]
