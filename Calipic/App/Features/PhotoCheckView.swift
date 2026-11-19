@@ -6,6 +6,8 @@ struct PhotoCheckView: View {
     let photoID: UUID
     @Binding var path: [Route]
     let acquire: Acquire
+    /// Opened straight from the camera (F11): the photo lands sooner, as the white veil fades.
+    var arrivedFromCamera = false
     @State private var showAdjust = false
     @State private var showRequirements = false
     @State private var confirmRemove = false
@@ -23,8 +25,8 @@ struct PhotoCheckView: View {
     @State private var verdictBounce = 0
     @State private var verdictRevealed = false
     @State private var celebratesVerdict = false
-    @GestureState private var compareHeld = false
-    @State private var suppressCompareTap = false
+    /// Set once the person has compared; the hint under the photo then stops appearing.
+    @AppStorage("compareHintRetired", store: CompareHint.defaults) private var compareHintRetired = false
     @Environment(\.zoomNamespace) private var zoomNamespace
     /// Where this screen sits in the path; the screens it opens are pushed right after it.
     private var nextIndex: Int { (path.lastIndex(of: .check(photoID)) ?? path.count - 1) + 1 }
@@ -41,7 +43,7 @@ struct PhotoCheckView: View {
     var body: some View {
         Group {
             if let entry {
-                JourneyScreen { size in
+                JourneyScreen(trayAnimation: Design.Motion.rearrange.resolved(reduceMotion: reduceMotion)) { size in
                     portrait(entry, size: size)
                 } tray: {
                     summaryBlock(entry)
@@ -140,7 +142,8 @@ struct PhotoCheckView: View {
         showsMeasureLines = false
         celebratesVerdict = true
         do {
-            try await Task.sleep(for: Design.Motion.landingDelay(reduceMotion: reduceMotion))
+            try await Task.sleep(for: arrivedFromCamera && !reduceMotion ? .milliseconds(350)
+                                     : Design.Motion.landingDelay(reduceMotion: reduceMotion))
             while entry?.isAnalyzing == true { try await Task.sleep(for: .milliseconds(50)) }
             try Task.checkCancellation()
             withAnimation(Design.Motion.landing.resolved(reduceMotion: reduceMotion)) { landed = true }
@@ -212,37 +215,12 @@ struct PhotoCheckView: View {
                 }
             }
             HStack(spacing: 8) {
-                Button {
-                    if !suppressCompareTap { compareBriefly() }
-                } label: {
-                    Label("Original", systemImage: "rectangle.on.rectangle")
-                        .font(.subheadline.weight(.semibold))
-                        .padding(.horizontal, 10)
-                        .frame(minHeight: 36)
+                // The Original button became a hint (founder, 0.21.11): a pointing finger under the photo until the
+                // person has held the photo once.
+                if showsCompareHint {
+                    CompareHint { compareBriefly() }
+                        .transition(.opacity.combined(with: .scale(scale: 0.92, anchor: .topLeading)))
                 }
-                .buttonStyle(.glass)
-                .tint(comparing ? Color.brandAccentFill : nil)
-                .foregroundStyle(comparing ? Color.white : Color.primary)
-                .background { if comparing { Capsule().fill(Brand.accentFill) } }
-                .simultaneousGesture(LongPressGesture(minimumDuration: 0.5, maximumDistance: 40)
-                    .sequenced(before: DragGesture(minimumDistance: 0))
-                    .updating($compareHeld) { value, state, _ in
-                        if case .second(true, _) = value { state = true }
-                    })
-                .onChange(of: compareHeld) { _, held in
-                    if held { suppressCompareTap = true }
-                    updateComparison { $0.holdControl(held) }
-                }
-                .task(id: compareHeld) {
-                    guard !compareHeld else { return }
-                    // A native Button also sends its action on release. Consume that action after a hold.
-                    do { try await Task.sleep(for: .milliseconds(100)) } catch { return }
-                    suppressCompareTap = false
-                }
-                .frame(minHeight: 44)
-                .disabled(displayedSummary.headline == .checking)
-                .accessibilityHint("Press and hold to compare with the original.")
-                .accessibilityIdentifier("photoCheck")
                 Spacer(minLength: 0)
                 if let measurement = measurement(for: entry), landed {
                     MeasurementChip(measurement: measurement, showsRange: model.document.statesHeadHeight, showsLines: $showsMeasureLines)
@@ -251,8 +229,11 @@ struct PhotoCheckView: View {
             }
             .frame(height: 40)
             .zIndex(1)
+            .animation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion), value: showsCompareHint)
         }
         .frame(width: size.width, height: size.height)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("photoCheck")
     }
 
     private func compareBriefly() {
@@ -261,6 +242,12 @@ struct PhotoCheckView: View {
 
     private func updateComparison(_ change: (inout OriginalComparison) -> Void) {
         withAnimation(Design.Motion.compare.resolved(reduceMotion: reduceMotion)) { change(&comparison) }
+        if comparison.isComparing { compareHintRetired = true }
+    }
+
+    /// After the verdict, outside the guide, until the person has compared once.
+    private var showsCompareHint: Bool {
+        !compareHintRetired && !model.tutorial.isActive && displayedSummary.headline != .checking
     }
 
     // MARK: - Verdict and details (design 2a)
@@ -290,38 +277,43 @@ struct PhotoCheckView: View {
                 supportingLine(entry, summary: summary)
                     .font(Design.Typography.cardDetail).foregroundStyle(.secondary)
             }
-            if summary.headline != .checking {
-                TrayRows {
-                    if !summary.rows.isEmpty {
-                        TrayRow(title: Text("Measured"),
-                                detail: Text(verbatim: (summary.attention.isEmpty ? summary.rows : summary.attention)
-                                    .map { String(localized: $0.title) }.joined(separator: " · ")),
-                                value: measurement(for: entry).map(measurementValue),
-                                chevron: true, action: { detailsFocus = .measured },
-                                leading: { StatusMark(summary.worstState) })
-                            .accessibilityHint("Shows every check.")
-                            .accessibilityIdentifier("measuredRow")
-                    }
-                    if !model.document.byEyeChecks.isEmpty {
-                        TrayRow(title: Text("To check by eye"),
-                                detail: Text(verbatim: model.document.byEyeChecks.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
-                                value: Text(model.document.byEyeChecks.count, format: .number),
-                                chevron: true, action: { detailsFocus = .byEye },
-                                leading: { StatusMark(.manualCheck) })
-                            .accessibilityHint("Shows every check.")
-                            .accessibilityIdentifier("byEyeRow")
-                    }
-                    if !entry.isUnlocked, let note = CheckPresentation.editingNote(for: entry, document: model.document) {
-                        TrayRow(title: Text("Edited photo"),
-                                detail: Text("This document's rules ask for an unedited photo. \(String(localized: note))"),
-                                leading: { StatusMark(.manualCheck) }, trailing: {
-                            Button("Use Original") { model.useOriginalLook(for: photoID) }
-                                .frame(minHeight: 44).accessibilityIdentifier("useOriginal")
-                        })
-                    }
+            // The rows hold their place from the start, so the tray keeps its height when the verdict arrives and
+            // the photo, with its measuring lines, stays still (founder, 0.21.11: "the photo jumps").
+            TrayRows {
+                if summary.headline == .checking {
+                    TrayRow(title: Text("Measured"), detail: Text("Checking…"),
+                            leading: { Image(systemName: "circle.dotted").foregroundStyle(.secondary) })
+                        .accessibilityIdentifier("measuredRow")
+                } else if !summary.rows.isEmpty {
+                    TrayRow(title: Text("Measured"),
+                            detail: Text(verbatim: (summary.attention.isEmpty ? summary.rows : summary.attention)
+                                .map { String(localized: $0.title) }.joined(separator: " · ")),
+                            value: measurement(for: entry).map(measurementValue),
+                            chevron: true, action: { detailsFocus = .measured },
+                            leading: { StatusMark(summary.worstState) })
+                        .accessibilityHint("Shows every check.")
+                        .accessibilityIdentifier("measuredRow")
                 }
-                .guideTarget(.checkResult, current: guideTip, ring: false)
+                if !model.document.byEyeChecks.isEmpty {
+                    TrayRow(title: Text("To check by eye"),
+                            detail: Text(verbatim: model.document.byEyeChecks.prefix(2).map(DocumentPresentation.check).joined(separator: " · ")),
+                            value: Text(model.document.byEyeChecks.count, format: .number),
+                            chevron: true, action: { detailsFocus = .byEye },
+                            leading: { StatusMark(.manualCheck) })
+                        .accessibilityHint("Shows every check.")
+                        .accessibilityIdentifier("byEyeRow")
+                }
+                if summary.headline != .checking, !entry.isUnlocked,
+                   let note = CheckPresentation.editingNote(for: entry, document: model.document) {
+                    TrayRow(title: Text("Edited photo"),
+                            detail: Text("This document's rules ask for an unedited photo. \(String(localized: note))"),
+                            leading: { StatusMark(.manualCheck) }, trailing: {
+                        Button("Use Original") { model.useOriginalLook(for: photoID) }
+                            .frame(minHeight: 44).accessibilityIdentifier("useOriginal")
+                    })
+                }
             }
+            .guideTarget(.checkResult, current: summary.headline == .checking ? nil : guideTip, ring: false)
         }
         .animation(Design.Motion.rearrange.resolved(reduceMotion: reduceMotion), value: summary.headline)
         .sensoryFeedback(trigger: summary.headline) { old, new in
@@ -458,6 +450,57 @@ struct PortraitView: View {
             .rotationEffect(.degrees(-adjustment.clamped().rotationDegrees),
                             anchor: UnitPoint(x: crop.x + crop.width / 2, y: crop.y + crop.height / 2))
             .offset(x: -crop.x / crop.width * size.width, y: -crop.y / crop.height * size.height)
+    }
+}
+
+/// A pointing finger under the photo: hold the photo to see the original. Drawn like the guide's bubbles, without
+/// its step count, because it is a single tip rather than a step. A tap shows the original briefly.
+private struct CompareHint: View {
+    /// UI tests ("--uitesting-fresh") never read or write the stored value: each launch starts with the hint.
+    static let defaults: UserDefaults = ProcessInfo.processInfo.arguments.contains("--uitesting-fresh")
+        ? UserDefaults(suiteName: "uitesting.\(UUID().uuidString)") ?? .standard : .standard
+    let action: () -> Void
+    @State private var appeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 0) {
+                Path { path in
+                    path.move(to: CGPoint(x: 0, y: 7))
+                    path.addLine(to: CGPoint(x: 7, y: 0))
+                    path.addLine(to: CGPoint(x: 14, y: 7))
+                    path.closeSubpath()
+                }
+                .fill(GuideStyle.fill)
+                .frame(width: 14, height: 7)
+                .padding(.leading, 16)
+                .padding(.bottom, -1)
+                Label {
+                    Text("Hold for the original")
+                        .lineLimit(1).minimumScaleFactor(0.75)
+                } icon: {
+                    Image(systemName: "hand.point.up.left.fill")
+                        .symbolEffect(.bounce, options: .nonRepeating, value: appeared)
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(GuideStyle.ink)
+                .padding(.horizontal, 10)
+                .frame(minHeight: 30)
+                .background(GuideStyle.fill, in: Capsule())
+            }
+            .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("Show the original"))
+        .accessibilityHint("You can also press and hold the photo.")
+        .accessibilityIdentifier("compareHint")
+        .task {
+            guard !reduceMotion else { return }
+            do { try await Task.sleep(for: .milliseconds(400)) } catch { return }
+            appeared = true
+        }
     }
 }
 

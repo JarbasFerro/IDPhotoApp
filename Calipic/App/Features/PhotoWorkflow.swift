@@ -157,8 +157,6 @@ final class PhotoWorkflow {
         let task: Task<(photo: PreparedPhoto, measured: FaceAnalysis?)?, Never>
     }
     @ObservationIgnored private var ahead: Ahead?
-    /// The still under review looks like it caught closed or downturned eyes; the camera's review says so.
-    private(set) var aheadEyesLookClosed = false
 
     #if DEBUG
     /// UI tests on a simulator, where Vision cannot run: "--uitesting-measured" gives every photo this synthetic face
@@ -225,16 +223,10 @@ final class PhotoWorkflow {
         }
         let key = staged.directory
         ahead = Ahead(key: key, task: task)
-        Task {
-            // Publish the eyes result only for the still still under review.
-            let closed = await task.value?.measured?.eyesLookClosed ?? false
-            if ahead?.key == key { aheadEyesLookClosed = closed }
-        }
     }
 
     /// Retake, Cancel, or the camera closing: the prepared copy is deleted.
     func discardAhead() {
-        aheadEyesLookClosed = false
         guard let pending = ahead else { return }
         ahead = nil
         pending.task.cancel()
@@ -271,6 +263,12 @@ final class PhotoWorkflow {
             activity = nil
             install(result.photo, mode: mode, measured: .some(result.measured))
         }
+    }
+
+    /// Cancel on the camera while its still is being prepared: nothing reaches the session, and the still is deleted.
+    func cancelCapture() {
+        discardAhead()
+        cancelWork()
     }
 
     /// Adds `photo` to the session (or replaces the selected one), selects it, and starts its analysis.

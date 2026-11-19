@@ -60,16 +60,18 @@ final class SheetAndCameraUITests: CalipicUITestCase {
         let shutter = app.buttons["shutter"]
         XCTAssertTrue(shutter.waitForExistence(timeout: 10))
         shutter.tap()
-        XCTAssertTrue(app.staticTexts["Review your photo"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["cameraRetake"].exists)
-        XCTAssertTrue(app.buttons["cameraUsePhoto"].exists)
+        // One review (F11): the still waits for Photo Check with a spinner, with nothing to decide; Cancel goes back
+        // to the live camera. The hand-over itself needs a real camera and is checked on the iPhone.
+        XCTAssertTrue(any(app, "cameraHandOver").waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["cameraUsePhoto"].exists)
+        XCTAssertFalse(app.staticTexts["Review your photo"].exists)
         XCTAssertFalse(shutter.exists)
         let screenshot = XCTAttachment(screenshot: app.screenshot())
-        screenshot.name = "Camera captured review, synthetic subject"
+        screenshot.name = "Camera hand-over, synthetic subject"
         screenshot.lifetime = .keepAlways
         add(screenshot)
         try app.performAccessibilityAudit(for: [.elementDetection, .hitRegion, .sufficientElementDescription])
-        app.buttons["cameraRetake"].tap()
+        app.buttons["cameraReviewCancel"].tap()
         XCTAssertTrue(shutter.waitForExistence(timeout: 5))
     }
 

@@ -230,18 +230,28 @@ struct HomeView: View {
     /// People already in the session: faces, copies, and the way back into the sheet.
     private var sessionCard: some View {
         HStack(spacing: 0) {
+            // Each face goes back to that person's Photo Check; the rest of the card opens the sheet (founder,
+            // 0.21.11: no clear way back to the photo from Home). Pass 3 redesigns this card.
+            HStack(spacing: -10) {
+                ForEach(Array(model.entries.prefix(4).enumerated()), id: \.element.id) { index, entry in
+                    Button { path = [.check(entry.id)] } label: {
+                        Image(decorative: entry.photo.preview, scale: 1)
+                            .resizable().scaledToFill()
+                            .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
+                            .clipShape(Circle())
+                            .overlay(Circle().strokeBorder(Design.Surface.card, lineWidth: Design.Stroke.separation))
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(model.activity != nil)
+                    .accessibilityLabel(model.entries.count > 1 ? Text("Photo \(index + 1)") : Text("Your photo"))
+                    .accessibilityHint("Opens its Photo Check.")
+                    .accessibilityIdentifier("face-\(index + 1)")
+                }
+            }
+            .padding(.leading).padding(.vertical)
             Button { path.append(.sheet) } label: {
                 HStack(spacing: Design.Spacing.cardContent) {
-                    HStack(spacing: -10) {
-                        ForEach(Array(model.entries.prefix(4).enumerated()), id: \.element.id) { index, entry in
-                            Image(decorative: entry.photo.preview, scale: 1)
-                                .resizable().scaledToFill()
-                                .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
-                                .clipShape(Circle())
-                                .overlay(Circle().strokeBorder(Design.Surface.card, lineWidth: Design.Stroke.separation))
-                                .accessibilityIdentifier("face-\(index + 1)")
-                        }
-                    }
                     VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                         Text("Your sheet").font(Design.Typography.cardTitle)
                         Text("^[\(model.entries.count) person](inflect: true) · ^[\(model.layout.placedCount) copy](inflect: true) · \(PaperNames.short(for: model.printJob.paper))")
@@ -249,7 +259,7 @@ struct HomeView: View {
                     }
                     Spacer(minLength: 0)
                 }
-                .padding(.leading).padding(.vertical)
+                .padding(.leading, Design.Spacing.cardContent).padding(.vertical)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -261,6 +271,14 @@ struct HomeView: View {
             .zoomSource(.sheet, at: 0, in: zoomNamespace)
             // Removing a photo from here, without opening Photo Check (founder, 0.20 review).
             Menu {
+                Section {
+                    ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
+                        Button { path = [.check(entry.id)] } label: {
+                            Label(model.entries.count > 1 ? LocalizedStringKey("Open Photo \(index + 1)") : LocalizedStringKey("Open Photo Check"),
+                                  systemImage: "person.crop.square")
+                        }
+                    }
+                }
                 ForEach(Array(model.entries.enumerated()), id: \.element.id) { index, entry in
                     Button(role: .destructive) { pendingRemoval = .one(entry.id) } label: {
                         Label(model.entries.count > 1 ? LocalizedStringKey("Remove Photo \(index + 1)") : LocalizedStringKey("Remove Photo"),

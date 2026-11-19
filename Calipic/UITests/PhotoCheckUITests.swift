@@ -251,13 +251,16 @@ extension PhotoCheckUITests {
         XCTAssertLessThanOrEqual(any(app, "byEyeRow").frame.maxY, app.buttons["adjust"].frame.minY)
         XCTAssertTrue(app.buttons["adjust"].isHittable)
         XCTAssertTrue(app.buttons["outputPrint"].isHittable)
-        let original = app.buttons["photoCheck"]
-        original.tap()
+        // The pointing hint replaced the Original button (founder, 0.21.11); a tap on it shows the original briefly,
+        // and once the person has compared it does not come back.
+        let hint = app.buttons["compareHint"]
+        XCTAssertTrue(hint.waitForExistence(timeout: 5))
+        attach(app, "Photo Check, hold hint")
+        hint.tap()
         XCTAssertEqual(portrait.label, "Original photo")
         let framed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Framed photo"), object: portrait)
         XCTAssertEqual(XCTWaiter.wait(for: [framed], timeout: 3), .completed)
-        original.press(forDuration: 0.6)
-        XCTAssertEqual(portrait.label, "Framed photo")
+        XCTAssertFalse(hint.exists)
         app.buttons["outputPrint"].tap()
         XCTAssertTrue(app.buttons["continueToShare"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.element(boundBy: 0).tap()

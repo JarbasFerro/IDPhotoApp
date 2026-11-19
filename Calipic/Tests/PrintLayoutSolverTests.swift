@@ -185,6 +185,17 @@ struct PrintLayoutSolverTests {
         #expect(PrintLayoutSolver.solve(landscape).pages[0].widthMM == 152.4)
     }
 
+    /// Turning corner cut marks off removes them from every page, one person or several (founder, 0.21.11).
+    @Test(arguments: [1, 2])
+    func cornerMarksFollowTheSwitch(people: Int) {
+        var marked = job(.photo4x6, items: people == 1 ? [(26, 32, 12)] : [(26, 32, 9), (35, 45, 4)])
+        #expect(PrintLayoutSolver.solve(marked).pages.allSatisfy { !$0.cornerTicks.isEmpty })
+        marked.options.cornerTicks = false
+        let layout = PrintLayoutSolver.solve(marked)
+        #expect(!layout.pages.isEmpty)
+        #expect(layout.pages.allSatisfy { $0.cornerTicks.isEmpty })
+    }
+
     @Test func ticksNeverEnterANeighbourAndStayOnPage() {
         let layout = PrintLayoutSolver.solve(job(.photo4x6, items: [(26, 32, 12)]))
         let page = layout.pages[0]

@@ -144,6 +144,8 @@ struct PrintPage: Sendable, Hashable {
     let calibrationBar: CalibrationBar?
     /// The grid's empty positions, in the order copies would fill them.
     var freeSlots: [Slot] = []
+    /// Off when the person turns corner cut marks off; `cornerTicks` is then empty.
+    var marksCorners = true
 
     var utilisation: Double {
         placements.reduce(0) { $0 + $1.trim.width * $1.trim.height } / (widthMM * heightMM)
@@ -200,6 +202,14 @@ enum PrintLayoutSolver {
     }
 
     static func solve(_ job: PrintJob) -> PrintLayout {
+        let layout = arrange(job)
+        guard !job.options.cornerTicks else { return layout }
+        // The person turned corner marks off: neither the screen nor the file draws them (founder, 0.21.11).
+        return PrintLayout(pages: layout.pages.map { var page = $0; page.marksCorners = false; return page },
+                           unplaced: layout.unplaced)
+    }
+
+    private static func arrange(_ job: PrintJob) -> PrintLayout {
         let options = job.options
         let items = job.items
         var demand = items.map { max(0, $0.copies) }
@@ -538,6 +548,7 @@ extension PrintPage {
     }
 
     var cornerTicks: [Tick] {
+        guard marksCorners else { return [] }
         var ticks: [Tick] = []
         let length = PrintLayoutSolver.tickLengthMM
         for placement in placements {

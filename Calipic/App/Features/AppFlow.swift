@@ -27,10 +27,34 @@ struct RootView: View {
     @State private var choosePhotoAfterCamera = false
     /// The camera's photo is being prepared; the camera closes once Photo Check is in place behind it.
     @State private var awaitingCameraPhoto = false
+    /// The white veil of the hand-over (F11, M1): full on the camera, then fading over Photo Check.
+    @State private var cameraVeil = false
+    @State private var arrivalVeil = false
+    /// The photo whose Photo Check opened straight from the camera; it lands sooner (M2).
+    @State private var cameraArrival: UUID?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selection: PhotosPickerItem?
     @State private var importMode: PhotoWorkflow.ImportMode = .replace
     /// Comma-separated ids of documents whose "Before your photo" sheet was shown (D-1: in full once per document).
     @AppStorage("preflightSeenDocuments") private var preflightSeen = ""
+
+    /// M1's end (F11 step 3): the camera turns white, closes without sliding, and the white fades over Photo Check.
+    /// Under Reduce Motion the camera simply closes.
+    private func handOverFromCamera() async {
+        var instant = Transaction()
+        instant.disablesAnimations = true
+        guard !reduceMotion else {
+            withTransaction(instant) { showCamera = false }
+            return
+        }
+        cameraVeil = true
+        try? await Task.sleep(for: .milliseconds(150))
+        withTransaction(instant) {
+            arrivalVeil = true
+            showCamera = false
+        }
+        withAnimation(.easeOut(duration: 0.35)) { arrivalVeil = false }
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -39,7 +63,8 @@ struct RootView: View {
                     Group {
                         switch route {
                         case .check(let id):
-                            PhotoCheckView(model: model, photoID: id, path: $path, acquire: acquire)
+                            PhotoCheckView(model: model, photoID: id, path: $path, acquire: acquire,
+                                           arrivedFromCamera: cameraArrival == id)
                         case .digital(let id):
                             DigitalShareView(model: model, photoID: id, path: $path)
                         case .sheet:
@@ -50,6 +75,9 @@ struct RootView: View {
                 }
         }
         .environment(\.zoomNamespace, zoom)
+        .overlay {
+            Color.white.ignoresSafeArea().opacity(arrivalVeil ? 0.55 : 0).allowsHitTesting(false)
+        }
         #if DEBUG
         .onChange(of: path) { _, routes in
             if routes.last == .sheet, ProcessInfo.processInfo.arguments.contains("--uitesting-print-import-error") {
@@ -73,6 +101,7 @@ struct RootView: View {
         .fullScreenCover(isPresented: $showCamera, onDismiss: {
             // A still prepared during its review but never used (Cancel) is thrown away.
             awaitingCameraPhoto = false
+            cameraVeil = false
             model.discardAhead()
             if choosePhotoAfterCamera { choosePhotoAfterCamera = false; showPicker = true }
         }) {
@@ -84,9 +113,12 @@ struct RootView: View {
                 model.useCapture(staged, mode: importMode)
             }, onChoosePhoto: { choosePhotoAfterCamera = true; showCamera = false },
                onReviewChange: { staged in
-                // Analyse the still while the person looks at it, so Photo Check is ready on Use Photo (P2).
+                // Analyse the still at once, so Photo Check is ready when the camera closes (P2).
                 if let staged { model.prepareAhead(staged) } else { model.discardAhead() }
-            }, eyesLookClosed: model.aheadEyesLookClosed)
+            }, onCancelCapture: {
+                awaitingCameraPhoto = false
+                model.cancelCapture()
+            }, veil: cameraVeil)
             .onAppear { model.warmUp() }
         }
         .onChange(of: selection) { _, item in
@@ -96,14 +128,19 @@ struct RootView: View {
         }
         .onChange(of: model.lastInstalled) { _, event in
             guard let event else { return }
-            // Behind the camera the change happens without animation; the camera then slides away to reveal it.
+            let fromCamera = awaitingCameraPhoto
+            if fromCamera { cameraArrival = event.id }
+            // Behind the camera the change happens without animation.
             var transaction = Transaction()
-            transaction.disablesAnimations = awaitingCameraPhoto
+            transaction.disablesAnimations = fromCamera
             withTransaction(transaction) {
                 // A retake replaces the current Photo Check; a new person gets their own.
                 if case .check = path.last { path[path.count - 1] = .check(event.id) } else { path.append(.check(event.id)) }
             }
-            if awaitingCameraPhoto { awaitingCameraPhoto = false; showCamera = false }
+            if fromCamera {
+                awaitingCameraPhoto = false
+                Task { await handOverFromCamera() }
+            }
         }
         .task(id: awaitingCameraPhoto) {
             // Safety net: never leave the camera waiting on a photo that will not arrive.
