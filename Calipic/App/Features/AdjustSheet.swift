@@ -31,6 +31,7 @@ struct AdjustSheet: View {
     }
 
     private var entry: PhotoEntry? { model.entries.first { $0.id == photoID } }
+    private var mirrored: Bool { entry?.mirroredOnScreen == true }
 
     private var availableTools: [Tool] {
         Tool.allCases.filter { $0 != .light || model.policy.alteration != .forbidden || model.document.isCustom }
@@ -81,7 +82,8 @@ struct AdjustSheet: View {
 
     private func photoArea(_ entry: PhotoEntry) -> some View {
         VStack(spacing: Design.Spacing.caption) {
-            CropPreview(photo: entry.photo, format: model.renderTarget.format, image: model.showsOriginal ? nil : entry.backgroundPreview, adjustment: $model.adjustment)
+            CropPreview(photo: entry.photo, format: model.renderTarget.format, image: model.showsOriginal ? nil : entry.backgroundPreview, adjustment: $model.adjustment,
+                        mirrored: entry.mirroredOnScreen)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             status(entry)
                 .font(Design.Typography.caption)
@@ -216,11 +218,13 @@ struct AdjustSheet: View {
 
     private var straightenPanel: some View {
         VStack(alignment: .leading, spacing: Design.Spacing.text) {
-            Text(Measurement(value: model.adjustment.rotationDegrees, unit: UnitAngle.degrees)
+            Text(Measurement(value: (mirrored ? -1 : 1) * model.adjustment.rotationDegrees, unit: UnitAngle.degrees)
                 .formatted(.measurement(width: .narrow, usage: .asProvided, numberFormatStyle: .number.precision(.fractionLength(0...1)))))
                 .font(Design.Typography.readout(.subheadline))
                 .frame(maxWidth: .infinity)
-            slider("Straighten", value: $model.adjustment.rotationDegrees, range: CropAdjustment.rotationRange, step: 0.5)
+            slider("Straighten", value: Binding(get: { (mirrored ? -1 : 1) * model.adjustment.rotationDegrees },
+                                                set: { model.adjustment.rotationDegrees = (mirrored ? -1 : 1) * $0 }),
+                   range: CropAdjustment.rotationRange, step: 0.5)
         }
     }
 
@@ -267,7 +271,8 @@ struct AdjustSheet: View {
     private func moveButton(_ title: LocalizedStringKey, symbol: String, dx: Double, dy: Double) -> some View {
         iconButton(title, symbol: symbol) {
             var next = model.adjustment
-            next.horizontal += dx
+            // On a mirrored photo, left on screen is right in the photo.
+            next.horizontal += mirrored ? -dx : dx
             next.vertical += dy
             model.adjustment = next.clamped()
         }

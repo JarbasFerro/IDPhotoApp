@@ -66,6 +66,15 @@ final class PrintUITests: CalipicUITestCase {
         attachBothAppearances(app, "Finished")
         app.buttons["finishedDone"].tap()
         XCTAssertTrue(app.buttons["yourSheet"].waitForExistence(timeout: 5))
+        // With one person, Print opened from Home goes back to their Photo Check, the step before it (0.21.12).
+        app.buttons["yourSheet"].tap()
+        XCTAssertTrue(any(app, "sheetPreview").waitForExistence(timeout: 10) || app.buttons["continueToShare"].waitForExistence(timeout: 5))
+        // Print's own back first steps through its states; the step before the layout is Photo Check.
+        for _ in 0..<3 where !any(app, "measuredRow").exists {
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+            _ = any(app, "measuredRow").waitForExistence(timeout: 2)
+        }
+        XCTAssertTrue(any(app, "measuredRow").waitForExistence(timeout: 5))
     }
 
     /// The shop route offers the same check, but cannot print again from the app.

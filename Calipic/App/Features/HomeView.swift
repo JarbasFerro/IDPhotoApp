@@ -206,6 +206,7 @@ struct HomeView: View {
     @ViewBuilder private func heroSelfie(_ entry: PhotoEntry?) -> some View {
         if let entry {
             Image(decorative: entry.photo.preview, scale: 1).resizable().scaledToFill()
+                .scaleEffect(x: entry.mirroredOnScreen ? -1 : 1, y: 1)
         } else {
             Image(Self.samples[sampleIndex].selfie).resizable().scaledToFill()
                 .id(sampleIndex)
@@ -238,6 +239,7 @@ struct HomeView: View {
                         Image(decorative: entry.photo.preview, scale: 1)
                             .resizable().scaledToFill()
                             .frame(width: Design.Size.thumbnail, height: Design.Size.thumbnail)
+                            .scaleEffect(x: entry.mirroredOnScreen ? -1 : 1, y: 1)
                             .clipShape(Circle())
                             .overlay(Circle().strokeBorder(Design.Surface.card, lineWidth: Design.Stroke.separation))
                             .contentShape(Circle())
@@ -250,7 +252,11 @@ struct HomeView: View {
                 }
             }
             .padding(.leading).padding(.vertical)
-            Button { path.append(.sheet) } label: {
+            Button {
+                // With one person, Print's back goes to their Photo Check, the step before it (founder, 0.21.12).
+                if model.entries.count == 1, let only = model.entries.first { path = [.check(only.id), .sheet] }
+                else { path.append(.sheet) }
+            } label: {
                 HStack(spacing: Design.Spacing.cardContent) {
                     VStack(alignment: .leading, spacing: Design.Spacing.titlePair) {
                         Text("Your sheet").font(Design.Typography.cardTitle)
@@ -268,7 +274,7 @@ struct HomeView: View {
             .accessibilityLabel(Text("Your sheet: \(model.entries.count) people, \(model.layout.placedCount) copies"))
             .accessibilityHint("Opens the print sheet.")
             .accessibilityIdentifier("yourSheet")
-            .zoomSource(.sheet, at: 0, in: zoomNamespace)
+            .zoomSource(.sheet, at: model.entries.count == 1 ? 1 : 0, in: zoomNamespace)
             // Removing a photo from here, without opening Photo Check (founder, 0.20 review).
             Menu {
                 Section {

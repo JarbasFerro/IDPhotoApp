@@ -6,6 +6,8 @@ struct CropPreview: View {
     /// Preview with the selected background applied; defaults to the plain preview.
     var image: CGImage?
     @Binding var adjustment: CropAdjustment
+    /// A front-camera photo is shown as in the camera; dragging still moves the photo with the finger.
+    var mirrored = false
     @State private var dragStart: CropAdjustment?
     @State private var pinchStart: CropAdjustment?
 
@@ -22,11 +24,12 @@ struct CropPreview: View {
                         y: -crop.y / crop.height * geometry.size.height)
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
                 .clipped()
+                .scaleEffect(x: mirrored ? -1 : 1, y: 1)
                 .contentShape(Rectangle())
                 .gesture(DragGesture().onChanged { value in
                     if dragStart == nil { dragStart = adjustment }
                     adjustment = (dragStart ?? adjustment).translated(
-                        x: value.translation.width, y: value.translation.height,
+                        x: mirrored ? -value.translation.width : value.translation.width, y: value.translation.height,
                         previewWidth: geometry.size.width, source: photo.pixels, format: format)
                 }.onEnded { _ in dragStart = nil })
                 .simultaneousGesture(MagnifyGesture().onChanged { value in

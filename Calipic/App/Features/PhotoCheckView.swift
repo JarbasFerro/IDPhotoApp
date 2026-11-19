@@ -430,6 +430,8 @@ struct PortraitView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
             .clipped()
+            // A front-camera photo is shown as the person saw it in the camera; the file stays true.
+            .scaleEffect(x: entry.mirroredOnScreen ? -1 : 1, y: 1)
             .animation(Design.Motion.backgroundFade.resolved(animated: animated), value: hasPreview)
             .animation(Design.Motion.reframe.resolved(animated: animated), value: adjustment)
         }

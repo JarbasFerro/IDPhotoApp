@@ -36,7 +36,7 @@ struct CalipicApp: App {
                 if ProcessInfo.processInfo.arguments.contains("--uitesting-journey-tray") {
                     JourneyTrayFixture()
                 } else if ProcessInfo.processInfo.arguments.contains("--camera-review-fixture") {
-                    CameraView(onCapture: { _, _ in }, onChoosePhoto: {})
+                    CameraView(onCapture: { _, _, _ in }, onChoosePhoto: {})
                 } else {
                     RootView(model: model, promptForDocument: needsDocumentPrompt)
                 }
@@ -61,15 +61,17 @@ struct CalipicApp: App {
                         }
                         model.debugSyntheticFace = arguments.contains("--uitesting-measured")
                         let fixtures = arguments.contains("--uitesting-fixture-2") ? 2 : arguments.contains("--uitesting-fixture") ? 1 : 0
+                        // "--uitesting-mirrored": the fixture is shown as a front-camera photo would be.
+                        let mirrored = arguments.contains("--uitesting-mirrored")
                         for index in 0..<fixtures {
                             let palette: [CGColor] = index == 0 ? SyntheticFixture.defaultPalette
                                 : Array(repeating: CGColor(red: 1, green: 0, blue: 1, alpha: 1), count: 4)
                             // The first person is the local portrait when one exists (never in git); otherwise colour blocks.
                             if index == 0, let portrait = LocalPortrait.url {
                                 model.debugLocalFace = LocalPortrait.face
-                                model.importPhoto(mode: .add) { try await StagedPhoto.stage(portrait) }
+                                model.importPhoto(mode: .add, mirroredOnScreen: mirrored) { try await StagedPhoto.stage(portrait) }
                             } else {
-                                model.importPhoto(mode: .add) { try await SyntheticFixture.staged(palette: palette) }
+                                model.importPhoto(mode: .add, mirroredOnScreen: mirrored) { try await SyntheticFixture.staged(palette: palette) }
                             }
                             while model.activity == .importing { try? await Task.sleep(for: .milliseconds(20)) }
                         }

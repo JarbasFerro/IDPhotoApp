@@ -105,20 +105,17 @@ struct RootView: View {
             model.discardAhead()
             if choosePhotoAfterCamera { choosePhotoAfterCamera = false; showPicker = true }
         }) {
-            CameraView(onCapture: { staged, metrics in
+            CameraView(onCapture: { staged, metrics, mirrored in
                 // Stay on the camera until the photo is installed (onChange of lastInstalled below), so closing it
                 // reveals Photo Check rather than Home (founder, 0.20 review).
                 awaitingCameraPhoto = true
                 model.lastCameraMetrics = metrics
-                model.useCapture(staged, mode: importMode)
+                model.useCapture(staged, mode: importMode, mirroredOnScreen: mirrored)
             }, onChoosePhoto: { choosePhotoAfterCamera = true; showCamera = false },
                onReviewChange: { staged in
-                // Analyse the still at once, so Photo Check is ready when the camera closes (P2).
+                // Analyse the still while the person looks at it, so Photo Check is ready on Use Photo (P2).
                 if let staged { model.prepareAhead(staged) } else { model.discardAhead() }
-            }, onCancelCapture: {
-                awaitingCameraPhoto = false
-                model.cancelCapture()
-            }, veil: cameraVeil)
+            }, eyesLookClosed: model.aheadEyesLookClosed, veil: cameraVeil)
             .onAppear { model.warmUp() }
         }
         .onChange(of: selection) { _, item in

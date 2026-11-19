@@ -22,6 +22,9 @@ struct PhotoEntry: Identifiable {
     /// Unlocked with a credit (ADR-048): every output of this photo is free, and its look is final until it is
     /// edited again, which locks it.
     var isUnlocked = false
+    /// Taken with the front camera: every screen shows it as the person saw it in the camera, like a mirror, while
+    /// the file that is printed or shared stays the true photo (founder, 0.21.12).
+    var mirroredOnScreen = false
 
     var id: UUID { photo.id }
 }
@@ -125,7 +128,8 @@ final class PhotoWorkflow {
 
     // MARK: - Import
 
-    func importPhoto(mode: ImportMode = .replace, loader: @escaping @Sendable () async throws -> StagedPhoto?) {
+    func importPhoto(mode: ImportMode = .replace, mirroredOnScreen: Bool = false,
+                     loader: @escaping @Sendable () async throws -> StagedPhoto?) {
         cancelWork()
         let currentRevision = revision
         activity = .importing
@@ -141,7 +145,7 @@ final class PhotoWorkflow {
                     return
                 }
                 activity = nil
-                install(result, mode: mode)
+                install(result, mode: mode, mirroredOnScreen: mirroredOnScreen)
             } catch {
                 handle(error, revision: currentRevision)
             }
@@ -157,6 +161,8 @@ final class PhotoWorkflow {
         let task: Task<(photo: PreparedPhoto, measured: FaceAnalysis?)?, Never>
     }
     @ObservationIgnored private var ahead: Ahead?
+    /// The still under review looks like it caught closed or downturned eyes; the camera's review says so.
+    private(set) var aheadEyesLookClosed = false
 
     #if DEBUG
     /// UI tests on a simulator, where Vision cannot run: "--uitesting-measured" gives every photo this synthetic face
@@ -223,10 +229,16 @@ final class PhotoWorkflow {
         }
         let key = staged.directory
         ahead = Ahead(key: key, task: task)
+        Task {
+            // Publish the eyes result only for the still still under review.
+            let closed = await task.value?.measured?.eyesLookClosed ?? false
+            if ahead?.key == key { aheadEyesLookClosed = closed }
+        }
     }
 
     /// Retake, Cancel, or the camera closing: the prepared copy is deleted.
     func discardAhead() {
+        aheadEyesLookClosed = false
         guard let pending = ahead else { return }
         ahead = nil
         pending.task.cancel()
@@ -235,10 +247,10 @@ final class PhotoWorkflow {
     }
 
     /// Use Photo. When the still was prepared during the review, its analysis is reused; otherwise a normal import.
-    func useCapture(_ staged: StagedPhoto, mode: ImportMode) {
+    func useCapture(_ staged: StagedPhoto, mode: ImportMode, mirroredOnScreen: Bool = false) {
         guard let pending = ahead, pending.key == staged.directory else {
             discardAhead()
-            importPhoto(mode: mode) { staged }
+            importPhoto(mode: mode, mirroredOnScreen: mirroredOnScreen) { staged }
             return
         }
         ahead = nil
@@ -252,7 +264,7 @@ final class PhotoWorkflow {
                 // The early work failed (or was cancelled): fall back to the ordinary path with the camera's file.
                 guard revision == currentRevision else { try? FileManager.default.removeItem(at: staged.directory); return }
                 activity = nil
-                importPhoto(mode: mode) { staged }
+                importPhoto(mode: mode, mirroredOnScreen: mirroredOnScreen) { staged }
                 return
             }
             try? FileManager.default.removeItem(at: staged.directory)
@@ -261,20 +273,15 @@ final class PhotoWorkflow {
                 return
             }
             activity = nil
-            install(result.photo, mode: mode, measured: .some(result.measured))
+            install(result.photo, mode: mode, measured: .some(result.measured), mirroredOnScreen: mirroredOnScreen)
         }
-    }
-
-    /// Cancel on the camera while its still is being prepared: nothing reaches the session, and the still is deleted.
-    func cancelCapture() {
-        discardAhead()
-        cancelWork()
     }
 
     /// Adds `photo` to the session (or replaces the selected one), selects it, and starts its analysis.
     /// `measured` carries an analysis already done during the camera review (`.some(nil)` means it found nothing).
-    func install(_ photo: PreparedPhoto, mode: ImportMode, measured: FaceAnalysis?? = nil) {
-        let entry = PhotoEntry(photo: photo)
+    func install(_ photo: PreparedPhoto, mode: ImportMode, measured: FaceAnalysis?? = nil, mirroredOnScreen: Bool = false) {
+        var entry = PhotoEntry(photo: photo)
+        entry.mirroredOnScreen = mirroredOnScreen
         if mode == .add, canAddPhoto || selectedIndex == nil {
             entries.append(entry)
             appendDefaultPrintItem(for: photo, copies: entries.count == 1 ? nil : 4)
@@ -660,13 +667,15 @@ final class PhotoWorkflow {
         thumbnailTask?.cancel()
         let items = printJob.items
         let edits = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, PhotoEdit(photo: $0.photo, adjustment: $0.adjustment)) })
+        let mirrored = Set(entries.filter(\.mirroredOnScreen).map(\.id))
         thumbnailTask = Task {
             var result: [UUID: CGImage] = [:]
             for item in items {
                 guard let edit = edits[item.photoID] else { continue }
                 let format = PhotoFormat.format(widthMM: item.trimWidthMM, heightMM: item.trimHeightMM)
                 if let image = await pipeline.thumbnail(photo: edit.photo, adjustment: edit.adjustment, format: format) {
-                    result[item.id] = image
+                    // On screen only: the page drawn for printing uses the true photo.
+                    result[item.id] = mirrored.contains(item.photoID) ? (image.mirroredHorizontally() ?? image) : image
                 }
                 if Task.isCancelled { return }
             }

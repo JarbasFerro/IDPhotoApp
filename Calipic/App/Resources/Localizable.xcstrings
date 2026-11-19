@@ -2,22 +2,6 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {},
-    "Photo captured." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto tomada."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Foto tirada."
-          }
-        }
-      }
-    },
     "Opens its Photo Check." : {
       "localizations" : {
         "es" : {

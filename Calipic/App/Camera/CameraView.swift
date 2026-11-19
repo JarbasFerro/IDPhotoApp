@@ -44,13 +44,14 @@ struct CameraMetrics: Sendable, Hashable {
 }
 
 struct CameraView: View {
-    let onCapture: (StagedPhoto, CameraMetrics) -> Void
+    /// The still, its timings, and whether it came from the front camera (shown mirrored on screen, ADR-045 note).
+    let onCapture: (StagedPhoto, CameraMetrics, Bool) -> Void
     let onChoosePhoto: () -> Void
-    /// The still being handed over (to prepare it early), or nil when it is thrown away (roadmap P2).
+    /// The still under review (to prepare it early), or nil when it is thrown away (roadmap P2).
     var onReviewChange: (StagedPhoto?) -> Void = { _ in }
-    /// Cancel while the still is being handed to Photo Check: the session must not receive it.
-    var onCancelCapture: () -> Void = {}
-    /// The hand-over to Photo Check has begun: the white veil fills the camera before it closes (F11, M1).
+    /// The still under review looks like it caught closed or downturned eyes (measured while the person reviews it).
+    var eyesLookClosed = false
+    /// After Use Photo, the hand-over to Photo Check has begun: the white veil fills the camera before it closes (M1).
     var veil = false
     @State private var camera = CameraController()
     @State private var errorMessage: String?
@@ -63,13 +64,13 @@ struct CameraView: View {
     @AppStorage(DeveloperMode.key) private var developerMode = false
     @AppStorage("cameraHelpTipSeen") private var helpTipSeen = false
     @State private var showCameraHelp = false
+    @State private var capturedPhoto: StagedPhoto?
     @State private var capturedImage: CGImage?
     /// Whether the preview was mirrored when the still was taken (front camera), so the review can match it.
     @State private var capturedMirrored = false
     @State private var showingCapturedReview = false
     @State private var preparingReview = false
-    /// The still went to the session: the camera stays until Photo Check is ready underneath, so Home never flashes
-    /// between them.
+    /// Use Photo was tapped: the camera stays until Photo Check is ready underneath, so Home never flashes between them.
     @State private var usingPhoto = false
     @State private var captureRevision = UUID()
     @Environment(\.dismiss) private var dismiss
@@ -119,6 +120,7 @@ struct CameraView: View {
         }
         .onDisappear {
             captureRevision = UUID()
+            if let capturedPhoto { Task { await CameraStillPreview.discard(capturedPhoto) } }
             if !reviewFixture { camera.stop() }
         }
         .onChange(of: scenePhase) { _, phase in
@@ -166,7 +168,7 @@ struct CameraView: View {
             #if DEBUG
             if reviewFixture && showingCapturedReview {
                 CameraFramingGuidePreviewScene(ready: true, showGuide: false)
-                handOverControls
+                capturedReviewControls
             } else if reviewFixture {
                 CameraFramingGuidePreviewScene(ready: !reviewOffCenter,
                                                correction: camera.guideCorrection,
@@ -202,7 +204,7 @@ struct CameraView: View {
                         .clipped()
                         .ignoresSafeArea()
                         .accessibilityHidden(true)
-                    handOverControls
+                    capturedReviewControls
                 } else {
                     headGuide
                     overlayControls
@@ -470,17 +472,13 @@ struct CameraView: View {
                     await CameraStillPreview.discard(staged)
                     return
                 }
-                // One review (F11): the still stays full screen while it is prepared and goes straight to Photo
-                // Check; there is no Use Photo to tap.
+                capturedPhoto = staged
+                onReviewChange(staged)
                 capturedImage = image
                 capturedMirrored = mirrored
                 preparingReview = false
                 showingCapturedReview = true
-                usingPhoto = true
-                AccessibilityNotification.Announcement(String(localized: "Photo captured.")).post()
-                onReviewChange(staged)
-                onCapture(staged, CameraMetrics(startupMilliseconds: camera.startupMilliseconds,
-                                                captureMilliseconds: camera.lastCaptureMilliseconds))
+                AccessibilityNotification.Announcement(String(localized: "Photo captured. Review your photo.")).post()
             } catch {
                 guard captureRevision == revision else { return }
                 preparingReview = false
@@ -489,13 +487,11 @@ struct CameraView: View {
         }
     }
 
-    /// While the still is prepared for Photo Check: Cancel back to the live camera, and a spinner where the shutter
-    /// was. Nothing to decide here; Photo Check is the one review (F11).
-    private var handOverControls: some View {
+    private var capturedReviewControls: some View {
         VStack(spacing: 0) {
             HStack {
-                Button("Cancel") { cancelHandOver() }
-                    .disabled(veil)
+                Button("Cancel") { discardCapturedPhoto(); dismiss() }
+                    .disabled(usingPhoto)
                     .accessibilityIdentifier("cameraReviewCancel")
                 Spacer()
             }
@@ -504,39 +500,77 @@ struct CameraView: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             Spacer()
-            ProgressView()
-                .tint(.white)
-                .controlSize(.regular)
-                .padding(.bottom, 48)
-                .accessibilityLabel(Text("Preparing your photo…"))
-                .accessibilityIdentifier("cameraHandOver")
+            VStack(spacing: 8) {
+                Text("Review your photo")
+                    .font(.headline)
+                    .accessibilityAddTraits(.isHeader)
+                if eyesLookClosed {
+                    // Advisory: the eyes measured closed or turned down. Retake becomes the main choice.
+                    Label("Your eyes look closed or turned down", systemImage: "eye.slash")
+                        .font(.subheadline.weight(.medium))
+                        .padding(.horizontal, 14).padding(.vertical, 6)
+                        .background(.black.opacity(0.48), in: Capsule())
+                        .transition(.opacity)
+                        .accessibilityIdentifier("eyesClosedNote")
+                }
+                HStack(spacing: 12) {
+                    Group {
+                        if eyesLookClosed {
+                            Button("Retake") { discardCapturedPhoto() }
+                                .buttonStyle(.borderedProminent)
+                                .tint(Color.brandAccentFill)
+                        } else {
+                            Button("Retake") { discardCapturedPhoto() }
+                                .buttonStyle(.glass)
+                                .tint(.white)
+                        }
+                    }
+                    .disabled(usingPhoto)
+                    .accessibilityIdentifier("cameraRetake")
+                    Button {
+                        guard let capturedPhoto else { return }
+                        self.capturedPhoto = nil
+                        usingPhoto = true
+                        onCapture(capturedPhoto, CameraMetrics(startupMilliseconds: camera.startupMilliseconds,
+                                                               captureMilliseconds: camera.lastCaptureMilliseconds),
+                                  capturedMirrored)
+                    } label: {
+                        HStack(spacing: 8) {
+                            if usingPhoto { ProgressView().tint(.white) }
+                            Text("Use Photo")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(eyesLookClosed ? Color.white.opacity(0.25) : Color.brandAccentFill)
+                    .disabled(capturedPhoto == nil)
+                    .accessibilityIdentifier("cameraUsePhoto")
+                }
+                .frame(maxWidth: .infinity)
+                .controlSize(.large)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background {
+                LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+            }
         }
         .foregroundStyle(.white)
-        .opacity(veil ? 0 : 1)
-    }
-
-    private func cancelHandOver() {
-        if usingPhoto {
-            // The session owns the still now; stopping its work also deletes it.
-            onCancelCapture()
-            captureRevision = UUID()
-            capturedImage = nil
-            showingCapturedReview = false
-            preparingReview = false
-            usingPhoto = false
-        } else {
-            discardCapturedPhoto()
-        }
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: eyesLookClosed)
     }
 
     private func discardCapturedPhoto() {
         captureRevision = UUID()
+        if let capturedPhoto {
+            onReviewChange(nil)
+            Task { await CameraStillPreview.discard(capturedPhoto) }
+        }
+        capturedPhoto = nil
         capturedImage = nil
         showingCapturedReview = false
         preparingReview = false
         usingPhoto = false
     }
-
 }
 
 private enum CameraStillPreview {
